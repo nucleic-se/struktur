@@ -1,0 +1,67 @@
+/* Dark theme - Overrides custom.css from base Scribe */
+
+:root {
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2d2d2d;
+  --text-primary: #e0e0e0;
+  --text-secondary: #a0a0a0;
+  --link-color: #66b3ff;
+  --link-hover: #99ccff;
+  --border-color: #404040;
+  --code-bg: #2d2d2d;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+nav {
+  background-color: var(--bg-secondary);
+  border-bottom-color: var(--border-color);
+}
+
+nav a {
+  color: var(--link-color);
+}
+
+nav a:hover {
+  color: var(--link-hover);
+}
+
+footer {
+  background-color: var(--bg-secondary);
+  border-top-color: var(--border-color);
+  color: var(--text-secondary);
+}
+
+footer a {
+  color: var(--text-secondary);
+}
+
+footer a:hover {
+  color: var(--link-color);
+}
+
+a {
+  color: var(--link-color);
+}
+
+a:hover {
+  color: var(--link-hover);
+}
+
+.post-meta {
+  color: var(--text-secondary);
+}
+
+.tag {
+  background-color: var(--code-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.tag:hover {
+  background-color: var(--bg-secondary);
+  color: var(--link-hover);
+}

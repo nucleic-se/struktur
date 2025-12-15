@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{global.stack_name}}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      background: #0a0e14;
+      color: #00ff00;
+      font-family: 'Courier New', monospace;
+      font-size: clamp(16px, 2.5vw, 18px);
+      line-height: 1.6;
+      padding: clamp(15px, 4vw, 30px);
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .header {
+      border-bottom: 1px solid #00ff00;
+      padding-bottom: 15px;
+      margin-bottom: 25px;
+    }
+    
+    .header h1 {
+      color: #00ff00;
+      font-size: clamp(22px, 4vw, 28px);
+      font-weight: normal;
+      margin-bottom: 8px;
+    }
+    
+    .header .subtitle {
+      color: #888;
+      font-size: clamp(14px, 2.2vw, 16px);
+    }
+    
+    .prompt {
+      color: #00ff00;
+      margin-right: 5px;
+    }
+    
+    .section {
+      margin-bottom: 30px;
+    }
+    
+    .section-title {
+      color: #00ff00;
+      margin-bottom: 15px;
+      border-bottom: 1px solid #333;
+      padding-bottom: 8px;
+      font-size: clamp(18px, 3vw, 20px);
+    }
+    
+    .container-item {
+      background: #0d1117;
+      border: 1px solid #1f2937;
+      border-left: 3px solid #00ff00;
+      padding: clamp(15px, 3vw, 20px);
+      margin-bottom: clamp(15px, 3vw, 20px);
+      transition: border-left-color 0.2s;
+    }
+    
+    .container-item:hover {
+      border-left-color: #00ffff;
+      background: #111820;
+    }
+    
+    .container-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .container-name {
+      color: #00ffff;
+      font-weight: bold;
+      font-size: clamp(17px, 3vw, 20px);
+    }
+    
+    .container-status {
+      color: #888;
+      font-size: clamp(13px, 2vw, 15px);
+    }
+    
+    .status-running { color: #00ff00; }
+    .status-stopped { color: #ff0000; }
+    
+    .container-detail {
+      color: #888;
+      font-size: clamp(14px, 2.2vw, 16px);
+      margin: 8px 0;
+    }
+    
+    .container-detail .label {
+      color: #666;
+      display: inline-block;
+      width: clamp(90px, 15vw, 120px);
+    }
+    
+    .container-detail .value {
+      color: #00ff00;
+    }
+    
+    .port-link {
+      color: #00ffff;
+      text-decoration: none;
+      border-bottom: 1px solid #00ffff;
+      padding: 2px 6px;
+      background: rgba(0, 255, 255, 0.1);
+      border-radius: 3px;
+      transition: all 0.2s;
+    }
+    
+    .port-link:hover {
+      color: #0a0e14;
+      background: #00ffff;
+      border-bottom-color: #00ffff;
+    }
+    
+    .dependency {
+      color: #ffaa00;
+    }
+    
+    .network-section {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #333;
+    }
+    .network-item {
+      color: #888;
+      padding: 8px 0;
+      font-size: clamp(14px, 2.2vw, 16px);
+    }
+    
+    .network-name {
+      color: #00ffff;
+      font-weight: bold;
+    }
+    
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid #333;
+      color: #666;
+      font-size: clamp(12px, 2vw, 14px);
+      text-align: center;
+    }
+    
+    a {
+      color: #00ffff;
+      text-decoration: none;
+    }
+    
+    a:hover {
+      color: #00ff00;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1><span class="prompt">$</span> {{global.stack_name}}</h1>
+      <div class="subtitle">{{global.description}}</div>
+    </div>
+    
+    <div class="section">
+      <div class="section-title">
+        <span class="prompt">></span> CONTAINERS [<span id="container-count">0</span>]
+      </div>
+      
+{{#each instances_by_id}}{{#if aspects.docker_container}}{{#unless (eq id "global")}}
+      <div class="container-item">
+        <div class="container-header">
+          <div class="container-name">{{id}}</div>
+          <div class="container-status status-running">● CONFIGURED</div>
+        </div>
+        
+        <div class="container-detail">
+          <span class="label">image:</span>
+          <span class="value">{{aspects.docker_container.image}}</span>
+        </div>
+        
+{{#if aspects.docker_container.description}}
+        <div class="container-detail">
+          <span class="label">info:</span>
+          <span class="value">{{aspects.docker_container.description}}</span>
+        </div>
+{{/if}}
+
+{{#if aspects.docker_container.ports}}
+        <div class="container-detail">
+          <span class="label">access:</span>
+          <span class="value">
+{{#each aspects.docker_container.ports}}
+            <a href="http://localhost:{{split this ":" 0}}" class="port-link" target="_blank">http://localhost:{{split this ":" 0}}</a>{{#unless @last}}, {{/unless}}
+{{/each}}
+          </span>
+        </div>
+{{/if}}
+
+{{#if aspects.docker_container.networks}}
+        <div class="container-detail">
+          <span class="label">networks:</span>
+          <span class="value">{{#each aspects.docker_container.networks}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</span>
+        </div>
+{{/if}}
+
+{{#if aspects.docker_container.depends_on}}
+        <div class="container-detail">
+          <span class="label">depends:</span>
+          <span class="value dependency">{{#each aspects.docker_container.depends_on}}{{this}}{{#unless @last}} → {{/unless}}{{/each}}</span>
+        </div>
+{{/if}}
+
+{{#if aspects.docker_container.restart_policy}}
+        <div class="container-detail">
+          <span class="label">restart:</span>
+          <span class="value">{{aspects.docker_container.restart_policy}}</span>
+        </div>
+{{/if}}
+      </div>
+{{/unless}}{{/if}}{{/each}}
+    </div>
+    
+    <div class="network-section">
+      <div class="section-title">
+        <span class="prompt">></span> NETWORKS [<span id="network-count">0</span>]
+      </div>
+      
+{{#each instances_by_id}}{{#if aspects.docker_network}}{{#unless (eq id "global")}}
+      <div class="network-item">
+        <span class="network-name">{{id}}</span>
+{{#if aspects.docker_network.driver}}
+        <span style="color: #666;"> ({{aspects.docker_network.driver}})</span>
+{{/if}}
+      </div>
+{{/unless}}{{/if}}{{/each}}
+    </div>
+    
+    <div class="footer">
+      Generated by Struktur · <span id="container-count-footer">0</span> containers · <span id="network-count-footer">0</span> networks
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const containerCount = document.querySelectorAll('.container-item').length;
+      const networkCount = document.querySelectorAll('.network-item').length;
+      const setText = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value;
+      };
+      setText('container-count', containerCount);
+      setText('container-count-footer', containerCount);
+      setText('network-count', networkCount);
+      setText('network-count-footer', networkCount);
+    })();
+  </script>
+</body>
+</html>

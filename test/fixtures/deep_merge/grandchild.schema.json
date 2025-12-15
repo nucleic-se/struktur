@@ -1,0 +1,1 @@
+{"class":"grandchild","inherits_from":"child","schema":{"type":"object"},"fields":{"config":{"logging":{"destination":"/var/log/app.log"}}}}

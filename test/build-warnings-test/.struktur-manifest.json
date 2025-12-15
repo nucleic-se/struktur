@@ -1,0 +1,15 @@
+{
+  "version": "0.2.0-alpha",
+  "timestamp": "2025-12-15T23:13:08.304Z",
+  "hash": "614e717d",
+  "sources": {
+    "classDirs": [
+      "/Users/david/Coding/struktur-dev/public/struktur/test/fixtures/classes"
+    ],
+    "aspectDirs": [],
+    "instanceDirs": [
+      "/Users/david/Coding/struktur-dev/public/struktur/test/fixtures/instances"
+    ],
+    "templateDirs": []
+  }
+}

@@ -1,0 +1,473 @@
+# Struktur
+
+**Type-safe build engine for structured data.** Struktur transforms validated JSON data into generated code, configuration files, documentation, or any text-based output. Define data schemas with JSON Schema, create instances with multi-parent inheritance and aspect composition, then render outputs through Handlebars or Nunjucks templates. Built for infrastructure-as-code, static sites, and any workflow where type safety and deterministic builds matter.
+
+[![npm version](https://img.shields.io/npm/v/@nucleic-se/struktur.svg)](https://www.npmjs.com/package/@nucleic-se/struktur)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+
+## How It Works
+
+Struktur's pipeline has three stages:
+
+### 1. Define Shapes (Classes + Schemas)
+
+Classes describe the **structure** of your data. A class lists fields and can inherit from other classes to reuse common shapes. Schemas sit alongside classes and enforce constraints—required fields, type checks, allowed values.
+
+```json
+// classes/service.class.json
+{
+  "class": "service",
+  "parent": "base",
+  "fields": {
+    "replicas": 1,
+    "port": null
+  }
+}
+```
+
+```json
+// classes/service.schema.json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["id", "port"],
+  "properties": {
+    "id": { "type": "string" },
+    "port": { "type": "integer", "minimum": 1, "maximum": 65535 },
+    "replicas": { "type": "integer", "minimum": 1 }
+  }
+}
+```
+
+Classes provide defaults only when those defaults are **universally safe**. If a value needs to vary by environment, leave it unset so instances must provide it.
+
+### 2. Provide Data (Instances)
+
+Instances are the **real objects**—your actual services, networks, teams, whatever you're modeling. Each instance references a class and fills in the values that class defines.
+
+```json
+// instances/web-prod.json
+{
+  "id": "web-prod",
+  "class": "service",
+  "port": 8080,
+  "replicas": 3
+}
+```
+
+Instances inherit defaults from their class. Struktur merges them together and validates the result against the schema. If `port` is missing or `replicas` is negative, validation fails before any files are written.
+
+### 3. Render Outputs (Templates)
+
+Templates turn the merged data into files. Struktur uses Handlebars by default, but the template engine is swappable. Templates see the fully merged, validated data and can generate anything: YAML configs, HTML documentation, shell scripts, Terraform manifests.
+
+```handlebars
+{{!-- templates/docker-compose.yml --}}
+services:
+  {{id}}:
+    image: nginx:latest
+    ports:
+      - "{{port}}:80"
+    deploy:
+      replicas: {{replicas}}
+```
+
+Run `struktur build`, and Struktur:
+
+1. Loads classes and schemas
+2. Merges instances with class defaults
+3. Validates everything against schemas
+4. Renders templates into `build/`
+
+## When to Use Struktur
+
+Struktur shines when you need:
+
+- **Multi-environment configs**: Same shapes, different values for dev/staging/prod
+- **Schema-validated data**: Catch mistakes before deployment
+- **Composable stacks**: Reusable bases plus domain overlays
+- **Auditable builds**: Deterministic outputs you can diff and archive
+- **Template-driven generation**: Render the same data into multiple formats (YAML, HTML, scripts)
+
+**It's less useful for:**
+
+- One-off scripts that don't need validation or reusability
+- Highly dynamic data that can't be pre-validated
+- Systems where build-time validation isn't practical
+
+**Core principles:**
+- **Type-safe** — JSON Schema validation catches errors before deployment
+- **Deterministic** — Same inputs always produce identical outputs
+- **Composable** — Multi-parent inheritance + aspect-based composition
+- **Auditable** — Full transparency into what was merged and how
+
+## Installation
+
+### Global Installation (Recommended)
+
+```bash
+npm install -g @nucleic-se/struktur@alpha
+```
+
+### Local Installation
+
+```bash
+npm install --save-dev @nucleic-se/struktur@alpha
+```
+
+### Verify Installation
+
+```bash
+struktur --version
+```
+
+## Quick Start
+
+### 1. Initialize from Example
+
+```bash
+struktur init --example universal my-project
+cd my-project
+```
+
+Available examples:
+- **universal** — Foundation with entity-aspect-domain patterns
+- **docked** — Docker container management with docker-compose generation
+- **skribe** — Static site generator with structured content
+
+### 2. Validate Your Stack
+
+```bash
+struktur validate -c classes/ -i instances/
+```
+
+### 3. Generate Outputs
+
+```bash
+struktur build \
+  -c classes/ \
+  -i instances/ \
+  -t templates/ \
+  -b build/ \
+  --engine handlebars
+```
+
+
+
+## Commands
+
+### `validate`
+
+Validate instances against class schemas:
+
+```bash
+# Stack directory mode (auto-discovers classes/, instances/, aspects/)
+struktur validate .
+
+# Explicit paths
+struktur validate -c classes/ -i instances/ -a aspects/
+
+# JSON output for CI/CD
+struktur validate -c classes/ -i instances/ --json
+```
+
+### `build`
+
+Generate validated outputs from templates:
+
+```bash
+struktur build \
+  -c classes/ \
+  -i instances/ \
+  -t templates/ \
+  -b build/ \
+  --engine handlebars
+
+# With aspects
+struktur build \
+  -c classes/ \
+  -a aspects/ \
+  -i instances/ \
+  -t templates/ \
+  -b build/output
+```
+
+### `generate`
+
+Generate canonical data without rendering templates:
+
+```bash
+struktur generate \
+  -c classes/ \
+  -i instances/ \
+  -o canonical.json
+```
+
+### `info`
+
+Display information about loaded classes:
+
+```bash
+struktur info -c classes/
+```
+
+### `init`
+
+Initialize new project from example:
+
+```bash
+struktur init --example docked my-stack
+```
+
+## Validation System
+
+Struktur validates instances through multiple layers:
+
+1. **JSON Schema validation**: Structural correctness (required fields, types, additionalProperties)
+2. **Semantic validation**: Data quality checks (minLength, maxLength, enum, bounds, format validation)
+3. **Lint checks**: Best practices and common issues (empty fields, suspicious formats)
+4. **Canonical shape validation**: Output structure integrity
+
+The validation system checks:
+
+- **Missing required fields** — Fails if schema declares a field as required
+- **Extra fields** — Warns about fields not in schema (with `--warn-extra-fields`)
+- **Type mismatches** — Ensures string/number/boolean/object types match schema
+- **String length bounds** — Validates minLength, maxLength constraints
+- **Numeric bounds** — Validates minimum, maximum constraints
+- **Enum restrictions** — Value must be in allowed list
+- **Format patterns** — email, date, date-time format validation
+- **Type coercion issues** — Numbers stored as strings
+- **Empty display fields** — Warns about empty titles, names, descriptions
+- **Suspicious values** — Detects placeholder text and common mistakes
+
+By default, schema validation warnings are promoted to errors (`--warnings-as-errors=true`). Semantic and lint checks remain warnings—they're informational, not failures.
+
+## What Makes Struktur Different
+
+Struktur isn't a config language, a DSL, or a framework. It's a **composable data pipeline** for deterministic modeling and text generation.
+
+### How Struktur Compares
+
+**vs. Config/IaC tools** (Terraform, Ansible, Puppet):
+- They provide runtime execution, providers, and state management
+- Struktur provides **build-time composition and validation**
+- **Use together**: Struktur generates their config files from validated models
+
+**vs. Kubernetes packaging** (Helm, Kustomize):
+- They support overlays/templates but are domain-bound to K8s
+- Struktur is **domain-free** and **schema-driven** for any structured data
+- **Use together**: Struktur can generate Helm charts or Kustomize overlays
+
+**vs. Schema/modeling tools** (JSON Schema validators, Protobuf):
+- They validate shapes but don't compose data or generate artifacts
+- Struktur **unifies composition, validation, and generation** in one pipeline
+- **Use together**: Struktur uses JSON Schema internally, can generate Protobuf definitions
+
+**vs. Templating engines** (Handlebars, Jinja, Mustache):
+- They render text but lack composition and validation
+- Struktur adds the **missing data pipeline** before rendering
+- **Use together**: Struktur uses Handlebars internally (swappable)
+
+**vs. Scaffolding/build tools** (Yeoman, Cookiecutter, Make):
+- They automate tasks but aren't data-centric
+- Struktur is designed around **deterministic model assembly**
+- **Use together**: Struktur can be the data engine behind your scaffolding
+
+### The Bottom Line
+
+Struktur **feeds and complements** domain-specific tools rather than replacing them. It's a build-time data pipeline that ensures your inputs are clean, valid, and composable before anything gets deployed.
+
+This separation means:
+
+- **No vendor lock-in**: Your data is JSON. Your templates are Handlebars (or whatever you swap in). No proprietary formats.
+- **Inspectable builds**: Open `canonical.json` and see exactly what Struktur merged together.
+- **Composable design**: Layer stacks, override templates, extend classes—all without forking.
+- **Fail-fast validation**: Errors surface at build time with clear messages and line numbers.
+
+## Features
+
+### Multi-Parent Inheritance
+
+Classes inherit from multiple parents with deterministic merge order:
+
+```json
+{
+  "class": "production_db",
+  "parent": ["database", "production_config", "monitored_service"]
+}
+```
+
+### Instance Merging
+
+Multiple JSON files defining the same instance ID are merged:
+
+```json
+// base/config.json
+{ "id": "app", "class": "service", "port": 8080 }
+
+// prod/config.json  
+{ "id": "app", "replicas": 5, "region": "us-east" }
+
+// Result: { id: "app", class: "service", port: 8080, replicas: 5, region: "us-east" }
+```
+
+### Mixins
+
+Composable stack extensions without modification:
+
+```bash
+struktur build examples/skribe \
+  examples/skribe/mixins/rss \
+  examples/skribe/mixins/dark-theme
+```
+
+### Multi-Pass Validation
+
+Each class in the inheritance hierarchy validates independently:
+
+```
+universal_base → validates common fields
+  ↓
+docked_container → validates container-specific fields
+```
+
+## Template Helpers
+
+### Built-in Helpers
+
+- `eq`, `or` — Logic comparisons
+- `concat` — Join strings
+- `replace` — String replacement
+- `sortBy` — Sort arrays by field
+- `where`, `whereIncludes` — Filter arrays
+- `groupBy` — Group by field
+- `length` — Array/object length
+- `render_file` — Generate separate output files
+
+### Example Usage
+
+```handlebars
+{{#each (sortBy instances "name")}}
+{{#if (eq class "container")}}
+  {{render_file "layouts/container" (concat "containers/" id ".yml")}}
+{{/if}}
+{{/each}}
+```
+
+## Examples
+
+### Docker Compose Generation
+
+```bash
+cd examples/docked
+struktur build \
+  -c classes/ \
+  -a aspects/ \
+  -i instances/ \
+  -t templates/ \
+  -b build/
+  
+# Output: build/docker-compose.yml with all containers configured
+```
+
+### Static Site Generation
+
+```bash
+cd examples/skribe
+struktur build -c classes/ -i instances/ -t templates/ -b build/
+
+# With RSS feed
+struktur build . mixins/rss -b build/
+```
+
+### Infrastructure as Code
+
+```bash
+struktur build \
+  -c infra/classes/ \
+  -i infra/instances/ \
+  -t terraform/ \
+  -b output/
+```
+
+## Configuration
+
+### Directory Exclusions
+
+Struktur automatically excludes:
+- `mixins/` directories (must be explicitly included)
+- `stacks/` directories (must be explicitly included)
+- `node_modules/`
+- Build outputs containing `canonical.json`
+
+### Template Engines
+
+Supported engines:
+- **Handlebars** (default) — `--engine handlebars`
+- **Nunjucks** — `--engine nunjucks`
+
+## Development
+
+### Run Tests
+
+```bash
+npm test
+```
+
+### Local Development
+
+```bash
+npm link
+struktur --version
+```
+
+## Documentation
+
+- [API Reference](docs/)
+- [Architecture](docs/archive/)
+- [Examples](examples/)
+
+## Use Cases
+
+- **Infrastructure as Code** — Generate Terraform, CloudFormation, K8s manifests
+- **Container Orchestration** — Build docker-compose files from structured data
+- **Static Sites** — Type-safe content management with schema validation
+- **Configuration Management** — Validate and generate service configs
+- **Documentation** — Generate docs from structured specifications
+
+## Why Struktur?
+
+Traditional config management is error-prone:
+- ❌ No type safety (typos cause runtime failures)
+- ❌ No validation (invalid configs deploy to production)
+- ❌ Duplication (copy-paste across environments)
+- ❌ No composition (hard to share common patterns)
+
+Struktur solves this:
+- ✅ JSON Schema catches errors at build time
+- ✅ Multi-parent inheritance eliminates duplication
+- ✅ Deterministic builds (same input = same output)
+- ✅ Composable mixins for reusable extensions
+- ✅ Full auditability of what was merged and why
+
+## Requirements
+
+- Node.js ≥ 18.0.0
+
+## License
+
+Apache 2.0 — see [LICENSE](LICENSE)
+
+## Support
+
+- **Issues**: [GitHub Issues](https://github.com/nucleic-se/struktur/issues)
+- **Email**: daddy@nucleic.se
+
+## Status
+
+**Version**: 0.2.0-alpha  
+**Tests**: 219/219 passing ✅  
+**Status**: Alpha (breaking changes allowed)
+
+This is a clean rewrite with improved architecture. Breaking changes from 0.1.x are expected.

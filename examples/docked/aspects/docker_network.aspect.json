@@ -1,0 +1,16 @@
+{
+  "aspect": "docker_network",
+  "schema": {
+    "class": "aspect_docker_network",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "description": "Docker network configuration",
+    "additionalProperties": true,
+    "properties": {
+      "driver": {
+        "type": "string",
+        "description": "Docker network driver (bridge, overlay, etc.)"
+      }
+    }
+  }
+}

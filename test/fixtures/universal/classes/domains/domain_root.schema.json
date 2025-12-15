@@ -1,0 +1,37 @@
+{
+  "class": "domain_root",
+  "inherits_from": "universal_base",
+  "schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "domains": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Domain identifiers for classification"
+      },
+      "aspects": {
+        "type": "object",
+        "properties": {
+          "domain": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Display name of the domain"
+              },
+              "description": {
+                "type": "string",
+                "description": "Description of the domain purpose"
+              }
+            }
+          }
+        }
+      }
+    },
+    "additionalProperties": true
+  },
+  "fields": {}
+}

@@ -1,0 +1,8 @@
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{pageTitle}}{{#if pageTitle}} - {{/if}}{{@root.global.site.title}}</title>
+  {{#each @root.global.stylesheets}}
+  <link rel="stylesheet" href="{{#if ../pathPrefix}}{{../pathPrefix}}{{/if}}{{this}}">
+  {{/each}}
+</head>

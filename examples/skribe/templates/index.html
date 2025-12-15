@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+{{> partials/head}}
+<body>
+  {{> partials/nav}}
+
+  <h1>{{global.site.title}}</h1>
+  <p>{{global.site.description}}</p>
+
+  <h2>Recent Posts</h2>
+  {{#each instances}}
+  {{#if (eq class "blog_post")}}
+  <article class="post">
+    <h3><a href="posts/{{slug}}.html">{{title}}</a></h3>
+    <div class="post-meta">
+      {{date}} • {{author}}
+    </div>
+    <p>{{description}}</p>
+    {{#if tags}}
+    {{> partials/tags}}
+    {{/if}}
+  </article>
+  {{/if}}
+  {{/each}}
+
+  {{> partials/footer}}
+</body>
+</html>
+
+{{!-- Generate individual blog post pages using render_file helper --}}
+{{#each instances}}
+{{#if (eq class "blog_post")}}
+{{render_file "layouts/blog-post" (concat "posts/" slug ".html") pathPrefix="../"}}
+{{/if}}
+{{/each}}
+
+{{!-- Generate individual page files using render_file helper --}}
+{{#each instances}}
+{{#if (eq class "page")}}
+{{render_file "layouts/page" (concat slug ".html")}}
+{{/if}}
+{{/each}}
+
+{{!-- Generate tag index pages --}}
+{{#each (unique (flatten (pluck (where instances "class" "blog_post") "tags")))}}
+{{render_file "layouts/tag" (concat "tags/" this ".html") tagName=this posts=(where_includes @root.instances "tags" this) pathPrefix="../"}}
+{{/each}}

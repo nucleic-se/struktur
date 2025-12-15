@@ -1,0 +1,50 @@
+{
+  "class": "global",
+  "schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "const": "global"
+      },
+      "class": {
+        "type": "string",
+        "const": "global"
+      },
+      "site": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "url": { "type": "string", "format": "uri" },
+          "description": { "type": "string" }
+        }
+      },
+      "stylesheets": {
+        "type": "array",
+        "items": { "type": "string" }
+      },
+      "rss": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "link": { "type": "string", "format": "uri" },
+          "language": { "type": "string" },
+          "copyright": { "type": "string" }
+        }
+      },
+      "build": {
+        "type": "array",
+        "items": {
+          "type": "object"
+        }
+      }
+    },
+    "required": ["id", "class"]
+  },
+  "fields": {
+    "stylesheets": [],
+    "build": []
+  }
+}

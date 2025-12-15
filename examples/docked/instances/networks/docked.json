@@ -1,0 +1,10 @@
+{
+  "id": "docked",
+  "class": "docked_network",
+  "domains": ["infrastructure"],
+  "aspects": {
+    "docker_network": {
+      "driver": "bridge"
+    }
+  }
+}

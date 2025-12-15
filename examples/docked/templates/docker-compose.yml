@@ -1,0 +1,100 @@
+services:
+{{#each instances_by_id}}{{#if aspects.docker_container}}{{#unless (eq id "global")}}
+  {{id}}:
+{{#if aspects.docker_container.image}}
+    image: {{aspects.docker_container.image}}
+{{/if}}
+{{#if aspects.docker_container.build}}
+{{#if (eq (typeof aspects.docker_container.build) "string")}}
+    build: {{aspects.docker_container.build}}
+{{else}}
+    build:
+      context: {{aspects.docker_container.build.context}}
+{{#if aspects.docker_container.build.dockerfile}}
+      dockerfile: {{aspects.docker_container.build.dockerfile}}
+{{/if}}
+{{#if aspects.docker_container.build.target}}
+      target: {{aspects.docker_container.build.target}}
+{{/if}}
+{{#if aspects.docker_container.build.args}}
+      args:
+{{#each aspects.docker_container.build.args}}
+        {{@key}}: {{this}}
+{{/each}}
+{{/if}}
+{{/if}}
+{{/if}}
+    container_name: {{id}}
+{{#if aspects.docker_container.restart_policy}}
+    restart: {{aspects.docker_container.restart_policy}}
+{{/if}}
+{{#if aspects.docker_container.ports}}
+    ports:
+{{#each aspects.docker_container.ports}}
+      - "{{this}}"
+{{/each}}
+{{/if}}
+{{#if aspects.docker_container.volumes}}
+    volumes:
+{{#each aspects.docker_container.volumes}}
+      - {{this}}
+{{/each}}
+{{/if}}
+{{#if aspects.docker_container.environment}}
+    environment:
+{{#each aspects.docker_container.environment}}
+      {{@key}}: "{{this}}"
+{{/each}}
+{{/if}}
+{{#if relations.[manages/managed_by]}}
+{{#unless aspects.docker_container.environment}}
+    environment:
+{{/unless}}
+      REDIS_HOSTS: "{{#each relations.[manages/managed_by]}}local:{{this}}:6379{{#unless @last}},{{/unless}}{{/each}}"
+{{/if}}
+{{#if aspects.docker_container.networks}}
+    networks:
+{{#each aspects.docker_container.networks}}
+      - {{this}}
+{{/each}}
+{{/if}}
+{{#if aspects.docker_container.depends_on}}
+    depends_on:
+{{#each aspects.docker_container.depends_on}}
+      - {{this}}
+{{/each}}
+{{/if}}
+{{#if relations.[manages/managed_by]}}
+{{#unless aspects.docker_container.depends_on}}
+    depends_on:
+{{/unless}}
+{{#each relations.[manages/managed_by]}}
+      - {{this}}
+{{/each}}
+{{/if}}
+{{#if relations.[monitors/monitored_by]}}
+{{#unless (or aspects.docker_container.depends_on relations.[manages/managed_by])}}
+    depends_on:
+{{/unless}}
+{{#each relations.[monitors/monitored_by]}}
+      - {{this}}
+{{/each}}
+{{/if}}
+{{/unless}}{{/if}}{{/each}}
+
+networks:
+{{#each instances_by_id}}{{#if aspects.docker_network}}{{#unless (eq id "global")}}
+  {{id}}:
+{{#if aspects.docker_network.driver}}
+    driver: {{aspects.docker_network.driver}}
+{{/if}}
+{{/unless}}{{/if}}{{/each}}
+
+volumes:
+{{#each instances_by_id}}{{#if aspects.docker_volume}}{{#unless (eq id "global")}}
+  {{id}}:
+{{#if aspects.docker_volume.driver}}
+    driver: {{aspects.docker_volume.driver}}
+{{/if}}
+{{/unless}}{{/if}}{{/each}}
+

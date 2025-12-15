@@ -1,0 +1,61 @@
+{
+  "class": "service",
+  "lineage": [
+    "entity_base",
+    "service"
+  ],
+  "schemas": [
+    {
+      "type": "object",
+      "required": [
+        "id",
+        "class"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "class": {
+          "type": "string"
+        },
+        "domains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "port"
+      ],
+      "properties": {
+        "replicas": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "port": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535
+        }
+      }
+    }
+  ],
+  "fields": {
+    "domains": [],
+    "replicas": 1
+  },
+  "aspects": [
+    "network_interface"
+  ],
+  "kinds": [],
+  "pretty_name": "service",
+  "domains": [],
+  "parent": [
+    "entity_base"
+  ]
+}

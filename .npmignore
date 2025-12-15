@@ -1,0 +1,24 @@
+# Development files
+test/
+old_tests/
+prototypes/
+.eslintrc.json
+.vscode/
+.idea/
+
+# Build artifacts
+build/
+dodo/
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# CI/CD
+.github/

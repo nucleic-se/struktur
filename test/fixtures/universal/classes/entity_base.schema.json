@@ -1,0 +1,39 @@
+{
+  "class": "entity_base",
+  "inherits_from": "universal_base",
+  "schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Unique identifier for the entity instance"
+      },
+      "name": {
+        "type": "string",
+        "description": "Display name for the entity (falls back to id if not provided)"
+      },
+      "kinds": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Aspect types this entity belongs to"
+      },
+      "domains": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Domain classifications for this entity"
+      },
+      "aspects": {
+        "type": "object",
+        "additionalProperties": true,
+        "description": "Aspect-specific data for this entity"
+      }
+    },
+    "additionalProperties": true
+  },
+  "fields": {}
+}

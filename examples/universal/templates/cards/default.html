@@ -1,0 +1,70 @@
+<div class="card h-100">
+  <div class="card-header">
+    <h5 class="card-title mb-0">{{aspects.employee.name}}</h5>
+    <small class="text-muted">{{id}}</small>
+  </div>
+  <div class="card-body">
+    {{#if aspects.employee}}
+      <div class="mb-2">
+        <strong class="text-uppercase small text-muted">Email</strong>
+        <div>{{aspects.employee.email}}</div>
+      </div>
+      
+      {{#if aspects.employee.department}}
+      <div class="mb-2">
+        <strong class="text-uppercase small text-muted">Department</strong>
+        <div>{{aspects.employee.department}}</div>
+      </div>
+      {{/if}}
+      
+      {{#if aspects.employee.role}}
+      <div class="mb-2">
+        <strong class="text-uppercase small text-muted">Role</strong>
+        <div>{{aspects.employee.role}}</div>
+      </div>
+      {{/if}}
+      
+      {{#if aspects.employee.description}}
+      <div class="mb-2">
+        <strong class="text-uppercase small text-muted">Description</strong>
+        <div>{{aspects.employee.description}}</div>
+      </div>
+      {{/if}}
+      
+      {{#if aspects.employee.responsibilities}}
+      <div class="mb-2">
+        <strong class="text-uppercase small text-muted">Responsibilities</strong>
+        <ul class="mb-0">
+          {{#each aspects.employee.responsibilities}}
+          <li>{{this}}</li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/if}}
+    {{/if}}
+    
+    {{#if (or kinds domains)}}
+    <div class="mt-3 pt-3 border-top">
+      {{#if kinds}}
+      <div class="mb-2">
+        {{#each kinds}}
+        <span class="badge bg-primary me-1">{{this}}</span>
+        {{/each}}
+      </div>
+      {{/if}}
+      
+      {{#if domains}}
+      <div>
+        {{#each domains}}
+        <span class="badge bg-success me-1">{{this}}</span>
+        {{/each}}
+      </div>
+      {{/if}}
+    </div>
+    {{/if}}
+  </div>
+  
+  <div class="card-footer">
+    <small class="text-muted">Class: <code>{{class}}</code></small>
+  </div>
+</div>

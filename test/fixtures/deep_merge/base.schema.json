@@ -1,0 +1,1 @@
+{"class":"base","schema":{"type":"object","properties":{"id":{"type":"string"}}},"fields":{"config":{"timeout":30,"retries":3,"logging":{"level":"info","format":"json"}}}}

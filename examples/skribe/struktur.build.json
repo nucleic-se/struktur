@@ -1,0 +1,6 @@
+{
+  "classes": ["classes"],
+  "instances": ["instances", "mixins/rss/instances", "mixins/dark-theme/instances"],
+  "templates": ["templates", "mixins/rss/templates", "mixins/dark-theme/templates"],
+  "buildDir": "build"
+}

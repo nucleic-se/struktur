@@ -1,0 +1,16 @@
+{
+  "id": "global",
+  "class": "global",
+  "rss": {
+    "title": "Scribe Blog",
+    "description": "Learn about Struktur through practical examples",
+    "link": "https://example.com",
+    "language": "en-us",
+    "copyright": "2025 Struktur Team"
+  },
+  "build": [
+    {
+      "feed.xml": "/feed.xml"
+    }
+  ]
+}

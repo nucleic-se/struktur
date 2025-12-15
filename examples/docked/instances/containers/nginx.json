@@ -1,0 +1,18 @@
+{
+  "id": "nginx",
+  "class": "docked_container",
+  "domains": ["web"],
+  "aspects": {
+    "docker_container": {
+      "image": "nginx:alpine",
+      "description": "Web server for docked viewer",
+      "web_ui": "http://localhost:8080",
+      "ports": ["8080:80"],
+      "networks": ["docked"],
+      "restart_policy": "unless-stopped",
+      "volumes": [
+        "./nginx:/usr/share/nginx/html:ro"
+      ]
+    }
+  }
+}

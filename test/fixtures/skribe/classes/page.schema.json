@@ -1,0 +1,17 @@
+{
+  "class": "page",
+  "inherits_from": "content_base",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "menu": { 
+        "type": "string",
+        "enum": ["header", "footer", "both", "none"],
+        "description": "Where to show this page link: header nav, footer, both, or none"
+      }
+    }
+  },
+  "fields": {
+    "menu": "header"
+  }
+}

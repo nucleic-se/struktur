@@ -1,0 +1,28 @@
+{
+  "id": "grafana",
+  "class": "docked_container",
+  "domains": ["monitoring"],
+  "aspects": {
+    "docker_container": {
+      "image": "grafana/grafana:latest",
+      "description": "Metrics visualization and monitoring dashboards",
+      "web_ui": "http://localhost:3000",
+      "ports": ["3000:3000"],
+      "networks": ["docked"],
+      "restart_policy": "unless-stopped",
+      "volumes": [
+        "grafana-data:/var/lib/grafana",
+        "./grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro"
+      ],
+      "environment": {
+        "GF_SECURITY_ADMIN_USER": "admin",
+        "GF_SECURITY_ADMIN_PASSWORD": "${GRAFANA_ADMIN_PASSWORD}",
+        "GF_USERS_ALLOW_SIGN_UP": "false",
+        "GF_INSTALL_PLUGINS": "redis-datasource"
+      }
+    }
+  },
+  "relations": {
+    "monitors/monitored_by": ["redis"]
+  }
+}

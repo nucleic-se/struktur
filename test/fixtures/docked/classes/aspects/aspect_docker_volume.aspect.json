@@ -1,0 +1,130 @@
+{
+  "aspect": "aspect_docker_volume",
+  "schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "description": "Docker volume configuration",
+    "additionalProperties": true,
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Identifier for the object"
+      },
+      "class": {
+        "type": "string",
+        "description": "Class name for this object"
+      },
+      "build": {
+        "type": "array",
+        "description": "Build instructions for template rendering",
+        "items": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object",
+              "additionalProperties": true
+            },
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          ]
+        }
+      },
+      "stack_name": {
+        "type": "string",
+        "description": "Display name for the stack (global metadata)"
+      },
+      "description": {
+        "type": "string",
+        "description": "Human-friendly overview"
+      },
+      "parent": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        ],
+        "description": "Parent class(es) to inherit from"
+      },
+      "pretty_name": {
+        "type": "string",
+        "description": "Optional display name"
+      },
+      "aspects": {
+        "type": "object",
+        "description": "Aspect metadata",
+        "additionalProperties": true,
+        "properties": {
+          "aspect": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      },
+      "objects": {
+        "type": "object",
+        "description": "Stack objects catalog",
+        "additionalProperties": {
+          "type": "object",
+          "additionalProperties": {}
+        }
+      },
+      "classes_by_id": {
+        "type": "object",
+        "description": "Loaded class definitions",
+        "additionalProperties": {
+          "type": "object",
+          "additionalProperties": {}
+        }
+      },
+      "classEntries": {
+        "type": "array",
+        "description": "Loaded class entries",
+        "items": {
+          "type": "object",
+          "properties": {
+            "class": {
+              "type": "string"
+            },
+            "parent": {
+              "type": [
+                "string",
+                "array",
+                "null"
+              ]
+            },
+            "properties": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "driver": {
+        "type": "string",
+        "description": "Volume driver",
+        "default": "local"
+      }
+    }
+  },
+  "fields": {
+    "aspects": {
+      "aspect": {
+        "kind": "docker_volume",
+        "description": "Docker volumes for persistent data storage"
+      }
+    }
+  }
+}

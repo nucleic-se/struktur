@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+{{> partials/head pageTitle=(concat "Tag: " tagName) pathPrefix=pathPrefix}}
+<body>
+  {{> partials/nav pathPrefix=pathPrefix}}
+
+  <article>
+    <h1>Posts tagged: {{tagName}}</h1>
+    <p class="post-meta">{{postCount}} {{#if (eq postCount 1)}}post{{else}}posts{{/if}} with this tag</p>
+
+    <section>
+      {{#each posts}}
+      <article class="post-summary">
+        <h2><a href="{{../pathPrefix}}posts/{{slug}}.html">{{title}}</a></h2>
+        <p class="post-meta">
+          <time datetime="{{date}}">{{date}}</time>
+          {{#if author}}by {{author}}{{/if}}
+        </p>
+        {{#if description}}
+        <p>{{description}}</p>
+        {{/if}}
+        {{> partials/tags pathPrefix=../../pathPrefix}}
+      </article>
+      {{/each}}
+    </section>
+  </article>
+
+  {{> partials/footer pathPrefix=pathPrefix}}
+</body>
+</html>

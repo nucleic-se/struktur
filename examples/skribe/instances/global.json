@@ -1,0 +1,24 @@
+{
+  "id": "global",
+  "class": "global",
+  "site": {
+    "title": "Skribe Demo",
+    "url": "https://example.com",
+    "description": "A static site generator powered by Struktur"
+  },
+  "stylesheets": [
+    "style.css",
+    "custom.css"
+  ],
+  "build": [
+    {
+      "index.html": "/index.html"
+    },
+    {
+      "style.css": "/style.css"
+    },
+    {
+      "custom.css": "/custom.css"
+    }
+  ]
+}

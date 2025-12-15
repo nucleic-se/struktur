@@ -1,0 +1,23 @@
+{
+  "id": "global",
+  "class": "docked_stack",
+  "stack_name": "Docker Docked Stack",
+  "description": "Complete Docker container infrastructure with relationship-driven configuration. Automatic service integration, credentials management, and beautiful visualization.",
+  "build": [
+    {
+      "viewer.html": "/index.html"
+    },
+    {
+      "nginx-index.html": "/nginx/index.html"
+    },
+    {
+      "docker-compose.yml": "/docker-compose.yml"
+    },
+    {
+      "dot.env.example": "/.env.example"
+    },
+    {
+      "grafana-datasources.yml": "/grafana-datasources.yml"
+    }
+  ]
+}

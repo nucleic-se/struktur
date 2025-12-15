@@ -1,0 +1,43 @@
+{
+  "aspect": "aspect_base",
+  "schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "parent": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        ],
+        "description": "Parent class(es) to inherit from"
+      },
+      "aspects": {
+        "type": "object",
+        "properties": {
+          "aspect": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "description": "The aspect kind identifier"
+              },
+              "description": {
+                "type": "string",
+                "description": "Description of this aspect type"
+              }
+            }
+          }
+        }
+      }
+    },
+    "additionalProperties": true
+  },
+  "fields": {}
+}

@@ -1,0 +1,208 @@
+{
+  "class": "docked_stack",
+  "inherits_from": "universal_base",
+  "schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Unique identifier for the stack (use 'global')"
+      },
+      "class": {
+        "type": "string",
+        "const": "docked_stack"
+      },
+      "stack_name": {
+        "type": "string",
+        "description": "Display name for the stack"
+      },
+      "description": {
+        "type": "string",
+        "description": "Human-friendly overview of the stack"
+      },
+      "build": {
+        "type": "array",
+        "description": "Build instructions for template rendering",
+        "items": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object",
+              "additionalProperties": true
+            },
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          ]
+        }
+      },
+      "domains": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Domain classifications for the stack"
+      },
+      "kinds": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Kind classifications for the stack"
+      },
+      "aspects": {
+        "type": "object",
+        "additionalProperties": true,
+        "description": "Aspect data for the stack root (optional)"
+      },
+      "relations": {
+        "type": "object",
+        "additionalProperties": true,
+        "description": "Relationships to other objects (optional)"
+      },
+      "objects": {
+        "type": "object",
+        "description": "Resolved object map injected at build time",
+        "additionalProperties": {
+          "type": "object",
+          "additionalProperties": {}
+        }
+      },
+      "classes_by_id": {
+        "type": "object",
+        "description": "Resolved classes metadata injected at build time",
+        "additionalProperties": {
+          "type": "object",
+          "additionalProperties": {}
+        }
+      },
+      "classEntries": {
+        "type": "array",
+        "description": "Resolved class entries injected at build time",
+        "items": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "pretty_name": {
+        "type": "string",
+        "description": "Optional display name"
+      }
+    },
+    "required": [
+      "id",
+      "class"
+    ],
+    "additionalProperties": true,
+    "schema": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the stack (use 'global')"
+        },
+        "class": {
+          "type": "string",
+          "const": "docked_stack"
+        },
+        "stack_name": {
+          "type": "string",
+          "description": "Display name for the stack"
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-friendly overview of the stack"
+        },
+        "build": {
+          "type": "array",
+          "description": "Build instructions for template rendering",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object",
+                "additionalProperties": true
+              },
+              {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            ]
+          }
+        },
+        "domains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Domain classifications for the stack"
+        },
+        "kinds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Kind classifications for the stack"
+        },
+        "aspects": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Aspect data for the stack root (optional)"
+        },
+        "relations": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Relationships to other objects (optional)"
+        },
+        "objects": {
+          "type": "object",
+          "description": "Resolved object map injected at build time",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": {}
+          }
+        },
+        "classes_by_id": {
+          "type": "object",
+          "description": "Resolved classes metadata injected at build time",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": {}
+          }
+        },
+        "classEntries": {
+          "type": "array",
+          "description": "Resolved class entries injected at build time",
+          "items": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "pretty_name": {
+          "type": "string",
+          "description": "Optional display name"
+        }
+      },
+      "required": [
+        "id",
+        "class"
+      ],
+      "additionalProperties": true
+    }
+  },
+  "fields": {
+    "pretty_name": "Docked Stack"
+  },
+  "aspects": null
+}

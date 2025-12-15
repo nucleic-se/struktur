@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Universal Viewer</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    .sidebar { min-height: 100vh; border-right: 1px solid #dee2e6; overflow-y: auto; }
+    @media (max-width: 767.98px) { .sidebar { min-height: auto; max-height: 50vh; } }
+    
+    /* Tree styles */
+    .tree-node { cursor: pointer; user-select: none; }
+    .tree-node:hover { background-color: rgba(0,0,0,0.05); }
+    .tree-node.selected { background-color: rgba(13,110,253,0.15); }
+    .tree-children { display: none; }
+    .tree-children.expanded { display: block; }
+    .tree-instance { display: none; } /* Hide instance leaf nodes in tree */
+    .tree-toggle { width: 1.2em; display: inline-block; text-align: center; }
+    .tree-icon { margin-right: 0.3em; }
+    .tree-count { font-size: 0.75em; color: #6c757d; }
+    .tree-level-1 { padding-left: 0.5rem; }
+    .tree-level-2 { padding-left: 1.5rem; }
+    .tree-level-3 { padding-left: 2.5rem; }
+    .tree-level-4 { padding-left: 3.5rem; }
+    .tree-level-5 { padding-left: 4.5rem; }
+    .tree-level-6 { padding-left: 5.5rem; }
+    .instance-item { font-size: 0.9em; }
+  </style>
+  
+  {{!-- Stack-specific styling extension point --}}
+  {{#if (partial_exists "partials/card_styling")}}
+    {{> partials/card_styling}}
+  {{/if}}
+</head>
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      {{!-- Tree Sidebar --}}
+      <nav class="col-lg-3 col-md-4 bg-light sidebar collapse show" id="treeSidebar">
+        <div class="position-sticky pt-3 pb-3">
+          {{!-- Branding extension point --}}
+          {{#if (partial_exists "partials/viewer_branding")}}
+            {{> partials/viewer_branding}}
+          {{else}}
+          <div class="px-3 mb-3">
+            <h5>Universal Viewer</h5>
+            <p class="text-muted small mb-0">Aspect Tree Browser</p>
+          </div>
+          {{/if}}
+          
+          <div class="px-3 mb-3">
+            <input type="text" class="form-control form-control-sm" id="searchInput" placeholder="Search...">
+          </div>
+          
+          <div class="px-3 mb-2">
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="small fw-bold text-muted">ASPECT TREES</span>
+              <div>
+                <button class="btn btn-link btn-sm p-0 me-2" id="expandAll" title="Expand All"><i class="bi bi-arrows-expand"></i></button>
+                <button class="btn btn-link btn-sm p-0" id="collapseAll" title="Collapse All"><i class="bi bi-arrows-collapse"></i></button>
+              </div>
+            </div>
+          </div>
+          
+          <div id="treeContainer" class="px-2"></div>
+          
+          <hr class="my-3">
+          
+          {{!-- Sidebar extension point for stack-specific features --}}
+          {{#if (partial_exists "partials/sidebar_extension")}}
+            {{> partials/sidebar_extension}}
+            <hr class="my-3">
+          {{/if}}
+          
+          <div class="px-3">
+            <div class="mb-2">
+              <span class="small fw-bold text-muted">QUICK FILTERS</span>
+            </div>
+            <div class="mb-2">
+              <select class="form-select form-select-sm" id="domainFilter">
+                <option value="">All Domains</option>
+              </select>
+            </div>
+            <button class="btn btn-sm btn-outline-secondary w-100" id="showAll">Show All</button>
+          </div>
+        </div>
+      </nav>
+
+      {{!-- Main content --}}
+      <main class="col-lg-9 col-md-8 ms-sm-auto px-4">
+        <div class="d-flex justify-content-between align-items-center pt-3 pb-2 mb-3 border-bottom">
+          <div>
+            <h1 class="h2 mb-0" id="viewTitle">All Objects</h1>
+            <nav aria-label="breadcrumb" id="breadcrumb" class="d-none">
+              <ol class="breadcrumb mb-0 small"></ol>
+            </nav>
+          </div>
+          <button class="btn btn-sm btn-outline-secondary d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#treeSidebar">
+            <i class="bi bi-list"></i> Tree
+          </button>
+        </div>
+        <div id="objectCount" class="mb-3 text-muted"></div>
+        
+        <div id="objectGrid" class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3"></div>
+      </main>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Load canonical data (single source of truth)
+    const canonical = {{{json canonical}}};
+    const allInstances = canonical.objects.filter(obj => obj.id !== 'global');
+    const allClasses = Object.values(canonical.classes_by_id);
+    
+    // Build relation indexes (drift-safe unidirectional)
+    const relationIndexes = buildRelationIndexes(allInstances);
+    
+    function buildRelationIndexes(instances) {
+      const outbound = new Map(); // instance id -> its outbound relations
+      const inbound = new Map();  // instance id -> who points to it
+      
+      instances.forEach(inst => {
+        if (inst.relations && typeof inst.relations === 'object') {
+          outbound.set(inst.id, inst.relations);
+          
+          // Build inverse index (derived relations)
+          for (const [relationType, targets] of Object.entries(inst.relations)) {
+            if (!Array.isArray(targets)) continue;
+            targets.forEach(targetId => {
+              if (!inbound.has(targetId)) {
+                inbound.set(targetId, {});
+              }
+              if (!inbound.get(targetId)[relationType]) {
+                inbound.get(targetId)[relationType] = [];
+              }
+              inbound.get(targetId)[relationType].push(inst.id);
+            });
+          }
+        }
+      });
+      
+      return { outbound, inbound };
+    }
+    
+    // Build aspect metadata map from canonical.aspects_by_kind (single source of truth)
+    const aspectMetadata = new Map();
+    const aspectsByKind = canonical.aspects_by_kind || {};
+    Object.entries(aspectsByKind).forEach(([kind, meta]) => {
+      aspectMetadata.set(kind, {
+        pretty_name: meta.pretty_name || kind.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+        description: meta.description || null
+      });
+    });
+    
+    // Build tree structure from classes
+    const aspectTrees = new Map();  // kind -> { classes: Map<className, {class, children, instances}> }
+    const classToParent = new Map(); // class -> direct parent class (within same kind)
+    const instancesByClass = new Map(); // class -> [instances]
+    
+    // Group instances by class
+    allInstances.forEach(inst => {
+      if (!instancesByClass.has(inst.class)) instancesByClass.set(inst.class, []);
+      instancesByClass.get(inst.class).push(inst);
+    });
+    
+    // Build class hierarchy per aspect tree
+    allClasses.forEach(cls => {
+      if (!cls.kinds || cls.kinds.length === 0) return;
+      
+      // Add class to ALL aspect trees it belongs to
+      cls.kinds.forEach(kind => {
+        if (!aspectTrees.has(kind)) {
+          aspectTrees.set(kind, { name: kind, classes: new Map(), roots: [] });
+        }
+        
+        const tree = aspectTrees.get(kind);
+        tree.classes.set(cls.class, {
+          class: cls.class,
+          data: cls,
+          children: [],
+          instances: instancesByClass.get(cls.class) || [],
+          parent: null
+        });
+      });
+    });
+    
+    // Determine parent-child relationships within each tree
+    aspectTrees.forEach((tree, kind) => {
+      tree.classes.forEach((node, className) => {
+        // Find the closest parent that's in the same tree
+        const parentChain = node.data.parent || [];
+        for (let i = parentChain.length - 1; i >= 0; i--) {
+          const potentialParent = parentChain[i];
+          if (tree.classes.has(potentialParent) && potentialParent !== className) {
+            node.parent = potentialParent;
+            tree.classes.get(potentialParent).children.push(className);
+            break;
+          }
+        }
+      });
+      
+      // Find root classes (no parent in this tree)
+      tree.classes.forEach((node, className) => {
+        if (!node.parent) {
+          tree.roots.push(className);
+        }
+      });
+      
+      // Sort roots alphabetically
+      tree.roots.sort();
+    });
+    
+    // Current selection state
+    let selectedKind = null;
+    let selectedClass = null;
+    let selectedInstance = null;
+    let searchTerm = '';
+    let domainFilter = '';
+    
+    // Render the tree
+    function renderTree() {
+      const container = document.getElementById('treeContainer');
+      container.innerHTML = '';
+      
+      // Sort aspect trees alphabetically
+      const sortedKinds = Array.from(aspectTrees.keys()).sort();
+      
+      sortedKinds.forEach(kind => {
+        const tree = aspectTrees.get(kind);
+        const kindInstances = countTreeInstances(tree);
+        
+        // Get aspect metadata for label
+        const metadata = aspectMetadata.get(kind);
+        const label = metadata?.pretty_name || formatLabel(kind);
+        
+        // If only one root class, skip the aspect level and show class directly
+        if (tree.roots.length === 1) {
+          const singleClass = tree.roots[0];
+          const node = tree.classes.get(singleClass);
+          
+          const hasChildren = node.children.length > 0;
+          const instanceCount = countClassInstances(tree, singleClass);
+          const toggleIcon = hasChildren ? '<i class="bi bi-chevron-right"></i>' : '';
+          
+          const classNode = document.createElement('div');
+          classNode.className = 'tree-kind mb-1';
+          classNode.innerHTML = `
+            <div class="tree-node tree-level-1 py-1 rounded d-flex align-items-center ${selectedClass === singleClass ? 'selected' : ''}" data-kind="${kind}" data-class="${singleClass}">
+              <span class="tree-toggle">${toggleIcon}</span>
+              <i class="bi bi-folder tree-icon text-secondary"></i>
+              <span class="flex-grow-1">${escapeHtml(formatClassName(singleClass))}</span>
+              <span class="tree-count">${instanceCount}</span>
+            </div>
+            <div class="tree-children" id="class-${singleClass}"></div>
+          `;
+          container.appendChild(classNode);
+          
+          const childContainer = classNode.querySelector('.tree-children');
+          
+          // Render child classes
+          if (node.children.length > 0) {
+            renderClassNodes(tree, node.children, childContainer, kind, 2);
+          }
+          
+          // Render instances
+          node.instances.forEach(inst => {
+            const instNode = document.createElement('div');
+            instNode.className = 'tree-instance';
+            const displayName = getInstanceName(inst);
+            instNode.innerHTML = `
+              <div class="tree-node tree-level-2 py-1 rounded d-flex align-items-center instance-item ${selectedInstance === inst.id ? 'selected' : ''}" data-kind="${kind}" data-class="${singleClass}" data-instance="${inst.id}">
+                <span class="tree-toggle"></span>
+                <i class="bi bi-file-earmark tree-icon text-muted"></i>
+                <span>${escapeHtml(displayName)}</span>
+              </div>
+            `;
+            childContainer.appendChild(instNode);
+          });
+        } else {
+          // Multiple root classes - show aspect level
+          const kindNode = document.createElement('div');
+          kindNode.className = 'tree-kind mb-1';
+          kindNode.innerHTML = `
+            <div class="tree-node tree-level-1 py-1 rounded d-flex align-items-center ${selectedKind === kind && !selectedClass ? 'selected' : ''}" data-kind="${kind}">
+              <span class="tree-toggle"><i class="bi bi-chevron-right"></i></span>
+              <i class="bi bi-diagram-3 tree-icon text-primary"></i>
+              <span class="flex-grow-1">${escapeHtml(label)}</span>
+              <span class="tree-count">${kindInstances}</span>
+            </div>
+            <div class="tree-children" id="tree-${kind}"></div>
+          `;
+          container.appendChild(kindNode);
+          
+          // Render class nodes
+          const childContainer = kindNode.querySelector('.tree-children');
+          renderClassNodes(tree, tree.roots, childContainer, kind, 2);
+        }
+      });
+      
+      // Attach tree node click handlers
+      container.querySelectorAll('.tree-node[data-kind]').forEach(node => {
+        node.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const kind = node.dataset.kind;
+          const cls = node.dataset.class;
+          const inst = node.dataset.instance;
+          
+          if (inst) {
+            selectInstance(kind, cls, inst);
+          } else if (cls) {
+            selectClass(kind, cls);
+          } else {
+            selectKind(kind);
+          }
+        });
+        
+        // Toggle expand/collapse on chevron click
+        const toggle = node.querySelector('.tree-toggle');
+        if (toggle) {
+          toggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const children = node.nextElementSibling;
+            if (children && children.classList.contains('tree-children')) {
+              children.classList.toggle('expanded');
+              const icon = toggle.querySelector('i');
+              icon.classList.toggle('bi-chevron-right');
+              icon.classList.toggle('bi-chevron-down');
+            }
+          });
+        }
+      });
+    }
+    
+    function renderClassNodes(tree, classNames, container, kind, level) {
+      classNames.filter(Boolean).sort().forEach(className => {
+        const node = tree.classes.get(className);
+        if (!node) return;
+        
+        const hasChildren = node.children.length > 0;
+        const instanceCount = countClassInstances(tree, className);
+        
+        // Skip this level if: only one child class AND no instances
+        if (node.children.length === 1 && node.instances.length === 0) {
+          // Render the child directly, skipping this level
+          renderClassNodes(tree, node.children, container, kind, level);
+          return;
+        }
+        
+        // Use chevron for expandable nodes, empty span for leaf nodes (keeps indentation)
+        const toggleIcon = hasChildren ? '<i class="bi bi-chevron-right"></i>' : '';
+        
+        const classNode = document.createElement('div');
+        classNode.className = 'tree-class';
+        classNode.innerHTML = `
+          <div class="tree-node tree-level-${level} py-1 rounded d-flex align-items-center ${selectedClass === className ? 'selected' : ''}" data-kind="${kind}" data-class="${className}">
+            <span class="tree-toggle">${toggleIcon}</span>
+            <i class="bi bi-folder tree-icon text-secondary"></i>
+            <span class="flex-grow-1">${escapeHtml(formatClassName(className))}</span>
+            <span class="tree-count">${instanceCount}</span>
+          </div>
+          <div class="tree-children" id="class-${className}"></div>
+        `;
+        container.appendChild(classNode);
+        
+        const childContainer = classNode.querySelector('.tree-children');
+        
+        // Render child classes
+        if (node.children.length > 0) {
+          renderClassNodes(tree, node.children, childContainer, kind, level + 1);
+        }
+        
+        // Render instances
+        node.instances.forEach(inst => {
+          const instNode = document.createElement('div');
+          instNode.className = 'tree-instance';
+          const displayName = getInstanceName(inst);
+          instNode.innerHTML = `
+            <div class="tree-node tree-level-${level + 1} py-1 rounded d-flex align-items-center instance-item ${selectedInstance === inst.id ? 'selected' : ''}" data-kind="${kind}" data-class="${className}" data-instance="${inst.id}">
+              <span class="tree-toggle"></span>
+              <i class="bi bi-file-earmark tree-icon text-muted"></i>
+              <span>${escapeHtml(displayName)}</span>
+            </div>
+          `;
+          childContainer.appendChild(instNode);
+        });
+      });
+    }
+    
+    // Count instances respecting domain filter
+    function countTreeInstances(tree) {
+      let count = 0;
+      tree.classes.forEach(node => {
+        count += countFilteredInstances(node.instances);
+      });
+      return count;
+    }
+    
+    function countClassInstances(tree, className) {
+      const node = tree.classes.get(className);
+      if (!node) return 0;
+      
+      let count = countFilteredInstances(node.instances);
+      node.children.forEach(child => {
+        count += countClassInstances(tree, child);
+      });
+      return count;
+    }
+    
+    function countFilteredInstances(instances) {
+      if (!domainFilter) return instances.length;
+      return instances.filter(inst => 
+        inst.domains && inst.domains.includes(domainFilter)
+      ).length;
+    }
+    
+    // Selection handlers
+    function selectKind(kind) {
+      selectedKind = kind;
+      selectedClass = null;
+      selectedInstance = null;
+      
+      // Expand this tree
+      const treeEl = document.getElementById(`tree-${kind}`);
+      if (treeEl) {
+        treeEl.classList.add('expanded');
+        const toggle = treeEl.previousElementSibling?.querySelector('.tree-toggle i');
+        if (toggle) {
+          toggle.classList.remove('bi-chevron-right');
+          toggle.classList.add('bi-chevron-down');
+        }
+      }
+      
+      updateUI();
+    }
+    
+    function selectClass(kind, cls) {
+      selectedKind = kind;
+      selectedClass = cls;
+      selectedInstance = null;
+      
+      // Expand path to this class
+      expandPathToClass(kind, cls);
+      
+      updateUI();
+    }
+    
+    function selectInstance(kind, cls, instId) {
+      selectedKind = kind;
+      selectedClass = cls;
+      selectedInstance = instId;
+      
+      // Expand path
+      expandPathToClass(kind, cls);
+      
+      updateUI();
+    }
+    
+    function expandPathToClass(kind, cls) {
+      // Expand kind
+      const treeEl = document.getElementById(`tree-${kind}`);
+      if (treeEl) {
+        treeEl.classList.add('expanded');
+        const toggle = treeEl.previousElementSibling?.querySelector('.tree-toggle i');
+        if (toggle) {
+          toggle.classList.remove('bi-chevron-right');
+          toggle.classList.add('bi-chevron-down');
+        }
+      }
+      
+      // Expand class ancestors
+      const tree = aspectTrees.get(kind);
+      if (!tree) return;
+      
+      let current = cls;
+      while (current) {
+        const classEl = document.getElementById(`class-${current}`);
+        if (classEl) {
+          classEl.classList.add('expanded');
+          const toggle = classEl.previousElementSibling?.querySelector('.tree-toggle i');
+          if (toggle) {
+            toggle.classList.remove('bi-chevron-right');
+            toggle.classList.add('bi-chevron-down');
+          }
+        }
+        const node = tree.classes.get(current);
+        current = node?.parent;
+      }
+    }
+    
+    function updateUI() {
+      updateTreeSelection();
+      filterAndRender();
+      updateBreadcrumb();
+      updateTitle();
+    }
+    
+    function updateTreeSelection() {
+      // Update selection highlights without rebuilding tree
+      document.querySelectorAll('.tree-node').forEach(node => {
+        node.classList.remove('selected');
+        
+        const kind = node.dataset.kind;
+        const cls = node.dataset.class;
+        const inst = node.dataset.instance;
+        
+        if (inst && inst === selectedInstance) {
+          node.classList.add('selected');
+        } else if (cls && cls === selectedClass && !selectedInstance) {
+          node.classList.add('selected');
+        } else if (kind && kind === selectedKind && !cls && !inst && !selectedClass && !selectedInstance) {
+          // Only select top-level kind nodes (no class/instance attributes)
+          node.classList.add('selected');
+        }
+      });
+    }
+    
+    function updateTitle() {
+      const title = document.getElementById('viewTitle');
+      if (selectedInstance) {
+        const inst = allInstances.find(i => i.id === selectedInstance);
+        title.textContent = inst ? getInstanceName(inst) : selectedInstance;
+      } else if (selectedClass) {
+        title.textContent = formatClassName(selectedClass);
+      } else if (selectedKind) {
+        const metadata = aspectMetadata.get(selectedKind);
+        title.textContent = metadata?.pretty_name || (formatLabel(selectedKind) + 's');
+      } else {
+        title.textContent = 'All Objects';
+      }
+    }
+    
+    function updateBreadcrumb() {
+      const breadcrumb = document.getElementById('breadcrumb');
+      const ol = breadcrumb.querySelector('ol');
+      ol.innerHTML = '';
+      
+      if (!selectedKind) {
+        breadcrumb.classList.add('d-none');
+        return;
+      }
+      
+      breadcrumb.classList.remove('d-none');
+      
+      // Add "All" link
+      ol.innerHTML += `<li class="breadcrumb-item"><a href="#" onclick="showAll(); return false;">All</a></li>`;
+      
+      // Add kind
+      if (selectedKind) {
+        const metadata = aspectMetadata.get(selectedKind);
+        const kindLabel = metadata?.pretty_name || formatLabel(selectedKind);
+        
+        if (selectedClass || selectedInstance) {
+          ol.innerHTML += `<li class="breadcrumb-item"><a href="#" onclick="selectKind('${selectedKind}'); return false;">${escapeHtml(kindLabel)}</a></li>`;
+        } else {
+          ol.innerHTML += `<li class="breadcrumb-item active">${escapeHtml(kindLabel)}</li>`;
+        }
+      }
+      
+      // Add class hierarchy
+      if (selectedClass) {
+        const tree = aspectTrees.get(selectedKind);
+        if (tree) {
+          const path = [];
+          let current = selectedClass;
+          while (current) {
+            path.unshift(current);
+            const node = tree.classes.get(current);
+            current = node?.parent;
+          }
+          
+          path.forEach((cls, idx) => {
+            if (idx === path.length - 1 && !selectedInstance) {
+              ol.innerHTML += `<li class="breadcrumb-item active">${escapeHtml(formatClassName(cls))}</li>`;
+            } else {
+              ol.innerHTML += `<li class="breadcrumb-item"><a href="#" onclick="selectClass('${selectedKind}', '${cls}'); return false;">${escapeHtml(formatClassName(cls))}</a></li>`;
+            }
+          });
+        }
+      }
+      
+      // Add instance
+      if (selectedInstance) {
+        const inst = allInstances.find(i => i.id === selectedInstance);
+        ol.innerHTML += `<li class="breadcrumb-item active">${escapeHtml(inst ? getInstanceName(inst) : selectedInstance)}</li>`;
+      }
+    }
+    
+    function showAll() {
+      selectedKind = null;
+      selectedClass = null;
+      selectedInstance = null;
+      domainFilter = '';
+      document.getElementById('domainFilter').value = '';
+      updateUI();
+    }
+    
+    // Filter and render instances
+    function filterAndRender() {
+      let filtered = allInstances;
+      
+      // Filter by search
+      if (searchTerm) {
+        filtered = filtered.filter(obj => 
+          JSON.stringify(obj).toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      }
+      
+      // Filter by domain
+      if (domainFilter) {
+        filtered = filtered.filter(obj => 
+          obj.domains && obj.domains.includes(domainFilter)
+        );
+      }
+      
+      // Filter by selection
+      if (selectedInstance) {
+        filtered = filtered.filter(obj => obj.id === selectedInstance);
+      } else if (selectedClass) {
+        // Include instances of this class and all descendant classes
+        const tree = aspectTrees.get(selectedKind);
+        if (tree) {
+          const validClasses = getDescendantClasses(tree, selectedClass);
+          validClasses.add(selectedClass);
+          filtered = filtered.filter(obj => validClasses.has(obj.class));
+        }
+      } else if (selectedKind) {
+        filtered = filtered.filter(obj => 
+          obj.kinds && obj.kinds.includes(selectedKind)
+        );
+      }
+      
+      // Sort by name or id
+      filtered.sort((a, b) => {
+        const aName = getInstanceName(a);
+        const bName = getInstanceName(b);
+        return aName.localeCompare(bName);
+      });
+      
+      document.getElementById('objectCount').textContent = 
+        `${filtered.length} object${filtered.length !== 1 ? 's' : ''}`;
+      
+      renderObjects(filtered);
+    }
+    
+    function getDescendantClasses(tree, className) {
+      const descendants = new Set();
+      const node = tree.classes.get(className);
+      if (node) {
+        node.children.forEach(child => {
+          descendants.add(child);
+          getDescendantClasses(tree, child).forEach(d => descendants.add(d));
+        });
+      }
+      return descendants;
+    }
+    
+    function renderObjects(objects) {
+      const grid = document.getElementById('objectGrid');
+      grid.innerHTML = '';
+      
+      objects.forEach(obj => {
+        const col = document.createElement('div');
+        col.className = 'col';
+        col.innerHTML = createCard(obj);
+        grid.appendChild(col);
+      });
+    }
+    
+    // Create card HTML - universal renderer
+    function createCard(obj) {
+      const aspects = obj.aspects || {};
+      const aspectNames = Object.keys(aspects).filter(k => k !== 'domain');
+      const displayName = getInstanceName(obj);
+      const primaryAspect = aspectNames[0] || '';
+
+      let html = `
+        <div class="card h-100" ${primaryAspect ? `data-aspect="${escapeHtml(primaryAspect)}"` : ''}>
+          <div class="card-header">
+            <h5 class="card-title mb-0">${escapeHtml(displayName)}</h5>
+            <small class="text-muted">${escapeHtml(obj.id)}</small>
+          </div>
+          <div class="card-body">
+      `;
+
+      // Render each aspect namespace
+      aspectNames.forEach((aspectName, idx) => {
+        const aspectData = aspects[aspectName];
+        if (!aspectData || typeof aspectData !== 'object') return;
+
+        if (idx > 0) html += `<hr class="my-2">`;
+        html += `<div class="mb-2"><span class="badge bg-secondary">${escapeHtml(aspectName)}</span></div>`;
+
+        Object.entries(aspectData).forEach(([key, value]) => {
+          if (key === 'name' || value === null || value === undefined) return;
+          html += renderField(formatLabel(key), value);
+        });
+      });
+
+      // --- Relationships Section ---
+      // Show parent and child relationships in a domain-agnostic way
+      const parents = Array.isArray(obj.parent) ? obj.parent : (obj.parent ? [obj.parent] : []);
+      // Find children: any instance whose parent includes this object's id
+      const children = allInstances.filter(inst => {
+        if (inst.id === obj.id) return false;
+        const p = Array.isArray(inst.parent) ? inst.parent : (inst.parent ? [inst.parent] : []);
+        return p.includes(obj.id);
+      });
+
+      if (parents.length > 0 || children.length > 0) {
+        html += `<hr class="my-2"><div class="mb-2"><span class="badge bg-info">Relationships</span></div>`;
+        if (parents.length > 0) {
+          html += `<div class="mb-1"><strong class="text-uppercase small text-muted">Parents</strong><ul class="mb-0">`;
+          parents.forEach(pid => {
+            // Try to find the parent instance for display name
+            const parentObj = allInstances.find(i => i.id === pid);
+            html += `<li>${parentObj ? escapeHtml(getInstanceName(parentObj)) + ' <span class=\"text-muted\">(' + escapeHtml(pid) + ')</span>' : escapeHtml(pid)}</li>`;
+          });
+          html += `</ul></div>`;
+        }
+        if (children.length > 0) {
+          html += `<div class="mb-1"><strong class="text-uppercase small text-muted">Children</strong><ul class="mb-0">`;
+          children.forEach(child => {
+            html += `<li>${escapeHtml(getInstanceName(child))} <span class=\"text-muted\">(${escapeHtml(child.id)})</span></li>`;
+          });
+          html += `</ul></div>`;
+        }
+      }
+      
+      // --- Relations Section (Drift-Safe Topology) ---
+      const outboundRels = relationIndexes.outbound.get(obj.id);
+      const inboundRels = relationIndexes.inbound.get(obj.id);
+      
+      if (outboundRels || inboundRels) {
+        html += `<hr class="my-2"><div class="mb-2"><span class="badge bg-warning">Relations</span></div>`;
+        
+        // Outbound relations (what this instance points to)
+        if (outboundRels) {
+          for (const [relType, targets] of Object.entries(outboundRels)) {
+            if (!Array.isArray(targets) || targets.length === 0) continue;
+            // Support bidirectional relation names: "outbound/inbound" format
+            const outboundLabel = relType.includes('/') ? relType.split('/')[0] : relType;
+            const showArrow = !relType.includes('/'); // Only show arrow for legacy format
+            html += `<div class="mb-2"><strong class="text-uppercase small text-muted">${escapeHtml(formatLabel(outboundLabel))}</strong>${showArrow ? ' <i class="bi bi-arrow-right text-muted"></i>' : ''}<ul class="mb-0">`;
+            targets.forEach(targetId => {
+              const targetObj = allInstances.find(i => i.id === targetId);
+              const displayName = targetObj ? getInstanceName(targetObj) : targetId;
+              html += `<li><a href="#" onclick="selectInstanceById('${escapeHtml(targetId)}'); return false;">${escapeHtml(displayName)}</a> <span class="text-muted small">(${escapeHtml(targetId)})</span></li>`;
+            });
+            html += `</ul></div>`;
+          }
+        }
+        
+        // Inbound relations (what points to this instance - derived)
+        if (inboundRels) {
+          for (const [relType, sources] of Object.entries(inboundRels)) {
+            if (!Array.isArray(sources) || sources.length === 0) continue;
+            // Support bidirectional relation names: use inbound label if present
+            const inboundLabel = relType.includes('/') ? relType.split('/')[1] : relType;
+            const showArrow = !relType.includes('/'); // Only show arrow for legacy format
+            html += `<div class="mb-2">${showArrow ? '<i class="bi bi-arrow-left text-muted"></i> ' : ''}<strong class="text-uppercase small text-muted">${escapeHtml(formatLabel(inboundLabel))}</strong><ul class="mb-0">`;
+            sources.forEach(sourceId => {
+              const sourceObj = allInstances.find(i => i.id === sourceId);
+              const displayName = sourceObj ? getInstanceName(sourceObj) : sourceId;
+              html += `<li><a href="#" onclick="selectInstanceById('${escapeHtml(sourceId)}'); return false;">${escapeHtml(displayName)}</a> <span class="text-muted small">(${escapeHtml(sourceId)})</span></li>`;
+            });
+            html += `</ul></div>`;
+          }
+        }
+      }
+
+      // Kinds and domains badges
+      if ((obj.kinds && obj.kinds.length) || (obj.domains && obj.domains.length)) {
+        html += `<div class="mt-3 pt-3 border-top">`;
+        if (obj.kinds) {
+          obj.kinds.forEach(k => {
+            html += `<span class="badge bg-primary me-1">${escapeHtml(k)}</span>`;
+          });
+        }
+        if (obj.domains) {
+          obj.domains.forEach(d => {
+            html += `<span class="badge bg-success me-1">${escapeHtml(d)}</span>`;
+          });
+        }
+        html += `</div>`;
+      }
+
+      html += `
+          </div>
+          <div class="card-footer">
+            <small class="text-muted">Class: <code>${escapeHtml(obj.class)}</code></small>
+          </div>
+        </div>
+      `;
+
+      return html;
+    }
+    
+    function getInstanceName(obj) {
+      // 1. Use explicit entity-level name if set
+      if (obj.name) return obj.name;
+      
+      // 2. Fall back to searching aspects (skip 'domain' as it's metadata)
+      const aspects = obj.aspects || {};
+      for (const [aspectKey, aspectData] of Object.entries(aspects)) {
+        if (aspectKey === 'domain') continue; // Skip domain metadata
+        if (aspectData?.name) return aspectData.name;
+      }
+      
+      // 3. Final fallback to ID
+      return obj.id;
+    }
+    
+    function formatLabel(key) {
+      return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    }
+    
+    function formatClassName(cls) {
+      if (!cls) return 'Unknown';
+      
+      // Check if class has pretty_name in canonical data
+      const classData = allClasses.find(c => c.class === cls);
+      if (classData && classData.pretty_name) {
+        return classData.pretty_name;
+      }
+      
+      // Fallback: remove common prefixes for display
+      const parts = cls.split('_');
+      if (parts.length > 1) {
+        return parts.slice(1).map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
+      }
+      return formatLabel(cls);
+    }
+    
+    function renderField(label, value) {
+      let html = `<div class="mb-2"><strong class="text-uppercase small text-muted">${escapeHtml(label)}</strong>`;
+      
+      if (Array.isArray(value)) {
+        if (value.length === 0) {
+          html += `<div class="text-muted fst-italic">None</div>`;
+        } else {
+          html += `<ul class="mb-0">`;
+          value.forEach(item => {
+            html += `<li>${escapeHtml(String(item))}</li>`;
+          });
+          html += `</ul>`;
+        }
+      } else if (typeof value === 'object' && value !== null) {
+        html += `<div class="ms-2 small">`;
+        Object.entries(value).forEach(([k, v]) => {
+          html += `<div><span class="text-muted">${escapeHtml(formatLabel(k))}:</span> ${escapeHtml(String(v))}</div>`;
+        });
+        html += `</div>`;
+      } else if (typeof value === 'boolean') {
+        html += `<div>${value ? '✓ Yes' : '✗ No'}</div>`;
+      } else {
+        html += `<div>${escapeHtml(String(value))}</div>`;
+      }
+      
+      html += `</div>`;
+      return html;
+    }
+    
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    // Helper to select instance by ID (used in relation links)
+    function selectInstanceById(instanceId) {
+      const inst = allInstances.find(i => i.id === instanceId);
+      if (!inst) return;
+      
+      // Find which tree this instance belongs to
+      if (inst.kinds && inst.kinds.length > 0) {
+        const kind = inst.kinds[0];
+        selectInstance(kind, inst.class, instanceId);
+      } else {
+        // Fallback: just filter by ID
+        selectedInstance = instanceId;
+        selectedClass = inst.class;
+        selectedKind = null;
+        updateUI();
+      }
+    }
+    
+    // Initialize domain filter
+    function initDomainFilter() {
+      const domains = new Set();
+      allInstances.forEach(obj => {
+        if (obj.domains) obj.domains.forEach(d => domains.add(d));
+      });
+      
+      const select = document.getElementById('domainFilter');
+      Array.from(domains).sort().forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d;
+        opt.textContent = formatLabel(d);
+        select.appendChild(opt);
+      });
+    }
+    
+    // Event listeners
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      searchTerm = e.target.value;
+      filterAndRender();
+    });
+    
+    document.getElementById('domainFilter').addEventListener('change', (e) => {
+      domainFilter = e.target.value;
+      renderTree();  // Re-render tree to update counts
+      filterAndRender();
+    });
+    
+    document.getElementById('showAll').addEventListener('click', showAll);
+    
+    document.getElementById('expandAll').addEventListener('click', () => {
+      document.querySelectorAll('.tree-children').forEach(el => {
+        el.classList.add('expanded');
+      });
+      document.querySelectorAll('.tree-toggle i').forEach(icon => {
+        icon.classList.remove('bi-chevron-right');
+        icon.classList.add('bi-chevron-down');
+      });
+    });
+    
+    document.getElementById('collapseAll').addEventListener('click', () => {
+      document.querySelectorAll('.tree-children').forEach(el => {
+        el.classList.remove('expanded');
+      });
+      document.querySelectorAll('.tree-toggle i').forEach(icon => {
+        icon.classList.add('bi-chevron-right');
+        icon.classList.remove('bi-chevron-down');
+      });
+    });
+    
+    // Initialize
+    initDomainFilter();
+    renderTree();
+    filterAndRender();
+  </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "id": "whoami",
+  "class": "docked_container",
+  "domains": ["web"],
+  "aspects": {
+    "docker_container": {
+      "image": "traefik/whoami:latest",
+      "description": "Simple HTTP server that returns request information",
+      "web_ui": "http://localhost:8082",
+      "ports": ["8082:80"],
+      "networks": ["docked"],
+      "restart_policy": "unless-stopped"
+    }
+  }
+}

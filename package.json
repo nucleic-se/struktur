@@ -1,0 +1,63 @@
+{
+  "name": "@nucleic-se/struktur",
+  "version": "0.2.0-alpha",
+  "description": "Declarative configuration system with JSON Schema validation, multi-parent inheritance, and template-driven output generation. Clean rewrite with improved architecture.",
+  "main": "src/index.js",
+  "type": "module",
+  "bin": {
+    "struktur": "./bin/struktur"
+  },
+  "files": [
+    "src/",
+    "bin/",
+    "cli.js",
+    "examples/",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test test/**/*.test.js",
+    "test:watch": "node --test --watch test/**/*.test.js",
+    "lint": "eslint src/ test/",
+    "prepublishOnly": "npm test"
+  },
+  "keywords": [
+    "build-tool",
+    "template-engine",
+    "schema-validation",
+    "json-schema",
+    "configuration-management",
+    "infrastructure-as-code",
+    "deterministic",
+    "inheritance",
+    "composable",
+    "code-generation",
+    "docker-compose",
+    "terraform",
+    "handlebars",
+    "nunjucks"
+  ],
+  "author": "daddy@nucleic.se",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nucleic-se/struktur.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nucleic-se/struktur/issues"
+  },
+  "homepage": "https://github.com/nucleic-se/struktur#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "ajv": "^8.12.0",
+    "ajv-formats": "^2.1.1",
+    "commander": "^14.0.2",
+    "handlebars": "^4.7.8",
+    "nunjucks": "^3.2.4"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0"
+  }
+}

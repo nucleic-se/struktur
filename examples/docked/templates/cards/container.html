@@ -1,0 +1,190 @@
+{{#if aspects.docker_container}}
+<div class="container-card">
+  <div class="container-header">
+    <h3>{{id}}</h3>
+    {{#if aspects.docker_container.web_ui}}
+    <a href="{{aspects.docker_container.web_ui}}" target="_blank" class="web-link">🔗 Web UI</a>
+    {{/if}}
+  </div>
+  
+  <div class="container-body">
+    {{#if aspects.docker_container.description}}
+    <p class="description">{{aspects.docker_container.description}}</p>
+    {{/if}}
+    
+    <div class="container-details">
+      <div class="detail-row">
+        <span class="label">Image:</span>
+        <code>{{aspects.docker_container.image}}</code>
+      </div>
+      
+      {{#if aspects.docker_container.ports}}
+      <div class="detail-row">
+        <span class="label">Ports:</span>
+        <div class="ports">
+          {{#each aspects.docker_container.ports}}
+          <code class="port">{{this}}</code>
+          {{/each}}
+        </div>
+      </div>
+      {{/if}}
+      
+      {{#if aspects.docker_container.networks}}
+      <div class="detail-row">
+        <span class="label">Networks:</span>
+        <div class="networks">
+          {{#each aspects.docker_container.networks}}
+          <span class="badge">{{this}}</span>
+          {{/each}}
+        </div>
+      </div>
+      {{/if}}
+      
+      {{#if aspects.docker_container.volumes}}
+      <div class="detail-row">
+        <span class="label">Volumes:</span>
+        <div class="volumes">
+          {{#each aspects.docker_container.volumes}}
+          <code class="volume">{{this}}</code>
+          {{/each}}
+        </div>
+      </div>
+      {{/if}}
+      
+      {{#if domains}}
+      <div class="detail-row">
+        <span class="label">Domain:</span>
+        <div class="domains">
+          {{#each domains}}
+          <span class="badge domain">{{this}}</span>
+          {{/each}}
+        </div>
+      </div>
+      {{/if}}
+      
+      {{#if aspects.docker_container.restart_policy}}
+      <div class="detail-row">
+        <span class="label">Restart:</span>
+        <code>{{aspects.docker_container.restart_policy}}</code>
+      </div>
+      {{/if}}
+      
+      {{#if aspects.docker_container.depends_on}}
+      <div class="detail-row">
+        <span class="label">Depends on:</span>
+        <div class="dependencies">
+          {{#each aspects.docker_container.depends_on}}
+          <span class="badge dependency">{{this}}</span>
+          {{/each}}
+        </div>
+      </div>
+      {{/if}}
+    </div>
+  </div>
+</div>
+
+<style>
+.container-card {
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.container-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #333;
+}
+
+.container-header h3 {
+  margin: 0;
+  color: #4fc3f7;
+  font-family: 'Courier New', monospace;
+}
+
+.web-link {
+  color: #81c784;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.web-link:hover {
+  text-decoration: underline;
+}
+
+.description {
+  color: #bbb;
+  font-style: italic;
+  margin-bottom: 1rem;
+}
+
+.container-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.detail-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.label {
+  font-weight: bold;
+  color: #9e9e9e;
+  min-width: 80px;
+  flex-shrink: 0;
+}
+
+code {
+  background: #2a2a2a;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: #ffcc80;
+}
+
+.ports, .networks, .volumes, .domains, .dependencies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.port {
+  background: #1a237e;
+  color: #64b5f6;
+}
+
+.volume {
+  background: #1b5e20;
+  color: #81c784;
+  font-size: 0.75rem;
+  word-break: break-all;
+}
+
+.badge {
+  background: #424242;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+}
+
+.badge.domain {
+  background: #4a148c;
+  color: #ce93d8;
+}
+
+.badge.dependency {
+  background: #bf360c;
+  color: #ffab91;
+}
+</style>
+{{/if}}

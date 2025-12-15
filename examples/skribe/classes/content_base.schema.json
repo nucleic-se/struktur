@@ -1,0 +1,40 @@
+{
+  "class": "content_base",
+  "title": "",
+  "description": "",
+  "slug": "",
+  "schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "required": [
+      "id",
+      "class",
+      "title",
+      "slug"
+    ],
+    "properties": {
+      "id": {
+        "type": "string"
+      },
+      "class": {
+        "type": "string"
+      },
+      "title": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": {
+        "type": "string"
+      },
+      "slug": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "^[a-z0-9]([a-z0-9-]*[a-z0-9])?$",
+        "description": "URL-safe slug: lowercase letters, numbers, hyphens only. Must start and end with alphanumeric."
+      },
+      "parent": {
+        "type": "string"
+      }
+    }
+  }
+}

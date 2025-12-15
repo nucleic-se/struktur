@@ -1,0 +1,13 @@
+{
+  "class": "class_c",
+  "inherits_from": "class_a",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "prop_c": {
+        "type": "number"
+      }
+    },
+    "required": ["prop_c"]
+  }
+}

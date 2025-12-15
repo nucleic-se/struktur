@@ -1,0 +1,92 @@
+{
+  "class": "domain_infrastructure",
+  "inherits_from": "domain_root",
+  "schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "domains": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "aspects": {
+        "type": "object",
+        "properties": {
+          "domain": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "description"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "required": [
+      "domains"
+    ],
+    "additionalProperties": true,
+    "schema": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "domains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "aspects": {
+          "type": "object",
+          "properties": {
+            "domain": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "description"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "domains"
+      ],
+      "additionalProperties": true
+    }
+  },
+  "fields": {
+    "domains": [
+      "infrastructure"
+    ],
+    "aspects": {
+      "domain": {
+        "name": "Infrastructure",
+        "description": "Core infrastructure and networking components"
+      }
+    }
+  },
+  "aspects": null
+}

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+{{> partials/head pageTitle=title pathPrefix=pathPrefix}}
+<body>
+  {{> partials/nav pathPrefix=pathPrefix}}
+
+  <article>
+    <h1>{{title}}</h1>
+    <div class="page-content">
+      <p>{{{replace (escape content) "\n\n" "</p><p>"}}}</p>
+    </div>
+  </article>
+
+  {{> partials/footer pathPrefix=pathPrefix}}
+</body>
+</html>

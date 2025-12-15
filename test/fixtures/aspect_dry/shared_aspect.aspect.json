@@ -1,0 +1,17 @@
+{
+  "aspect": "shared_aspect",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "shared_prop": {
+        "type": "string",
+        "description": "Shared property available to all classes using this aspect"
+      },
+      "shared_number": {
+        "type": "number",
+        "description": "Shared numeric property"
+      }
+    },
+    "required": ["shared_prop"]
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "class": "mixin_b",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "prop_b": {
+        "type": "number",
+        "description": "Property from mixin B"
+      }
+    },
+    "required": ["prop_b"]
+  },
+  "fields": {
+    "prop_b": 42
+  }
+}

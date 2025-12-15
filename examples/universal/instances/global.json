@@ -1,0 +1,9 @@
+{
+  "id": "global",
+  "class": "global",
+  "build": [
+    {
+      "viewer.html": "/index.html"
+    }
+  ]
+}

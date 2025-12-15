@@ -1,0 +1,8 @@
+# Environment variables with secrets - DO NOT COMMIT!
+.env
+
+# Build outputs (if user commits the build folder)
+build/
+
+# You can commit everything else in this folder
+# It's all generated from your instances/

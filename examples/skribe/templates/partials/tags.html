@@ -1,0 +1,5 @@
+<div class="tags">
+  {{#each tags}}
+  <a href="{{#if ../pathPrefix}}{{../pathPrefix}}{{/if}}tags/{{this}}.html" class="tag">{{this}}</a>
+  {{/each}}
+</div>

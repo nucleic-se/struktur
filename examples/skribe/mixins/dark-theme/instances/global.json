@@ -1,0 +1,12 @@
+{
+  "id": "global",
+  "class": "global",
+  "stylesheets": [
+    "dark-theme.css"
+  ],
+  "build": [
+    {
+      "dark-theme.css": "/dark-theme.css"
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{{!-- Universal card partial - renders generic instance cards --}}
+<div class="card h-100">
+  <div class="card-header">
+    <h5 class="card-title mb-0">{{displayName}}</h5>
+    <small class="text-muted">{{id}}</small>
+  </div>
+  <div class="card-body">
+    {{#each aspectData}}
+      {{#if @index}}<hr class="my-2">{{/if}}
+      <div class="mb-2"><span class="badge bg-secondary">{{@key}}</span></div>
+      {{#each this}}
+        {{#unless (eq @key "name")}}
+          {{#if this}}
+            <div class="mb-2">
+              <strong class="text-uppercase small text-muted">{{formatLabel @key}}</strong>
+              <div>{{formatValue this}}</div>
+            </div>
+          {{/if}}
+        {{/unless}}
+      {{/each}}
+    {{/each}}
+    
+    {{#if (or kinds domains)}}
+      <div class="mt-3 pt-3 border-top">
+        {{#each kinds}}
+          <span class="badge bg-primary me-1">{{this}}</span>
+        {{/each}}
+        {{#each domains}}
+          <span class="badge bg-success me-1">{{this}}</span>
+        {{/each}}
+      </div>
+    {{/if}}
+  </div>
+  <div class="card-footer">
+    <small class="text-muted">Class: <code>{{class}}</code></small>
+  </div>
+</div>

@@ -1,0 +1,56 @@
+{
+  "class": "docked_network",
+  "parent": "entity_base",
+  "pretty_name": "Networks",
+  "kinds": [
+    "docker_network"
+  ],
+  "domains": [],
+  "schema": {
+    "class": "docked_network",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Unique network id"
+      },
+      "class": {
+        "type": "string",
+        "const": "docked_network"
+      },
+      "domain": {
+        "type": "string",
+        "description": "Logical domain for organization"
+      },
+      "kind": {
+        "type": "string",
+        "description": "Specific type within domain"
+      },
+      "aspects": {
+        "type": "object",
+        "properties": {
+          "docker_network": {
+            "type": "object",
+            "properties": {
+              "driver": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "docker_network"
+        ],
+        "additionalProperties": true
+      }
+    },
+    "required": [
+      "id",
+      "class",
+      "aspects"
+    ],
+    "additionalProperties": true
+  }
+}

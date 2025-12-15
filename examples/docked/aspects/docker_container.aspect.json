@@ -1,0 +1,313 @@
+{
+  "aspect": "docker_container",
+  "schema": {
+    "class": "aspect_docker_container",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "description": "Docker container configuration",
+    "additionalProperties": true,
+    "properties": {
+      "image": {
+        "type": "string",
+        "description": "Container image reference (e.g. redis:alpine). Mutually exclusive with build."
+      },
+      "build": {
+        "oneOf": [
+          {
+            "type": "string",
+            "description": "Path to build context directory"
+          },
+          {
+            "type": "object",
+            "description": "Build configuration",
+            "properties": {
+              "context": {
+                "type": "string",
+                "description": "Path to build context"
+              },
+              "dockerfile": {
+                "type": "string",
+                "description": "Dockerfile name (default: Dockerfile)"
+              },
+              "args": {
+                "type": "object",
+                "description": "Build arguments",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "target": {
+                "type": "string",
+                "description": "Target build stage for multi-stage builds"
+              }
+            },
+            "required": [
+              "context"
+            ]
+          }
+        ],
+        "description": "Build configuration for custom images. Mutually exclusive with image."
+      },
+      "description": {
+        "type": "string",
+        "description": "Human-friendly summary of the container"
+      },
+      "ports": {
+        "type": "array",
+        "description": "Port mappings in HOST:CONTAINER format (e.g., '8080:80', '3000-3005:3000-3005', '8080:80/tcp')",
+        "items": {
+          "type": "string",
+          "pattern": "^[0-9]{1,5}(-[0-9]{1,5})?:[0-9]{1,5}(-[0-9]{1,5})?(/tcp|/udp)?$"
+        }
+      },
+      "networks": {
+        "type": "array",
+        "description": "Networks this container joins",
+        "items": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "volumes": {
+        "type": "array",
+        "description": "Volume mounts in standard docker-compose syntax",
+        "items": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "environment": {
+        "type": "object",
+        "description": "Environment variables for the container",
+        "additionalProperties": {
+          "type": "string"
+        }
+      },
+      "depends_on": {
+        "type": "array",
+        "description": "Startup dependencies",
+        "items": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "restart_policy": {
+        "type": "string",
+        "description": "Docker restart policy",
+        "enum": [
+          "no",
+          "always",
+          "on-failure",
+          "unless-stopped"
+        ]
+      },
+      "command": {
+        "oneOf": [
+          {
+            "type": "string",
+            "description": "Override default command (shell form)"
+          },
+          {
+            "type": "array",
+            "description": "Override default command (exec form)",
+            "items": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "entrypoint": {
+        "oneOf": [
+          {
+            "type": "string",
+            "description": "Override default entrypoint (shell form)"
+          },
+          {
+            "type": "array",
+            "description": "Override default entrypoint (exec form)",
+            "items": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "working_dir": {
+        "type": "string",
+        "description": "Working directory inside the container"
+      },
+      "user": {
+        "type": "string",
+        "description": "User to run as (e.g., '1000', '1000:1000', 'username')"
+      },
+      "hostname": {
+        "type": "string",
+        "description": "Container hostname"
+      },
+      "healthcheck": {
+        "type": "object",
+        "description": "Container health check configuration",
+        "properties": {
+          "test": {
+            "oneOf": [
+              {
+                "type": "string",
+                "description": "Health check command (shell form)"
+              },
+              {
+                "type": "array",
+                "description": "Health check command (exec form)",
+                "items": {
+                  "type": "string"
+                }
+              }
+            ]
+          },
+          "interval": {
+            "type": "string",
+            "description": "Time between checks (e.g., '30s', '1m')"
+          },
+          "timeout": {
+            "type": "string",
+            "description": "Time to wait for check (e.g., '10s')"
+          },
+          "retries": {
+            "type": "integer",
+            "description": "Consecutive failures before unhealthy",
+            "minimum": 1
+          },
+          "start_period": {
+            "type": "string",
+            "description": "Grace period before first check (e.g., '40s')"
+          }
+        },
+        "required": [
+          "test"
+        ]
+      },
+      "labels": {
+        "type": "object",
+        "description": "Container labels (metadata)",
+        "additionalProperties": {
+          "type": "string"
+        }
+      },
+      "cap_add": {
+        "type": "array",
+        "description": "Linux capabilities to add",
+        "items": {
+          "type": "string",
+          "pattern": "^[A-Z_]+$"
+        }
+      },
+      "cap_drop": {
+        "type": "array",
+        "description": "Linux capabilities to drop",
+        "items": {
+          "type": "string",
+          "pattern": "^[A-Z_]+$"
+        }
+      },
+      "privileged": {
+        "type": "boolean",
+        "description": "Run container in privileged mode"
+      },
+      "stop_grace_period": {
+        "type": "string",
+        "description": "Time to wait before force killing (e.g., '10s', '1m')"
+      },
+      "stop_signal": {
+        "type": "string",
+        "description": "Signal to stop container (e.g., 'SIGTERM', 'SIGKILL')"
+      },
+      "tmpfs": {
+        "type": "array",
+        "description": "Temporary file systems to mount",
+        "items": {
+          "type": "string"
+        }
+      },
+      "ulimits": {
+        "type": "object",
+        "description": "Override default ulimits",
+        "additionalProperties": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "soft": {
+                  "type": "integer"
+                },
+                "hard": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "soft",
+                "hard"
+              ]
+            }
+          ]
+        }
+      },
+      "logging": {
+        "type": "object",
+        "description": "Logging configuration",
+        "properties": {
+          "driver": {
+            "type": "string",
+            "description": "Logging driver (e.g., 'json-file', 'syslog', 'journald')"
+          },
+          "options": {
+            "type": "object",
+            "description": "Driver-specific options",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "devices": {
+        "type": "array",
+        "description": "Device mappings (e.g., '/dev/sda:/dev/xvda:rwm')",
+        "items": {
+          "type": "string"
+        }
+      },
+      "security_opt": {
+        "type": "array",
+        "description": "Security options (e.g., 'no-new-privileges:true')",
+        "items": {
+          "type": "string"
+        }
+      },
+      "read_only": {
+        "type": "boolean",
+        "description": "Mount root filesystem as read-only"
+      },
+      "init": {
+        "type": "boolean",
+        "description": "Run an init inside the container"
+      },
+      "web_ui": {
+        "type": "string",
+        "description": "Optional link to the container UI",
+        "format": "uri"
+      }
+    },
+    "oneOf": [
+      {
+        "required": [
+          "image"
+        ]
+      },
+      {
+        "required": [
+          "build"
+        ]
+      }
+    ]
+  }
+}

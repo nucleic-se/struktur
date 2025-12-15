@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>{{global.rss.title}}</title>
+    <description>{{global.rss.description}}</description>
+    <link>{{global.rss.link}}</link>
+    <language>{{global.rss.language}}</language>
+    {{#if global.rss.copyright}}
+    <copyright>{{global.rss.copyright}}</copyright>
+    {{/if}}
+    <atom:link href="{{global.rss.link}}/feed.xml" rel="self" type="application/rss+xml" />
+    {{#each (sort_by @root.instances "date" reverse=true)}}
+    {{#if (eq class "blog_post")}}
+    <item>
+      <title>{{title}}</title>
+      <link>{{@root.global.rss.link}}/posts/{{slug}}.html</link>
+      <guid>{{@root.global.rss.link}}/posts/{{slug}}.html</guid>
+      <pubDate>{{date}}</pubDate>
+      <description>{{description}}</description>
+      {{#if author}}
+      <author>{{author}}</author>
+      {{/if}}
+      {{#each tags}}
+      <category>{{this}}</category>
+      {{/each}}
+    </item>
+    {{/if}}
+    {{/each}}
+  </channel>
+</rss>

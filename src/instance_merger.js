@@ -1,0 +1,141 @@
+/**
+ * Instance Merger - Merge multiple instances with same ID
+ * 
+ * Phase 1: Simple deterministic merge
+ * - Objects: deep merge, last wins for scalars
+ * - Arrays: append (concatenate) + auto-dedupe
+ * - Fail fast: class mismatch, type conflicts
+ * - Track source files for debugging
+ */
+
+/**
+ * Deep merge two objects with strict type checking
+ * @param {any} target - Base value
+ * @param {any} source - Value to merge in
+ * @param {string} path - Current path for error messages
+ * @returns {any} Merged result
+ */
+function deepMerge(target, source, path = '') {
+  // Handle primitives and nulls
+  if (source === null || source === undefined) {
+    return target;
+  }
+  
+  if (target === null || target === undefined) {
+    return source;
+  }
+  
+  const targetType = Array.isArray(target) ? 'array' : typeof target;
+  const sourceType = Array.isArray(source) ? 'array' : typeof source;
+  
+  // Fail fast: type mismatch (except both objects)
+  if (targetType !== sourceType) {
+    throw new Error(
+      `Type conflict at ${path || 'root'}: cannot merge ${targetType} with ${sourceType}`
+    );
+  }
+  
+  // Arrays: concatenate and dedupe
+  if (Array.isArray(target)) {
+    const merged = [...target, ...source];
+    // Dedupe: keep first occurrence of primitives, all objects
+    const seen = new Set();
+    return merged.filter(item => {
+      if (typeof item === 'object' && item !== null) {
+        return true; // Keep all objects
+      }
+      const key = JSON.stringify(item);
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }
+  
+  // Objects: deep merge recursively
+  if (typeof target === 'object') {
+    const result = { ...target };
+    for (const key of Object.keys(source)) {
+      const newPath = path ? `${path}.${key}` : key;
+      if (key in result) {
+        result[key] = deepMerge(result[key], source[key], newPath);
+      } else {
+        result[key] = source[key];
+      }
+    }
+    return result;
+  }
+  
+  // Scalars: last wins
+  return source;
+}
+
+/**
+ * Merge instances with same ID
+ * @param {Array<Object>} instances - All instances from all sources
+ * @returns {Array<Object>} Merged instances
+ */
+export function mergeInstances(instances) {
+  const byId = new Map();
+  
+  for (const inst of instances) {
+    if (!inst.id) {
+      throw new Error('Instance missing required "id" field');
+    }
+    
+    if (!byId.has(inst.id)) {
+      byId.set(inst.id, {
+        merged: { ...inst },
+        sources: [inst._source_file || 'unknown']
+      });
+    } else {
+      const existing = byId.get(inst.id);
+      
+      // Fail fast: class mismatch
+      if (inst.class && existing.merged.class && existing.merged.class !== inst.class) {
+        throw new Error(
+          `Instance '${inst.id}' has conflicting classes:\n` +
+          `  ${existing.merged.class} in ${existing.sources[0]}\n` +
+          `  ${inst.class} in ${inst._source_file || 'unknown'}\n` +
+          `\n` +
+          `Tip: Use explicit flags to compose stacks at class level:\n` +
+          `  struktur build -c stack1/classes -c stack2/classes -i stack2/instances`
+        );
+      }
+      
+      try {
+        existing.merged = deepMerge(existing.merged, inst, inst.id);
+        existing.sources.push(inst._source_file || 'unknown');
+      } catch (error) {
+        throw new Error(
+          `Failed to merge instance '${inst.id}': ${error.message}\n` +
+          `  Sources: ${existing.sources.join(', ')}, ${inst._source_file || 'unknown'}`
+        );
+      }
+    }
+  }
+  
+  // Return merged instances with source tracking
+  return Array.from(byId.values()).map(({ merged, sources }) => ({
+    ...merged,
+    _merged_from: sources.length > 1 ? sources : undefined
+  }));
+}
+
+/**
+ * Get merge statistics for reporting
+ * @param {Array<Object>} instances - Original instances
+ * @param {Array<Object>} merged - Merged instances
+ * @returns {Object} Statistics
+ */
+export function getMergeStats(instances, merged) {
+  const mergedCount = merged.filter(m => m._merged_from).length;
+  const totalSources = instances.length;
+  const uniqueInstances = merged.length;
+  
+  return {
+    totalSources,
+    uniqueInstances,
+    mergedCount,
+    reduction: totalSources - uniqueInstances
+  };
+}
