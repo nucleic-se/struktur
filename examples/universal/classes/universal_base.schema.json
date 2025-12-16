@@ -31,12 +31,12 @@
         },
         "description": "Build instructions for template rendering"
       },
-      "kinds": {
+      "aspect_types": {
         "type": "array",
         "items": {
           "type": "string"
         },
-        "description": "Kind classifications for this instance"
+        "description": "Aspect types present on this instance (auto-derived from aspects object keys)"
       },
       "domains": {
         "type": "array",

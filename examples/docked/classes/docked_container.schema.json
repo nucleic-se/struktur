@@ -2,7 +2,7 @@
   "class": "docked_container",
   "parent": "entity_base",
   "pretty_name": "Containers",
-  "kinds": [
+  "aspect_types": [
     "docker_container"
   ],
   "domains": [],

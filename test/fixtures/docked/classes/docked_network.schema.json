@@ -95,7 +95,7 @@
   },
   "fields": {
     "pretty_name": "Networks",
-    "kinds": [
+    "aspect_types": [
       "docker_network"
     ],
     "domains": []

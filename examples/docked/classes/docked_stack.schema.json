@@ -51,7 +51,7 @@
         },
         "description": "Domain classifications for the stack"
       },
-      "kinds": {
+      "aspect_types": {
         "type": "array",
         "items": {
           "type": "string"
@@ -66,11 +66,11 @@
       "relations": {
         "type": "object",
         "additionalProperties": true,
-        "description": "Relationships to other objects (optional)"
+        "description": "Relationships to other instances (optional)"
       },
-      "objects": {
+      "instances": {
         "type": "object",
-        "description": "Resolved object map injected at build time",
+        "description": "Resolved instance map injected at build time",
         "additionalProperties": {
           "type": "object",
           "additionalProperties": {}

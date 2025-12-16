@@ -1,10 +1,10 @@
 {
-  "objects": [],
+  "instances": [],
   "instances_by_id": {},
   "classes_by_id": {},
-  "aspects_by_kind": {},
+  "aspects_by_id": {},
   "metadata": {
-    "timestamp": "2025-12-16T09:33:16.707Z",
+    "timestamp": "2025-12-16T10:05:00.385Z",
     "version": "0.2.0-alpha",
     "generator": "struktur",
     "count": 0,

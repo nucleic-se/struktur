@@ -350,11 +350,11 @@ describe('Security Tests', () => {
       });
 
       // Verify instance without id was not included
-      const noIdInstance = result.canonical.objects.find(obj => obj.some_field === 'value');
+      const noIdInstance = result.canonical.instances.find(obj => obj.some_field === 'value');
       assert.ok(!noIdInstance, 'Instance without id should not be loaded');
       
       // Verify valid instance was included
-      const validInstance = result.canonical.objects.find(obj => obj.id === 'valid1');
+      const validInstance = result.canonical.instances.find(obj => obj.id === 'valid1');
       assert.ok(validInstance, 'Instance with id should be loaded');
     });
   });

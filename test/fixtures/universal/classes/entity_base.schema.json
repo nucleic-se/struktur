@@ -13,7 +13,7 @@
         "type": "string",
         "description": "Display name for the entity (falls back to id if not provided)"
       },
-      "kinds": {
+      "aspect_types": {
         "type": "array",
         "items": {
           "type": "string"

@@ -40,7 +40,7 @@
       "required": true
     }
   },
-  "kinds": [],
+  "aspect_types": [],
   "pretty_name": "parent_with_aspect",
   "domains": [],
   "parent": [

@@ -105,7 +105,7 @@ export async function buildStack(options) {
     log.log(`  ✓ Merged ${mergeStats.reduction} duplicate IDs into ${instances.length} unique instances`);
   }
 
-  // Step 2: Generate canonical with validation (includes aspects_by_kind)
+  // Step 2: Generate canonical with validation (includes aspects_by_id)
   log.log('\n🔍 Validating stack...');
   const canonical = generateCanonicalWithValidation(instances, struktur, {
     includeMetadata: true,
@@ -133,7 +133,7 @@ export async function buildStack(options) {
     throw new Error('Security: canonical.json path resolution failed');
   }
   await fs.writeFile(canonicalPath, JSON.stringify(canonical, null, 2), 'utf-8');
-  log.log(`  ✓ canonical.json (${canonical.objects.length} objects)`);
+  log.log(`  ✓ canonical.json (${canonical.instances.length} instances)`);
 
   // Step 5: Write class definitions
   const classDefsDir = path.join(buildDir, 'meta', 'classes');
@@ -190,7 +190,7 @@ export async function buildStack(options) {
     }
 
     // Find global instance with build array
-    const globalInstance = canonical.objects.find(obj => obj.id === 'global');
+    const globalInstance = canonical.instances.find(obj => obj.id === 'global');
     const buildArray = globalInstance?.build || [];
     
     if (!globalInstance?.build) {
@@ -215,18 +215,18 @@ export async function buildStack(options) {
         });
       }
 
-      // Build instances_by_id map for v1 template compatibility
+      // Build instances_by_id map for backward compatibility
       const instancesById = {};
-      canonical.objects.forEach(obj => {
+      canonical.instances.forEach(obj => {
         instancesById[obj.id] = obj;
       });
 
       // Prepare context with canonical as single source of truth
-      // canonical.classes_by_id now contains resolved class objects (not instance IDs)
-      // aspects_by_kind is now part of canonical output
+      // canonical.classes_by_id contains resolved class objects
+      // canonical.aspects_by_id contains aspect definitions
       const templateContext = {
         global: globalInstance,
-        instances: canonical.objects,
+        instances: canonical.instances,
         instances_by_id: instancesById,  // v1 compatibility
         canonical,
         ...canonical
@@ -482,7 +482,7 @@ async function generateViewer(buildDir, canonical, classCount, aspectCount) {
   <div class="stats">
     <div class="stat-card">
       <h3>Instances</h3>
-      <div class="value">${canonical.objects.length}</div>
+      <div class="value">${canonical.instances.length}</div>
     </div>
     <div class="stat-card">
       <h3>Classes</h3>
@@ -496,7 +496,7 @@ async function generateViewer(buildDir, canonical, classCount, aspectCount) {
 
   <div class="instances">
     <h2>Instances</h2>
-    ${canonical.objects.map(obj => `
+    ${canonical.instances.map(obj => `
       <div class="instance">
         <div class="instance-header">
           <span class="instance-id">${obj.id}</span>

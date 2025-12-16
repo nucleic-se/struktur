@@ -2,7 +2,7 @@
   "class": "docked_network",
   "parent": "entity_base",
   "pretty_name": "Networks",
-  "kinds": [
+  "aspect_types": [
     "docker_network"
   ],
   "domains": [],

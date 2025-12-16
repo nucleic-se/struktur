@@ -426,7 +426,7 @@ program
         const outputDir = options.output || './output';
         await fs.mkdir(outputDir, { recursive: true });
 
-        for (const obj of canonical.objects) {
+        for (const obj of canonical.instances) {
           const templateName = `${obj.class}.hbs`;
           try {
             const rendered = await adapter.render(templateName, obj);
@@ -443,7 +443,7 @@ program
           }
         }
 
-        console.log(`\nRendered ${canonical.objects.length} objects to ${outputDir}`);
+        console.log(`\nRendered ${canonical.instances.length} instances to ${outputDir}`);
       } else {
         // Output canonical JSON
         let output;
@@ -453,9 +453,9 @@ program
             success: true,
             canonical,
             stats: {
-              instances: canonical.objects?.length || 0,
+              instances: canonical.instances?.length || 0,
               classes: Object.keys(canonical.classes_by_id || {}).length,
-              aspects: Object.keys(canonical.aspects_by_kind || {}).length,
+              aspects: Object.keys(canonical.aspects_by_id || {}).length,
               validationErrors: canonical.validation?.invalid || 0
             }
           }, null, 2);

@@ -21,9 +21,9 @@ function mergeInstanceWithFields(instance, fields = {}) {
   if (instance.aspects) {
     merged.aspects = instance.aspects;
     
-    // Auto-populate kinds from aspect keys if not already set
-    if (!merged.kinds && typeof instance.aspects === 'object') {
-      merged.kinds = Object.keys(instance.aspects);
+    // Auto-populate aspect_types from aspect keys for convenient filtering
+    if (!merged.aspect_types && typeof instance.aspects === 'object') {
+      merged.aspect_types = Object.keys(instance.aspects);
     }
   }
 
@@ -32,17 +32,17 @@ function mergeInstanceWithFields(instance, fields = {}) {
 
 /**
  * Build class index with resolved class objects
- * @param {Array<Object>} objects - Merged objects
+ * @param {Array<Object>} instances - Merged instances
  * @param {ClassResolver} resolver - Class resolver for metadata
  * @param {Object} logger - Logger instance
  * @returns {Object} - Map of class name to resolved class object (not instance IDs)
  */
-function buildClassIndex(objects, resolver, logger) {
+function buildClassIndex(instances, resolver, logger) {
   const index = {};
   const uniqueClasses = new Set();
 
-  // Collect unique class names from objects
-  for (const obj of objects) {
+  // Collect unique class names from instances
+  for (const obj of instances) {
     if (obj.class) {
       uniqueClasses.add(obj.class);
     }
@@ -81,7 +81,7 @@ export function generateCanonical(instances, resolver, options = {}) {
   } = options;
 
   // Merge instances with class defaults
-  const objects = instances.map(instance => {
+  const mergedInstances = instances.map(instance => {
     if (!instance.class) {
       // No class field - return as-is (should not happen if filtered correctly)
       return instance;
@@ -101,12 +101,12 @@ export function generateCanonical(instances, resolver, options = {}) {
 
   // Build canonical structure
   const canonical = {
-    objects
+    instances: mergedInstances
   };
   
-  // Add instances_by_id for fast lookup (v1 compatibility)
+  // Add instances_by_id for fast lookup
   const instancesById = {};
-  for (const obj of objects) {
+  for (const obj of mergedInstances) {
     if (obj.id) {
       instancesById[obj.id] = obj;
     }
@@ -115,21 +115,21 @@ export function generateCanonical(instances, resolver, options = {}) {
 
   // Add class index with resolved class objects (not instance IDs)
   if (includeClassIndex) {
-    canonical.classes_by_id = buildClassIndex(objects, resolver, logger);
+    canonical.classes_by_id = buildClassIndex(mergedInstances, resolver, logger);
   }
 
-  // Add aspects_by_kind (first-class entities)
+  // Add aspects_by_id (first-class entities)
   if (aspectLoader && aspectLoader.aspects) {
-    const aspectsByKind = {};
+    const aspectsById = {};
     for (const [aspectName, aspectDef] of aspectLoader.aspects.entries()) {
-      aspectsByKind[aspectName] = {
+      aspectsById[aspectName] = {
         aspect: aspectName,
         description: aspectDef.schema?.description || null,
         pretty_name: aspectName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
         schema: aspectDef.schema || {}
       };
     }
-    canonical.aspects_by_kind = aspectsByKind;
+    canonical.aspects_by_id = aspectsById;
   }
 
   // Add metadata
@@ -138,7 +138,7 @@ export function generateCanonical(instances, resolver, options = {}) {
       timestamp,
       version: '0.2.0-alpha',
       generator: 'struktur',
-      count: objects.length,
+      count: mergedInstances.length,
       classes: Object.keys(canonical.classes_by_id || {}).length,
       aspects: aspectLoader ? aspectLoader.aspects.size : 0
     };

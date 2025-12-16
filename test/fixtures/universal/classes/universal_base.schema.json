@@ -31,7 +31,7 @@
         },
         "description": "Build instructions for template rendering"
       },
-      "kinds": {
+      "aspect_types": {
         "type": "array",
         "items": {
           "type": "string"

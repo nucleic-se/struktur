@@ -31,7 +31,7 @@
     "domains": []
   },
   "aspects": {},
-  "kinds": [],
+  "aspect_types": [],
   "pretty_name": "entity_base",
   "domains": [],
   "parent": []

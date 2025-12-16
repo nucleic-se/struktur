@@ -97,7 +97,7 @@
   },
   "fields": {
     "pretty_name": "Volumes",
-    "kinds": [
+    "aspect_types": [
       "docker_volume"
     ],
     "domains": []

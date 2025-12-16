@@ -237,7 +237,7 @@
   },
   "fields": {
     "pretty_name": "Containers",
-    "kinds": [
+    "aspect_types": [
       "docker_container"
     ],
     "domains": []

@@ -47,7 +47,7 @@
       "required": false
     }
   },
-  "kinds": [],
+  "aspect_types": [],
   "pretty_name": "optional_service",
   "domains": [],
   "parent": [

@@ -73,9 +73,9 @@
           }
         }
       },
-      "objects": {
+      "instances": {
         "type": "object",
-        "description": "Stack objects catalog",
+        "description": "Stack instances catalog",
         "additionalProperties": {
           "type": "object",
           "additionalProperties": {}

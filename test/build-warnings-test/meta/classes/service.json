@@ -54,7 +54,7 @@
       "required": true
     }
   },
-  "kinds": [],
+  "aspect_types": [],
   "pretty_name": "service",
   "domains": [],
   "parent": [

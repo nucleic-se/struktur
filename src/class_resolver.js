@@ -51,7 +51,7 @@ export class ClassResolver {
       fields,
       aspects,
       // Include metadata from class definition for viewer
-      kinds: classDef.kinds || [],
+      aspect_types: classDef.aspect_types || [],
       pretty_name: classDef.pretty_name || className,
       domains: classDef.domains || [],
       parent: lineage.slice(0, -1)  // All parents in lineage order

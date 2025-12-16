@@ -2,7 +2,7 @@
   "class": "docked_volume",
   "parent": "entity_base",
   "pretty_name": "Volumes",
-  "kinds": [
+  "aspect_types": [
     "docker_volume"
   ],
   "domains": [],

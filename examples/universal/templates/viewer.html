@@ -112,7 +112,7 @@
   <script>
     // Load canonical data (single source of truth)
     const canonical = {{{json canonical}}};
-    const allInstances = canonical.objects.filter(obj => obj.id !== 'global');
+    const allInstances = canonical.instances.filter(obj => obj.id !== 'global');
     const allClasses = Object.values(canonical.classes_by_id);
     
     // Build relation indexes (drift-safe unidirectional)
@@ -145,9 +145,9 @@
       return { outbound, inbound };
     }
     
-    // Build aspect metadata map from canonical.aspects_by_kind (single source of truth)
+    // Build aspect metadata map from canonical.aspects_by_id (single source of truth)
     const aspectMetadata = new Map();
-    const aspectsByKind = canonical.aspects_by_kind || {};
+    const aspectsByKind = canonical.aspects_by_id || {};
     Object.entries(aspectsByKind).forEach(([kind, meta]) => {
       aspectMetadata.set(kind, {
         pretty_name: meta.pretty_name || kind.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
@@ -168,10 +168,10 @@
     
     // Build class hierarchy per aspect tree
     allClasses.forEach(cls => {
-      if (!cls.kinds || cls.kinds.length === 0) return;
+      if (!cls.aspect_types || cls.aspect_types.length === 0) return;
       
       // Add class to ALL aspect trees it belongs to
-      cls.kinds.forEach(kind => {
+      cls.aspect_types.forEach(kind => {
         if (!aspectTrees.has(kind)) {
           aspectTrees.set(kind, { name: kind, classes: new Map(), roots: [] });
         }
@@ -528,7 +528,7 @@
         const metadata = aspectMetadata.get(selectedKind);
         title.textContent = metadata?.pretty_name || (formatLabel(selectedKind) + 's');
       } else {
-        title.textContent = 'All Objects';
+        title.textContent = 'All Instances';
       }
     }
     
@@ -628,7 +628,7 @@
         }
       } else if (selectedKind) {
         filtered = filtered.filter(obj => 
-          obj.kinds && obj.kinds.includes(selectedKind)
+          obj.aspect_types && obj.aspect_types.includes(selectedKind)
         );
       }
       
@@ -640,9 +640,9 @@
       });
       
       document.getElementById('objectCount').textContent = 
-        `${filtered.length} object${filtered.length !== 1 ? 's' : ''}`;
+        `${filtered.length} instance${filtered.length !== 1 ? 's' : ''}`;
       
-      renderObjects(filtered);
+      renderInstances(filtered);
     }
     
     function getDescendantClasses(tree, className) {
@@ -657,11 +657,11 @@
       return descendants;
     }
     
-    function renderObjects(objects) {
+    function renderInstances(instances) {
       const grid = document.getElementById('objectGrid');
       grid.innerHTML = '';
       
-      objects.forEach(obj => {
+      instances.forEach(obj => {
         const col = document.createElement('div');
         col.className = 'col';
         col.innerHTML = createCard(obj);
@@ -772,10 +772,10 @@
       }
 
       // Kinds and domains badges
-      if ((obj.kinds && obj.kinds.length) || (obj.domains && obj.domains.length)) {
+      if ((obj.aspect_types && obj.aspect_types.length) || (obj.domains && obj.domains.length)) {
         html += `<div class="mt-3 pt-3 border-top">`;
-        if (obj.kinds) {
-          obj.kinds.forEach(k => {
+        if (obj.aspect_types) {
+          obj.aspect_types.forEach(k => {
             html += `<span class="badge bg-primary me-1">${escapeHtml(k)}</span>`;
           });
         }
@@ -875,8 +875,8 @@
       if (!inst) return;
       
       // Find which tree this instance belongs to
-      if (inst.kinds && inst.kinds.length > 0) {
-        const kind = inst.kinds[0];
+      if (inst.aspect_types && inst.aspect_types.length > 0) {
+        const kind = inst.aspect_types[0];
         selectInstance(kind, inst.class, instanceId);
       } else {
         // Fallback: just filter by ID

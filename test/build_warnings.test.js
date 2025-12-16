@@ -24,7 +24,7 @@ describe('Build Warnings and Messaging', () => {
     assert.strictEqual(typeof canonical.canonical.instances_by_id, 'object');
     
     // Verify it's a lookup map
-    const instances = canonical.canonical.objects;
+    const instances = canonical.canonical.instances;
     for (const inst of instances) {
       if (inst.id) {
         assert.ok(canonical.canonical.instances_by_id[inst.id], `instances_by_id should contain ${inst.id}`);

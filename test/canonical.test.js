@@ -28,10 +28,10 @@ describe('Canonical Output', () => {
 
     const canonical = generateCanonical(instances, resolver);
 
-    assert.ok(canonical.objects, 'Should have objects array');
-    assert.equal(canonical.objects.length, 2, 'Should have 2 objects');
-    assert.equal(canonical.objects[0].id, 'test1', 'First object should be test1');
-    assert.equal(canonical.objects[1].id, 'test2', 'Second object should be test2');
+    assert.ok(canonical.instances, 'Should have objects array');
+    assert.equal(canonical.instances.length, 2, 'Should have 2 objects');
+    assert.equal(canonical.instances[0].id, 'test1', 'First object should be test1');
+    assert.equal(canonical.instances[1].id, 'test2', 'Second object should be test2');
   });
 
   it('should merge instances with class field defaults', async () => {
@@ -44,7 +44,7 @@ describe('Canonical Output', () => {
     ];
 
     const canonical = generateCanonical(instances, resolver);
-    const obj = canonical.objects[0];
+    const obj = canonical.instances[0];
 
     // Should have both instance fields and class defaults
     assert.equal(obj.id, 'test1', 'Should preserve instance id');
@@ -134,8 +134,8 @@ describe('Canonical Output', () => {
 
     const canonical = generateCanonical(instances, resolver);
 
-    assert.ok(canonical.objects[0].aspects, 'Should preserve aspects');
-    assert.equal(canonical.objects[0].aspects.test_aspect.value, 'test', 'Should preserve aspect data');
+    assert.ok(canonical.instances[0].aspects, 'Should preserve aspects');
+    assert.equal(canonical.instances[0].aspects.test_aspect.value, 'test', 'Should preserve aspect data');
   });
 
   it('should handle unknown classes gracefully', async () => {
@@ -149,9 +149,9 @@ describe('Canonical Output', () => {
 
     const canonical = generateCanonical(instances, resolver);
 
-    assert.ok(canonical.objects, 'Should still generate output');
-    assert.equal(canonical.objects.length, 1, 'Should include instance');
-    assert.equal(canonical.objects[0].id, 'test1', 'Should preserve instance');
+    assert.ok(canonical.instances, 'Should still generate output');
+    assert.equal(canonical.instances.length, 1, 'Should include instance');
+    assert.equal(canonical.instances[0].id, 'test1', 'Should preserve instance');
   });
 
   it('should generate canonical with validation metadata', async () => {
@@ -185,7 +185,7 @@ describe('Canonical Output', () => {
     const canonical = generateCanonical(instances, resolver);
 
     // Instance value should win over class default
-    assert.equal(canonical.objects[0].status, 'published', 'Instance value should override default');
+    assert.equal(canonical.instances[0].status, 'published', 'Instance value should override default');
   });
 
   it('should handle empty instances array', async () => {
@@ -195,8 +195,8 @@ describe('Canonical Output', () => {
 
     const canonical = generateCanonical([], resolver);
 
-    assert.ok(canonical.objects, 'Should have objects array');
-    assert.equal(canonical.objects.length, 0, 'Should be empty');
+    assert.ok(canonical.instances, 'Should have objects array');
+    assert.equal(canonical.instances.length, 0, 'Should be empty');
     assert.ok(canonical.metadata, 'Should have metadata');
     assert.equal(canonical.metadata.count, 0, 'Should show 0 count');
   });
