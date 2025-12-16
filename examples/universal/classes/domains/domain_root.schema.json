@@ -2,7 +2,6 @@
   "class": "domain_root",
   "parent": "universal_base",
   "schema": {
-    "class": "domain_root",
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {

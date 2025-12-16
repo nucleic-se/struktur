@@ -1,7 +1,6 @@
 {
   "aspect": "docker_container",
   "schema": {
-    "class": "aspect_docker_container",
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "description": "Docker container configuration",

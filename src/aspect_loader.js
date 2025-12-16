@@ -34,7 +34,7 @@ export class AspectLoader {
 
     // Meta-validate schema against JSON Schema draft-07 (security: fail fast)
     try {
-      const ajv = new Ajv({ strict: false, validateFormats: false });
+      const ajv = new Ajv({ strict: true, strictRequired: false, strictTypes: false, validateSchema: true, validateFormats: false });
       ajv.compile(aspect.schema);
     } catch (error) {
       throw new Error(

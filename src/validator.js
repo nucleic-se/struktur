@@ -12,7 +12,10 @@ export class MultiPassValidator {
   constructor(options = {}) {
     this.ajv = new Ajv({
       allErrors: true,
-      strict: false,
+      strict: true,
+      strictRequired: false, // Allow required in oneOf branches without defining all properties
+      strictTypes: false, // Allow union types like ["string", "null"]
+      validateSchema: true,
       validateFormats: true,
       ...options.ajvOptions
     });
