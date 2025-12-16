@@ -33,7 +33,7 @@ describe('Build Warnings and Messaging', () => {
     }
   });
 
-  it('should warn about classless instances (except global)', async () => {
+  it('should throw error for classless instances', async () => {
     const testDir = path.join(__dirname, 'temp-classless-test');
     await fs.mkdir(testDir, { recursive: true });
     
@@ -43,33 +43,30 @@ describe('Build Warnings and Messaging', () => {
       JSON.stringify({ id: 'bad-instance', field: 'value' })
     );
 
-    // Create a logger to capture warnings
-    const { createLogger } = await import('../src/utils/logger.js');
-    const logger = createLogger({ quiet: true });
-
-    await buildStack({
-      classDirs: [path.join(fixturesDir, 'classes')],
-      instanceDirs: [testDir],
-      buildDir: path.join(__dirname, 'build-classless-test'),
-      logger
-    });
-
-    // Check for warning about classless instances
-    const warnings = logger.getWarnings();
-    const classlessWarning = warnings.find(w => 
-      w.message.includes('classless instances will be dropped') ||
-      w.message.includes('bad-instance')
+    // Should throw error for classless instances
+    await assert.rejects(
+      async () => {
+        await buildStack({
+          classDirs: [path.join(fixturesDir, 'classes')],
+          instanceDirs: [testDir],
+          buildDir: path.join(__dirname, 'build-classless-test'),
+          quiet: true
+        });
+      },
+      (error) => {
+        return error.message.includes("missing required 'class' field") &&
+               error.message.includes('bad-instance');
+      },
+      'Should throw error with classless instance details'
     );
-    assert.ok(classlessWarning, 'Should warn about classless instances');
 
     // Cleanup
     await fs.rm(testDir, { recursive: true, force: true });
     await fs.rm(path.join(__dirname, 'build-classless-test'), { recursive: true, force: true });
   });
 
-  it('should show separate counts for class vs classless instances', async () => {
-    // Just verify that build completes successfully with classless instances
-    // (The actual count format is tested in integration tests)
+  it('should successfully build when all instances have class field', async () => {
+    // Verify that build completes successfully when all instances are valid
     await buildStack({
       classDirs: [path.join(fixturesDir, 'classes')],
       instanceDirs: [path.join(fixturesDir, 'instances')],

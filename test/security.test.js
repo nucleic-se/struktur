@@ -52,6 +52,7 @@ describe('Security Tests', () => {
         path.join(testDir, 'instances', 'global.json'),
         JSON.stringify({
           id: 'global',
+          class: 'test',
           build: [
             { 'test.html': '../../../etc/passwd' }
           ]

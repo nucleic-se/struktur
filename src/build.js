@@ -85,17 +85,19 @@ export async function buildStack(options) {
   
   log.log(`  ✓ Loaded ${allInstances.length} instances`);
   
-  // Emit consolidated warning for classless rejects
+  // Enforce class field requirement - throw error for classless instances
   if (allClasslessRejects.length > 0) {
-    log.warn(`  ⚠ Rejected ${allClasslessRejects.length} classless instances (missing 'class' field):`);
+    const errorMessage = [`\nError: Found ${allClasslessRejects.length} instances missing required 'class' field:\n`];
     // Show first 5 examples
     const examples = allClasslessRejects.slice(0, 5);
     for (const reject of examples) {
-      log.warn(`     - '${reject.id}' in ${reject.file}`);
+      errorMessage.push(`  - '${reject.id}' in ${reject.file}`);
     }
     if (allClasslessRejects.length > 5) {
-      log.warn(`     ... and ${allClasslessRejects.length - 5} more`);
+      errorMessage.push(`  ... and ${allClasslessRejects.length - 5} more`);
     }
+    errorMessage.push('\nAll instances must have a "class" field that references a valid class definition.');
+    throw new Error(errorMessage.join('\n'));
   }
 
   // Merge instances with same ID
