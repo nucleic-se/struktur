@@ -30,10 +30,10 @@ describe('Example Stack Builds', () => {
       const resolvePath = (p) => join(stack.path, p);
       
       const buildOptions = {
-        classDirs: (config.classDirs || []).map(resolvePath),
-        instanceDirs: (config.instanceDirs || []).map(resolvePath),
-        aspectDirs: (config.aspectDirs || []).map(resolvePath),
-        templateDirs: (config.templateDirs || []).map(resolvePath),
+        classDirs: (config.classes || config.classDirs || []).map(resolvePath),
+        instanceDirs: (config.instances || config.instanceDirs || []).map(resolvePath),
+        aspectDirs: (config.aspects || config.aspectDirs || []).map(resolvePath),
+        templateDirs: (config.templates || config.templateDirs || []).map(resolvePath),
         buildDir: resolvePath(config.buildDir || 'build'),
         engine: config.engine || 'handlebars',
         logger: {

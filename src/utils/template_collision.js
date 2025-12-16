@@ -80,7 +80,7 @@ export async function detectTemplateCollisions(templateDirs) {
       collisions.push({
         templateKey: key,
         sources: sources.map(s => s.dir),
-        winner: sources[0].dir, // First one wins in search path
+        winner: sources[sources.length - 1].dir, // Last one wins in search path
         fullPaths: sources.map(s => s.fullPath)
       });
     } else {

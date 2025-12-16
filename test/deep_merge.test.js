@@ -125,7 +125,7 @@ describe('Class Field Deep Merging', async () => {
       path.join(testDir, 'child.schema.json'),
       JSON.stringify({
         class: 'child',
-        inherits_from: 'base',
+        parent: 'base',
         schema: {
           type: 'object',
           properties: {
@@ -148,7 +148,7 @@ describe('Class Field Deep Merging', async () => {
       path.join(testDir, 'grandchild.schema.json'),
       JSON.stringify({
         class: 'grandchild',
-        inherits_from: 'child',
+        parent: 'child',
         schema: {
           type: 'object'
         },
@@ -190,7 +190,7 @@ describe('Class Field Deep Merging', async () => {
       path.join(testDir, 'simple.schema.json'),
       JSON.stringify({
         class: 'simple',
-        inherits_from: 'base',
+        parent: 'base',
         schema: { type: 'object' },
         fields: {
           simple_field: 'value'

@@ -33,7 +33,7 @@ export async function buildStack(options) {
   } = options;
 
   // Validate required inputs
-  if (!classDirs || classDirs.length === 0) {
+  if (!classDirs || !Array.isArray(classDirs) || classDirs.length === 0) {
     throw new Error('Either provide a stack directory or use -c/--classes flag');
   }
 
