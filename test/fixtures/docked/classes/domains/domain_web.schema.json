@@ -1,6 +1,6 @@
 {
   "class": "domain_web",
-  "inherits_from": "domain_root",
+  "parent": "domain_root",
   "schema": {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",

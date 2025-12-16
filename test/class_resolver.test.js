@@ -86,13 +86,13 @@ describe('ClassResolver', () => {
       // Create circular classes manually
       loader.classes.set('circular_a', {
         class: 'circular_a',
-        inherits_from: 'circular_b',
+        parent: 'circular_b',
         schema: { type: 'object' }
       });
 
       loader.classes.set('circular_b', {
         class: 'circular_b',
-        inherits_from: 'circular_a',
+        parent: 'circular_a',
         schema: { type: 'object' }
       });
 

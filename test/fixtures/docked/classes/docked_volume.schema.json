@@ -1,6 +1,6 @@
 {
   "class": "docked_volume",
-  "inherits_from": "entity_base",
+  "parent": "entity_base",
   "schema": {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",

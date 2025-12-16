@@ -1,6 +1,6 @@
 {
   "class": "class_c",
-  "inherits_from": "class_a",
+  "parent": "class_a",
   "schema": {
     "type": "object",
     "properties": {

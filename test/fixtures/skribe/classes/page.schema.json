@@ -1,6 +1,6 @@
 {
   "class": "page",
-  "inherits_from": "content_base",
+  "parent": "content_base",
   "schema": {
     "type": "object",
     "properties": {

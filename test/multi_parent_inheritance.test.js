@@ -27,10 +27,10 @@ describe('Multi-Parent Inheritance', () => {
     const multiParent = classLoader.getClass('multi_parent');
 
     assert.ok(multiParent);
-    assert.ok(Array.isArray(multiParent.inherits_from));
-    assert.strictEqual(multiParent.inherits_from.length, 2);
-    assert.ok(multiParent.inherits_from.includes('mixin_a'));
-    assert.ok(multiParent.inherits_from.includes('mixin_b'));
+    assert.ok(Array.isArray(multiParent.parent));
+    assert.strictEqual(multiParent.parent.length, 2);
+    assert.ok(multiParent.parent.includes('mixin_a'));
+    assert.ok(multiParent.parent.includes('mixin_b'));
   });
 
   it('should resolve multi-parent lineage in left-to-right order', () => {

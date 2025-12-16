@@ -1,6 +1,6 @@
 {
   "class": "blog_post",
-  "inherits_from": "content_base",
+  "parent": "content_base",
   "schema": {
     "type": "object",
     "required": ["date"],

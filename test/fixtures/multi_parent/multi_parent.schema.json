@@ -1,6 +1,6 @@
 {
   "class": "multi_parent",
-  "inherits_from": ["mixin_a", "mixin_b"],
+  "parent": ["mixin_a", "mixin_b"],
   "schema": {
     "type": "object",
     "properties": {

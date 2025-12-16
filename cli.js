@@ -227,13 +227,14 @@ function displayResults(results, quiet) {
         }
       }
     }
-
-    console.log('\n=== Summary ===');
-    console.log(`Total:   ${summary.total}`);
-    console.log(`Valid:   ${summary.valid}`);
-    console.log(`Invalid: ${summary.invalid}`);
-    console.log(`Errors:  ${summary.errorCount}\n`);
   }
+
+  // Always show summary (even in quiet mode)
+  console.log('\n=== Summary ===');
+  console.log(`Total:   ${summary.total}`);
+  console.log(`Valid:   ${summary.valid}`);
+  console.log(`Invalid: ${summary.invalid}`);
+  console.log(`Errors:  ${summary.errorCount}\n`);
 }
 
 program

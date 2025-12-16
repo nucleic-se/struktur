@@ -1,6 +1,6 @@
 {
   "class": "service",
-  "inherits_from": "entity_base",
+  "parent": "entity_base",
   "schema": {
     "type": "object",
     "required": ["port"],
