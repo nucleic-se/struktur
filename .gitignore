@@ -32,3 +32,5 @@ temp/
 
 # Test outputs
 test-results/
+test/build-warnings-test/.struktur-manifest.json
+test/build-warnings-test/canonical.json
