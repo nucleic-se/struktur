@@ -122,6 +122,13 @@ program
         console.log(`✓ Merged ${mergeStats.reduction} duplicate IDs into ${instances.length} unique instances`);
       }
 
+      // Warn if no instances found
+      if (instances.length === 0 && !options.quiet) {
+        console.warn('⚠ Warning: No instances found to validate.');
+        console.warn('   Tip: Use -i/--instances to specify instance directory');
+        console.warn('        or provide a stack directory with instances/ subdirectory');
+      }
+
       // Validate all instances
       const results = struktur.validate(instances);
 
@@ -254,13 +261,13 @@ function displayResults(results, quiet) {
         }
       }
     }
-  }
 
-  console.log('\n=== Summary ===');
-  console.log(`Total:   ${summary.total}`);
-  console.log(`Valid:   ${summary.valid}`);
-  console.log(`Invalid: ${summary.invalid}`);
-  console.log(`Errors:  ${summary.errorCount}\n`);
+    console.log('\n=== Summary ===');
+    console.log(`Total:   ${summary.total}`);
+    console.log(`Valid:   ${summary.valid}`);
+    console.log(`Invalid: ${summary.invalid}`);
+    console.log(`Errors:  ${summary.errorCount}\n`);
+  }
 }
 
 program

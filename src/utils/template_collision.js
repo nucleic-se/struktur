@@ -80,7 +80,7 @@ export async function detectTemplateCollisions(templateDirs) {
       collisions.push({
         templateKey: key,
         sources: sources.map(s => s.dir),
-        winner: sources[sources.length - 1].dir, // Last one wins
+        winner: sources[0].dir, // First one wins in search path
         fullPaths: sources.map(s => s.fullPath)
       });
     } else {
@@ -125,7 +125,7 @@ export function formatCollisionReport(report, options = {}) {
     
     for (let i = 0; i < collision.sources.length; i++) {
       const source = collision.sources[i];
-      const isWinner = i === collision.sources.length - 1;
+      const isWinner = i === 0; // First directory wins in search path order
       const marker = isWinner ? '→ USED' : '  overridden';
       lines.push(`    ${marker}: ${source}`);
     }

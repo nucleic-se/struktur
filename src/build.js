@@ -32,6 +32,11 @@ export async function buildStack(options) {
     failOnCollisions = true
   } = options;
 
+  // Validate required inputs
+  if (!classDirs || classDirs.length === 0) {
+    throw new Error('Either provide a stack directory or use -c/--classes flag');
+  }
+
   const log = logger || createLogger({ quiet });
   
   // Generate deterministic build dir by default (disable with deterministic=false)
