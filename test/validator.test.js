@@ -278,7 +278,7 @@ describe('MultiPassValidator', () => {
           properties: { id: { type: 'string' } }
         }],
         fields: {},
-        aspects: ['test_aspect']
+        aspects: { test_aspect: { required: false } }
       };
 
       const aspectDef = {
@@ -317,7 +317,7 @@ describe('MultiPassValidator', () => {
           properties: { id: { type: 'string' } }
         }],
         fields: {},
-        aspects: ['test_aspect']
+        aspects: { test_aspect: { required: false } }
       };
 
       const aspectDef = {
@@ -407,7 +407,7 @@ describe('MultiPassValidator', () => {
         lineage: ['test'],
         schemas: [{ type: 'object', properties: { id: { type: 'string' } } }],
         fields: {},
-        aspects: ['unregistered_aspect']
+        aspects: { unregistered_aspect: { required: false } }
       };
 
       validator.registerClass(resolvedClass);
@@ -575,7 +575,7 @@ describe('MultiPassValidator', () => {
         lineage: ['test'],
         schemas: [{ type: 'object', properties: { id: { type: 'string' } } }],
         fields: {},
-        aspects: ['test_aspect']
+        aspects: { test_aspect: { required: false } }
       };
 
       const aspectDef = {

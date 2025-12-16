@@ -136,25 +136,37 @@ export class ClassResolver {
    * Merge aspect requirements across lineage
    * @private
    * @param {Array<string>} lineage - Lineage chain
-   * @returns {Array<string>}
+   * @returns {Object.<string, {required: boolean}>}
    */
   _mergeAspects(lineage) {
-    const aspectSet = new Set();
+    const aspectMap = {};
 
     for (const className of lineage) {
       const classDef = this.classLoader.getClass(className);
       if (classDef.aspects) {
         if (Array.isArray(classDef.aspects)) {
-          // Handle array format: ["aspect1", "aspect2"]
-          classDef.aspects.forEach(aspect => aspectSet.add(aspect));
+          // Handle array format: ["aspect1", "aspect2"] - assume optional
+          classDef.aspects.forEach(aspect => {
+            if (!aspectMap[aspect]) {
+              aspectMap[aspect] = { required: false };
+            }
+          });
         } else {
           // Handle object format: { aspect1: {required: true}, aspect2: {required: false} }
-          Object.keys(classDef.aspects).forEach(aspect => aspectSet.add(aspect));
+          for (const [aspectName, aspectConfig] of Object.entries(classDef.aspects)) {
+            // Parent required=true takes precedence over child required=false
+            if (!aspectMap[aspectName]) {
+              aspectMap[aspectName] = { required: aspectConfig.required === true };
+            } else if (aspectConfig.required === true) {
+              // Override if this layer requires it (parent wins)
+              aspectMap[aspectName].required = true;
+            }
+          }
         }
       }
     }
 
-    return Array.from(aspectSet);
+    return aspectMap;
   }
 
   /**

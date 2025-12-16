@@ -91,14 +91,12 @@ export class MultiPassValidator {
     }
 
     // Pass 2: Validate aspects
-    const aspectList = Array.isArray(aspects) ? aspects : Object.keys(aspects || {});
+    // aspects is now always an object: {aspectName: {required: boolean}, ...}
+    const aspectList = Object.keys(aspects || {});
 
     for (const aspectName of aspectList) {
       const aspectData = instance.aspects?.[aspectName];
-
-      // For array format, aspects are not explicitly required
-      // For object format, check requirement.required
-      const requirement = Array.isArray(aspects) ? null : aspects[aspectName];
+      const requirement = aspects[aspectName];
       const isRequired = requirement?.required === true;
 
       // Check required

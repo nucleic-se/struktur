@@ -2,6 +2,6 @@
   "classes": ["../universal/classes", "classes"],
   "aspects": ["../universal/aspects", "aspects"],
   "instances": ["instances"],
-  "templates": ["templates"],
+  "templates": ["../universal/templates", "templates"],
   "buildDir": "build"
 }

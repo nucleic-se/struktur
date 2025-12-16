@@ -59,8 +59,8 @@ describe('Aspect DRY (Define Once, Use Many)', () => {
 
     // But it inherits from class_a which has shared_aspect
     const resolved = resolver.resolve('class_c');
-    assert.ok(Array.isArray(resolved.aspects), 'Resolved aspects should be an array');
-    assert.ok(resolved.aspects.includes('shared_aspect'), 'Should inherit aspect from parent');
+    assert.strictEqual(typeof resolved.aspects, 'object', 'Resolved aspects should be an object');
+    assert.ok(resolved.aspects.shared_aspect, 'Should inherit aspect from parent');
   });
 
   it('should validate all classes using the same aspect schema', () => {

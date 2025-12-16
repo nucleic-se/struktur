@@ -1,0 +1,13 @@
+{
+  "class": "parent_with_aspect",
+  "parent": "entity_base",
+  "schema": {
+    "type": "object",
+    "properties": {}
+  },
+  "aspects": {
+    "network_interface": {
+      "required": true
+    }
+  }
+}

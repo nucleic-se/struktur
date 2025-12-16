@@ -1,0 +1,13 @@
+{
+  "class": "child_optionalizes",
+  "parent": "parent_requires",
+  "schema": {
+    "type": "object",
+    "properties": {}
+  },
+  "aspects": {
+    "network_interface": {
+      "required": false
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "class": "child_with_aspect",
+  "parent": "parent_with_aspect",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "child_field": {
+        "type": "string"
+      }
+    }
+  }
+}

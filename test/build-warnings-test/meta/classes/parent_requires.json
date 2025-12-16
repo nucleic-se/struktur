@@ -1,7 +1,8 @@
 {
-  "class": "entity_base",
+  "class": "parent_requires",
   "lineage": [
-    "entity_base"
+    "entity_base",
+    "parent_requires"
   ],
   "schemas": [
     {
@@ -25,14 +26,24 @@
           }
         }
       }
+    },
+    {
+      "type": "object",
+      "properties": {}
     }
   ],
   "fields": {
     "domains": []
   },
-  "aspects": {},
+  "aspects": {
+    "network_interface": {
+      "required": true
+    }
+  },
   "kinds": [],
-  "pretty_name": "entity_base",
+  "pretty_name": "parent_requires",
   "domains": [],
-  "parent": []
+  "parent": [
+    "entity_base"
+  ]
 }

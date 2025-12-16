@@ -49,9 +49,11 @@
     "domains": [],
     "replicas": 1
   },
-  "aspects": [
-    "network_interface"
-  ],
+  "aspects": {
+    "network_interface": {
+      "required": true
+    }
+  },
   "kinds": [],
   "pretty_name": "service",
   "domains": [],

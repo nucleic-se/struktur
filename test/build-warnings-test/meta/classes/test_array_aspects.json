@@ -1,7 +1,8 @@
 {
-  "class": "entity_base",
+  "class": "test_array_aspects",
   "lineage": [
-    "entity_base"
+    "entity_base",
+    "test_array_aspects"
   ],
   "schemas": [
     {
@@ -25,14 +26,28 @@
           }
         }
       }
+    },
+    {
+      "type": "object",
+      "properties": {
+        "test_field": {
+          "type": "string"
+        }
+      }
     }
   ],
   "fields": {
     "domains": []
   },
-  "aspects": {},
+  "aspects": {
+    "network_interface": {
+      "required": false
+    }
+  },
   "kinds": [],
-  "pretty_name": "entity_base",
+  "pretty_name": "test_array_aspects",
   "domains": [],
-  "parent": []
+  "parent": [
+    "entity_base"
+  ]
 }

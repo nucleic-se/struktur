@@ -1,7 +1,8 @@
 {
-  "class": "entity_base",
+  "class": "optional_service",
   "lineage": [
-    "entity_base"
+    "entity_base",
+    "optional_service"
   ],
   "schemas": [
     {
@@ -25,14 +26,31 @@
           }
         }
       }
+    },
+    {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
     }
   ],
   "fields": {
     "domains": []
   },
-  "aspects": {},
+  "aspects": {
+    "network_interface": {
+      "required": false
+    }
+  },
   "kinds": [],
-  "pretty_name": "entity_base",
+  "pretty_name": "optional_service",
   "domains": [],
-  "parent": []
+  "parent": [
+    "entity_base"
+  ]
 }

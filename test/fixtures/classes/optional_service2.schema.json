@@ -1,0 +1,18 @@
+{
+  "class": "optional_service2",
+  "parent": "entity_base",
+  "schema": {
+    "type": "object",
+    "required": ["id"],
+    "properties": {
+      "id": {
+        "type": "string"
+      }
+    }
+  },
+  "aspects": {
+    "network_interface": {
+      "required": false
+    }
+  }
+}

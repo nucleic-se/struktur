@@ -1,7 +1,9 @@
 {
-  "class": "entity_base",
+  "class": "child_optionalizes",
   "lineage": [
-    "entity_base"
+    "entity_base",
+    "parent_requires",
+    "child_optionalizes"
   ],
   "schemas": [
     {
@@ -25,14 +27,29 @@
           }
         }
       }
+    },
+    {
+      "type": "object",
+      "properties": {}
+    },
+    {
+      "type": "object",
+      "properties": {}
     }
   ],
   "fields": {
     "domains": []
   },
-  "aspects": {},
+  "aspects": {
+    "network_interface": {
+      "required": true
+    }
+  },
   "kinds": [],
-  "pretty_name": "entity_base",
+  "pretty_name": "child_optionalizes",
   "domains": [],
-  "parent": []
+  "parent": [
+    "entity_base",
+    "parent_requires"
+  ]
 }
