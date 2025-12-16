@@ -203,16 +203,18 @@ export async function buildStack(options) {
     await renderer.registerHelpers(canonical);
     await renderer.loadPartials(templateDirs);
 
-    // Find global instance with build array
-    const globalInstance = canonical.instances.find(obj => obj.id === 'global');
-    const buildArray = globalInstance?.build || [];
-    
-    if (!globalInstance?.build) {
-      log.warn(`  ⚠ Warning: No global.build array found - no templates will be rendered`);
-      log.log(`     Add a global.json with "build": [...] array to enable template rendering`);
+    // Collect build arrays from all instances (not just global)
+    const buildArray = [];
+    for (const instance of canonical.instances) {
+      if (instance.build && Array.isArray(instance.build)) {
+        buildArray.push(...instance.build);
+      }
     }
-
-    if (buildArray.length > 0) {
+    
+    if (buildArray.length === 0) {
+      log.log(`  ℹ No build tasks found (no instances with "build" array)`);
+      log.log(`     Templates will not be rendered. This is OK if you only need canonical output.`);
+    } else {
       log.log(`  Found ${buildArray.length} build tasks`);
       
       // Render all templates
