@@ -1,6 +1,6 @@
 {
   "name": "@nucleic-se/struktur",
-  "version": "0.2.0-alpha",
+  "version": "0.2.1-alpha",
   "description": "Declarative configuration system with JSON Schema validation, multi-parent inheritance, and template-driven output generation. Clean rewrite with improved architecture.",
   "main": "src/index.js",
   "type": "module",
