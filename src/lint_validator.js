@@ -12,13 +12,13 @@
 
 class LintValidator {
   constructor(options = {}) {
-    this.checkDescription = options.checkDescription !== false;
-    this.checkId = options.checkId !== false;
-    this.checkArrays = options.checkArrays !== false;
-    this.checkValues = options.checkValues !== false;
-    
-    // Array fields to check for emptiness
-    this.arrayFields = options.arrayFields || ['tags', 'categories', 'labels'];
+    this.options = {
+      checkDescription: options.checkDescription !== false,
+      checkId: options.checkId !== false,
+      checkArrays: options.checkArrays !== false,
+      checkValues: options.checkValues !== false,
+      arrayFields: options.arrayFields || ['tags', 'categories', 'labels']
+    };
     
     // ID pattern: lowercase alphanumeric + hyphens, no consecutive hyphens
     this.idPattern = /^[a-z0-9]+(-[a-z0-9]+)*$/;
@@ -29,8 +29,8 @@ class LintValidator {
    * @param {Object} instance
    * @returns {Array<Object>} Warnings
    */
-  checkDescription(instance) {
-    if (!this.checkDescription) return [];
+  _checkDescription(instance) {
+    if (!this.options.checkDescription) return [];
     
     const warnings = [];
     const desc = instance.description;
@@ -53,8 +53,8 @@ class LintValidator {
    * @param {Object} instance
    * @returns {Array<Object>} Warnings
    */
-  checkIdFormat(instance) {
-    if (!this.checkId) return [];
+  _checkIdFormat(instance) {
+    if (!this.options.checkId) return [];
     
     const warnings = [];
     const id = instance.id;
@@ -77,12 +77,12 @@ class LintValidator {
    * @param {Object} instance
    * @returns {Array<Object>} Warnings
    */
-  checkEmptyArrays(instance) {
-    if (!this.checkArrays) return [];
+  _checkEmptyArrays(instance) {
+    if (!this.options.checkArrays) return [];
     
     const warnings = [];
     
-    for (const field of this.arrayFields) {
+    for (const field of this.options.arrayFields) {
       if (Array.isArray(instance[field]) && instance[field].length === 0) {
         warnings.push({
           level: 'warning',
@@ -102,8 +102,8 @@ class LintValidator {
    * @param {Object} instance
    * @returns {Array<Object>} Warnings
    */
-  checkSuspiciousValues(instance) {
-    if (!this.checkValues) return [];
+  _checkSuspiciousValues(instance) {
+    if (!this.options.checkValues) return [];
     
     const warnings = [];
     
@@ -140,10 +140,10 @@ class LintValidator {
   validateInstance(instance) {
     const warnings = [];
     
-    warnings.push(...this.checkDescription(instance));
-    warnings.push(...this.checkIdFormat(instance));
-    warnings.push(...this.checkEmptyArrays(instance));
-    warnings.push(...this.checkSuspiciousValues(instance));
+    warnings.push(...this._checkDescription(instance));
+    warnings.push(...this._checkIdFormat(instance));
+    warnings.push(...this._checkEmptyArrays(instance));
+    warnings.push(...this._checkSuspiciousValues(instance));
     
     return warnings;
   }

@@ -1,12 +1,15 @@
 /**
- * MultiPassValidator - Validate instances against lineage + aspects
+ * MultiPassValidator - Validate instances against lineage + aspects + semantics + lint
  *
  * Key principle: Validate against each schema in lineage separately
  * Port of prototypes/multi_pass_validator.js with production hardening
+ * Extended with semantic validation and lint passes
  */
 
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
+import { SemanticValidator } from './semantic_validator.js';
+import { LintValidator } from './lint_validator.js';
 
 export class MultiPassValidator {
   constructor(options = {}) {
@@ -26,6 +29,12 @@ export class MultiPassValidator {
     this.classValidators = new Map();
     /** @type {Map<string, Function>} */
     this.aspectValidators = new Map();
+
+    // Semantic and lint validators
+    this.enableSemantic = options.enableSemantic !== false;
+    this.enableLint = options.enableLint !== false;
+    this.semanticValidator = new SemanticValidator();
+    this.lintValidator = new LintValidator(options.lintOptions);
   }
 
   /**
@@ -140,9 +149,27 @@ export class MultiPassValidator {
       }
     }
 
+    // Pass 3: Semantic validation (format checks, quality checks)
+    if (this.enableSemantic) {
+      const semanticWarnings = this.semanticValidator.validateInstance(instance);
+      errors.push(...semanticWarnings);
+    }
+
+    // Pass 4: Lint pass (data quality, conventions)
+    if (this.enableLint) {
+      const lintWarnings = this.lintValidator.validateInstance(instance);
+      errors.push(...lintWarnings);
+    }
+
+    // Separate errors from warnings
+    const actualErrors = errors.filter(e => e.level === 'error');
+    const warnings = errors.filter(e => e.level === 'warning');
+
     return {
-      valid: errors.length === 0,
-      errors
+      valid: actualErrors.length === 0,
+      errors: actualErrors,
+      warnings,
+      allIssues: errors  // Combined for convenience
     };
   }
 
