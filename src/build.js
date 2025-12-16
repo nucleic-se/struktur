@@ -28,7 +28,8 @@ export async function buildStack(options) {
     engine = 'handlebars',
     quiet = false,
     logger,
-    deterministic = false
+    deterministic = false,
+    failOnCollisions = true
   } = options;
 
   const log = logger || createLogger({ quiet });
@@ -179,6 +180,20 @@ export async function buildStack(options) {
   let renderedCount = 0;
   if (templateDirs.length > 0) {
     log.log('\n🎨 Rendering templates...');
+    
+    // Detect template collisions
+    const { detectTemplateCollisions, formatCollisionReport } = await import('./utils/template_collision.js');
+    const collisionReport = await detectTemplateCollisions(templateDirs);
+    
+    if (collisionReport.collisionCount > 0) {
+      const reportLines = formatCollisionReport(collisionReport, { verbose: false });
+      reportLines.forEach(line => log.warn(line));
+      
+      if (failOnCollisions) {
+        throw new Error(`Template collision detected. Found ${collisionReport.collisionCount} template(s) in multiple directories. Use unique names, remove duplicates, or use --allow-template-collisions to permit overrides.`);
+      }
+    }
+    
     const { createTemplateAdapter } = await import('./template_helpers.js');
     const adapter = createTemplateAdapter(engine);
     adapter.setSearchPaths(templateDirs);

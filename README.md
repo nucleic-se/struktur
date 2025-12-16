@@ -344,6 +344,27 @@ Templates are **read-only** by design. They receive validated data and generate 
 
 **Path Safety**: All output paths are resolved relative to build directory. Attempts to write outside build directory fail immediately with clear error messages.
 
+**Template Collision Detection**: When multiple template directories contain files with the same relative path, Struktur detects the collision and fails by default (strict mode). This catches unintentional duplicates and ensures explicit intent.
+
+- **Default behavior**: Collisions cause build failure with detailed report
+- **Override pattern**: Use `--allow-template-collisions` to permit layering (last directory wins)
+- **Collision report**: Shows which directories have the same template and which one will be used
+
+Example collision error:
+```
+⚠ 1 template collision(s) detected:
+
+Template: layouts/page.hbs
+Sources:
+  overridden: examples/base/templates
+  → USED: examples/custom/templates
+
+Note: Later directories override earlier ones in search path order.
+      Collisions fail by default. Use --allow-template-collisions to permit.
+```
+
+This strict-by-default approach prevents silent overwrites while still supporting intentional template layering when needed.
+
 ### Helper Extension
 
 Add custom helpers through the HelperRegistry:
