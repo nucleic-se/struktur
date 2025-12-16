@@ -99,8 +99,7 @@ export class ClassResolver {
       }
 
       // Handle both single parent (string) and multi-parent (array)
-      // Support both 'parent' (standard) and 'inherits_from' (legacy)
-      const parents = classDef.parent || classDef.inherits_from;
+      const parents = classDef.parent;
       if (parents) {
         const parentArray = Array.isArray(parents) ? parents : [parents];
         for (const parent of parentArray) {

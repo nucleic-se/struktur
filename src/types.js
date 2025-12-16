@@ -8,7 +8,7 @@
  * @typedef {Object} ClassDefinition
  * Raw class definition loaded from filesystem
  * @property {string} class - Class name
- * @property {string|Array<string>} [inherits_from] - Parent class name (or array for multi-parent)
+ * @property {string|Array<string>} [parent] - Parent class name (or array for multi-parent)
  * @property {Object} schema - JSON Schema (NOT merged with parents)
  * @property {Object.<string, any>} [fields] - Default field values
  * @property {Array<string>|Object.<string, AspectRequirement>} [aspects] - Aspect requirements (array or object)

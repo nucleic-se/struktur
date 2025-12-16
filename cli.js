@@ -178,10 +178,10 @@ program
       console.log('\n=== Classes ===');
       const classes = struktur.classLoader.getAllClasses();
       for (const cls of classes) {
-        const inherits = cls.inherits_from
-          ? Array.isArray(cls.inherits_from)
-            ? cls.inherits_from.join(', ')
-            : cls.inherits_from
+        const inherits = cls.parent
+          ? Array.isArray(cls.parent)
+            ? cls.parent.join(', ')
+            : cls.parent
           : 'none';
         console.log(`  ${cls.class} (inherits: ${inherits})`);
       }
