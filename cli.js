@@ -24,7 +24,7 @@ const __dirname = path.dirname(__filename);
 program
   .name('struktur')
   .description('Struktur - Stack validation and output generation')
-  .version('0.2.0-alpha');
+  .version('0.2.1-alpha');
 
 program
   .command('validate [stack-dirs...]')
