@@ -458,7 +458,21 @@ program
       let configFromFile = {};
 
       // Try to load config file
-      const configPath = options.config || path.join(process.cwd(), 'struktur.build.json');
+      // If a single stack dir is provided and no explicit config, check for config in that directory
+      let configPath = options.config;
+      if (!configPath && stackDirs && stackDirs.length === 1) {
+        const stackConfigPath = path.join(stackDirs[0], 'struktur.build.json');
+        try {
+          await fs.access(stackConfigPath);
+          configPath = stackConfigPath;
+        } catch {
+          // Fall back to current directory
+          configPath = path.join(process.cwd(), 'struktur.build.json');
+        }
+      } else {
+        configPath = configPath || path.join(process.cwd(), 'struktur.build.json');
+      }
+      
       try {
         const configContent = await fs.readFile(configPath, 'utf-8');
         configFromFile = JSON.parse(configContent);
