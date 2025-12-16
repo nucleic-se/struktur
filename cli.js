@@ -15,6 +15,10 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { resolveOutputPath } from './src/template_helpers/engine/index.js';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+const packageJson = require('./package.json');
 
 const program = new Command();
 
@@ -25,7 +29,7 @@ const __dirname = path.dirname(__filename);
 program
   .name('struktur')
   .description('Struktur - Stack validation and output generation')
-  .version('0.2.3-alpha');
+  .version(packageJson.version);
 
 program
   .command('validate [stack-dirs...]')
