@@ -118,6 +118,13 @@ export async function buildStack(options) {
   const summary = getValidationSummary(canonical.validation);
   if (summary.invalid > 0) {
     log.log(`  ✗ Validation failed: ${summary.invalid} invalid instances`);
+    
+    // Display detailed error information
+    if (canonical.validation && canonical.validation.errors) {
+      log.log('');
+      displayValidationErrors(canonical.validation, log);
+    }
+    
     throw new Error('Validation failed');
   }
   log.log(`  ✓ All ${summary.total} class-bearing instances valid`);
@@ -389,6 +396,101 @@ async function loadInstancesFromDir(dirPath) {
 
   await loadFromDir(dirPath);
   return { instances, classlessRejects };
+}
+
+/**
+ * Display validation errors with context and guidance
+ */
+function displayValidationErrors(validation, log) {
+  const errorEntries = validation?.errors || [];
+  
+  for (const entry of errorEntries) {
+    log.log(`❌ Instance: ${entry.instance || '(unknown)'}`);
+    if (entry.class) {
+      log.log(`   Class: ${entry.class}`);
+    }
+    log.log('');
+    
+    // Group errors by type for better readability
+    const errorsByType = {
+      required: [],
+      type: [],
+      pattern: [],
+      additionalProperties: [],
+      other: []
+    };
+    
+    for (const error of (entry.errors || [])) {
+      const ajv = error.ajvError || {};
+      const keyword = ajv.keyword || 'other';
+      
+      if (errorsByType[keyword]) {
+        errorsByType[keyword].push(error);
+      } else {
+        errorsByType.other.push(error);
+      }
+    }
+    
+    // Display missing required fields
+    if (errorsByType.required.length > 0) {
+      log.log('   Missing required fields:');
+      for (const err of errorsByType.required) {
+        const field = err.ajvError?.params?.missingProperty || '(unknown)';
+        log.log(`     • ${field}`);
+        log.log(`       ${err.message}`);
+      }
+      log.log('');
+    }
+    
+    // Display type errors
+    if (errorsByType.type.length > 0) {
+      log.log('   Type mismatches:');
+      for (const err of errorsByType.type) {
+        const expectedType = err.ajvError?.params?.type || 'unknown';
+        log.log(`     • Field: ${err.path}`);
+        log.log(`       Expected: ${expectedType}`);
+        log.log(`       ${err.message}`);
+      }
+      log.log('');
+    }
+    
+    // Display pattern/format errors
+    if (errorsByType.pattern.length > 0) {
+      log.log('   Format/pattern errors:');
+      for (const err of errorsByType.pattern) {
+        log.log(`     • Field: ${err.path}`);
+        log.log(`       ${err.message}`);
+        if (err.ajvError?.params?.pattern) {
+          log.log(`       Expected pattern: ${err.ajvError.params.pattern}`);
+        }
+      }
+      log.log('');
+    }
+    
+    // Display unexpected fields
+    if (errorsByType.additionalProperties.length > 0) {
+      log.log('   Unexpected fields (not in schema):');
+      for (const err of errorsByType.additionalProperties) {
+        const field = err.ajvError?.params?.additionalProperty || '(unknown)';
+        log.log(`     • ${field}`);
+        log.log(`       ${err.message}`);
+      }
+      log.log('');
+    }
+    
+    // Display other errors
+    if (errorsByType.other.length > 0) {
+      log.log('   Other validation errors:');
+      for (const err of errorsByType.other) {
+        log.log(`     • ${err.message}`);
+      }
+      log.log('');
+    }
+    
+    log.log('   💡 Tip: Check the schema for this class to see all requirements');
+    log.log('   📄 Full details: build/build-*/meta/validation.json');
+    log.log('');
+  }
 }
 
 /**
