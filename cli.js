@@ -10,6 +10,7 @@ import NunjucksAdapter from './src/adapters/nunjucks_adapter.js';
 import { buildStack } from './src/build.js';
 import { mergeInstances, getMergeStats } from './src/instance_merger.js';
 import { loadInstancesFromDir } from './src/utils/load_instances.js';
+import { normalizePathArray, discoverStackDirs, resolveConfigPaths, handleCommandError } from './src/cli_helpers.js';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -40,43 +41,17 @@ program
 
       let classDirs, aspectDirs, instanceDirs;
 
-      // Simplified mode: stack directories
+      // Stack directory mode with auto-discovery
       if (stackDirs && stackDirs.length > 0 && !options.classes) {
-        classDirs = [];
-        instanceDirs = [];
-        aspectDirs = [];
-
-        for (const stackDir of stackDirs) {
-          const resolvedStackDir = path.resolve(stackDir);
-          const conventionalDirs = {
-            classes: path.join(resolvedStackDir, 'classes'),
-            instances: path.join(resolvedStackDir, 'instances'),
-            aspects: path.join(resolvedStackDir, 'aspects')
-          };
-
-          const existingDirs = {};
-          for (const [key, dir] of Object.entries(conventionalDirs)) {
-            try {
-              await fs.access(dir);
-              existingDirs[key] = dir;
-            } catch {}
-          }
-
-          if (!existingDirs.classes) {
-            throw new Error(`Stack directory ${stackDir} requires classes/ subdirectory`);
-          }
-
-          classDirs.push(existingDirs.classes);
-          if (existingDirs.instances) instanceDirs.push(existingDirs.instances);
-          if (existingDirs.aspects) aspectDirs.push(existingDirs.aspects);
-        }
-
-        if (instanceDirs.length === 0) instanceDirs = [...classDirs];
+        const discovered = await discoverStackDirs(stackDirs, { includeTemplates: false });
+        classDirs = discovered.classDirs;
+        aspectDirs = discovered.aspectDirs;
+        instanceDirs = discovered.instanceDirs;
       } else if (options.classes) {
-        // Explicit mode
-        classDirs = Array.isArray(options.classes) ? options.classes : [options.classes];
-        aspectDirs = options.aspects ? (Array.isArray(options.aspects) ? options.aspects : [options.aspects]) : [];
-        instanceDirs = options.instances ? (Array.isArray(options.instances) ? options.instances : [options.instances]) : classDirs;
+        // Explicit mode with CLI flags
+        classDirs = normalizePathArray(options.classes);
+        aspectDirs = normalizePathArray(options.aspects);
+        instanceDirs = normalizePathArray(options.instances, classDirs);
       } else {
         throw new Error('Either provide a stack directory or use -c/--classes flag');
       }
@@ -146,15 +121,7 @@ program
       const hasErrors = results.some(r => !r.valid);
       process.exit(hasErrors ? 1 : 0);
     } catch (error) {
-      if (options.json) {
-        console.log(JSON.stringify({
-          success: false,
-          error: error.message
-        }, null, 2));
-      } else {
-        console.error(`Error: ${error.message}`);
-      }
-      process.exit(1);
+      handleCommandError(error, options);
     }
   });
 
@@ -168,8 +135,8 @@ program
       const struktur = createStruktur();
 
       // Load from multiple directories
-      const classDirs = Array.isArray(options.classes) ? options.classes : [options.classes];
-      const aspectDirs = options.aspects ? (Array.isArray(options.aspects) ? options.aspects : [options.aspects]) : [];
+      const classDirs = normalizePathArray(options.classes);
+      const aspectDirs = normalizePathArray(options.aspects);
 
       for (const dir of classDirs) {
         await struktur.classLoader.loadClassesFromDirectory(dir);
@@ -203,8 +170,7 @@ program
         console.log(`\nTotal: ${aspects.length} aspects`);
       }
     } catch (error) {
-      console.error(`Error: ${error.message}`);
-      process.exit(1);
+      handleCommandError(error, options);
     }
   });
 
@@ -289,47 +255,19 @@ program
 
       let classDirs, aspectDirs, instanceDirs, templateDirs;
 
-      // Simplified mode: stack directories
+      // Stack directory mode (templates NOT auto-discovered)
       if (stackDirs && stackDirs.length > 0 && !options.classes) {
-        classDirs = [];
-        instanceDirs = [];
-        aspectDirs = [];
-        templateDirs = [];
-
-        for (const stackDir of stackDirs) {
-          const resolvedStackDir = path.resolve(stackDir);
-          const conventionalDirs = {
-            classes: path.join(resolvedStackDir, 'classes'),
-            instances: path.join(resolvedStackDir, 'instances'),
-            aspects: path.join(resolvedStackDir, 'aspects')
-            // Note: generate does NOT auto-discover templates/ - use -t flag explicitly
-          };
-
-          const existingDirs = {};
-          for (const [key, dir] of Object.entries(conventionalDirs)) {
-            try {
-              await fs.access(dir);
-              existingDirs[key] = dir;
-            } catch {}
-          }
-
-          if (!existingDirs.classes) {
-            throw new Error(`Stack directory ${stackDir} requires classes/ subdirectory`);
-          }
-
-          classDirs.push(existingDirs.classes);
-          if (existingDirs.instances) instanceDirs.push(existingDirs.instances);
-          if (existingDirs.aspects) aspectDirs.push(existingDirs.aspects);
-          // Templates NOT auto-discovered in generate - use explicit -t flag
-        }
-
-        if (instanceDirs.length === 0) instanceDirs = [...classDirs];
+        const discovered = await discoverStackDirs(stackDirs, { includeTemplates: false });
+        classDirs = discovered.classDirs;
+        aspectDirs = discovered.aspectDirs;
+        instanceDirs = discovered.instanceDirs;
+        templateDirs = normalizePathArray(options.templates);
       } else if (options.classes) {
-        // Explicit mode
-        classDirs = Array.isArray(options.classes) ? options.classes : [options.classes];
-        aspectDirs = options.aspects ? (Array.isArray(options.aspects) ? options.aspects : [options.aspects]) : [];
-        instanceDirs = options.instances ? (Array.isArray(options.instances) ? options.instances : [options.instances]) : classDirs;
-        templateDirs = options.templates ? (Array.isArray(options.templates) ? options.templates : [options.templates]) : [];
+        // Explicit mode with CLI flags
+        classDirs = normalizePathArray(options.classes);
+        aspectDirs = normalizePathArray(options.aspects);
+        instanceDirs = normalizePathArray(options.instances, classDirs);
+        templateDirs = normalizePathArray(options.templates);
       } else {
         throw new Error('Either provide a stack directory or use -c/--classes flag');
       }
@@ -433,15 +371,7 @@ program
 
       process.exit(0);
     } catch (error) {
-      if (options.json) {
-        console.log(JSON.stringify({
-          success: false,
-          error: error.message
-        }, null, 2));
-      } else {
-        console.error(`Error: ${error.message}`);
-      }
-      process.exit(1);
+      handleCommandError(error, options);
     }
   });
 
@@ -496,22 +426,7 @@ program
 
       // Resolve paths from config relative to config file directory
       const configDir = path.dirname(configPath);
-      if (configFromFile.classes) {
-        configFromFile.classes = (Array.isArray(configFromFile.classes) ? configFromFile.classes : [configFromFile.classes])
-          .map(p => path.resolve(configDir, p));
-      }
-      if (configFromFile.aspects) {
-        configFromFile.aspects = (Array.isArray(configFromFile.aspects) ? configFromFile.aspects : [configFromFile.aspects])
-          .map(p => path.resolve(configDir, p));
-      }
-      if (configFromFile.instances) {
-        configFromFile.instances = (Array.isArray(configFromFile.instances) ? configFromFile.instances : [configFromFile.instances])
-          .map(p => path.resolve(configDir, p));
-      }
-      if (configFromFile.templates) {
-        configFromFile.templates = (Array.isArray(configFromFile.templates) ? configFromFile.templates : [configFromFile.templates])
-          .map(p => path.resolve(configDir, p));
-      }
+      resolveConfigPaths(configFromFile, configDir, ['classes', 'aspects', 'instances', 'templates']);
       if (configFromFile.buildDir) {
         configFromFile.buildDir = path.resolve(configDir, configFromFile.buildDir);
       }
@@ -519,18 +434,10 @@ program
       // CLI flags override config file, config file overrides defaults
       if (options.classes || configFromFile.classes || (stackDirs && stackDirs.length > 0)) {
         // Explicit mode or config mode
-        classDirs = options.classes 
-          ? (Array.isArray(options.classes) ? options.classes : [options.classes])
-          : configFromFile.classes || [];
-        aspectDirs = options.aspects 
-          ? (Array.isArray(options.aspects) ? options.aspects : [options.aspects])
-          : configFromFile.aspects || [];
-        instanceDirs = options.instances 
-          ? (Array.isArray(options.instances) ? options.instances : [options.instances])
-          : configFromFile.instances || [];
-        templateDirs = options.templates 
-          ? (Array.isArray(options.templates) ? options.templates : [options.templates])
-          : configFromFile.templates || [];
+        classDirs = normalizePathArray(options.classes || configFromFile.classes);
+        aspectDirs = normalizePathArray(options.aspects || configFromFile.aspects);
+        instanceDirs = normalizePathArray(options.instances || configFromFile.instances);
+        templateDirs = normalizePathArray(options.templates || configFromFile.templates);
 
         // Use build dir from CLI flag, then config, then default
         if (options.buildDir !== './build') {
@@ -556,52 +463,11 @@ program
 
       // Simplified mode: stack directories with conventional subdirectories
       if (stackDirs && stackDirs.length > 0 && classDirs.length === 0) {
-        classDirs = [];
-        instanceDirs = [];
-        aspectDirs = [];
-        templateDirs = [];
-
-        for (const stackDir of stackDirs) {
-          const resolvedStackDir = path.resolve(stackDir);
-          
-          // Auto-discover conventional subdirectories
-          const conventionalDirs = {
-            classes: path.join(resolvedStackDir, 'classes'),
-            instances: path.join(resolvedStackDir, 'instances'),
-            aspects: path.join(resolvedStackDir, 'aspects'),
-            templates: path.join(resolvedStackDir, 'templates')
-          };
-
-          // Check which directories exist
-          const existingDirs = {};
-          for (const [key, dir] of Object.entries(conventionalDirs)) {
-            try {
-              await fs.access(dir);
-              existingDirs[key] = dir;
-            } catch {
-              // Directory doesn't exist, skip
-            }
-          }
-
-          if (!existingDirs.classes) {
-            throw new Error(`Stack directory ${stackDir} requires classes/ subdirectory`);
-          }
-
-          classDirs.push(existingDirs.classes);
-          if (existingDirs.instances) instanceDirs.push(existingDirs.instances);
-          if (existingDirs.aspects) aspectDirs.push(existingDirs.aspects);
-          if (existingDirs.templates) templateDirs.push(existingDirs.templates);
-
-          if (!options.quiet && !options.json) {
-            console.log(`📦 Stack: ${resolvedStackDir}`);
-            console.log(`   Classes:   ${existingDirs.classes ? '✓' : '✗'}`);
-            console.log(`   Instances: ${existingDirs.instances ? '✓' : '✗'}`);
-            console.log(`   Aspects:   ${existingDirs.aspects ? '✓' : '✗'}`);
-            console.log(`   Templates: ${existingDirs.templates ? '✓' : '✗'}`);
-          }
-        }
-
-        if (instanceDirs.length === 0) instanceDirs = [...classDirs];
+        const discovered = await discoverStackDirs(stackDirs, { includeTemplates: true });
+        classDirs = discovered.classDirs;
+        aspectDirs = discovered.aspectDirs;
+        instanceDirs = discovered.instanceDirs;
+        templateDirs = discovered.templateDirs;
       }
 
       const result = await buildStack({
@@ -634,15 +500,12 @@ program
 
       process.exit(0);
     } catch (error) {
-      if (options.json) {
-        console.log(JSON.stringify({
-          success: false,
-          error: error.message
-        }, null, 2));
-      } else {
+      if (!options.json) {
         console.error(`\n❌ Build failed: ${error.message}`);
+        process.exit(1);
+      } else {
+        handleCommandError(error, options);
       }
-      process.exit(1);
     }
   });
 
