@@ -16,7 +16,7 @@ export function inherits(context, className, targetClasses) {
   const { classes_by_id } = context;
   if (!classes_by_id || !className) return false;
   
-  const classDef = classes_by_id.get(className);
+  const classDef = classes_by_id[className];
   if (!classDef) return false;
   
   const targets = Array.isArray(targetClasses) ? targetClasses : [targetClasses];
@@ -52,7 +52,7 @@ export function classLineage(context, className) {
   const { classes_by_id } = context;
   if (!classes_by_id || !className) return [];
   
-  const classDef = classes_by_id.get(className);
+  const classDef = classes_by_id[className];
   if (!classDef) return [];
   
   return classDef.lineage || [className];

@@ -178,6 +178,29 @@ export async function buildStack(options) {
       adapter.registerHelper(name, fn);
     }
 
+    // Register struktur-specific helpers (require canonical context)
+    const strukturSchema = await import('./template_helpers/struktur/schema.js');
+    const strukturInheritance = await import('./template_helpers/struktur/inheritance.js');
+    
+    // Bind helpers with canonical context
+    const strukturContext = { classes_by_id: canonical.classes_by_id };
+    adapter.registerHelper('schemaRequired', (className, fieldName) => 
+      strukturSchema.schemaRequired(strukturContext, className, fieldName));
+    adapter.registerHelper('schemaHas', (className, fieldName) => 
+      strukturSchema.schemaHas(strukturContext, className, fieldName));
+    adapter.registerHelper('schemaProps', (className) => 
+      strukturSchema.schemaProps(strukturContext, className));
+    adapter.registerHelper('schemaPropSource', (className, fieldName) => 
+      strukturSchema.schemaPropSource(strukturContext, className, fieldName));
+    adapter.registerHelper('schemaRequiredBySource', (className) => 
+      strukturSchema.schemaRequiredBySource(strukturContext, className));
+    adapter.registerHelper('inherits', (className, targetClasses) => 
+      strukturInheritance.inherits(strukturContext, className, targetClasses));
+    adapter.registerHelper('filterInherits', (entries, targetClasses) => 
+      strukturInheritance.filterInherits(strukturContext, entries, targetClasses));
+    adapter.registerHelper('classLineage', (className) => 
+      strukturInheritance.classLineage(strukturContext, className));
+
     // Load all templates recursively as partials (format-agnostic)
     for (const dir of templateDirs) {
       if (adapter.loadPartials) {

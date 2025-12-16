@@ -36,14 +36,14 @@ export function schemaRequired(context, className, fieldName) {
   const { classes_by_id } = context;
   if (!classes_by_id || !className || !fieldName) return false;
   
-  const classDef = classes_by_id.get(className);
+  const classDef = classes_by_id[className];
   if (!classDef) return false;
   
   // Check class and all parents
   const lineage = classDef.lineage || [className];
   
   for (const ancestorName of lineage) {
-    const ancestor = classes_by_id.get(ancestorName);
+    const ancestor = classes_by_id[ancestorName];
     if (ancestor?.schema) {
       const required = getSchemaRequired(ancestor.schema);
       if (required.includes(fieldName)) {
@@ -66,14 +66,14 @@ export function schemaHas(context, className, fieldName) {
   const { classes_by_id } = context;
   if (!classes_by_id || !className || !fieldName) return false;
   
-  const classDef = classes_by_id.get(className);
+  const classDef = classes_by_id[className];
   if (!classDef) return false;
   
   // Check class and all parents
   const lineage = classDef.lineage || [className];
   
   for (const ancestorName of lineage) {
-    const ancestor = classes_by_id.get(ancestorName);
+    const ancestor = classes_by_id[ancestorName];
     if (ancestor?.schema) {
       const props = getSchemaProperties(ancestor.schema);
       if (props.includes(fieldName)) {
@@ -95,14 +95,14 @@ export function schemaProps(context, className) {
   const { classes_by_id } = context;
   if (!classes_by_id || !className) return [];
   
-  const classDef = classes_by_id.get(className);
+  const classDef = classes_by_id[className];
   if (!classDef) return [];
   
   const lineage = classDef.lineage || [className];
   const props = new Set();
   
   for (const ancestorName of lineage) {
-    const ancestor = classes_by_id.get(ancestorName);
+    const ancestor = classes_by_id[ancestorName];
     if (ancestor?.schema) {
       const ancestorProps = getSchemaProperties(ancestor.schema);
       ancestorProps.forEach(prop => props.add(prop));
@@ -123,13 +123,13 @@ export function schemaPropSource(context, className, fieldName) {
   const { classes_by_id } = context;
   if (!classes_by_id || !className || !fieldName) return '';
   
-  const classDef = classes_by_id.get(className);
+  const classDef = classes_by_id[className];
   if (!classDef) return '';
   
   const lineage = classDef.lineage || [className];
   
   for (const ancestorName of lineage) {
-    const ancestor = classes_by_id.get(ancestorName);
+    const ancestor = classes_by_id[ancestorName];
     if (ancestor?.schema) {
       const props = getSchemaProperties(ancestor.schema);
       if (props.includes(fieldName)) {
@@ -151,14 +151,14 @@ export function schemaRequiredBySource(context, className) {
   const { classes_by_id } = context;
   if (!classes_by_id || !className) return [];
   
-  const classDef = classes_by_id.get(className);
+  const classDef = classes_by_id[className];
   if (!classDef) return [];
   
   const lineage = classDef.lineage || [className];
   const result = [];
   
   for (const ancestorName of lineage) {
-    const ancestor = classes_by_id.get(ancestorName);
+    const ancestor = classes_by_id[ancestorName];
     if (ancestor?.schema) {
       const required = getSchemaRequired(ancestor.schema);
       if (required.length > 0) {
