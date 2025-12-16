@@ -725,10 +725,13 @@ program
           console.error(`Error: Directory ${targetDir} already exists. Use --force to overwrite.`);
           process.exit(1);
         }
-        // Remove existing directory
-        await fs.rm(targetDir, { recursive: true, force: true });
+        // Remove existing directory contents (but keep directory itself to avoid CWD issues)
+        const entries = await fs.readdir(targetDir);
+        for (const entry of entries) {
+          await fs.rm(path.join(targetDir, entry), { recursive: true, force: true });
+        }
       } catch {
-        // Directory doesn't exist, that's fine
+        // Directory doesn't exist, that's fine - create it below
       }
 
       // Copy example to target
@@ -755,10 +758,12 @@ program
   });
 
 /**
- * Recursively copy directory
+ * Recursively copy directory contents
  */
 async function copyDirectory(src, dest) {
+  // Ensure destination directory exists
   await fs.mkdir(dest, { recursive: true });
+  
   const entries = await fs.readdir(src, { withFileTypes: true });
 
   for (const entry of entries) {
