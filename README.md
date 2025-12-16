@@ -660,7 +660,7 @@ Apache 2.0 — see [LICENSE](LICENSE)
 ## Status
 
 **Version**: 0.2.0-alpha  
-**Tests**: 352/352 passing ✅  
+**Tests**: 364/364 passing ✅  
 **Status**: Alpha (breaking changes allowed)
 
 This is a clean rewrite with improved architecture. Breaking changes from 0.1.x are expected.
