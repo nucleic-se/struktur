@@ -285,6 +285,178 @@ This separation means:
 - **Composable design**: Layer stacks, override templates, extend classes—all without forking.
 - **Fail-fast validation**: Errors surface at build time with clear messages and line numbers.
 
+## Architecture
+
+### Build Pipeline
+
+Struktur executes builds through four deterministic phases:
+
+```
+1. LOAD      → Discover classes, aspects, instances from directories
+2. MERGE     → Combine data following inheritance and merge rules
+3. VALIDATE  → Check schemas, constraints, canonical structure
+4. RENDER    → Execute templates with validated data
+```
+
+Each phase is independent and can be inspected:
+- **Load Phase**: Creates class definitions with schemas and lineage
+- **Merge Phase**: Produces canonical.json with fully resolved instances
+- **Validate Phase**: Runs JSON Schema, constraint checks, semantic validation
+- **Render Phase**: Generates final outputs from templates
+
+**Error Handling**: Errors include phase labels, file paths, and class/instance context. Use `--quiet` to suppress progress logs while keeping error details.
+
+### Template System
+
+Templates are **read-only** by design. They receive validated data and generate outputs but cannot modify the canonical data model.
+
+**Template Context** (available in all templates):
+```javascript
+{
+  global,              // Global instance (id: "global")
+  instances,           // Array of all instances
+  instances_by_id,     // Map for lookups by ID
+  canonical,           // Full canonical structure
+  classes_by_id,       // Class definitions (for inheritance checks)
+  // ...plus all canonical fields spread at top level
+}
+```
+
+**Template Helpers** (three categories):
+
+1. **Generic Helpers** — Pure functions, no context needed
+   - Logic: `eq`, `or`, `and`, `not`
+   - Collections: `where`, `whereIncludes`, `sortBy`, `groupBy`, `pluck`
+   - Strings: `concat`, `replace`, `slugify`, `lowercase`, `uppercase`
+   - Utility: `length`, `defaultTo`
+
+2. **Struktur Helpers** — Need class/schema context
+   - `inherits(className, targetClass)` — Check inheritance
+   - `filterInherits(instances, targetClass)` — Filter by class
+   - `classLineage(className)` — Get full lineage array
+   - `schemaRequired(className, field)` — Check if field required
+   - `schemaHas(className, field)` — Check if field exists in schema
+   - `schemaProps(className)` — Get all schema properties
+
+3. **Engine Helpers** — Need build context
+   - `render_file(template, outputPath)` — Generate separate output files
+   - `partial_exists(partialName)` — Check if partial template exists
+
+**Path Safety**: All output paths are resolved relative to build directory. Attempts to write outside build directory fail immediately with clear error messages.
+
+### Helper Extension
+
+Add custom helpers through the HelperRegistry:
+
+```javascript
+import { HelperRegistry } from './src/template_helpers/index.js';
+
+const registry = new HelperRegistry();
+
+// Generic helper (pure function)
+registry.register('myHelper', (value) => {
+  return value.toUpperCase();
+}, { category: 'generic' });
+
+// Struktur helper (needs context)
+registry.register('hasPort', (context, className) => {
+  return context.classes_by_id[className]?.fields?.port !== undefined;
+}, { 
+  category: 'struktur',
+  requiresContext: true 
+});
+
+// Register to adapter
+registry.registerToAdapter(handlebarsAdapter, strukturContext, buildContext);
+```
+
+**Binding Rules**:
+- Generic helpers: Called directly with arguments
+- Struktur helpers: First argument is bound to `{ classes_by_id, canonical }`
+- Engine helpers: Receive `{ buildDir, outputs, log, adapter }`
+
+### Validation Architecture
+
+Validation runs in multiple passes to maintain separation of concerns:
+
+1. **Structural Validation** (JSON Schema, per-class)
+   - Each class validates independently
+   - Parent schemas checked first, then child schemas
+   - Keeps schemas separate for debugging and extensibility
+
+2. **Constraint Validation** (cross-schema conflicts)
+   - Detects impossible constraint combinations
+   - Examples: min > max, disjoint enums, incompatible types
+   - Fails immediately when conflicts detected (strict by default)
+
+3. **Semantic Validation** (data quality)
+   - Format checks (email, date, hostname, IP, URL)
+   - Length bounds (minLength, maxLength, minItems, maxItems)
+   - Enum restrictions and type correctness
+   - Warnings by default (informational, not failures)
+
+4. **Canonical Validation** (output structure)
+   - Validates the final canonical.json structure
+   - Ensures instances/classes/aspects arrays present
+   - Checks for required metadata and domain structure
+
+**Strictness Policy**: Schema validation warnings become errors by default (`--warnings-as-errors=true`). Semantic validation remains warnings. Constraint conflicts always fail (no opt-out).
+
+### Merge Semantics
+
+Instances merge through three mechanisms:
+
+1. **Multi-file Merging** (same ID across files)
+   ```json
+   // base/app.json
+   { "id": "app", "class": "service", "port": 8080 }
+   
+   // prod/app.json
+   { "id": "app", "replicas": 5 }
+   
+   // Result: { id: "app", class: "service", port: 8080, replicas: 5 }
+   ```
+
+2. **Class Inheritance** (parent → child defaults)
+   ```json
+   // Parent "service" has: { port: 8080, replicas: 1 }
+   // Child "web_service" adds: { ssl: true }
+   // Instance gets: { port: 8080, replicas: 1, ssl: true }
+   ```
+
+3. **Array Merging** (append by default, reset with $reset)
+   ```json
+   // Parent: { "tags": ["base", "service"] }
+   // Child:  { "tags": ["production"] }
+   // Result: { "tags": ["base", "service", "production"] }
+   
+   // With reset:
+   // Child:  { "tags": { "$reset": true, "values": ["production"] } }
+   // Result: { "tags": ["production"] }
+   ```
+
+**Merge Order**: Deterministic by directory order, then depth-first alphabetical for classes.
+
+### Logging Conventions
+
+Struktur uses structured logging with context preservation:
+
+- **Quiet Mode** (`--quiet`): Suppresses progress logs, keeps errors
+- **Phase Labels**: All errors include phase context (LOAD, MERGE, VALIDATE, RENDER)
+- **File Paths**: Errors show absolute paths to source files
+- **Instance Context**: When validation fails, shows instance ID and class
+- **Stack Traces**: Available in non-quiet mode for debugging
+
+**Error Message Structure**:
+```
+[VALIDATE] Schema constraint conflicts detected in class container:
+  - TYPE_CONFLICT: domain_infrastructure/container
+    Path: ports[*]
+    Parent universal_base requires string
+    Parent docked_container requires object
+    No compatible types remain after merge
+```
+
 ## Features
 
 ### Multi-Parent Inheritance
@@ -467,7 +639,7 @@ Apache 2.0 — see [LICENSE](LICENSE)
 ## Status
 
 **Version**: 0.2.0-alpha  
-**Tests**: 331/331 passing ✅  
+**Tests**: 352/352 passing ✅  
 **Status**: Alpha (breaking changes allowed)
 
 This is a clean rewrite with improved architecture. Breaking changes from 0.1.x are expected.
