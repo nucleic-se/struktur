@@ -116,6 +116,8 @@ export function generateCanonical(instances, resolver, options = {}) {
   // Add class index with resolved class objects (not instance IDs)
   if (includeClassIndex) {
     canonical.classes_by_id = buildClassIndex(mergedInstances, resolver, logger);
+    // Also provide classes as array for consistency with instances
+    canonical.classes = Object.values(canonical.classes_by_id);
   }
 
   // Add aspects_by_id (first-class entities)
@@ -130,6 +132,8 @@ export function generateCanonical(instances, resolver, options = {}) {
       };
     }
     canonical.aspects_by_id = aspectsById;
+    // Also provide aspects as array for consistency with instances
+    canonical.aspects = Object.values(aspectsById);
   }
 
   // Add metadata

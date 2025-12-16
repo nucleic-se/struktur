@@ -2,9 +2,11 @@
   "instances": [],
   "instances_by_id": {},
   "classes_by_id": {},
+  "classes": [],
   "aspects_by_id": {},
+  "aspects": [],
   "metadata": {
-    "timestamp": "2025-12-16T14:38:44.271Z",
+    "timestamp": "2025-12-16T14:46:30.864Z",
     "version": "0.2.0-alpha",
     "generator": "struktur",
     "count": 0,
