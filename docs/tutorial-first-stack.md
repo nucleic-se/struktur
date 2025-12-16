@@ -37,9 +37,9 @@ blog-stack/
 
 ## Step 2: Define Base Class
 
-Create the foundation class all content inherits from.
+Create the foundation class with defaults and validation.
 
-**`classes/content.json`:**
+**`classes/content.schema.json`:**
 ```json
 {
   "class": "content",
@@ -47,52 +47,39 @@ Create the foundation class all content inherits from.
   "title": "",
   "author": null,
   "created_at": "2025-01-01",
-  "status": "draft"
+  "status": "draft",
+  "schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "title": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200
+      },
+      "author": {
+        "type": "string"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date"
+      },
+      "status": {
+        "type": "string",
+        "enum": ["draft", "published", "archived"]
+      }
+    },
+    "required": ["title", "author"]
+  }
 }
 ```
 
 **What this means:**
-- `class`: Unique identifier matching filename
+- `class`: Unique identifier matching filename (`content`)
 - `parent: null`: Top-level class (no inheritance)
-- Other fields: Default values for all content
-
----
-
-## Step 3: Define Schema
-
-Add validation rules for the content class.
-
-**`classes/content.schema.json`:**
-```json
-{
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "class": "content",
-  "type": "object",
-  "properties": {
-    "title": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 200
-    },
-    "author": {
-      "type": "string"
-    },
-    "created_at": {
-      "type": "string",
-      "format": "date"
-    },
-    "status": {
-      "type": "string",
-      "enum": ["draft", "published", "archived"]
-    }
-  },
-  "required": ["title", "author"]
-}
-```
-
-**Key points:**
-- `"class"` field must match filename (required since v0.2.0)
-- `required`: Fields that must be present
+- Top-level fields: Default values for all content
+- `schema`: Validation rules (types, constraints, required fields)
+- `required`: Fields that must be present (title, author)
 - `enum`: Allowed values for status
 - `minLength/maxLength`: String constraints
 
@@ -118,75 +105,65 @@ content
 
 ---
 
-## Step 5: Create Specialized Classes
+## Step 3: Create Specialized Classes
 
 Add classes that inherit from content.
 
-**`classes/post.json`:**
+**`classes/post.schema.json`:**
 ```json
 {
   "class": "post",
   "parent": "content",
   "category": "general",
   "excerpt": "",
-  "content": ""
-}
-```
-
-**`classes/post.schema.json`:**
-```json
-{
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "class": "post",
-  "type": "object",
-  "properties": {
-    "category": {
-      "type": "string"
+  "content": "",
+  "schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "category": {
+        "type": "string"
+      },
+      "excerpt": {
+        "type": "string",
+        "maxLength": 200
+      },
+      "content": {
+        "type": "string"
+      }
     },
-    "excerpt": {
-      "type": "string",
-      "maxLength": 200
-    },
-    "content": {
-      "type": "string"
-    }
-  },
-  "required": ["category", "content"]
-}
-```
-
-**`classes/page.json`:**
-```json
-{
-  "class": "page",
-  "parent": "content",
-  "slug": "",
-  "content": ""
+    "required": ["category", "content"]
+  }
 }
 ```
 
 **`classes/page.schema.json`:**
 ```json
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
   "class": "page",
-  "type": "object",
-  "properties": {
-    "slug": {
-      "type": "string",
-      "pattern": "^[a-z0-9-]+$"
+  "parent": "content",
+  "slug": "",
+  "content": "",
+  "schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "slug": {
+        "type": "string",
+        "pattern": "^[a-z0-9-]+$"
+      },
+      "content": {
+        "type": "string"
+      }
     },
-    "content": {
-      "type": "string"
-    }
-  },
-  "required": ["slug", "content"]
+    "required": ["slug", "content"]
+  }
 }
 ```
 
 ---
 
-## Step 6: Check Inheritance
+## Step 4: Check Inheritance
 
 ```bash
 struktur info -c classes/
@@ -213,7 +190,7 @@ page
 
 ---
 
-## Step 7: Create Instances
+## Step 5: Create Instances
 
 Add actual blog content.
 
@@ -263,7 +240,7 @@ Add actual blog content.
 
 ---
 
-## Step 8: Validate Instances
+## Step 6: Validate Instances
 
 ```bash
 struktur validate -c classes/ -i instances/
@@ -283,7 +260,7 @@ struktur validate -c classes/ -i instances/
 
 ---
 
-## Step 9: Test Validation Errors
+## Step 7: Test Validation Errors
 
 Try creating an invalid instance to see validation in action.
 
@@ -328,7 +305,7 @@ struktur validate -c classes/ -i instances/
 
 ---
 
-## Step 10: Create Index Template
+## Step 8: Create Index Template
 
 **`templates/index.html.hbs`:**
 ```handlebars
@@ -389,7 +366,7 @@ struktur validate -c classes/ -i instances/
 
 ---
 
-## Step 11: Create Post Template
+## Step 9: Create Post Template
 
 **`templates/post.html.hbs`:**
 ```handlebars
@@ -422,7 +399,7 @@ struktur validate -c classes/ -i instances/
 
 ---
 
-## Step 12: Create Page Template
+## Step 10: Create Page Template
 
 **`templates/page.html.hbs`:**
 ```handlebars
@@ -451,7 +428,7 @@ struktur validate -c classes/ -i instances/
 
 ---
 
-## Step 13: Add Multi-Page Generation
+## Step 11: Add Multi-Page Generation
 
 Update index template to generate individual pages using `render_file`.
 
@@ -473,7 +450,7 @@ Update index template to generate individual pages using `render_file`.
 
 ---
 
-## Step 14: Build!
+## Step 12: Build!
 
 ```bash
 struktur build -c classes/ -i instances/ -t templates/
@@ -510,7 +487,7 @@ Build Output:
 
 ---
 
-## Step 15: View Your Blog
+## Step 13: View Your Blog
 
 ```bash
 open build/build-*/index.html

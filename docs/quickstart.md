@@ -181,27 +181,23 @@ EOF
 
 # Create custom class
 mkdir -p classes
-cat > classes/blog_post.json <<EOF
+cat > classes/blog_post.schema.json <<EOF
 {
   "class": "blog_post",
   "parent": "entity_base",
   "author": "Anonymous",
-  "status": "draft"
-}
-EOF
-
-cat > classes/blog_post.schema.json <<EOF
-{
-  "\$schema": "http://json-schema.org/draft-07/schema#",
-  "class": "blog_post",
-  "type": "object",
-  "properties": {
-    "title": {"type": "string"},
-    "author": {"type": "string"},
-    "content": {"type": "string"},
-    "status": {"type": "string", "enum": ["draft", "published"]}
-  },
-  "required": ["title", "content"]
+  "status": "draft",
+  "schema": {
+    "\$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "title": {"type": "string"},
+      "author": {"type": "string"},
+      "content": {"type": "string"},
+      "status": {"type": "string", "enum": ["draft", "published"]}
+    },
+    "required": ["title", "content"]
+  }
 }
 EOF
 

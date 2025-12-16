@@ -409,10 +409,21 @@ Instance references class that doesn't exist in class directories.
 
 1. **Create class definition:**
    ```json
-   // classes/blog_post.json
+   // classes/blog_post.schema.json
    {
      "class": "blog_post",
-     "parent": "entity_base"
+     "parent": "entity_base",
+     "title": "",
+     "content": "",
+     "schema": {
+       "$schema": "http://json-schema.org/draft-07/schema#",
+       "type": "object",
+       "properties": {
+         "title": { "type": "string" },
+         "content": { "type": "string" }
+       },
+       "required": ["title"]
+     }
    }
    ```
 

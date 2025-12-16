@@ -93,7 +93,7 @@ mkdir classes instances templates aspects
 
 ## Step 4: Create Class Inheriting from entity_base
 
-**`classes/server.json`:**
+**`classes/server.schema.json`:**
 ```json
 {
   "class": "server",
@@ -102,55 +102,47 @@ mkdir classes instances templates aspects
   "ip_address": "",
   "os": "linux",
   "cpu_cores": 2,
-  "memory_gb": 4
+  "memory_gb": 4,
+  "schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "hostname": {
+        "type": "string",
+        "pattern": "^[a-z0-9-]+$"
+      },
+      "ip_address": {
+        "type": "string",
+        "format": "ipv4"
+      },
+      "os": {
+        "type": "string",
+        "enum": ["linux", "windows", "macos"]
+      },
+      "cpu_cores": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 128
+      },
+      "memory_gb": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 1024
+      }
+    },
+    "required": ["hostname", "ip_address", "os"]
+  }
 }
 ```
 
 **What you get:**
 - From `entity_base`: id, name, description, labels, domain
 - From `server`: hostname, ip_address, os, cpu_cores, memory_gb
+- `schema`: Validation rules (constraints, required fields)
 
 ---
 
-## Step 5: Add Schema with Constraints
-
-**`classes/server.schema.json`:**
-```json
-{
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "class": "server",
-  "type": "object",
-  "properties": {
-    "hostname": {
-      "type": "string",
-      "pattern": "^[a-z0-9-]+$"
-    },
-    "ip_address": {
-      "type": "string",
-      "format": "ipv4"
-    },
-    "os": {
-      "type": "string",
-      "enum": ["linux", "windows", "macos"]
-    },
-    "cpu_cores": {
-      "type": "integer",
-      "minimum": 1,
-      "maximum": 128
-    },
-    "memory_gb": {
-      "type": "integer",
-      "minimum": 1,
-      "maximum": 1024
-    }
-  },
-  "required": ["hostname", "ip_address", "os"]
-}
-```
-
----
-
-## Step 6: Verify Inheritance
+## Step 5: Verify Inheritance
 
 ```bash
 struktur info -c ../universal/classes classes/
