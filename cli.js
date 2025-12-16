@@ -301,8 +301,8 @@ program
           const conventionalDirs = {
             classes: path.join(resolvedStackDir, 'classes'),
             instances: path.join(resolvedStackDir, 'instances'),
-            aspects: path.join(resolvedStackDir, 'aspects'),
-            templates: path.join(resolvedStackDir, 'templates')
+            aspects: path.join(resolvedStackDir, 'aspects')
+            // Note: generate does NOT auto-discover templates/ - use -t flag explicitly
           };
 
           const existingDirs = {};
@@ -320,7 +320,7 @@ program
           classDirs.push(existingDirs.classes);
           if (existingDirs.instances) instanceDirs.push(existingDirs.instances);
           if (existingDirs.aspects) aspectDirs.push(existingDirs.aspects);
-          if (existingDirs.templates) templateDirs.push(existingDirs.templates);
+          // Templates NOT auto-discovered in generate - use explicit -t flag
         }
 
         if (instanceDirs.length === 0) instanceDirs = [...classDirs];
