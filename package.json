@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "type": "module",
   "bin": {
-    "struktur": "./bin/struktur"
+    "struktur": "bin/struktur"
   },
   "files": [
     "src/",
