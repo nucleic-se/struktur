@@ -5,6 +5,7 @@
  */
 
 import { deepMerge } from './utils/deep_merge.js';
+import { analyzeSchemaConstraints, formatConflicts } from './schema_constraint_validator.js';
 
 export class ClassResolver {
   constructor(classLoader) {
@@ -43,6 +44,13 @@ export class ClassResolver {
 
     // Merge aspect requirements
     const aspects = this._mergeAspects(lineage);
+
+    // Analyze schema constraints for conflicts (strict by default, fail fast)
+    const schemaConflicts = analyzeSchemaConstraints(schemas, lineage, className);
+    if (schemaConflicts.length > 0) {
+      const message = formatConflicts(schemaConflicts);
+      throw new Error(`Schema constraint conflicts detected in class ${className}:\n${message}`);
+    }
 
     const resolved = {
       class: className,
