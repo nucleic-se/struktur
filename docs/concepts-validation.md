@@ -19,12 +19,15 @@ Load → Merge → Validate → Render
 
 Struktur performs validation in four independent passes:
 
-### 1. Structural Validation (JSON Schema)
+### Pass 1: Schema Validation (JSON Schema)
 
 Checks basic structure and types:
 - Field presence (required fields)
 - Data types (string, number, boolean, object, array)
 - Additional properties handling
+- Schema constraints (min/max, patterns, enums)
+
+**Level:** Error (validation fails)
 
 **Example:**
 ```json
@@ -33,74 +36,100 @@ Checks basic structure and types:
   "required": ["name"]
 }
 
-// Instance missing "name" → Structural validation fails
+// Instance missing "name" → Schema validation fails
 {
   "id": "app",
   "class": "service"
 }
 ```
 
-### 2. Constraint Validation
+### Pass 2: Aspect Validation
 
-Validates bounds and restrictions:
-- Numeric ranges (minimum, maximum)
-- String lengths (minLength, maxLength)
-- Enum restrictions
-- Pattern matching (regex)
-- Array constraints (minItems, maxItems, uniqueItems)
+Validates aspect-specific requirements:
+- Required aspect fields are present
+- Aspect field types match schema
+- Aspect-specific constraints satisfied
 
-**Example:**
-```json
-// Schema has constraint
-{
-  "properties": {
-    "port": {
-      "type": "integer",
-      "minimum": 1024,
-      "maximum": 65535
-    }
-  }
-}
-
-// Instance violates constraint → Constraint validation fails
-{
-  "port": 80  // Below minimum
-}
-```
-
-### 3. Semantic Validation
-
-Checks data quality:
-- Format validation (email, date, ipv4, hostname, uri)
-- Empty field detection (empty strings in display fields)
-- Type coercion issues (numbers as strings)
-- Suspicious values (placeholders, TODOs)
+**Level:** Error (validation fails)
 
 **Example:**
 ```json
-// Schema specifies format
+// terraform aspect requires "resource_type"
 {
-  "properties": {
-    "email": {
-      "type": "string",
-      "format": "email"
-    }
-  }
+  "required": ["resource_type"]
 }
 
-// Instance has invalid format → Semantic warning
+// Instance missing aspect field → Aspect validation fails
 {
-  "email": "not-an-email"
+  "id": "vm-01",
+  "aspects": ["terraform"]
+  // Missing: resource_type
 }
 ```
 
-### 4. Canonical Validation
+### Pass 3: Semantic Validation ⚠️
 
-Validates final output structure:
-- Canonical JSON shape correctness
-- Required top-level fields (instances, classes, aspects)
-- Metadata presence
-- Array integrity
+Checks data formats and quality (warnings only):
+- Format validation: `email`, `uri`, `hostname`, `ipv4`, `port`
+- Empty field detection (name, description, display_name)
+- Placeholder detection (TODO, FIXME, XXX, TBD)
+
+**Level:** Warning (does not fail validation)
+
+**Example:**
+```json
+// Instance with format issue → Semantic warning
+{
+  "id": "srv-01",
+  "name": "TODO: Add proper name",  // Warning: placeholder_value
+  "email": "not-an-email",           // Warning: invalid_format
+  "hostname": "UPPERCASE.COM"        // Warning: invalid_format (should be lowercase)
+}
+```
+
+### Pass 4: Lint Validation 🔍
+
+Checks data quality and conventions (warnings only):
+- Missing descriptions
+- Malformed IDs (not kebab-case)
+- Empty arrays in tags/categories/labels
+- Suspicious values (port 0, empty name)
+
+**Level:** Warning (does not fail validation)
+
+**Example:**
+```json
+// Instance with lint issues → Lint warnings
+{
+  "id": "MyService_01",    // Warning: malformed_id (should be kebab-case)
+  "name": "",              // Warning: suspicious_value (empty name)
+  "port": 0,               // Warning: suspicious_value (port 0)
+  "tags": []               // Warning: empty_array
+  // Missing: description   // Warning: missing_description
+}
+```
+
+---
+
+## Errors vs Warnings
+
+**Errors** (validation fails):
+- Schema violations (Pass 1)
+- Aspect requirement violations (Pass 2)
+- Result: `valid: false`, build stops
+
+**Warnings** (validation passes):
+- Semantic format issues (Pass 3)
+- Lint quality issues (Pass 4)
+- Result: `valid: true`, warnings shown but build continues
+
+**Control Flags:**
+```javascript
+const validator = new MultiPassValidator({
+  enableSemantic: true,  // Enable Pass 3 (default: true)
+  enableLint: true       // Enable Pass 4 (default: true)
+});
+```
 
 ---
 

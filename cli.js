@@ -223,7 +223,13 @@ function displayResults(results, quiet) {
 
       if (!result.valid && result.errors.length > 0) {
         for (const error of result.errors) {
-          console.log(`    ${error.message}`);
+          console.log(`    ERROR: ${error.message}`);
+        }
+      }
+
+      if (result.warnings && result.warnings.length > 0) {
+        for (const warning of result.warnings) {
+          console.log(`    WARNING: ${warning.message}`);
         }
       }
     }
@@ -231,10 +237,17 @@ function displayResults(results, quiet) {
 
   // Always show summary (even in quiet mode)
   console.log('\n=== Summary ===');
-  console.log(`Total:   ${summary.total}`);
-  console.log(`Valid:   ${summary.valid}`);
-  console.log(`Invalid: ${summary.invalid}`);
-  console.log(`Errors:  ${summary.errorCount}\n`);
+  console.log(`Total:    ${summary.total}`);
+  console.log(`Valid:    ${summary.valid}`);
+  console.log(`Invalid:  ${summary.invalid}`);
+  console.log(`Errors:   ${summary.errorCount}`);
+  
+  // Count warnings across all results
+  const warningCount = results.reduce((sum, r) => sum + (r.warnings?.length || 0), 0);
+  if (warningCount > 0) {
+    console.log(`Warnings: ${warningCount}`);
+  }
+  console.log();
 }
 
 program
