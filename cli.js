@@ -9,6 +9,7 @@ import { createStruktur, generateCanonicalWithValidation, HandlebarsAdapter } fr
 import NunjucksAdapter from './src/adapters/nunjucks_adapter.js';
 import { buildStack } from './src/build.js';
 import { mergeInstances, getMergeStats } from './src/instance_merger.js';
+import { loadInstancesFromDir } from './src/utils/load_instances.js';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -199,57 +200,6 @@ program
       process.exit(1);
     }
   });
-
-/**
- * Load all instance files from directory
- */
-async function loadInstancesFromDir(dirPath) {
-  const instances = [];
-  const classlessRejects = [];
-
-  async function loadFromDir(dir) {
-    const entries = await fs.readdir(dir, { withFileTypes: true });
-
-    for (const entry of entries) {
-      const fullPath = path.join(dir, entry.name);
-
-      if (entry.isDirectory()) {
-        await loadFromDir(fullPath);
-      } else if (entry.isFile() && entry.name.endsWith('.json') && !entry.name.endsWith('.schema.json') && !entry.name.endsWith('.aspect.json')) {
-        try {
-          const content = await fs.readFile(fullPath, 'utf-8');
-          const data = JSON.parse(content);
-
-          // Could be a single instance or an array
-          if (Array.isArray(data)) {
-            // Filter classless instances from arrays
-            for (const item of data) {
-              if (item && typeof item === 'object' && item.id) {
-                if (item.class) {
-                  instances.push({ ...item, _source_file: fullPath });
-                } else {
-                  classlessRejects.push({ id: item.id, file: path.basename(fullPath) });
-                }
-              }
-            }
-          } else if (data && typeof data === 'object' && data.id) {
-            // Single object with id
-            if (data.class) {
-              instances.push(data);
-            } else {
-              classlessRejects.push({ id: data.id, file: path.basename(fullPath) });
-            }
-          }
-        } catch (error) {
-          console.warn(`Warning: Failed to load ${fullPath}: ${error.message}`);
-        }
-      }
-    }
-  }
-
-  await loadFromDir(dirPath);
-  return { instances, classlessRejects };
-}
 
 /**
  * Create template adapter based on engine name
