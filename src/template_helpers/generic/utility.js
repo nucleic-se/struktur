@@ -129,3 +129,34 @@ export function typeOf(value) {
   if (Array.isArray(value)) return 'array';
   return typeof value;
 }
+
+/**
+ * Get values from an object (Object.values)
+ * @param {Object} obj - Object to get values from
+ * @returns {Array}
+ */
+export function values(obj) {
+  if (!obj || typeof obj !== 'object') return [];
+  return Object.values(obj);
+}
+
+/**
+ * Get keys from an object (Object.keys)
+ * @param {Object} obj - Object to get keys from
+ * @returns {Array<string>}
+ */
+export function keys(obj) {
+  if (!obj || typeof obj !== 'object') return [];
+  return Object.keys(obj);
+}
+
+/**
+ * Lookup helper - get property from object
+ * @param {Object} obj - Object to lookup in
+ * @param {string} key - Property key
+ * @returns {*}
+ */
+export function lookup(obj, key) {
+  if (!obj || typeof obj !== 'object') return undefined;
+  return obj[key];
+}
