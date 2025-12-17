@@ -1,0 +1,36 @@
+---
+- name: Configure web services
+  hosts: web
+  become: yes
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+
+    - name: Create custom index page
+      copy:
+        content: |
+          <!DOCTYPE html>
+          <html>
+          <head><title>{{ instance_name }}</title></head>
+          <body>
+            <h1>{{ instance_name }}</h1>
+            <p>Web server configured by Ansible on {{ inventory_hostname }}</p>
+          </body>
+          </html>
+        dest: /var/www/html/index.html
+        mode: '0644'
+
+    - name: Start and enable Nginx
+      service:
+        name: nginx
+        state: started
+        enabled: yes

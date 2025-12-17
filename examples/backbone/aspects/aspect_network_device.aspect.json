@@ -1,0 +1,14 @@
+{
+  "aspect": "aspect_network_device",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "vendor": {
+        "type": "string"
+      },
+      "model": {
+        "type": "string"
+      }
+    }
+  }
+}

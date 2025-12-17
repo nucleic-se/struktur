@@ -41,6 +41,7 @@
     }
   },
   "aspect_types": [],
+  "aspect_defaults": {},
   "pretty_name": "parent_with_aspect",
   "domains": [],
   "parent": [

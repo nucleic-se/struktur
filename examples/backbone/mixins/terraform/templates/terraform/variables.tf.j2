@@ -1,0 +1,27 @@
+variable "pm_api_token_id" {
+    description = "Proxmox API token ID (set via TF_VAR_pm_api_token_id)"
+    type        = string
+    sensitive   = true
+}
+
+variable "pm_api_token_secret" {
+    description = "Proxmox API token secret (set via TF_VAR_pm_api_token_secret)"
+    type        = string
+    sensitive   = true
+}
+
+variable "pm_api_url" {
+    description = "Proxmox API URL (set via TF_VAR_pm_api_url)"
+    type        = string
+}
+
+variable "pm_tls_insecure" {
+    description = "Allow insecure TLS for Proxmox API (set via TF_VAR_pm_tls_insecure)"
+    type        = bool
+}
+
+variable "ssh_public_keys" {
+    description = "SSH public keys for LXC instances (set via TF_VAR_ssh_public_keys)"
+    type        = string
+    sensitive   = true
+}

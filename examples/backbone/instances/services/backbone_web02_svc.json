@@ -1,0 +1,21 @@
+{
+  "id": "backbone_web02_svc",
+  "name": "Web Service 02",
+  "class": "network_service",  "domains": ["services"],  "aspects": {
+    "infrastructure": {
+      "environment": "production",
+      "notes": "Generic web application service",
+      "location": "homelab"
+    },
+    "service": {
+      "type": "web",
+      "port": 8080,
+      "protocol": "HTTP",
+      "url": "http://web02.home"
+    },
+    "service_entity": {
+      "parent": "backbone_web02",
+      "status": "active"
+    }
+  }
+}

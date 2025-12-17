@@ -59,7 +59,8 @@ export class ClassResolver {
       fields,
       aspects,
       // Include metadata from class definition for viewer
-      aspect_types: classDef.aspect_types || [],
+      aspect_types: this._mergeAspectTypes(lineage),
+      aspect_defaults: this._mergeAspectDefaults(lineage),
       pretty_name: classDef.pretty_name || className,
       domains: classDef.domains || [],
       parent: lineage.slice(0, -1)  // All parents in lineage order
@@ -174,6 +175,59 @@ export class ClassResolver {
     }
 
     return aspectMap;
+  }
+
+  /**
+   * Accumulate aspect_types across lineage
+   * @private
+   * @param {Array<string>} lineage - Lineage chain (base → child order)
+   * @returns {Array<string>} - Accumulated aspect_types, deduplicated
+   */
+  _mergeAspectTypes(lineage) {
+    const accumulated = [];
+    const seen = new Set();
+
+    // Traverse lineage in order (base → child)
+    for (const className of lineage) {
+      const classDef = this.classLoader.getClass(className);
+      const aspectTypes = classDef.aspect_types || [];
+
+      // Add new aspect_types, deduplicate
+      for (const aspectType of aspectTypes) {
+        if (!seen.has(aspectType)) {
+          seen.add(aspectType);
+          accumulated.push(aspectType);
+        }
+      }
+    }
+
+    return accumulated;
+  }
+
+  /**
+   * Accumulate aspect_defaults across lineage
+   * @private
+   * @param {Array<string>} lineage - Lineage chain (base → child order)
+   * @returns {Object.<string, Object>} - Merged aspect defaults by aspect name
+   */
+  _mergeAspectDefaults(lineage) {
+    const merged = {};
+
+    // Traverse lineage in order (base → child, child wins)
+    for (const className of lineage) {
+      const classDef = this.classLoader.getClass(className);
+      if (classDef.aspect_defaults) {
+        // Deep merge each aspect's defaults
+        for (const [aspectName, defaults] of Object.entries(classDef.aspect_defaults)) {
+          if (!merged[aspectName]) {
+            merged[aspectName] = {};
+          }
+          merged[aspectName] = deepMerge(merged[aspectName], defaults);
+        }
+      }
+    }
+
+    return Object.keys(merged).length > 0 ? merged : {};
   }
 
   /**

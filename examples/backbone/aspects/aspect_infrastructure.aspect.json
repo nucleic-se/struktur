@@ -1,0 +1,26 @@
+{
+  "aspect": "aspect_infrastructure",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "environment": {
+        "type": "string",
+        "description": "Environment identifier (production, lab, etc.)"
+      },
+      "location": {
+        "type": "string",
+        "description": "Physical/logical location"
+      },
+      "notes": {
+        "type": "string",
+        "description": "Free-form notes about the entity"
+      }
+    },
+    "required": [
+      "notes"
+    ],
+    "additionalProperties": false
+  },
+  "environment": "production",
+  "location": "homelab"
+}

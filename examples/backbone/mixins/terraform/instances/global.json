@@ -1,0 +1,9 @@
+{
+  "id": "global",
+  "class": "global",
+  "build": [
+    { "terraform/dot.env.terraform.example": "/terraform/.env.terraform.example" },
+    { "terraform/main.tf.j2": "/terraform/main.tf" },
+    { "terraform/variables.tf.j2": "/terraform/variables.tf" }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "backbone_dns",
+  "name": "DNS Server",
+  "class": "proxmox_lxc",
+  "domains": ["virtual"],
+  "aspects": {
+    "infrastructure": {
+      "notes": "Terraform-managed DNS server"
+    },
+    "compute_node": {
+      "cores": 1,
+        "memory": 1024,
+      "storage": "10G"
+    },
+    "proxmox_guest": {
+      "vmid": 400100
+    },
+    "network_interface": {
+      "hostname": "dns",
+      "ip": "192.168.68.10",
+      "mac": "BC:24:11:E3:59:DE",
+      "nameserver": "192.168.68.1"
+    },
+    "terraform": {
+      "enabled": true
+    }
+  }
+}

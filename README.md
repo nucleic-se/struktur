@@ -21,7 +21,7 @@ Classes describe the **structure** of your data. Each class file (`.schema.json`
   "replicas": 1,
   "port": null,
   "schema": {
-    "\$schema": "http://json-schema.org/draft-07/schema#",
+    "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "required": ["id", "port"],
     "properties": {

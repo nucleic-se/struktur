@@ -1,0 +1,18 @@
+{
+  "class": "domain_operations",
+  "parent": "domain_root",
+  "domains": [
+    "operations"
+  ],
+  "aspects": {
+    "domain": {
+      "name": "Operations & Automation",
+      "description": "Infrastructure-as-code and automation tooling"
+    }
+  },
+  "schema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": true
+  }
+}

@@ -32,6 +32,7 @@
   },
   "aspects": {},
   "aspect_types": [],
+  "aspect_defaults": {},
   "pretty_name": "entity_base",
   "domains": [],
   "parent": []

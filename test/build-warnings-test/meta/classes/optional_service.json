@@ -48,6 +48,7 @@
     }
   },
   "aspect_types": [],
+  "aspect_defaults": {},
   "pretty_name": "optional_service",
   "domains": [],
   "parent": [

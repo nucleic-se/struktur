@@ -1,0 +1,18 @@
+{
+  "class": "domain_virtual",
+  "parent": "domain_root",
+  "domains": [
+    "virtual"
+  ],
+  "aspects": {
+    "domain": {
+      "name": "Virtual Infrastructure",
+      "description": "Virtual machines and containers hosted on physical compute nodes"
+    }
+  },
+  "schema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": true
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "id": "backbone_web02",
+  "name": "Web Application 02",
+  "class": "proxmox_lxc",
+  "domains": ["virtual"],
+  "aspects": {
+    "infrastructure": {
+      "notes": "Terraform-managed web container"
+    },
+    "compute_node": {
+      "cores": 2,
+      "memory": 512,
+      "storage": "4G"
+    },
+    "proxmox_guest": {
+      "vmid": 400103
+    },
+    "network_interface": {
+      "hostname": "web02",
+      "ip": "192.168.68.12",
+      "mac": "BC:24:11:E3:59:E1"
+    },
+    "terraform": {
+      "enabled": true
+    }
+  }
+}

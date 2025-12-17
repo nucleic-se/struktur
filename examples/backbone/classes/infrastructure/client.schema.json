@@ -1,0 +1,13 @@
+{
+  "class": "client",
+  "parent": [
+    "compute_node",
+    "domain_physical"
+  ],
+  "pretty_name": "Client",
+  "schema": {
+    "type": "object",
+    "description": "User workstation or client device",
+    "additionalProperties": true
+  }
+}

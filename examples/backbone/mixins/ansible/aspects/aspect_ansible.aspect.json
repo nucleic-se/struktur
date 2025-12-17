@@ -1,0 +1,8 @@
+{
+  "aspect": "aspect_ansible",
+  "schema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": true
+  }
+}

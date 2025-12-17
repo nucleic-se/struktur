@@ -55,6 +55,7 @@
     }
   },
   "aspect_types": [],
+  "aspect_defaults": {},
   "pretty_name": "service",
   "domains": [],
   "parent": [

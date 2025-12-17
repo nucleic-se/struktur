@@ -1,0 +1,11 @@
+{
+  "class": "storage_device",
+  "parent": "infrastructure_entity",
+  "aspect_types": ["storage_device"],
+  "pretty_name": "Storage Device",
+  "schema": {
+    "type": "object",
+    "description": "Base class for storage infrastructure devices",
+    "additionalProperties": true
+  }
+}

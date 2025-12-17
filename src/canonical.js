@@ -12,22 +12,67 @@ const require = createRequire(import.meta.url);
 const { version: PACKAGE_VERSION } = require('../package.json');
 
 /**
- * Merge instance with class field defaults
+ * Merge instance with class field defaults and aspect defaults
  * @param {Object} instance - Instance data
- * @param {Object} fields - Class default fields
+ * @param {Object} resolvedClass - Resolved class with fields and aspect_defaults
+ * @param {Object} aspectLoader - Aspect loader for aspect definitions
  * @returns {Object} - Merged instance
  */
-function mergeInstanceWithFields(instance, fields = {}) {
+function mergeInstanceWithFields(instance, resolvedClass = {}, aspectLoader = null) {
+  const fields = resolvedClass.fields || {};
+  
   // Deep merge: start with empty object, merge defaults, then instance (instance wins)
   const merged = deepMerge(deepMerge({}, fields), instance);
 
-  // Preserve aspects if present
-  if (instance.aspects) {
-    merged.aspects = instance.aspects;
+  // Three-layer aspect data merge
+  // Collect all aspect names from: instance, class aspect_types, class aspect_defaults
+  const allAspectNames = new Set();
+  
+  if (instance.aspects && typeof instance.aspects === 'object') {
+    Object.keys(instance.aspects).forEach(name => allAspectNames.add(name));
+  }
+  
+  if (resolvedClass.aspect_types && Array.isArray(resolvedClass.aspect_types)) {
+    resolvedClass.aspect_types.forEach(name => allAspectNames.add(name));
+  }
+  
+  if (resolvedClass.aspect_defaults) {
+    Object.keys(resolvedClass.aspect_defaults).forEach(name => allAspectNames.add(name));
+  }
+  
+  if (allAspectNames.size > 0) {
+    merged.aspects = {};
     
-    // Auto-populate aspect_types from aspect keys for convenient filtering
-    if (!merged.aspect_types && typeof instance.aspects === 'object') {
-      merged.aspect_types = Object.keys(instance.aspects);
+    for (const aspectName of allAspectNames) {
+      let aspectData = {};
+      
+      // Layer 1: Aspect definition defaults (from aspect file)
+      if (aspectLoader && aspectLoader.aspects) {
+        // Aspect definitions are stored with "aspect_" prefix, but instances use them without
+        const aspectKey = aspectName.startsWith('aspect_') ? aspectName : `aspect_${aspectName}`;
+        const aspectDef = aspectLoader.aspects.get(aspectKey);
+        if (aspectDef) {
+          const { aspect, schema, ...defaults } = aspectDef;
+          aspectData = deepMerge(aspectData, defaults);
+        }
+      }
+      
+      // Layer 2: Class hierarchy aspect_defaults (from resolved class)
+      if (resolvedClass.aspect_defaults && resolvedClass.aspect_defaults[aspectName]) {
+        aspectData = deepMerge(aspectData, resolvedClass.aspect_defaults[aspectName]);
+      }
+      
+      // Layer 3: Instance aspect values (always win)
+      if (instance.aspects && instance.aspects[aspectName]) {
+        aspectData = deepMerge(aspectData, instance.aspects[aspectName]);
+      }
+      
+      merged.aspects[aspectName] = aspectData;
+    }
+    
+    // Auto-populate aspect_types from all merged aspects for convenient filtering
+    if (!merged.aspect_types) {
+      merged.aspect_types = Array.from(allAspectNames);
     }
   }
 
@@ -93,7 +138,7 @@ export function generateCanonical(instances, resolver, options = {}) {
     
     try {
       const resolved = resolver.resolve(instance.class);
-      return mergeInstanceWithFields(instance, resolved.fields);
+      return mergeInstanceWithFields(instance, resolved, aspectLoader);
     } catch (error) {
       // If class resolution fails, return instance as-is
       if (logger) {
@@ -128,11 +173,15 @@ export function generateCanonical(instances, resolver, options = {}) {
   if (aspectLoader && aspectLoader.aspects) {
     const aspectsById = {};
     for (const [aspectName, aspectDef] of aspectLoader.aspects.entries()) {
+      // Extract defaults: all top-level fields except 'aspect' and 'schema'
+      const { aspect, schema, ...defaults } = aspectDef;
+      
       aspectsById[aspectName] = {
         aspect: aspectName,
-        description: aspectDef.schema?.description || null,
+        description: schema?.description || null,
         pretty_name: aspectName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-        schema: aspectDef.schema || {}
+        schema: schema || {},
+        defaults: Object.keys(defaults).length > 0 ? defaults : null
       };
     }
     canonical.aspects_by_id = aspectsById;

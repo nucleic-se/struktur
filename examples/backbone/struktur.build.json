@@ -1,0 +1,7 @@
+{
+  "classes": ["../universal/classes", "classes", "mixins/terraform/classes", "mixins/ansible/classes"],
+  "aspects": ["../universal/aspects", "aspects", "mixins/terraform/aspects", "mixins/ansible/aspects"],
+  "instances": ["../universal/instances", "instances", "mixins/terraform/instances", "mixins/ansible/instances"],
+  "templates": ["../universal/templates", "mixins/terraform/templates", "mixins/ansible/templates"],
+  "buildDir": "build"
+}

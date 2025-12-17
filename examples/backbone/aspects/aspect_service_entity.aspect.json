@@ -1,0 +1,21 @@
+{
+  "aspect": "aspect_service_entity",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "parent": {
+        "type": "string",
+        "description": "Parent service/entity id"
+      },
+      "status": {
+        "type": "string",
+        "description": "Operational status"
+      }
+    },
+    "required": [
+      "parent",
+      "status"
+    ],
+    "additionalProperties": false
+  }
+}

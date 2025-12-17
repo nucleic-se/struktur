@@ -50,6 +50,7 @@
     }
   },
   "aspect_types": [],
+  "aspect_defaults": {},
   "pretty_name": "child_with_aspect",
   "domains": [],
   "parent": [

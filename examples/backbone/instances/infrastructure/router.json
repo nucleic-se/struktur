@@ -1,0 +1,22 @@
+{
+  "id": "router",
+  "name": "Network Router",
+  "class": "router",
+  "domains": ["physical", "network"],
+  "aspects": {
+    "infrastructure": {
+      "environment": "lab",
+      "location": "Network Closet",
+      "notes": "Main network router and firewall"
+    },
+    "network_interface": {
+      "hostname": "router",
+      "ip": "10.100.0.1",
+      "mac": "AA:BB:CC:00:00:01",
+      "nameserver": "192.168.68.1"
+    },
+    "terraform": {
+      "enabled": false
+    }
+  }
+}

@@ -1,0 +1,16 @@
+# Build outputs
+build/
+
+# Environment secrets
+.env.terraform
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db

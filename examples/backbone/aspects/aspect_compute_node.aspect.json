@@ -1,0 +1,33 @@
+{
+  "aspect": "aspect_compute_node",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "cores": {
+        "type": [
+          "integer",
+          "number"
+        ],
+        "description": "Number of CPU cores"
+      },
+      "memory": {
+        "type": [
+          "integer",
+          "number",
+          "string"
+        ],
+        "description": "Memory capacity (bytes or human string)"
+      },
+      "storage": {
+        "type": "string",
+        "description": "Storage capacity"
+      }
+    },
+    "required": [
+      "cores",
+      "memory",
+      "storage"
+    ],
+    "additionalProperties": false
+  }
+}
