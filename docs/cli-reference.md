@@ -78,6 +78,7 @@ struktur build [options] [stack-dirs...]
 - `--engine <name>` - Template engine: `handlebars` or `nunjucks` (default: `handlebars`)
 - `-q, --quiet` - Suppress output except errors
 - `--json` - Output build results as JSON
+- `--exact` - Use exact build directory path without hash suffix (recommended)
 - `--no-deterministic` - Disable deterministic build directories (allows overwrites)
 - `--allow-template-collisions` - Allow templates with same name in multiple directories (last wins)
 - `-h, --help` - Show command help
@@ -347,6 +348,13 @@ struktur build mystack -t other-templates/
 - Combine with `--quiet` to get only JSON output
 
 ### Build Flags
+
+**`--exact`** (Recommended)
+- Uses exact build directory path without hash suffix
+- Builds into `./build/` instead of `./build/build-<hash>/`
+- Overrides `--deterministic` setting
+- Recommended for tutorials, production builds, and predictable paths
+- Example: `struktur build mystack --exact` → `./build/`
 
 **`--no-deterministic`**
 - Disables hash-based build directories
