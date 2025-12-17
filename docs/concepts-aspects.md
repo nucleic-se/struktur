@@ -55,7 +55,180 @@ Aspects define:
 
 - `name` — Human-readable name
 - `description` — What the aspect provides
-- `defaults` — Default values for aspect fields
+- `defaults` — Default values for aspect fields (see [Aspect Defaults](#aspect-defaults))
+
+---
+
+## Aspect Defaults
+
+### Three-Layer Merge System
+
+Aspect data merges from three sources with clear priority:
+
+```
+1. Aspect definition defaults    (base layer)
+2. Class aspect_defaults          (class-specific overrides)
+3. Instance aspects               (highest priority)
+```
+
+**Each layer overrides the previous, deep merging objects.**
+
+### Layer 1: Aspect Definition Defaults
+
+Define defaults in the aspect file itself:
+
+```json
+// aspects/aspect_proxmox_guest.aspect.json
+{
+  "aspect": "aspect_proxmox_guest",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "host_node": { "type": "string" },
+      "start": { "type": "boolean" },
+      "unprivileged": { "type": "boolean" }
+    }
+  },
+  "defaults": {
+    "host_node": "default-host",
+    "start": true,
+    "unprivileged": true
+  }
+}
+```
+
+**Applied to:** All instances using this aspect
+
+### Layer 2: Class aspect_defaults
+
+Override defaults for a specific class:
+
+```json
+// classes/proxmox_lxc.schema.json
+{
+  "class": "proxmox_lxc",
+  "parent": "proxmox_guest",
+  "aspect_types": ["proxmox_guest"],
+  "aspect_defaults": {
+    "proxmox_guest": {
+      "host_node": "polaris",
+      "ostemplate": "local:vztmpl/debian-13-standard_13.1-2_amd64.tar.zst"
+    }
+  },
+  "schema": { ... }
+}
+```
+
+**Applied to:** All instances of `proxmox_lxc` class
+
+**Inheritance:** aspect_defaults accumulate and deep merge through parent chain (base → child)
+
+### Layer 3: Instance Values
+
+Override for specific instance:
+
+```json
+// instances/backbone_web01.json
+{
+  "id": "backbone_web01",
+  "class": "proxmox_lxc",
+  "aspects": {
+    "proxmox_guest": {
+      "vmid": 400102  // Instance-specific value
+      // host_node, ostemplate, start, unprivileged all inherited
+    }
+  }
+}
+```
+
+**Final merged result:**
+```json
+{
+  "vmid": 400102,                    // From instance (layer 3)
+  "host_node": "polaris",            // From class (layer 2)
+  "ostemplate": "local:vztmpl/...",  // From class (layer 2)
+  "start": true,                      // From aspect (layer 1)
+  "unprivileged": true                // From aspect (layer 1)
+}
+```
+
+### Benefits of Three-Layer System
+
+**1. DRY Principle** — Define once, inherit everywhere
+```json
+// ❌ Before: Repeat in every instance
+{
+  "aspects": {
+    "proxmox_guest": {
+      "host_node": "polaris",
+      "ostemplate": "local:vztmpl/debian-13-standard_13.1-2_amd64.tar.zst",
+      "start": true,
+      "unprivileged": true,
+      "vmid": 400102
+    }
+  }
+}
+
+// ✅ After: Only declare what's unique
+{
+  "aspects": {
+    "proxmox_guest": {
+      "vmid": 400102  // Everything else inherited
+    }
+  }
+}
+```
+
+**2. Maintainability** — Change defaults in one place
+- Update aspect defaults: affects all classes/instances
+- Update class aspect_defaults: affects all instances of that class
+- Override in instance: affects only that instance
+
+**3. Clear Priority** — Easy to reason about
+- Instance always wins
+- Class overrides aspect
+- Aspect provides base
+
+---
+
+## Aspect Types
+
+### Automatic Accumulation
+
+**aspect_types** lists which aspects a class uses. Since v0.2.9, these accumulate automatically through inheritance:
+
+```json
+// infrastructure_entity.schema.json
+{
+  "class": "infrastructure_entity",
+  "aspect_types": ["infrastructure"]
+}
+
+// compute_node.schema.json (child)
+{
+  "class": "compute_node",
+  "parent": "infrastructure_entity",
+  "aspect_types": ["compute_node"]  // Only declares its own
+}
+
+// proxmox_guest.schema.json (grandchild)
+{
+  "class": "proxmox_guest",
+  "parent": "compute_node",
+  "aspect_types": ["proxmox_guest", "network_interface"]
+}
+```
+
+**Accumulated result** for `proxmox_guest`:
+```json
+["infrastructure", "compute_node", "proxmox_guest", "network_interface"]
+```
+
+**Benefits:**
+- Each class declares only its own aspects
+- No need to manually list all inherited aspect_types
+- Changes to parent aspects propagate automatically
+- Fully backward compatible (explicit cumulative lists still work)
 
 ---
 

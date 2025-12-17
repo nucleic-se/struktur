@@ -48,6 +48,8 @@ A class is a `.schema.json` file that defines:
 
 - `class` (required) — Unique identifier, must match filename
 - `parent` (optional) — Single parent or array of parents
+- `aspect_types` (optional) — Array of aspect names this class uses (accumulates through inheritance)
+- `aspect_defaults` (optional) — Default values for aspect data (see [Aspect Defaults](#aspect-defaults))
 - All other fields — Default values for instances
 
 ### The `class` Field Requirement
@@ -134,6 +136,86 @@ entity_base
 - HAS-A relationships (use aspects instead)
 - Unrelated shared fields (create separate base)
 - More than 3-4 levels deep
+
+---
+
+## Aspect Defaults
+
+### Defining Aspect Defaults in Classes
+
+Classes can provide default values for aspect data using the `aspect_defaults` field:
+
+```json
+// classes/proxmox_lxc.schema.json
+{
+  "class": "proxmox_lxc",
+  "parent": "proxmox_guest",
+  "aspect_types": ["proxmox_guest", "network_interface"],
+  "aspect_defaults": {
+    "proxmox_guest": {
+      "host_node": "polaris",
+      "ostemplate": "local:vztmpl/debian-13-standard_13.1-2_amd64.tar.zst",
+      "rootfs_storage": "local-lvm",
+      "start": true,
+      "unprivileged": true
+    },
+    "network_interface": {
+      "bridge": "vmbr0",
+      "gateway": "192.168.68.1"
+    }
+  },
+  "schema": { ... }
+}
+```
+
+### Inheritance and Accumulation
+
+Like other class fields, `aspect_defaults` deep merge through the inheritance chain:
+
+```json
+// parent class
+{
+  "class": "base_container",
+  "aspect_defaults": {
+    "docker": {
+      "restart": "unless-stopped",
+      "network_mode": "bridge"
+    }
+  }
+}
+
+// child class
+{
+  "class": "web_container",
+  "parent": "base_container",
+  "aspect_defaults": {
+    "docker": {
+      "restart": "always"  // Overrides parent
+      // network_mode inherited from parent
+    }
+  }
+}
+```
+
+**Result for `web_container` instances:**
+```json
+{
+  "docker": {
+    "restart": "always",        // From child
+    "network_mode": "bridge"    // From parent
+  }
+}
+```
+
+### Three-Layer Merge
+
+Aspect data merges from three sources:
+
+1. **Aspect definition defaults** (base layer)
+2. **Class aspect_defaults** (class-specific overrides)
+3. **Instance aspects** (highest priority)
+
+See [Concepts: Aspects - Aspect Defaults](concepts-aspects.md#aspect-defaults) for complete details.
 
 ---
 

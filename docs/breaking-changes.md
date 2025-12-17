@@ -6,6 +6,43 @@ This document tracks breaking changes in Struktur's alpha releases.
 
 ---
 
+## v0.2.9-alpha (December 2025)
+
+### Three-Layer Aspect Merge (Non-Breaking Enhancement)
+
+**New Feature**: Aspect data now merges from three sources automatically.
+
+**What Changed**:
+- aspect_types accumulate through inheritance (no manual cumulative lists needed)
+- aspect_defaults deep merge through parent chain
+- Three-layer merge: aspect.defaults ⊕ class.aspect_defaults ⊕ instance.aspects
+
+**Fully Backward Compatible**:
+```json
+// Old style (explicit cumulative lists) - still works
+{
+  "class": "proxmox_lxc",
+  "aspect_types": ["infrastructure", "compute_node", "proxmox_guest"]
+}
+
+// New style (minimal declarations) - now works too
+{
+  "class": "proxmox_lxc",
+  "aspect_types": ["proxmox_guest"]  // Others inherited automatically
+}
+```
+
+**Migration**: None required. Existing stacks work unchanged. New stacks can use cleaner minimal declarations.
+
+**Benefits**:
+- DRY principle: Define aspect defaults once, inherit everywhere
+- Reduced duplication: No need to repeat aspect fields in every instance
+- Maintainability: Change defaults in one place
+
+See [Concepts: Aspects - Aspect Defaults](concepts-aspects.md#aspect-defaults) for details.
+
+---
+
 ## v0.2.0-alpha (December 2025)
 
 ### Schema `class` Field Required
