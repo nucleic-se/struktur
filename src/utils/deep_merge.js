@@ -1,8 +1,20 @@
 /**
- * Deep merge utility for field defaults
+ * Deep merge utility for class field defaults
  * 
- * Preserves nested object structure when merging field defaults across class hierarchy.
+ * PURPOSE: Merges field defaults across class inheritance hierarchy.
  * Unlike shallow Object.assign, this preserves all levels of nested defaults.
+ * 
+ * BEHAVIOR:
+ * - Objects: Recursively merged (nested objects preserved)
+ * - Arrays: Replaced entirely (source wins)
+ * - Primitives: Last write wins
+ * - Modifies target in place
+ * 
+ * NOTE: This is separate from instance_merger.js which has stricter
+ * type checking, array concatenation, and path tracking for errors.
+ * The two implementations serve different purposes:
+ * - utils/deep_merge.js: Lenient merge for class defaults (design-time)
+ * - instance_merger.js: Strict merge for instances (build-time, fail-fast)
  */
 
 /**

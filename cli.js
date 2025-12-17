@@ -195,9 +195,17 @@ function createTemplateAdapter(engineName) {
 
 /**
  * Get output file extension based on class name
+ * 
+ * TODO: In future, read extension from class schema metadata:
+ *   - class.schema.outputExtension
+ *   - class.schema.x-struktur.extension
+ * 
+ * @param {string} _className - Class name (currently unused)
+ * @returns {string} File extension without dot
  */
 function getOutputExtension(_className) {
-  // Default to .txt, can be customized based on class metadata
+  // Default to .txt for single-file output mode
+  // Multi-file output uses template names with extensions
   return 'txt';
 }
 

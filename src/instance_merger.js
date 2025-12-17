@@ -1,11 +1,19 @@
 /**
  * Instance Merger - Merge multiple instances with same ID
  * 
- * Phase 1: Simple deterministic merge
- * - Objects: deep merge, last wins for scalars
- * - Arrays: append (concatenate) + auto-dedupe
- * - Fail fast: class mismatch, type conflicts
- * - Track source files for debugging
+ * PURPOSE: Merges instances from multiple source files (e.g., base + overlay).
+ * Uses strict type checking to catch configuration errors early.
+ * 
+ * BEHAVIOR:
+ * - Objects: Deep merge, last wins for scalars
+ * - Arrays: Concatenate + auto-dedupe primitives
+ * - Type mismatch: Throws error with path context
+ * - Tracks source files for debugging
+ * 
+ * NOTE: This is separate from utils/deep_merge.js which is more lenient.
+ * The two implementations serve different purposes:
+ * - utils/deep_merge.js: Lenient merge for class defaults (design-time)
+ * - instance_merger.js: Strict merge for instances (build-time, fail-fast)
  */
 
 /**
