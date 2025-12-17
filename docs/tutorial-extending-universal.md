@@ -1,49 +1,49 @@
 # Tutorial: Extending Universal
 
-Learn how to build on Universal's foundation using inheritance, aspects, and domain organization. This 25-minute tutorial shows real-world patterns from the Docked example.
+Learn how to build on Universal's foundation using **aspects** (the correct pattern for adding custom data). This 20-minute tutorial shows the aspect-based composition pattern used throughout Struktur.
 
 ## What You'll Learn
 
-- Inherit from Universal's base classes
-- Use aspects for composition
-- Organize with domain hierarchies
-- Reference instances with tags
-- Multi-stack composition
+- Use Universal's entity_base class
+- Extend functionality with aspects
+- Organize with domain hierarchies  
+- Multi-stack composition with explicit paths
+- Template access to aspect data
 
 ## Prerequisites
 
 - Completed [First Stack Tutorial](tutorial-first-stack.md) or equivalent experience
 - Struktur installed
-- Universal initialized
 
 ---
 
 ## Why Universal?
 
-**Universal** provides foundational classes that most stacks need:
+**Universal** provides foundational classes for most infrastructure stacks:
 
-- **entity_base** - Root class with id, name, description, labels, domain
-- **aspect_base** - For aspect definitions
+- **universal_base** - Root with id, class, name, description
+- **entity_base** - Extends universal_base with domains, aspects, relations
+- **aspect_base** - For defining aspect schemas
 - **domain_root** - For hierarchical organization
 
-**Benefits:**
-- Don't reinvent common fields
-- Consistent structure across stacks
-- Shared tooling (viewer template)
-- Gradual adoption (use what you need)
+**Key Design:**
+- Universal uses `additionalProperties: false` for strict validation
+- Custom data goes in **aspects** (namespaced, validated)
+- Don't create custom classes - use entity_base + aspects
+- Domains provide hierarchical organization
 
 ---
 
 ## Step 1: Initialize Universal
 
-```bash
+\`\`\`bash
 struktur init universal
 cd universal
 struktur info -c classes/
-```
+\`\`\`
 
-**You'll see:**
-```
+**Output:**
+\`\`\`
 === Classes ===
   domain_root (inherits: universal_base)
   entity_base (inherits: universal_base)
@@ -51,53 +51,45 @@ struktur info -c classes/
   universal_base (inherits: none)
 
 Total: 4 classes
-```
+\`\`\`
+
+✅ **Checkpoint:** Universal stack initialized with 4 base classes.
 
 ---
 
 ## Step 2: Create Extension Stack
 
-Create a new stack that extends Universal.
+Create a new stack directory for your custom infrastructure.
 
-```bash
+\`\`\`bash
 cd ..
 mkdir infra-stack && cd infra-stack
 mkdir classes instances templates aspects
-```
+\`\`\`
+
+**Directory structure:**
+\`\`\`
+infra-stack/
+├── aspects/     # Aspect definitions (custom schemas)
+├── instances/   # Your data
+└── templates/   # Your templates
+\`\`\`
 
 ---
 
-## Step 3: Configure Multi-Stack Build
+## Step 3: Create Server Aspect
 
-**`struktur.build.json`:**
-```json
+Aspects are the **correct way** to add custom fields to universal entities.
+
+**\`aspects/server.json\`:**
+\`\`\`json
 {
-  "classes": ["../universal/classes", "./classes"],
-  "aspects": ["../universal/aspects", "./aspects"],
-  "instances": ["../universal/instances", "./instances"],
-  "templates": ["../universal/templates", "./templates"],
-  "buildDir": "./build"
-}
-```
-
-**Key concept:** Arrays are merged left-to-right. Universal provides base, your stack adds specialization.
-
----
-
-## Step 4: Create Class Inheriting from entity_base
-
-**`classes/server.schema.json`:**
-```json
-{
-  "class": "server",
-  "parent": "entity_base",
-  "hostname": "localhost",
-  "ip_address": "",
-  "os": "linux",
-  "cpu_cores": 2,
-  "memory_gb": 4,
+  "id": "server",
+  "class": "aspect_base",
+  "name": "Server Configuration",
+  "description": "Server hardware and OS configuration",
   "schema": {
-    "$schema": "http://json-schema.org/draft-07/schema#",
+    "\$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
       "hostname": {
@@ -126,570 +118,458 @@ mkdir classes instances templates aspects
     "required": ["hostname", "ip_address", "os"]
   }
 }
-```
+\`\`\`
 
-**What you get:**
-- From `entity_base`: id, name, description, labels, domain
-- From `server`: hostname, ip_address, os, cpu_cores, memory_gb
-- `schema`: Validation rules (constraints, required fields)
-
----
-
-## Step 5: Verify Inheritance
-
-```bash
-struktur info -c ../universal/classes classes/
-```
-
-**Output:**
-```
-Classes loaded: 4
-
-entity_base
-  parent: (none)
-
-aspect_base
-  parent: entity_base
-
-domain_root
-  parent: entity_base
-
-server
-  parent: entity_base
-  schema: server.schema.json
-```
-
-✅ **Checkpoint:** server inherits from entity_base.
+**Why aspects?**
+- Namespaced (no conflicts with universal fields)
+- Validated (aspect schema enforces rules)
+- Optional (entities can mix different aspects)
+- Composable (entities can have multiple aspects)
 
 ---
 
-## Step 7: Create Domain Structure
+## Step 4: Create Domain Structure
 
 Domains provide hierarchical organization.
 
-**`instances/production-domain.json`:**
-```json
+**\`instances/production-domain.json\`:**
+\`\`\`json
 {
   "id": "production",
   "class": "domain_root",
   "name": "Production Environment",
   "description": "Production infrastructure"
 }
-```
+\`\`\`
 
-**`instances/web-tier-domain.json`:**
-```json
+**\`instances/web-tier-domain.json\`:**
+\`\`\`json
 {
   "id": "web-tier",
   "class": "domain_root",
   "name": "Web Tier",
   "description": "Load balancers and web servers",
-  "domain": "@production"
+  "domains": ["production"]
 }
-```
+\`\`\`
 
-**Key concept:** `"domain": "@production"` is a **tag reference** that creates parent-child relationship.
+**Key concept:** \`"domains": ["production"]\` creates a parent-child relationship. Domain instances can be nested arbitrarily deep.
 
 ---
 
-## Step 8: Create Server Instances
+## Step 5: Create Server Instances
 
-**`instances/web-01.json`:**
-```json
+Use **entity_base** class with the **server aspect**.
+
+**\`instances/web-01.json\`:**
+\`\`\`json
 {
   "id": "web-01",
-  "class": "server",
+  "class": "entity_base",
   "name": "Web Server 01",
   "description": "Primary web server",
-  "domain": "@web-tier",
-  "hostname": "web-01",
-  "ip_address": "10.0.1.10",
-  "os": "linux",
-  "cpu_cores": 4,
-  "memory_gb": 16,
-  "labels": ["nginx", "production"]
+  "domains": ["web-tier"],
+  "aspects": {
+    "server": {
+      "hostname": "web-01",
+      "ip_address": "10.0.1.10",
+      "os": "linux",
+      "cpu_cores": 4,
+      "memory_gb": 16
+    }
+  }
 }
-```
+\`\`\`
 
-**`instances/web-02.json`:**
-```json
+**\`instances/web-02.json\`:**
+\`\`\`json
 {
   "id": "web-02",
-  "class": "server",
+  "class": "entity_base",
   "name": "Web Server 02",
   "description": "Secondary web server",
-  "domain": "@web-tier",
-  "hostname": "web-02",
-  "ip_address": "10.0.1.11",
-  "os": "linux",
-  "cpu_cores": 4,
-  "memory_gb": 16,
-  "labels": ["nginx", "production", "standby"]
+  "domains": ["web-tier"],
+  "aspects": {
+    "server": {
+      "hostname": "web-02",
+      "ip_address": "10.0.1.11",
+      "os": "linux",
+      "cpu_cores": 4,
+      "memory_gb": 16
+    }
+  }
 }
-```
+\`\`\`
+
+**What you get:**
+- From **entity_base**: id, name, description, domains, aspects
+- From **server aspect**: hostname, ip_address, os, cpu_cores, memory_gb
+- Validated against both universal and aspect schemas
 
 ---
 
-## Step 9: Validate
+## Step 6: Validate Multi-Stack
 
-```bash
-struktur validate .
-```
+Use explicit path flags to load both universal and your stack.
 
-**Expected output:**
-```
-✓ Loaded 4 classes (3 from universal, 1 local)
-✓ Loaded 4 instances
-✓ Validation passed
-  - production (domain_root)
-  - web-tier (domain_root)
-  - web-01 (server)
-  - web-02 (server)
-```
+\`\`\`bash
+struktur validate -c ../universal/classes classes/ -a ../universal/aspects aspects/ -i ../universal/instances instances/
+\`\`\`
 
-✅ **Checkpoint:** All instances valid with inherited fields.
+**Output:**
+\`\`\`
+=== Validation Results ===
+
+✓ global (global)
+✓ production (domain_root)
+✓ web-01 (entity_base)
+✓ web-02 (entity_base)
+✓ web-tier (domain_root)
+
+=== Summary ===
+Total:    5
+Valid:    5
+Invalid:  0
+Errors:   0
+\`\`\`
+
+✅ **Checkpoint:** All instances validate with aspect data.
+
+**Key pattern:** Multiple \`-c\`, \`-a\`, \`-i\` paths are merged left-to-right (universal first, then local).
 
 ---
 
-## Step 10: Use Aspect Composition
+## Step 7: Override Global Configuration
 
-Aspects provide reusable behaviors without inheritance.
+Universal includes a global instance with viewer.html template. Override it for your needs.
 
-**`aspects/monitoring.json`:**
-```json
+**\`instances/global.json\`:**
+\`\`\`json
+{
+  "id": "global",
+  "class": "global",
+  "description": "Infrastructure configuration",
+  "build": [
+    {
+      "inventory.txt": "/inventory.txt"
+    }
+  ]
+}
+\`\`\`
+
+**What happens:** Instance merging combines both global.json files, with your version taking precedence for conflicting fields. The \`build\` array is replaced entirely.
+
+---
+
+## Step 8: Create Template Using Aspects
+
+**\`templates/inventory.txt\`:**
+\`\`\`handlebars
+# Infrastructure Inventory
+
+## Domains
+{{#each (where instances "class" "domain_root")}}
+- {{name}}: {{description}}
+  {{#if (gt (length domains) 0)}}Parent Domains: {{#each domains}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{/if}}
+{{/each}}
+
+## Servers
+{{#each instances}}
+{{#if aspects.server}}
+### {{name}}
+- Hostname: {{aspects.server.hostname}}
+- IP: {{aspects.server.ip_address}}
+- OS: {{aspects.server.os}}
+- Resources: {{aspects.server.cpu_cores}} cores, {{aspects.server.memory_gb}}GB RAM
+- Domains: {{#each domains}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+
+{{/if}}
+{{/each}}
+\`\`\`
+
+**Aspect access:**
+- Check presence: \`{{#if aspects.server}}\`
+- Access data: \`{{aspects.server.hostname}}\`
+- Filter: iterate all instances, check for aspect
+
+---
+
+## Step 9: Build Multi-Stack
+
+\`\`\`bash
+struktur build -c ../universal/classes classes/ -a ../universal/aspects aspects/ -i ../universal/instances instances/ -t ../universal/templates templates/ --exact
+\`\`\`
+
+**Output:**
+\`\`\`
+📦 Loading stack...
+  ✓ Loaded 4 classes
+  ✓ Loaded 0 aspects
+  ✓ Loaded 6 instances
+  ✓ Merged 1 duplicate IDs into 5 unique instances
+
+🔍 Validating stack...
+  ✓ All 5 class-bearing instances valid
+
+📁 Preparing build directory: ./build
+
+📝 Writing outputs...
+  ✓ canonical.json (5 instances)
+  ✓ meta/classes/ (4 classes)
+  ✓ meta/validation.json
+
+🎨 Rendering templates...
+  Found 2 build tasks
+  ✓ 2 files rendered
+
+✨ Build complete!
+  📊 5 instances validated
+  📦 4 class definitions
+  🎨 2 templates rendered
+  📂 ./build/
+
+✨ Open ./build/index.html to view your stack
+\`\`\`
+
+---
+
+## Step 10: View Results
+
+\`\`\`bash
+cat build/inventory.txt
+\`\`\`
+
+**Output:**
+\`\`\`
+# Infrastructure Inventory
+
+## Domains
+- Production Environment: Production infrastructure
+  
+- Web Tier: Load balancers and web servers
+  Parent Domains: production
+
+## Servers
+### Web Server 01
+- Hostname: web-01
+- IP: 10.0.1.10
+- OS: linux
+- Resources: 4 cores, 16GB RAM
+- Domains: web-tier
+
+### Web Server 02
+- Hostname: web-02
+- IP: 10.0.1.11
+- OS: linux
+- Resources: 4 cores, 16GB RAM
+- Domains: web-tier
+\`\`\`
+
+✅ **Success!** Aspect-based extension with domain hierarchy.
+
+---
+
+## What You Learned
+
+### Aspect Pattern (Recommended)
+- **Don't create custom classes** - use entity_base
+- **Do use aspects** for custom data (namespaced, validated)
+- Universal's strict schema ensures consistency
+- Aspects enable composition over inheritance
+
+### Multi-Stack Composition
+- Use explicit \`-c\`, \`-a\`, \`-i\`, \`-t\` flags
+- Paths merge left-to-right (base first, extensions after)
+- Instance merging handles duplicate IDs
+- Templates search all template directories
+
+### Domain Hierarchies
+- \`domain_root\` class for organization
+- \`domains\` array creates parent-child links
+- Viewer template visualizes hierarchy
+- Domains are reference strings (not objects)
+
+---
+
+## Alternative: Custom Class Pattern
+
+If you **really need** custom top-level fields (not recommended):
+
+\`\`\`json
+{
+  "class": "server",
+  "parent": "entity_base",
+  "schema": {
+    "\$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "id": {"type": "string"},
+      "class": {"type": "string"},
+      "name": {"type": "string"},
+      "description": {"type": "string"},
+      "domains": {"type": "array", "items": {"type": "string"}},
+      "hostname": {"type": "string"},
+      "ip_address": {"type": "string"}
+    },
+    "required": ["id", "class", "hostname"],
+    "additionalProperties": true
+  }
+}
+\`\`\`
+
+**Downsides:**
+- Must list ALL properties (inherited + custom)
+- Schema inheritance doesn't auto-merge
+- Loses universal's strict validation benefits
+- More verbose, harder to maintain
+
+**Use aspects instead!**
+
+---
+
+## Next Steps
+
+### Add More Aspects
+
+\`\`\`json
 {
   "id": "monitoring",
   "class": "aspect_base",
-  "name": "Monitoring",
-  "description": "Monitoring configuration",
-  "kind": "required",
+  "name": "Monitoring Configuration",
   "schema": {
     "type": "object",
     "properties": {
-      "metrics_port": {
-        "type": "integer"
-      },
-      "health_endpoint": {
-        "type": "string"
-      }
-    },
-    "required": ["metrics_port"]
+      "metrics_port": {"type": "integer"},
+      "health_endpoint": {"type": "string"}
+    }
   }
 }
-```
+\`\`\`
 
-**Key concept:** Aspects define **optional or required** namespaced data.
-
----
-
-## Step 11: Apply Aspect to Instance
-
-**`instances/web-01.json`** (updated):
-```json
+Apply to instances:
+\`\`\`json
 {
   "id": "web-01",
-  "class": "server",
-  "name": "Web Server 01",
-  "description": "Primary web server",
-  "domain": "@web-tier",
-  "hostname": "web-01",
-  "ip_address": "10.0.1.10",
-  "os": "linux",
-  "cpu_cores": 4,
-  "memory_gb": 16,
-  "labels": ["nginx", "production"],
+  "class": "entity_base",
   "aspects": {
+    "server": {...},
     "monitoring": {
       "metrics_port": 9090,
       "health_endpoint": "/health"
     }
   }
 }
-```
+\`\`\`
 
-**What happens:**
-- Struktur validates `aspects.monitoring` against aspect schema
-- Data is namespaced to avoid conflicts
-- Templates can check for aspect presence
+### Use Viewer Template
+
+Universal includes an interactive hierarchical viewer:
+
+\`\`\`json
+{
+  "id": "global",
+  "class": "global",
+  "build": [
+    {
+      "viewer.html": "/index.html"
+    }
+  ]
+}
+\`\`\`
+
+Open \`build/index.html\` to see your domain hierarchy visualized.
+
+### Explore Examples
+
+- **docked** - Docker containers with aspects
+- **skribe** - Static site without universal
+- Check \`examples/\` in Struktur installation
 
 ---
 
-## Step 12: Create Template Using Inheritance
+## Common Patterns
 
-**`templates/inventory.txt.hbs`:**
-```handlebars
-# Infrastructure Inventory
-Generated: {{buildContext.timestamp}}
+### Conditional Aspects
 
-## Domains
-{{#each (where instances "class" "domain_root")}}
-- {{name}}: {{description}}
-  ID: {{id}}
-  {{#if domain}}Parent: {{domain}}{{/if}}
-{{/each}}
-
-## Servers
-{{#each (where instances "class" "server")}}
-### {{name}}
-- Hostname: {{hostname}}
-- IP: {{ip_address}}
-- OS: {{os}}
-- Resources: {{cpu_cores}} cores, {{memory_gb}}GB RAM
-- Domain: {{domain}}
-- Labels: {{join labels ", "}}
+\`\`\`handlebars
 {{#if aspects.monitoring}}
-- Monitoring: Port {{aspects.monitoring.metrics_port}}, Health {{aspects.monitoring.health_endpoint}}
+Monitoring: {{aspects.monitoring.metrics_port}}
 {{/if}}
+\`\`\`
 
+### Filter by Aspect
+
+\`\`\`handlebars
+{{#each instances}}
+  {{#if aspects.server}}
+    {{!-- Has server aspect --}}
+  {{/if}}
 {{/each}}
-```
+\`\`\`
 
-**Helpers used:**
-- `where` - Filter by class
-- `join` - Format arrays
-- `#if aspects.monitoring` - Check aspect presence
+### Multiple Aspects
 
----
-
-## Step 13: Create Template with Inheritance Filtering
-
-**`templates/production-servers.html.hbs`:**
-```handlebars
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Production Servers</title>
-  <style>
-    body { font-family: monospace; }
-    .server { margin: 1rem; padding: 1rem; border: 1px solid #ccc; }
-    .label { background: #e3f2fd; padding: 0.25rem; margin: 0.25rem; display: inline-block; }
-  </style>
-</head>
-<body>
-  <h1>Production Servers</h1>
-  
-  {{#each (filter_inherits instances "entity_base" classes_by_id)}}
-    {{#if (eq class "server")}}
-      <div class="server">
-        <h2>{{name}}</h2>
-        <p><strong>ID:</strong> {{id}}</p>
-        <p><strong>Hostname:</strong> {{hostname}}</p>
-        <p><strong>IP:</strong> {{ip_address}}</p>
-        <p><strong>Domain:</strong> {{domain}}</p>
-        
-        {{#if labels}}
-          <div>
-            <strong>Labels:</strong>
-            {{#each labels}}
-              <span class="label">{{this}}</span>
-            {{/each}}
-          </div>
-        {{/if}}
-        
-        {{#if aspects.monitoring}}
-          <p><strong>Monitoring:</strong> :{{aspects.monitoring.metrics_port}} {{aspects.monitoring.health_endpoint}}</p>
-        {{/if}}
-      </div>
-    {{/if}}
-  {{/each}}
-  
-  <footer>
-    <p>Total servers: {{length (where instances "class" "server")}}</p>
-  </footer>
-</body>
-</html>
-```
-
-**Key helper:**
-- `filter_inherits` - Get all instances inheriting from entity_base
-
----
-
-## Step 14: Build
-
-```bash
-struktur build .
-```
-
-**Expected output:**
-```
-Build Phase: Stack Loading & Validation
-✓ Loaded 4 classes (3 from universal, 1 local)
-✓ Loaded 1 aspect
-✓ Loaded 4 instances
-✓ Validation passed
-
-Build Phase: Template Loading
-✓ Loaded 3 templates (1 from universal, 2 local)
-
-Build Phase: Rendering
-✓ Rendered viewer.html (from universal)
-✓ Rendered inventory.txt
-✓ Rendered production-servers.html
-
-Build complete: build/build-abc123/
-```
-
----
-
-## Step 15: Inspect Outputs
-
-```bash
-ls build/build-*/
-# canonical.json
-# viewer.html       (Universal's hierarchical viewer)
-# inventory.txt     (Your text inventory)
-# production-servers.html
-
-cat build/build-*/inventory.txt
-open build/build-*/viewer.html
-open build/build-*/production-servers.html
-```
-
-✅ **Success!** You've extended Universal with domain-specific classes.
-
----
-
-## Advanced: Tag References
-
-Tags create relationships between instances.
-
-### One-to-One Reference
-
-```json
+\`\`\`json
 {
-  "id": "app-server",
-  "class": "server",
-  "name": "Application Server",
-  "load_balancer": "@lb-01"
+  "aspects": {
+    "server": {...},
+    "monitoring": {...},
+    "backup": {...}
+  }
 }
-```
+\`\`\`
 
-### One-to-Many Reference
+### Aspect Types (Auto-Computed)
 
-```json
-{
-  "id": "web-cluster",
-  "class": "cluster",
-  "name": "Web Cluster",
-  "servers": ["@web-01", "@web-02", "@web-03"]
-}
-```
-
-### Use in Templates
-
-```handlebars
-{{#each servers}}
-  <!-- Each server is a tag reference -->
-  Server: {{this}}
-{{/each}}
-```
-
-**Future:** `resolve` helper will dereference tags to full instances.
-
----
-
-## Real-World Example: Docked
-
-The **Docked** example shows production-grade Universal extension:
-
-```bash
-cd ..
-struktur init --example docked
-cd docked
-cat README.md
-```
-
-**What Docked adds:**
-- **Classes**: container, network, volume, compose_service
-- **Aspects**: ports, environment, volumes, networks, healthcheck
-- **Domains**: Services organized hierarchically
-- **Templates**: Generates docker-compose.yml, .env, HTML catalog
-- **Validation**: Port ranges, volume types, network configs
-
-**Key patterns:**
-- Containers inherit from entity_base (get id, name, description, domain)
-- Aspects provide optional configuration (ports, env vars)
-- Templates query by inheritance: `filter_inherits instances "container"`
-- Multi-output: One canonical model → many rendered files
-
----
-
-## What You Learned
-
-### Universal Extension
-- Inherit from entity_base for common fields
-- Add domain-specific classes
-- Reuse Universal's viewer template
-
-### Multi-Stack Composition
-- `struktur.build.json` merges multiple directories
-- Earlier stacks provide base, later override
-- Classes, instances, templates all merge
-
-### Aspects
-- Define reusable behaviors
-- Namespaced to avoid conflicts
-- Validated independently
-- Optional or required per aspect `kind`
-
-### Tag References
-- `@instance-id` creates relationships
-- Domain hierarchies via `domain: "@parent"`
-- Future: `resolve` helper for dereferencing
-
-### Inheritance Helpers
-- `filter_inherits` - Find all instances of base class
-- `inherits` - Check class lineage
-- `class_lineage` - Full parent chain
-
----
-
-## Best Practices
-
-### When to Extend Universal
-
-✅ **Use Universal when:**
-- You need id, name, description, domain, labels
-- You want hierarchical organization
-- You're building infrastructure/config management
-- You want a standard base for multiple stacks
-
-❌ **Skip Universal when:**
-- Fields don't match your domain
-- You prefer different naming conventions
-- You're building something completely different
-- Universal adds unnecessary complexity
-
-### Class Design
-
-**Do:**
-- Inherit from entity_base for entities
-- Use aspects for optional, composable features
-- Keep class defaults sensible
-- Document required fields in schemas
-
-**Don't:**
-- Create deep inheritance chains (3-4 levels max)
-- Mix inheritance and aspects for same concern
-- Override parent fields unnecessarily
-
-### Domain Organization
-
-**Hierarchical domains:**
-```
-production/
-  ├── web-tier/
-  │   ├── web-01
-  │   └── web-02
-  └── db-tier/
-      └── db-01
-```
-
-**Flat domains:**
-```
-domains/
-  ├── web-servers
-  ├── databases
-  └── monitoring
-```
-
-Choose what fits your model.
-
----
-
-## Next Steps
-
-### Explore Real Examples
-
-```bash
-# Docker container stack (aspect-heavy)
-struktur init --example docked
-cd docked && struktur build .
-
-# Static site (class-heavy)
-struktur init --example skribe
-cd skribe && struktur build .
-```
-
-### Deep Dives
-
-- **[Concepts: Aspects](concepts-aspects.md)** - Composition patterns
-- **[Concepts: Validation](concepts-validation.md)** - Multi-pass validation
-- **[Concepts: Classes & Schemas](concepts-classes-schemas.md)** - Class design
-- **[Guide: Stack Patterns](guide-stack-patterns.md)** - Reusable patterns
-
-### Build Your Own
-
-**Ideas:**
-- Kubernetes manifests (extend Universal for pods, services, deployments)
-- Terraform modules (resources as entity_base instances)
-- CI/CD pipelines (jobs, stages, environments)
-- API documentation (endpoints as entities)
-- Team org charts (people, teams, domains)
+\`\`\`handlebars
+{{!-- aspect_types is automatically populated --}}
+Aspects: {{#each aspect_types}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+\`\`\`
 
 ---
 
 ## Troubleshooting
 
-### Class not found
+### "Unexpected field" errors
 
-```
-Error: Instance "my-server" references unknown class "server"
-```
+**Problem:** Added custom fields directly to entity_base instance.
 
-**Solution:** Ensure you're building with Universal:
-```bash
-struktur build -c ../universal/classes classes/
-```
-
-### Validation fails on inherited fields
-
-```
-Error: Property "name" is required but not provided
-```
-
-**Cause:** entity_base.schema.json requires `name`.
-
-**Solution:** Add to instance:
-```json
+**Solution:** Use aspects instead:
+\`\`\`json
 {
-  "id": "my-server",
-  "class": "server",
-  "name": "My Server",  // Required by entity_base
-  ...
+  "class": "entity_base",
+  "aspects": {
+    "your_aspect": {
+      "custom_field": "value"
+    }
+  }
 }
-```
+\`\`\`
 
-### Aspect validation errors
+### "Class not found" errors
 
-```
-Error: aspects.monitoring missing required property "metrics_port"
-```
+**Problem:** Forgot to include universal classes path.
 
-**Solution:** 
-1. Add missing field: `"metrics_port": 9090`
-2. Or make aspect optional: `"kind": "optional"` in aspect definition
+**Solution:** Always use \`-c ../universal/classes classes/\` for multi-stack.
 
-### Template can't find Universal helper
+### Template can't find data
 
-**Issue:** Universal viewer uses specific context structure.
+**Problem:** Accessing aspect data incorrectly.
 
-**Solution:** Copy viewer.html.hbs to your templates/ and modify, or use simple templates like examples above.
+**Solution:** Use \`aspects.aspect_name.field\`:
+\`\`\`handlebars
+{{aspects.server.hostname}}
+\`\`\`
 
 ---
 
-## Summary
+## Learn More
 
-You learned how to:
-- ✅ Extend Universal base classes
-- ✅ Configure multi-stack builds
-- ✅ Use domain hierarchies
-- ✅ Apply aspects for composition
-- ✅ Use tag references
-- ✅ Filter by inheritance in templates
-- ✅ Generate multiple outputs
+- **[First Stack Tutorial](tutorial-first-stack.md)** - Build blog from scratch
+- **[CLI Reference](cli-reference.md)** - All commands and flags
+- **[Concepts: Aspects](concepts-aspects.md)** - Deep dive into aspect system
+- **[Docked Example](../examples/docked/)** - Real-world aspect usage
 
-**Core insight:** Universal provides a foundation, but you control what you build on top. Use what fits, skip what doesn't.
+---
 
-Ready to master the concepts? Explore the [Concepts documentation](INDEX.md#core-concepts) for deep dives into each topic.
+Ready to build infrastructure stacks? The aspect pattern unlocks Universal's full power!
