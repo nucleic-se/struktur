@@ -3,6 +3,7 @@ import assert from 'node:assert';
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
 import { 
   generateBuildHash, 
   readManifest, 
@@ -10,6 +11,9 @@ import {
   checkCollision,
   generateDeterministicBuildDir 
 } from '../src/utils/build_manifest.js';
+
+const require = createRequire(import.meta.url);
+const { version: PACKAGE_VERSION } = require('../package.json');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -96,7 +100,7 @@ describe('Build Manifest and Deterministic Builds', () => {
     
     assert.ok(written, 'Should return written manifest');
     assert.ok(read, 'Should read manifest');
-    assert.strictEqual(read.version, '0.2.0-alpha');
+    assert.strictEqual(read.version, PACKAGE_VERSION);
     assert.strictEqual(read.hash, written.hash);
     assert.ok(read.timestamp);
     

@@ -5,6 +5,10 @@
 import fs from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+const { version: PACKAGE_VERSION } = require('../../package.json');
 
 /**
  * Generate a deterministic hash from build configuration
@@ -42,7 +46,7 @@ export async function readManifest(buildDir) {
  */
 export async function writeManifest(buildDir, config) {
   const manifest = {
-    version: '0.2.0-alpha',
+    version: PACKAGE_VERSION,
     timestamp: new Date().toISOString(),
     hash: generateBuildHash(config),
     sources: {

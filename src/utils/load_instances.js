@@ -10,9 +10,12 @@ import path from 'path';
  * Load instances from a directory recursively
  * 
  * @param {string} dirPath - Directory path
+ * @param {Object} options - Options
+ * @param {Object} options.logger - Logger for warnings (optional)
  * @returns {Promise<{instances: Array, classlessRejects: Array}>} Loaded instances and rejected classless items
  */
-export async function loadInstancesFromDir(dirPath) {
+export async function loadInstancesFromDir(dirPath, options = {}) {
+  const { logger } = options;
   const instances = [];
   const classlessRejects = [];
 
@@ -59,7 +62,10 @@ export async function loadInstancesFromDir(dirPath) {
               }
             }
           } catch (error) {
-            // Skip invalid JSON silently
+            // Log warning for invalid JSON (helps users debug typos)
+            if (logger?.warn) {
+              logger.warn(`Skipping ${fullPath}: Invalid JSON - ${error.message}`);
+            }
           }
         }
       }

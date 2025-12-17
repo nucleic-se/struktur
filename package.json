@@ -11,6 +11,7 @@
     "src/",
     "bin/",
     "cli.js",
+    "schemas/",
     "examples/",
     "README.md",
     "LICENSE"

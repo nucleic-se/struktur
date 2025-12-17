@@ -4,12 +4,16 @@
 
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { createRequire } from 'node:module';
 import { generateCanonical, generateCanonicalWithValidation } from '../src/canonical.js';
 import { ClassLoader } from '../src/class_loader.js';
 import { ClassResolver } from '../src/class_resolver.js';
 import { createStruktur } from '../src/index.js';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+
+const require = createRequire(import.meta.url);
+const { version: PACKAGE_VERSION } = require('../package.json');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -86,7 +90,7 @@ describe('Canonical Output', () => {
     const canonical = generateCanonical(instances, resolver);
 
     assert.ok(canonical.metadata, 'Should have metadata');
-    assert.equal(canonical.metadata.version, '0.2.0-alpha', 'Should have version');
+    assert.equal(canonical.metadata.version, PACKAGE_VERSION, 'Should have version');
     assert.equal(canonical.metadata.generator, 'struktur', 'Should have generator');
     assert.equal(canonical.metadata.count, 1, 'Should have object count');
     assert.equal(canonical.metadata.classes, 1, 'Should have class count');

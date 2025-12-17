@@ -60,6 +60,6 @@ Real-world patterns and practices:
 
 ---
 
-**Version**: 0.2.3-alpha  
+**Version**: 0.2.5-alpha  
 **Status**: Alpha (breaking changes expected before 1.0)  
-**Tests**: 364/364 passing ✅
+**Tests**: 415/415 passing ✅

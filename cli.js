@@ -76,8 +76,9 @@ program
       // Load instances from directories
       const allInstances = [];
       const allClasslessRejects = [];
+      const instanceLogger = options.quiet ? null : { warn: (msg) => console.warn(msg) };
       for (const dir of instanceDirs) {
-        const result = await loadInstancesFromDir(dir);
+        const result = await loadInstancesFromDir(dir, { logger: instanceLogger });
         allInstances.push(...result.instances);
         allClasslessRejects.push(...result.classlessRejects);
       }
@@ -306,8 +307,9 @@ program
       // Load instances from directories
       const allInstances = [];
       const allClasslessRejects = [];
+      const instanceLogger = options.quiet ? null : { warn: (msg) => console.warn(msg) };
       for (const dir of instanceDirs) {
-        const result = await loadInstancesFromDir(dir);
+        const result = await loadInstancesFromDir(dir, { logger: instanceLogger });
         allInstances.push(...result.instances);
         allClasslessRejects.push(...result.classlessRejects);
       }

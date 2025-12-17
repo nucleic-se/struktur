@@ -67,7 +67,7 @@ describe('Canonical Structure Validation', () => {
         instances_by_id: {},
         metadata: {
           timestamp: '2025-12-16T00:00:00.000Z',
-          version: '0.2.0-alpha',
+          version: '0.2.5-alpha',
           generator: 'struktur'
         }
       };

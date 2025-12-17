@@ -4,8 +4,12 @@
  * Generates canonical.json output with merged instances and metadata
  */
 
+import { createRequire } from 'module';
 import { deepMerge } from './utils/deep_merge.js';
 import { createLogger } from './utils/logger.js';
+
+const require = createRequire(import.meta.url);
+const { version: PACKAGE_VERSION } = require('../package.json');
 
 /**
  * Merge instance with class field defaults
@@ -140,7 +144,7 @@ export function generateCanonical(instances, resolver, options = {}) {
   if (includeMetadata) {
     canonical.metadata = {
       timestamp,
-      version: '0.2.0-alpha',
+      version: PACKAGE_VERSION,
       generator: 'struktur',
       count: mergedInstances.length,
       classes: Object.keys(canonical.classes_by_id || {}).length,

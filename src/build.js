@@ -86,7 +86,7 @@ export async function buildStack(options) {
   const allInstances = [];
   const allClasslessRejects = [];
   for (const dir of instanceDirs || classDirs) {
-    const result = await loadInstancesFromDir(dir);
+    const result = await loadInstancesFromDir(dir, { logger: log });
     allInstances.push(...result.instances);
     allClasslessRejects.push(...result.classlessRejects);
   }
