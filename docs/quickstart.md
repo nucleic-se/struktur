@@ -16,7 +16,7 @@ npm install -g @nucleic-se/struktur@alpha
 Verify installation:
 ```bash
 struktur --version
-# Should show: 0.2.3-alpha (or newer)
+# Should show: 0.2.6-alpha (or newer)
 ```
 
 ## Initialize Universal Base

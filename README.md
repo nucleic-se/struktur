@@ -126,7 +126,7 @@ struktur --version
 ### 1. Initialize from Example
 
 ```bash
-struktur init --example universal my-project
+struktur init my-project
 cd my-project
 ```
 

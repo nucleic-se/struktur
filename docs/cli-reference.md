@@ -253,14 +253,17 @@ struktur init [options] [directory]
 **Examples:**
 
 ```bash
-# Initialize Universal base in ./universal
+# Initialize Universal base (default)
 struktur init universal
 
-# Initialize Docked example in ./my-stack
+# Initialize with custom directory name (uses universal by default)
+struktur init my-project
+
+# Initialize Docked example
 struktur init --example docked my-stack
 
 # Overwrite existing directory
-struktur init --example skribe skribe --force
+struktur init --example skribe my-site --force
 ```
 
 **Available Examples:**

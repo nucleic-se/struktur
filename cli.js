@@ -540,7 +540,7 @@ program
 program
   .command('init [directory]')
   .description('Initialize a new stack from example template')
-  .option('--example <name>', 'Example to copy (universal, docked, skribe)')
+  .option('--example <name>', 'Example to copy (default: universal, or docked, skribe)')
   .option('--force', 'Overwrite existing directory')
   .action(async (directory, options) => {
     try {
@@ -566,7 +566,7 @@ program
       }
       
       // List examples if no directory provided
-      if (!directory && !options.example) {
+      if (!directory) {
         console.log('Available examples:\n');
         
         const examples = await fs.readdir(examplesDir, { withFileTypes: true });
@@ -602,8 +602,9 @@ program
         process.exit(0);
       }
 
-      const targetDir = path.resolve(directory || 'my-stack');
+      // Default to 'universal' example if no --example specified
       const exampleName = options.example || 'universal';
+      const targetDir = path.resolve(directory || exampleName);
       const sourceDir = path.join(examplesDir, exampleName);
 
       // Check if example exists
