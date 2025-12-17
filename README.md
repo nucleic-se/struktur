@@ -18,10 +18,8 @@ Classes describe the **structure** of your data. Each class file (`.schema.json`
 {
   "class": "service",
   "parent": "base",
-  "fields": {
-    "replicas": 1,
-    "port": null
-  },
+  "replicas": 1,
+  "port": null,
   "schema": {
     "\$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",

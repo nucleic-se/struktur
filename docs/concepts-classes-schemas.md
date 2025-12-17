@@ -455,19 +455,16 @@ Validates against:
 
 ```
 classes/
-├── entity_base.json
 ├── entity_base.schema.json
-├── server.json
 ├── server.schema.json
-├── web_server.json
 └── web_server.schema.json
 ```
 
 **Rules:**
-- One class per file
-- Schema alongside class
+- One class per file (`.schema.json`)
+- File contains class definition, defaults, and schema
 - Alphabetical order
-- Clear naming
+- Clear naming (filename must match `class` field)
 
 ---
 
