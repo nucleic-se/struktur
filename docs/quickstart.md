@@ -142,7 +142,7 @@ cat > instances/web-team.json <<EOF
   "class": "entity_base",
   "name": "Web Team",
   "description": "Frontend and backend developers",
-  "domain": "@engineering"
+  "domains": ["engineering"]
 }
 EOF
 
