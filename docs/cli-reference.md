@@ -103,6 +103,9 @@ struktur build mystack --engine nunjucks
 # Allow template name conflicts (last directory wins)
 struktur build base overlay --allow-template-collisions
 
+# Use exact build directory (recommended for tutorials and production)
+struktur build mystack --exact
+
 # Non-deterministic build (overwrites previous build)
 struktur build mystack --no-deterministic
 ```
@@ -115,7 +118,8 @@ struktur build mystack --no-deterministic
 
 **Build Output:**
 - By default: `./build/build-<hash>/` (deterministic, based on input hash)
-- With `--no-deterministic`: `./build/` (overwrites previous)
+- With `--exact`: `./build/` (uses exact path, simpler for tutorials/production)
+- With `--no-deterministic`: `./build/` (overwrites previous, with collision warnings)
 - Custom: Specify with `-b/--build-dir`
 
 **Build Directory Structure:**

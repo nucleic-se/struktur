@@ -416,6 +416,7 @@ program
   .option('-q, --quiet', 'Suppress output except errors')
   .option('--json', 'Output results as JSON')
   .option('--no-deterministic', 'Disable deterministic build directories (allows overwrites)')
+  .option('--exact', 'Use exact build directory path without hash suffix (overrides deterministic)')
   .option('--allow-template-collisions', 'Allow templates with same name in multiple directories (last wins)')
   .action(async (stackDirs, options) => {
     try {
@@ -506,7 +507,7 @@ program
         buildDir: options.buildDir,
         engine: options.engine,
         quiet: options.quiet || options.json,
-        deterministic: options.deterministic,
+        deterministic: options.exact ? false : options.deterministic,  // --exact overrides deterministic
         failOnCollisions: !options.allowTemplateCollisions  // Invert: default strict, opt-out permissive
       });
 

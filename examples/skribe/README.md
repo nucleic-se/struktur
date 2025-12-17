@@ -27,7 +27,7 @@ cd my-blog
 
 Build the site (uses `struktur.build.json` config):
 ```bash
-struktur build
+struktur build --exact
 ```
 
 The config includes RSS feed and dark theme by default.

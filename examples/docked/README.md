@@ -37,7 +37,7 @@ cd docked
 Docked includes a `struktur.build.json` config file that references Universal:
 
 ```bash
-struktur build
+struktur build --exact
 ```
 
 Or use explicit flags:

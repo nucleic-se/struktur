@@ -149,6 +149,7 @@ struktur build \
   -i instances/ \
   -t templates/ \
   -b build/ \
+  --exact \
   --engine handlebars
 ```
 

@@ -96,7 +96,7 @@ struktur validate .
 ## Build
 
 ```bash
-struktur build .
+struktur build . --exact
 ```
 
 **Output:**
@@ -113,10 +113,10 @@ Build Phase: Rendering
 ✓ Rendered viewer.html
 
 Build Phase: Finalization
-✓ Build complete: build/build-a3f7c812/
+✓ Build complete: build/
 
 Build Output:
-  build/build-a3f7c812/
+  build/
   ├── canonical.json    # Validated data
   └── viewer.html       # Interactive tree view
 ```
@@ -124,7 +124,7 @@ Build Output:
 ## View Result
 
 ```bash
-open build/build-*/viewer.html
+open build/index.html
 ```
 
 **You'll see:** Interactive hierarchical tree viewer with your domain instance.
@@ -146,7 +146,7 @@ cat > instances/web-team.json <<EOF
 }
 EOF
 
-struktur validate . && struktur build .
+struktur validate . && struktur build . --exact
 ```
 
 ### Explore Examples
