@@ -44,20 +44,13 @@ struktur info -c classes/
 
 **You'll see:**
 ```
-Classes loaded: 3
+=== Classes ===
+  domain_root (inherits: universal_base)
+  entity_base (inherits: universal_base)
+  global (inherits: none)
+  universal_base (inherits: none)
 
-entity_base
-  parent: (none)
-  schema: entity_base.schema.json
-  fields: id, name, description, labels, domain
-
-aspect_base
-  parent: entity_base
-  schema: aspect_base.schema.json
-  
-domain_root
-  parent: entity_base
-  schema: domain_root.schema.json
+Total: 4 classes
 ```
 
 ---

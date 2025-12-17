@@ -85,7 +85,7 @@ Create the foundation class with defaults and validation.
 
 ---
 
-## Step 4: Validate Structure So Far
+## Step 3: Validate Structure So Far
 
 ```bash
 struktur info -c classes/
@@ -93,19 +93,17 @@ struktur info -c classes/
 
 **Expected output:**
 ```
-Classes loaded: 1
+=== Classes ===
+  content (inherits: none)
 
-content
-  parent: (none)
-  schema: content.schema.json
-  fields: title, author, created_at, status
+Total: 1 classes
 ```
 
 ✅ **Checkpoint:** One class loaded with schema.
 
 ---
 
-## Step 3: Create Specialized Classes
+## Step 4: Create Specialized Classes
 
 Add classes that inherit from content.
 
@@ -163,7 +161,7 @@ Add classes that inherit from content.
 
 ---
 
-## Step 4: Check Inheritance
+## Step 5: Check Inheritance
 
 ```bash
 struktur info -c classes/
@@ -171,26 +169,19 @@ struktur info -c classes/
 
 **Expected output:**
 ```
-Classes loaded: 3
+=== Classes ===
+  content (inherits: none)
+  page (inherits: content)
+  post (inherits: content)
 
-content
-  parent: (none)
-  schema: content.schema.json
-
-post
-  parent: content
-  schema: post.schema.json
-  
-page
-  parent: content
-  schema: page.schema.json
+Total: 3 classes
 ```
 
 ✅ **Checkpoint:** Inheritance chain working.
 
 ---
 
-## Step 5: Create Instances
+## Step 6: Create Instances
 
 Add actual blog content.
 
@@ -200,6 +191,7 @@ Add actual blog content.
   "id": "welcome",
   "class": "post",
   "title": "Welcome to My Blog",
+  "description": "First post introducing the blog",
   "author": "Alice",
   "created_at": "2025-12-01",
   "status": "published",
@@ -215,6 +207,7 @@ Add actual blog content.
   "id": "struktur-intro",
   "class": "post",
   "title": "Introduction to Struktur",
+  "description": "Tutorial post about Struktur basics",
   "author": "Bob",
   "created_at": "2025-12-10",
   "status": "published",
@@ -230,6 +223,7 @@ Add actual blog content.
   "id": "about",
   "class": "page",
   "title": "About This Blog",
+  "description": "Information about the blog and its author",
   "author": "Alice",
   "created_at": "2025-12-01",
   "status": "published",
@@ -240,7 +234,7 @@ Add actual blog content.
 
 ---
 
-## Step 6: Validate Instances
+## Step 7: Validate Instances
 
 ```bash
 struktur validate -c classes/ -i instances/
@@ -260,7 +254,7 @@ struktur validate -c classes/ -i instances/
 
 ---
 
-## Step 7: Test Validation Errors
+## Step 8: Test Validation Errors
 
 Try creating an invalid instance to see validation in action.
 
@@ -450,10 +444,10 @@ Update index template to generate individual pages using `render_file`.
 
 ---
 
-## Step 12: Build!
+## Step 13: Build!
 
 ```bash
-struktur build -c classes/ -i instances/ -t templates/
+struktur build -c classes/ -i instances/ -t templates/ --exact
 ```
 
 **Expected output:**
@@ -487,10 +481,10 @@ Build Output:
 
 ---
 
-## Step 13: View Your Blog
+## Step 14: View Your Blog
 
 ```bash
-open build/build-*/index.html
+open build/index.html
 ```
 
 **You should see:**
