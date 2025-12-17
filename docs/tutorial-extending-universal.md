@@ -36,14 +36,14 @@ Learn how to build on Universal's foundation using **aspects** (the correct patt
 
 ## Step 1: Initialize Universal
 
-\`\`\`bash
+```bash
 struktur init universal
 cd universal
 struktur info -c classes/
-\`\`\`
+```
 
 **Output:**
-\`\`\`
+```
 === Classes ===
   domain_root (inherits: universal_base)
   entity_base (inherits: universal_base)
@@ -51,7 +51,7 @@ struktur info -c classes/
   universal_base (inherits: none)
 
 Total: 4 classes
-\`\`\`
+```
 
 ✅ **Checkpoint:** Universal stack initialized with 4 base classes.
 
@@ -61,19 +61,19 @@ Total: 4 classes
 
 Create a new stack directory for your custom infrastructure.
 
-\`\`\`bash
+```bash
 cd ..
 mkdir infra-stack && cd infra-stack
 mkdir classes instances templates aspects
-\`\`\`
+```
 
 **Directory structure:**
-\`\`\`
+```
 infra-stack/
 ├── aspects/     # Aspect definitions (custom schemas)
 ├── instances/   # Your data
 └── templates/   # Your templates
-\`\`\`
+```
 
 ---
 
@@ -82,7 +82,7 @@ infra-stack/
 Aspects are the **correct way** to add custom fields to universal entities.
 
 **\`aspects/server.json\`:**
-\`\`\`json
+```json
 {
   "id": "server",
   "class": "aspect_base",
@@ -118,7 +118,7 @@ Aspects are the **correct way** to add custom fields to universal entities.
     "required": ["hostname", "ip_address", "os"]
   }
 }
-\`\`\`
+```
 
 **Why aspects?**
 - Namespaced (no conflicts with universal fields)
@@ -133,17 +133,17 @@ Aspects are the **correct way** to add custom fields to universal entities.
 Domains provide hierarchical organization.
 
 **\`instances/production-domain.json\`:**
-\`\`\`json
+```json
 {
   "id": "production",
   "class": "domain_root",
   "name": "Production Environment",
   "description": "Production infrastructure"
 }
-\`\`\`
+```
 
 **\`instances/web-tier-domain.json\`:**
-\`\`\`json
+```json
 {
   "id": "web-tier",
   "class": "domain_root",
@@ -151,7 +151,7 @@ Domains provide hierarchical organization.
   "description": "Load balancers and web servers",
   "domains": ["production"]
 }
-\`\`\`
+```
 
 **Key concept:** \`"domains": ["production"]\` creates a parent-child relationship. Domain instances can be nested arbitrarily deep.
 
@@ -162,7 +162,7 @@ Domains provide hierarchical organization.
 Use **entity_base** class with the **server aspect**.
 
 **\`instances/web-01.json\`:**
-\`\`\`json
+```json
 {
   "id": "web-01",
   "class": "entity_base",
@@ -179,10 +179,10 @@ Use **entity_base** class with the **server aspect**.
     }
   }
 }
-\`\`\`
+```
 
 **\`instances/web-02.json\`:**
-\`\`\`json
+```json
 {
   "id": "web-02",
   "class": "entity_base",
@@ -199,7 +199,7 @@ Use **entity_base** class with the **server aspect**.
     }
   }
 }
-\`\`\`
+```
 
 **What you get:**
 - From **entity_base**: id, name, description, domains, aspects
@@ -212,12 +212,12 @@ Use **entity_base** class with the **server aspect**.
 
 Use explicit path flags to load both universal and your stack.
 
-\`\`\`bash
+```bash
 struktur validate -c ../universal/classes classes/ -a ../universal/aspects aspects/ -i ../universal/instances instances/
-\`\`\`
+```
 
 **Output:**
-\`\`\`
+```
 === Validation Results ===
 
 ✓ global (global)
@@ -231,7 +231,7 @@ Total:    5
 Valid:    5
 Invalid:  0
 Errors:   0
-\`\`\`
+```
 
 ✅ **Checkpoint:** All instances validate with aspect data.
 
@@ -244,7 +244,7 @@ Errors:   0
 Universal includes a global instance with viewer.html template. Override it for your needs.
 
 **\`instances/global.json\`:**
-\`\`\`json
+```json
 {
   "id": "global",
   "class": "global",
@@ -255,7 +255,7 @@ Universal includes a global instance with viewer.html template. Override it for 
     }
   ]
 }
-\`\`\`
+```
 
 **What happens:** Instance merging combines both global.json files, with your version taking precedence for conflicting fields. The \`build\` array is replaced entirely.
 
@@ -264,7 +264,7 @@ Universal includes a global instance with viewer.html template. Override it for 
 ## Step 8: Create Template Using Aspects
 
 **\`templates/inventory.txt\`:**
-\`\`\`handlebars
+```handlebars
 # Infrastructure Inventory
 
 ## Domains
@@ -285,7 +285,7 @@ Universal includes a global instance with viewer.html template. Override it for 
 
 {{/if}}
 {{/each}}
-\`\`\`
+```
 
 **Aspect access:**
 - Check presence: \`{{#if aspects.server}}\`
@@ -296,12 +296,12 @@ Universal includes a global instance with viewer.html template. Override it for 
 
 ## Step 9: Build Multi-Stack
 
-\`\`\`bash
+```bash
 struktur build -c ../universal/classes classes/ -a ../universal/aspects aspects/ -i ../universal/instances instances/ -t ../universal/templates templates/ --exact
-\`\`\`
+```
 
 **Output:**
-\`\`\`
+```
 📦 Loading stack...
   ✓ Loaded 4 classes
   ✓ Loaded 0 aspects
@@ -329,18 +329,18 @@ struktur build -c ../universal/classes classes/ -a ../universal/aspects aspects/
   📂 ./build/
 
 ✨ Open ./build/index.html to view your stack
-\`\`\`
+```
 
 ---
 
 ## Step 10: View Results
 
-\`\`\`bash
+```bash
 cat build/inventory.txt
-\`\`\`
+```
 
 **Output:**
-\`\`\`
+```
 # Infrastructure Inventory
 
 ## Domains
@@ -363,7 +363,7 @@ cat build/inventory.txt
 - OS: linux
 - Resources: 4 cores, 16GB RAM
 - Domains: web-tier
-\`\`\`
+```
 
 ✅ **Success!** Aspect-based extension with domain hierarchy.
 
@@ -395,7 +395,7 @@ cat build/inventory.txt
 
 If you **really need** custom top-level fields (not recommended):
 
-\`\`\`json
+```json
 {
   "class": "server",
   "parent": "entity_base",
@@ -415,7 +415,7 @@ If you **really need** custom top-level fields (not recommended):
     "additionalProperties": true
   }
 }
-\`\`\`
+```
 
 **Downsides:**
 - Must list ALL properties (inherited + custom)
@@ -431,7 +431,7 @@ If you **really need** custom top-level fields (not recommended):
 
 ### Add More Aspects
 
-\`\`\`json
+```json
 {
   "id": "monitoring",
   "class": "aspect_base",
@@ -444,10 +444,10 @@ If you **really need** custom top-level fields (not recommended):
     }
   }
 }
-\`\`\`
+```
 
 Apply to instances:
-\`\`\`json
+```json
 {
   "id": "web-01",
   "class": "entity_base",
@@ -459,13 +459,13 @@ Apply to instances:
     }
   }
 }
-\`\`\`
+```
 
 ### Use Viewer Template
 
 Universal includes an interactive hierarchical viewer:
 
-\`\`\`json
+```json
 {
   "id": "global",
   "class": "global",
@@ -475,7 +475,7 @@ Universal includes an interactive hierarchical viewer:
     }
   ]
 }
-\`\`\`
+```
 
 Open \`build/index.html\` to see your domain hierarchy visualized.
 
@@ -491,25 +491,25 @@ Open \`build/index.html\` to see your domain hierarchy visualized.
 
 ### Conditional Aspects
 
-\`\`\`handlebars
+```handlebars
 {{#if aspects.monitoring}}
 Monitoring: {{aspects.monitoring.metrics_port}}
 {{/if}}
-\`\`\`
+```
 
 ### Filter by Aspect
 
-\`\`\`handlebars
+```handlebars
 {{#each instances}}
   {{#if aspects.server}}
     {{!-- Has server aspect --}}
   {{/if}}
 {{/each}}
-\`\`\`
+```
 
 ### Multiple Aspects
 
-\`\`\`json
+```json
 {
   "aspects": {
     "server": {...},
@@ -517,14 +517,14 @@ Monitoring: {{aspects.monitoring.metrics_port}}
     "backup": {...}
   }
 }
-\`\`\`
+```
 
 ### Aspect Types (Auto-Computed)
 
-\`\`\`handlebars
+```handlebars
 {{!-- aspect_types is automatically populated --}}
 Aspects: {{#each aspect_types}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
-\`\`\`
+```
 
 ---
 
@@ -535,7 +535,7 @@ Aspects: {{#each aspect_types}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
 **Problem:** Added custom fields directly to entity_base instance.
 
 **Solution:** Use aspects instead:
-\`\`\`json
+```json
 {
   "class": "entity_base",
   "aspects": {
@@ -544,7 +544,7 @@ Aspects: {{#each aspect_types}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
     }
   }
 }
-\`\`\`
+```
 
 ### "Class not found" errors
 
@@ -557,9 +557,9 @@ Aspects: {{#each aspect_types}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
 **Problem:** Accessing aspect data incorrectly.
 
 **Solution:** Use \`aspects.aspect_name.field\`:
-\`\`\`handlebars
+```handlebars
 {{aspects.server.hostname}}
-\`\`\`
+```
 
 ---
 
