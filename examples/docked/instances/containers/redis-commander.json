@@ -1,6 +1,7 @@
 {
   "id": "redis-commander",
   "class": "docked_container",
+  "description": "Redis web UI for managing and viewing data",
   "domains": ["monitoring"],
   "aspects": {
     "docker_container": {

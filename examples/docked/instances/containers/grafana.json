@@ -1,6 +1,7 @@
 {
   "id": "grafana",
   "class": "docked_container",
+  "description": "Metrics visualization and monitoring dashboards",
   "domains": ["monitoring"],
   "aspects": {
     "docker_container": {

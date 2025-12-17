@@ -1,6 +1,7 @@
 {
   "id": "global",
   "class": "global",
+  "description": "Universal stack base configuration",
   "build": [
     {
       "viewer.html": "/index.html"

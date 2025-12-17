@@ -1,6 +1,7 @@
 {
   "id": "whoami",
   "class": "docked_container",
+  "description": "Simple HTTP server that returns request information",
   "domains": ["web"],
   "aspects": {
     "docker_container": {

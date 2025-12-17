@@ -1,6 +1,7 @@
 {
   "id": "grafana-data",
   "class": "docked_volume",
+  "description": "Persistent storage for Grafana dashboards and configuration",
   "domains": ["storage"],
   "aspects": {
     "docker_volume": {

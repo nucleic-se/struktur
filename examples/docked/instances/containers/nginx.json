@@ -1,6 +1,7 @@
 {
   "id": "nginx",
   "class": "docked_container",
+  "description": "Web server serving the docked stack viewer and example content",
   "domains": ["web"],
   "aspects": {
     "docker_container": {

@@ -1,6 +1,7 @@
 {
   "id": "global",
   "class": "global",
+  "description": "Skribe site configuration and build manifest",
   "site": {
     "title": "Skribe Demo",
     "url": "https://example.com",

@@ -1,6 +1,7 @@
 {
   "id": "docked",
   "class": "docked_network",
+  "description": "Bridge network connecting all docked containers",
   "domains": ["infrastructure"],
   "aspects": {
     "docker_network": {
