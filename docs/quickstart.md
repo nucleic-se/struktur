@@ -32,14 +32,15 @@ cd universal
 ```
 universal/
 ├── classes/
-│   ├── entity_base.json          # Root class
-│   ├── entity_base.schema.json   # Base schema
-│   ├── aspect_base.json           # Aspect root
-│   └── domain_root.json           # Domain container
+│   ├── entity_base.schema.json   # Entity class with schema
+│   ├── global.schema.json         # Global config class
+│   ├── universal_base.schema.json # Root base class
+│   └── domains/
+│       └── domain_root.schema.json  # Domain container class
 ├── instances/
-│   └── .gitkeep
+│   └── global.json                # Global instance
 └── templates/
-    └── viewer.html.hbs            # Hierarchical viewer
+    └── viewer.html                # Hierarchical viewer
 ```
 
 ## Inspect Classes

@@ -63,6 +63,9 @@ struktur build -c classes/ -i instances/ -t templates/
 - `.handlebars` - Handlebars templates
 - `.njk` - Nunjucks templates
 - `.nunjucks` - Nunjucks templates
+- **Any filename** - Templates can have any extension or none (engine determined by --engine flag)
+
+**Note:** Template extensions are optional. You can use `posts.html` instead of `posts.html.hbs` - the engine is determined by the `--engine` flag, not the file extension.
 
 ### Directory Structure
 

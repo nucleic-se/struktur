@@ -16,8 +16,12 @@ This document tracks breaking changes in Struktur's alpha releases.
 ```json
 // server.schema.json
 {
-  "type": "object",
-  "properties": { "hostname": { "type": "string" } }
+  "parent": "entity_base",
+  "hostname": null,
+  "schema": {
+    "type": "object",
+    "properties": { "hostname": { "type": "string" } }
+  }
 }
 ```
 
@@ -26,8 +30,12 @@ This document tracks breaking changes in Struktur's alpha releases.
 // server.schema.json
 {
   "class": "server",
-  "type": "object",
-  "properties": { "hostname": { "type": "string" } }
+  "parent": "entity_base",
+  "hostname": null,
+  "schema": {
+    "type": "object",
+    "properties": { "hostname": { "type": "string" } }
+  }
 }
 ```
 
