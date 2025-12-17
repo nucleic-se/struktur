@@ -50,19 +50,13 @@ struktur info -c classes/
 
 **Output:**
 ```
-Classes loaded: 3
+=== Classes ===
+  domain_root (inherits: universal_base)
+  entity_base (inherits: universal_base)
+  global (inherits: none)
+  universal_base (inherits: none)
 
-entity_base
-  parent: (none)
-  schema: entity_base.schema.json
-  
-aspect_base
-  parent: entity_base
-  schema: aspect_base.schema.json
-  
-domain_root
-  parent: entity_base
-  schema: domain_root.schema.json
+Total: 4 classes
 ```
 
 ## Create Your First Instance
@@ -87,10 +81,16 @@ struktur validate .
 
 **Success output:**
 ```
-✓ Loaded 3 classes
-✓ Loaded 1 instance
-✓ Validation passed
-  - engineering (domain_root)
+=== Validation Results ===
+
+✓ global (global)
+✓ engineering (domain_root)
+
+=== Summary ===
+Total:    2
+Valid:    2
+Invalid:  0
+Errors:   0
 ```
 
 ## Build
@@ -101,24 +101,41 @@ struktur build . --exact
 
 **Output:**
 ```
-Build Phase: Stack Loading & Validation
-✓ Loaded 3 classes
-✓ Loaded 1 instance
-✓ Validation passed
+📦 Loading stack...
+  ✓ Loaded 4 classes
+  ✓ Loaded 0 aspects
+  ✓ Loaded 2 instances
 
-Build Phase: Template Loading
-✓ Loaded 1 template (viewer.html.hbs)
+🔍 Validating stack...
+  ✓ All 2 class-bearing instances valid
 
-Build Phase: Rendering
-✓ Rendered viewer.html
+📁 Preparing build directory: ./build
 
-Build Phase: Finalization
-✓ Build complete: build/
+📝 Writing outputs...
+  ✓ canonical.json (2 instances)
+  ✓ meta/classes/ (4 classes)
+  ✓ meta/validation.json
+
+🎨 Rendering templates...
+  Found 1 build tasks
+  ✓ 1 files rendered
+
+✨ Build complete!
+  📊 2 instances validated
+  📦 4 class definitions
+  🎨 1 templates rendered
+  📂 ./build/
+
+✨ Open ./build/index.html to view your stack
 
 Build Output:
   build/
-  ├── canonical.json    # Validated data
-  └── viewer.html       # Interactive tree view
+  ├── .struktur-manifest.json
+  ├── canonical.json       # Validated data
+  ├── index.html           # Interactive tree view
+  └── meta/
+      ├── classes/         # Class definitions
+      └── validation.json
 ```
 
 ## View Result
@@ -165,44 +182,67 @@ struktur build .
 
 ### Build Your Own Stack
 
-Create a custom stack extending Universal:
+Create a custom stack with blog post content:
 
 ```bash
 mkdir mystack && cd mystack
+mkdir -p classes instances templates
 
-# Reference universal classes
-cat > struktur.build.json <<EOF
+# Create global class and instance (needed for build tasks)
+cat > classes/global.schema.json <<EOF
 {
-  "classes": ["../universal/classes", "./classes"],
-  "instances": ["./instances"],
-  "templates": ["./templates"]
+  "class": "global",
+  "schema": {
+    "\$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "id": {"type": "string"},
+      "class": {"type": "string"},
+      "description": {"type": "string"},
+      "build": {"type": "array"}
+    }
+  }
 }
 EOF
 
-# Create custom class
-mkdir -p classes
+cat > instances/global.json <<EOF
+{
+  "id": "global",
+  "class": "global",
+  "description": "Blog configuration",
+  "build": [
+    {
+      "posts.html": "/posts.html"
+    }
+  ]
+}
+EOF
+
+# Create custom blog_post class
 cat > classes/blog_post.schema.json <<EOF
 {
   "class": "blog_post",
-  "parent": "entity_base",
+  "title": "",
+  "content": "",
   "author": "Anonymous",
   "status": "draft",
   "schema": {
     "\$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
+    "required": ["id", "class", "title", "content"],
     "properties": {
+      "id": {"type": "string"},
+      "class": {"type": "string"},
       "title": {"type": "string"},
       "author": {"type": "string"},
       "content": {"type": "string"},
       "status": {"type": "string", "enum": ["draft", "published"]}
-    },
-    "required": ["title", "content"]
+    }
   }
 }
 EOF
 
-# Create instance
-mkdir -p instances
+# Create blog post instance
 cat > instances/welcome.json <<EOF
 {
   "id": "welcome-post",
@@ -210,13 +250,13 @@ cat > instances/welcome.json <<EOF
   "title": "Welcome to My Blog",
   "content": "This is my first post!",
   "author": "Alice",
-  "status": "published"
+  "status": "published",
+  "description": "First blog post"
 }
 EOF
 
-# Create template
-mkdir -p templates
-cat > templates/posts.html.hbs <<EOF
+# Create template (Note: no .hbs extension - any filename works!)
+cat > templates/posts.html <<EOF
 <!DOCTYPE html>
 <html>
 <head><title>Blog Posts</title></head>
@@ -235,8 +275,8 @@ EOF
 
 # Validate and build
 struktur validate .
-struktur build .
-open build/build-*/posts.html
+struktur build . --exact
+open build/posts.html
 ```
 
 **Success!** You've created a custom class, validated instances, and rendered templates.
