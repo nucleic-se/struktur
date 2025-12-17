@@ -1,6 +1,6 @@
 # Tutorial: Your First Stack
 
-Build a complete blog stack from scratch in 20 minutes. Learn classes, schemas, instances, and templates through hands-on practice.
+Build a complete blog stack from scratch in 20 minutes. Learn classes, schemas, instances, and templates through hands-on practice. (15 steps total)
 
 ## What You'll Build
 
@@ -242,12 +242,17 @@ struktur validate -c classes/ -i instances/
 
 **Expected output:**
 ```
-✓ Loaded 3 classes
-✓ Loaded 3 instances
-✓ Validation passed
-  - welcome (post)
-  - struktur-intro (post)
-  - about (page)
+=== Validation Results ===
+
+✓ about (page)
+✓ struktur-intro (post)
+✓ welcome (post)
+
+=== Summary ===
+Total:    3
+Valid:    3
+Invalid:  0
+Errors:   0
 ```
 
 ✅ **Checkpoint:** All instances valid against schemas.
@@ -273,35 +278,77 @@ struktur validate -c classes/ -i instances/
 
 **Expected error:**
 ```
-✗ Validation failed
+=== Validation Results ===
 
-Error (instance: invalid-post)
-  Property "author" is required but not provided
-  Schema: content.schema.json (from parent class "content")
+✓ about (page)
+✓ struktur-intro (post)
+✗ invalid-post (post)
+    ERROR: [content] / missing required field: author
+    ERROR: [post] / missing required field: category
+    ERROR: [post] / missing required field: content
+    WARNING: Instance 'invalid-post' has no description
+✓ welcome (post)
 
-Error (instance: invalid-post)
-  Property "category" is required but not provided
-  Schema: post.schema.json
-
-Error (instance: invalid-post)
-  Property "content" is required but not provided
-  Schema: post.schema.json
+=== Summary ===
+Total:    4
+Valid:    3
+Invalid:  1
+Errors:   3
+Warnings: 1
 ```
 
 **Fix it by removing the file:**
 ```bash
 rm instances/invalid.json
 struktur validate -c classes/ -i instances/
-# ✓ Validation passed
 ```
 
 ✅ **Learning:** Validation catches missing required fields from both parent and child schemas.
 
 ---
 
-## Step 8: Create Index Template
+## Step 9: Add Global Configuration
 
-**`templates/index.html.hbs`:**
+Before creating templates, we need a global configuration that specifies build tasks.
+
+**`classes/global.schema.json`:**
+```json
+{
+  "class": "global",
+  "schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "id": {"type": "string"},
+      "class": {"type": "string"},
+      "description": {"type": "string"},
+      "build": {"type": "array"}
+    }
+  }
+}
+```
+
+**`instances/global.json`:**
+```json
+{
+  "id": "global",
+  "class": "global",
+  "description": "Blog configuration",
+  "build": [
+    {
+      "index.html": "/index.html"
+    }
+  ]
+}
+```
+
+✅ **Learning:** The `build` array tells Struktur which templates to render and where to put them.
+
+---
+
+## Step 10: Create Index Template
+
+**`templates/index.html`** (note: no `.hbs` extension!):
 ```handlebars
 <!DOCTYPE html>
 <html lang="en">
@@ -360,9 +407,9 @@ struktur validate -c classes/ -i instances/
 
 ---
 
-## Step 9: Create Post Template
+## Step 11: Create Post Template
 
-**`templates/post.html.hbs`:**
+**`templates/post.html`:**
 ```handlebars
 <!DOCTYPE html>
 <html lang="en">
@@ -393,9 +440,9 @@ struktur validate -c classes/ -i instances/
 
 ---
 
-## Step 10: Create Page Template
+## Step 12: Create Page Template
 
-**`templates/page.html.hbs`:**
+**`templates/page.html`:**
 ```handlebars
 <!DOCTYPE html>
 <html lang="en">
@@ -422,20 +469,20 @@ struktur validate -c classes/ -i instances/
 
 ---
 
-## Step 11: Add Multi-Page Generation
+## Step 13: Add Multi-Page Generation
 
 Update index template to generate individual pages using `render_file`.
 
-**`templates/index.html.hbs`** (add before closing `</body>`):
+**`templates/index.html`** (add before closing `</body>`):
 ```handlebars
   {{!-- Generate individual post pages --}}
   {{#each (where instances "class" "post")}}
-    {{render_file "post.html.hbs" (concat "posts/" id ".html") this}}
+    {{render_file "post.html" (concat "posts/" id ".html") this}}
   {{/each}}
   
   {{!-- Generate individual page files --}}
   {{#each (where instances "class" "page")}}
-    {{render_file "page.html.hbs" (concat slug ".html") this}}
+    {{render_file "page.html" (concat slug ".html") this}}
   {{/each}}
 
 </body>
@@ -444,7 +491,7 @@ Update index template to generate individual pages using `render_file`.
 
 ---
 
-## Step 13: Build!
+## Step 14: Build!
 
 ```bash
 struktur build -c classes/ -i instances/ -t templates/ --exact
@@ -452,36 +499,55 @@ struktur build -c classes/ -i instances/ -t templates/ --exact
 
 **Expected output:**
 ```
-Build Phase: Stack Loading & Validation
-✓ Loaded 3 classes
-✓ Loaded 3 instances
-✓ Validation passed
+📦 Loading stack...
+  ✓ Loaded 4 classes
+  ✓ Loaded 4 instances
 
-Build Phase: Template Loading
-✓ Loaded 3 templates
+🔍 Validating stack...
+  ✓ All 4 class-bearing instances valid
 
-Build Phase: Rendering
-✓ Rendered index.html
-✓ Rendered posts/welcome.html (via render_file)
-✓ Rendered posts/struktur-intro.html (via render_file)
-✓ Rendered about.html (via render_file)
+📁 Preparing build directory: ./build
 
-Build Phase: Finalization
-✓ Build complete: build/build-8f3a29d1/
+📝 Writing outputs...
+  ✓ canonical.json (4 instances)
+  ✓ meta/classes/ (4 classes)
+  ✓ meta/validation.json
 
-Build Output:
-  build/build-8f3a29d1/
-  ├── canonical.json
-  ├── index.html
-  ├── about.html
-  └── posts/
-      ├── welcome.html
-      └── struktur-intro.html
+🎨 Rendering templates...
+  Found 1 build tasks
+  ✓ 4 files rendered
+
+✨ Build complete!
+  📊 4 instances validated
+  📦 4 class definitions
+  🎨 4 templates rendered
+  📂 ./build/
+
+✨ Open ./build/index.html to view your stack
+```
+
+**Build output files:**
+```
+build/
+├── .struktur-manifest.json
+├── canonical.json
+├── index.html
+├── about.html
+├── meta/
+│   ├── classes/
+│   │   ├── content.json
+│   │   ├── global.json
+│   │   ├── page.json
+│   │   └── post.json
+│   └── validation.json
+└── posts/
+    ├── struktur-intro.html
+    └── welcome.html
 ```
 
 ---
 
-## Step 14: View Your Blog
+## Step 15: View Your Blog
 
 ```bash
 open build/index.html
