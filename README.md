@@ -11,30 +11,26 @@ Struktur's pipeline has three stages:
 
 ### 1. Define Shapes (Classes + Schemas)
 
-Classes describe the **structure** of your data. A class lists fields and can inherit from other classes to reuse common shapes. Schemas sit alongside classes and enforce constraints—required fields, type checks, allowed values.
+Classes describe the **structure** of your data. Each class file (`.schema.json`) contains the class definition with inheritance, field defaults, and JSON Schema validation rules.
 
 ```json
-// classes/service.class.json
+// classes/service.schema.json
 {
   "class": "service",
   "parent": "base",
   "fields": {
     "replicas": 1,
     "port": null
-  }
-}
-```
-
-```json
-// classes/service.schema.json
-{
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "type": "object",
-  "required": ["id", "port"],
-  "properties": {
-    "id": { "type": "string" },
-    "port": { "type": "integer", "minimum": 1, "maximum": 65535 },
-    "replicas": { "type": "integer", "minimum": 1 }
+  },
+  "schema": {
+    "\$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "required": ["id", "port"],
+    "properties": {
+      "id": { "type": "string" },
+      "port": { "type": "integer", "minimum": 1, "maximum": 65535 },
+      "replicas": { "type": "integer", "minimum": 1 }
+    }
   }
 }
 ```
