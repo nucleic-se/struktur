@@ -6,10 +6,9 @@
   "build_dir": "build",
   "render": [
     {"viewer.html": "/index.html"},
-    {"nginx-index.html": "/nginx/index.html"},
+    {"frontend.html": "/frontend/index.html"},
     {"docker-compose.yml": "/docker-compose.yml"},
     {"dot.env.example": "/.env.example"},
-    {"grafana-datasources.yml": "/grafana-datasources.yml"},
     {".env.development": "/.env.development"},
     {".env.staging": "/.env.staging"},
     {".env.production": "/.env.production"},

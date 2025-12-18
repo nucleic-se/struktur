@@ -6,13 +6,13 @@
   "aspects": {
     "docker_container": {
       "image": "nginx:alpine",
-      "description": "Reverse proxy routing to API and serving static content",
+      "description": "Reverse proxy routing to API and serving frontend application",
       "web_ui": "http://localhost:8080",
       "ports": ["8080:80"],
       "networks": ["docked"],
       "restart_policy": "unless-stopped",
       "volumes": [
-        "./nginx:/usr/share/nginx/html:ro",
+        "./frontend:/usr/share/nginx/html:ro",
         "./nginx.conf:/etc/nginx/nginx.conf:ro"
       ],
       "depends_on": ["api"],

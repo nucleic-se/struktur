@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docked Stack Demo</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .stats {
+            background: #f7f9fc;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e1e8ed;
+        }
+        .stat-row:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .cache-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .cache-hit { background: #d4edda; color: #155724; }
+        .cache-miss { background: #fff3cd; color: #856404; }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        button:active {
+            transform: translateY(1px);
+        }
+        .status {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            text-align: center;
+        }
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .tech-stack {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #e1e8ed;
+        }
+        .tech-stack h3 {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .tech-item {
+            background: #f7f9fc;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #555;
+        }
+        .tech-item strong {
+            color: #333;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-left: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐋 Docked Stack</h1>
+        <p class="subtitle">Production-ready Docker infrastructure with PostgreSQL, Redis, Node.js, and Nginx</p>
+        
+        <div class="stats">
+            <div class="stat-row">
+                <span class="stat-label">Total Page Views</span>
+                <span class="stat-value" id="totalViews">-</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Cache Status</span>
+                <span id="cacheStatus">-</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Environment</span>
+                <span id="environment">-</span>
+            </div>
+        </div>
+
+        <button onclick="trackView()">Track Page View</button>
+        <div id="status"></div>
+
+        <div class="tech-stack">
+            <h3>Technology Stack</h3>
+            <div class="tech-grid">
+                <div class="tech-item">
+                    <strong>Frontend</strong>
+                    Nginx serving static HTML
+                </div>
+                <div class="tech-item">
+                    <strong>Backend</strong>
+                    Node.js 20 API
+                </div>
+                <div class="tech-item">
+                    <strong>Database</strong>
+                    PostgreSQL 16
+                </div>
+                <div class="tech-item">
+                    <strong>Cache</strong>
+                    Redis with AOF
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const data = await response.json();
+                const cacheHeader = response.headers.get('X-Cache');
+                
+                document.getElementById('totalViews').textContent = data.total_views;
+                
+                const cacheClass = cacheHeader === 'HIT' ? 'cache-hit' : 'cache-miss';
+                document.getElementById('cacheStatus').innerHTML = 
+                    `<span class="cache-badge ${cacheClass}">${cacheHeader}</span>`;
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+            }
+        }
+
+        async function loadHealth() {
+            try {
+                const response = await fetch('/api/health');
+                const data = await response.json();
+                document.getElementById('environment').textContent = 
+                    data.environment || 'unknown';
+            } catch (error) {
+                console.error('Failed to load health:', error);
+            }
+        }
+
+        async function trackView() {
+            const statusEl = document.getElementById('status');
+            statusEl.innerHTML = '<span class="spinner"></span>';
+            statusEl.className = 'status';
+            
+            try {
+                const response = await fetch('/api/track', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ path: window.location.pathname })
+                });
+                
+                if (response.ok) {
+                    statusEl.textContent = '✓ View tracked successfully!';
+                    statusEl.className = 'status success';
+                    
+                    // Reload stats after tracking
+                    setTimeout(() => loadStats(), 100);
+                } else {
+                    throw new Error('Failed to track view');
+                }
+            } catch (error) {
+                statusEl.textContent = '✗ Failed to track view';
+                statusEl.className = 'status error';
+            }
+            
+            setTimeout(() => statusEl.textContent = '', 3000);
+        }
+
+        // Load initial data
+        loadStats();
+        loadHealth();
+        
+        // Refresh stats every 5 seconds
+        setInterval(loadStats, 5000);
+    </script>
+</body>
+</html>

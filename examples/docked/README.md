@@ -1,23 +1,44 @@
-# Docked Production Stack
+# Docked Full-Stack Application
 
-**Docked** demonstrates production-ready Docker infrastructure generated from canonical data. It showcases multi-environment configuration, health checks, resource limits, and real application architecture (database, cache, API, reverse proxy).
+**Docked** is a complete, production-ready full-stack web application stack generated from canonical data. It demonstrates how all layers of a modern web application work together: frontend, backend API, database, and cache.
 
-**⚠️ Important**: Docked is an **extension** of Universal, not a standalone stack. You must build it with Universal's base classes. Running `struktur validate docked/` alone will fail because Docked's classes inherit from Universal.
+**⚠️ Important**: Docked is an **extension** of Universal, not a standalone stack. You must build it with Universal's base classes.
 
-## What this shows
+## What You Get
+
+A **working web application** with:
+
+- **Frontend**: Modern single-page app served by Nginx
+- **Backend API**: Node.js REST API with 3 endpoints
+- **Database**: PostgreSQL for persistent data
+- **Cache**: Redis for session/query caching
+- **Reverse Proxy**: Nginx routing frontend + API
+
+**Access it at**: http://localhost:8080 after starting the stack
+
+### The Complete Stack
+
+```
+User Browser
+    ↓
+Nginx :8080 (Frontend + Reverse Proxy)
+    ↓
+Node.js API :3001
+    ↓
+PostgreSQL :5432  +  Redis :6379
+```
 
 ### Production Features
-- **Multi-environment configs**: Dev/staging/production environment files with secrets management patterns
-- **Health checks**: Container health monitoring with proper startup dependencies
-- **Resource limits**: CPU and memory constraints for production deployment
-- **Real architecture**: PostgreSQL database, Redis cache, Node.js API, Nginx reverse proxy
-- **Dependency management**: Services start in correct order (`postgres` → `api` → `nginx`)
+- **Multi-environment configs**: Dev/staging/production with secrets management patterns
+- **Health checks**: All services monitor themselves and dependencies
+- **Resource limits**: CPU and memory constraints ready for production
+- **Dependency management**: Services start in correct order (DB → API → Frontend)
 
-### Struktur Capabilities
-- **Extending Universal**: Docked layers new classes on top of Universal's base vocabulary
-- **Domain modeling**: Aspect-based organization for Docker-specific concerns
-- **Multi-output templates**: One canonical model generates compose files, configs, application code
-- **Validation**: Schemas ensure port ranges, volume types, and network configs are valid before rendering
+### Struktur Capabilities Demonstrated
+- **Extending Universal**: Domain-specific classes layer on base vocabulary
+- **Multi-output templates**: One model generates compose, configs, and application code
+- **Schema validation**: Catches errors before deployment
+- **Aspect-based organization**: Docker concerns separated from business logic
 
 ## Quick start
 
@@ -75,50 +96,62 @@ cp .env.development .env
 
 # Start all services
 docker compose up -d
-
-# Watch startup (services start in dependency order)
-docker compose logs -f
 ```
 
-Access the services:
-- **Nginx (Frontend)**: http://localhost:8080
-- **API**: http://localhost:3001/health or http://localhost:8080/api/health (via nginx)
-- **PostgreSQL**: localhost:5432 (user: docked_dev, db: docked_app_dev)
-- **Redis**: localhost:6379
-- **Grafana**: http://localhost:3000 (admin/dev_grafana_admin)
-- **Redis Commander**: http://localhost:8081
-- **Whoami**: http://localhost:8082
+### 6. Open the application
 
-### 6. Test the API
+**Visit http://localhost:8080** in your browser
+
+You'll see a working full-stack web app that:
+- **Displays** total page views stored in PostgreSQL
+- **Shows** cache status (HIT/MISS) from Redis
+- **Tracks** new page views with the button (writes to database)
+- **Auto-refreshes** stats every 5 seconds
+
+### 7. API Endpoints
+
+Test the backend directly:
 
 ```bash
-# Check API health
+# Health check
 curl http://localhost:3001/health
 
-# Track a page view (writes to PostgreSQL)
+# Get stats (first call = cache MISS, second = HIT)
+curl -v http://localhost:3001/stats 2>&1 | grep X-Cache
+
+# Track a page view
 curl -X POST http://localhost:3001/track \
   -H "Content-Type: application/json" \
   -d '{"path": "/home"}'
-
-# Get stats (reads from PostgreSQL, caches in Redis)
-curl http://localhost:3001/stats
-
-# Call again - should return from cache (X-Cache: HIT)
-curl -v http://localhost:3001/stats 2>&1 | grep X-Cache
 ```
 
-### 7. Inspect outputs
+Or access via nginx reverse proxy:
+- Frontend: http://localhost:8080
+- API: http://localhost:8080/api/health
 
-The build generates:
-- `build/docker-compose.yml` - Complete compose file with health checks, dependencies, resource limits
-- `build/.env.development` - Development environment configuration
-- `build/.env.staging` - Staging environment template
-- `build/.env.production` - Production environment template with secrets management placeholders
-- `build/nginx.conf` - Reverse proxy configuration with security headers and caching
-- `build/api/server.js` - Node.js API with database and Redis integration
-- `build/api/package.json` - API dependencies
-- `build/index.html` - Visual catalog of all containers (open in browser)
-- `build/canonical.json` - Full merged data model
+### 8. What Got Generated
+
+The build creates a complete application:
+
+**Frontend**:
+- `build/frontend/index.html` - Modern single-page app
+
+**Backend**:
+- `build/api/server.js` - Node.js API (health, stats, track endpoints)
+- `build/api/package.json` - Dependencies (pg, redis)
+
+**Infrastructure**:
+- `build/docker-compose.yml` - All services with health checks and dependencies
+- `build/nginx.conf` - Reverse proxy config (frontend + API routing)
+
+**Configuration**:
+- `build/.env.development` - Dev environment
+- `build/.env.staging` - Staging template
+- `build/.env.production` - Production with secrets placeholders
+
+**Documentation**:
+- `build/index.html` - Visual stack viewer
+- `build/canonical.json` - Full data model
 
 ## Configuration
 
@@ -148,9 +181,9 @@ Paths are relative to the config file. CLI flags override config values.
 
 ### Instances (example data)
 
-- **Containers**: nginx, grafana, redis, redis-commander, whoami
-- **Networks**: docked (bridge network)
-- **Volumes**: grafana-data (persistent storage)
+- **Containers**: nginx (frontend + proxy), api (Node.js backend), postgres (database), redis (cache)
+- **Networks**: docked (bridge network connecting all services)
+- **Volumes**: postgres-data, redis-data (persistent storage)
 - **Global**: Stack-level metadata and build configuration
 
 ### Templates

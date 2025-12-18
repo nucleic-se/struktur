@@ -1,23 +1,20 @@
 {
   "id": "global",
   "class": "docked_stack",
-  "stack_name": "Docked Production Stack",
-  "description": "Production-ready Docker infrastructure with PostgreSQL, Redis, Node.js API, Nginx reverse proxy, and monitoring. Multi-environment support (dev/staging/prod) with health checks, resource limits, and proper dependency management.",
+  "stack_name": "Docked Full-Stack Application",
+  "description": "Complete full-stack web application with PostgreSQL database, Redis cache, Node.js backend API, and Nginx serving frontend and reverse proxy. Multi-environment support (dev/staging/prod) with health checks, resource limits, and proper dependency management.",
   "build": [
     {
       "viewer.html": "/index.html"
     },
     {
-      "nginx-index.html": "/nginx/index.html"
+      "frontend.html": "/frontend/index.html"
     },
     {
       "docker-compose.yml": "/docker-compose.yml"
     },
     {
       "dot.env.example": "/.env.example"
-    },
-    {
-      "grafana-datasources.yml": "/grafana-datasources.yml"
     },
     {
       ".env.development": "/.env.development"
