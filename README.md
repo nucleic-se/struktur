@@ -123,6 +123,8 @@ Struktur isn't just for ops! The same pattern works for:
 
 **Key insight:** Anywhere you have **structured data + templates** = Struktur can help.
 
+→ **[See detailed use cases with examples](docs/use-cases.md)**
+
 ## When to Use Struktur
 
 Struktur shines when you need:
@@ -174,6 +176,8 @@ Struktur shines when you need:
 - You need composition (aspects) not inheritance
 - You prefer build-time errors to runtime failures
 - You like explicit, traceable configuration
+
+→ **[Read full comparison and philosophy](docs/why-struktur.md)**
 
 ## Installation
 
