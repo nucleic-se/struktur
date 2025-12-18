@@ -1,0 +1,8 @@
+{
+  "classes": ["../universal/classes", "classes"],
+  "aspects": ["../universal/aspects"],
+  "instances": ["instances", "build-tasks/nunjucks"],
+  "templates": ["templates/nunjucks"],
+  "templateEngine": "nunjucks",
+  "buildDir": "build/nunjucks"
+}

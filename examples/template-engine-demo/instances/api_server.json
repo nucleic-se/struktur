@@ -1,0 +1,18 @@
+{
+  "id": "api-server",
+  "class": "web_service",
+  "name": "API Server",
+  "description": "Main REST API service",
+  "domains": ["backend", "api"],
+  "aspects": {
+    "web_service": {
+      "port": 3000,
+      "protocol": "https",
+      "hostname": "api.example.com",
+      "ssl_enabled": true,
+      "ssl_cert": "/etc/ssl/certs/api.crt",
+      "ssl_key": "/etc/ssl/private/api.key",
+      "workers": 8
+    }
+  }
+}

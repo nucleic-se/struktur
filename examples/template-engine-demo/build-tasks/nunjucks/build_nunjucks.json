@@ -1,0 +1,10 @@
+{
+  "id": "build-nunjucks",
+  "class": "entity_base",
+  "name": "Nunjucks Build Tasks",
+  "build": [
+    { "nginx.conf.njk": "/nginx.conf" },
+    { "docker-compose.yml.njk": "/docker-compose.yml" },
+    { "README.md.njk": "/README.md" }
+  ]
+}

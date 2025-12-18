@@ -1,0 +1,10 @@
+{
+  "id": "build-handlebars",
+  "class": "entity_base",
+  "name": "Handlebars Build Tasks",
+  "build": [
+    { "nginx.conf.hbs": "/nginx.conf" },
+    { "docker-compose.yml.hbs": "/docker-compose.yml" },
+    { "README.md.hbs": "/README.md" }
+  ]
+}

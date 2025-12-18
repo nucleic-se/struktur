@@ -1,0 +1,7 @@
+{
+  "classes": ["../universal/classes", "classes"],
+  "aspects": ["../universal/aspects"],
+  "instances": ["instances", "build-tasks/handlebars"],
+  "templates": ["templates/handlebars"],
+  "buildDir": "build/handlebars"
+}

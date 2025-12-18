@@ -1,0 +1,16 @@
+{
+  "id": "web-app",
+  "class": "web_service",
+  "name": "Web Application",
+  "description": "Frontend web application",
+  "domains": ["frontend", "web"],
+  "aspects": {
+    "web_service": {
+      "port": 8080,
+      "protocol": "http",
+      "hostname": "app.example.com",
+      "ssl_enabled": false,
+      "workers": 4
+    }
+  }
+}
