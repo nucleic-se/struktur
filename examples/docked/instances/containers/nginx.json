@@ -9,8 +9,6 @@
       "description": "Reverse proxy routing to API and serving frontend application",
       "web_ui": "http://localhost:8080",
       "ports": ["8080:80"],
-      "networks": ["docked"],
-      "restart_policy": "unless-stopped",
       "volumes": [
         "./frontend:/usr/share/nginx/html:ro",
         "./nginx.conf:/etc/nginx/nginx.conf:ro"
@@ -18,9 +16,7 @@
       "depends_on": ["api"],
       "healthcheck": {
         "test": ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/health"],
-        "interval": "10s",
         "timeout": "3s",
-        "retries": 3,
         "start_period": "10s"
       },
       "deploy": {

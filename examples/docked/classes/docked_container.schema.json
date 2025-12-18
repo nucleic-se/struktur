@@ -6,6 +6,17 @@
     "docker_container"
   ],
   "domains": [],
+  "aspect_defaults": {
+    "docker_container": {
+      "networks": ["docked"],
+      "restart_policy": "unless-stopped",
+      "healthcheck": {
+        "interval": "10s",
+        "timeout": "5s",
+        "retries": 5
+      }
+    }
+  },
   "schema": {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",

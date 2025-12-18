@@ -10,8 +10,6 @@
       "command": "sh -c 'npm install && node server.js'",
       "working_dir": "/app",
       "ports": ["3001:3001"],
-      "networks": ["docked"],
-      "restart_policy": "unless-stopped",
       "volumes": [
         "./api:/app"
       ],
@@ -28,8 +26,7 @@
       "healthcheck": {
         "test": ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/health"],
         "interval": "15s",
-        "timeout": "5s",
-        "retries": 3,
+        "retries": "3",
         "start_period": "30s"
       },
       "deploy": {

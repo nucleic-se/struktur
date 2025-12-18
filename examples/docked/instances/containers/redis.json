@@ -8,17 +8,13 @@
       "image": "redis:alpine",
       "description": "In-memory cache for application performance",
       "ports": ["6379:6379"],
-      "networks": ["docked"],
-      "restart_policy": "unless-stopped",
       "volumes": [
         "redis-data:/data"
       ],
       "command": "redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}",
       "healthcheck": {
         "test": ["CMD", "redis-cli", "--raw", "incr", "ping"],
-        "interval": "10s",
         "timeout": "3s",
-        "retries": 5,
         "start_period": "5s"
       },
       "deploy": {
