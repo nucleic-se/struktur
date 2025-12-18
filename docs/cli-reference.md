@@ -59,7 +59,7 @@ struktur validate mystack --quiet
 
 ### `build`
 
-Build complete outputs with template rendering.
+Build complete outputs with template rendering. Validation is always enabled with strict checks (extra fields and warnings treated as errors).
 
 ```bash
 struktur build [options] [stack-dirs...]
@@ -82,10 +82,6 @@ struktur build [options] [stack-dirs...]
 - `--exact` - Use exact build directory path without hash suffix (recommended)
 - `--no-deterministic` - Disable deterministic build directories (allows overwrites)
 - `--allow-template-collisions` - Allow templates with same name in multiple directories (last wins)
-- `--warn-extra-fields` - Warn about fields not in schema (default: true)
-- `--no-warn-extra-fields` - Disable warnings for extra fields
-- `--warnings-as-errors` - Treat validation warnings as errors (default: true)
-- `--no-warnings-as-errors` - Allow warnings without failing build
 - `-h, --help` - Show command help
 
 **Examples:**
@@ -163,9 +159,13 @@ struktur generate [options] [stack-dirs...]
 - `-c, --classes <dirs...>` - Class definition directories
 - `-a, --aspects <dirs...>` - Aspect definition directories
 - `-i, --instances <dirs...>` - Instance file directories
-- `-o, --output <file>` - Output file path (default: `canonical.json`)
-- `-q, --quiet` - Suppress output except errors
-- `--json` - Output metadata as JSON (canonical output is always JSON)
+- `-t, --templates <dirs...>` - Template directories to render
+- `-o, --output <file>` - Output file path (default: stdout)
+- `--engine <name>` - Template engine: `handlebars` or `nunjucks` (default: `handlebars`)
+- `--no-metadata` - Exclude metadata from output
+- `--no-class-index` - Exclude class index from output
+- `--include-validation` - Include validation results in output
+- `--json` - Output results as JSON (includes canonical + stats)
 - `-h, --help` - Show command help
 
 **Examples:**
