@@ -2,9 +2,17 @@
 
 Welcome to Struktur's documentation. This is your central hub for learning and reference.
 
+## 🎯 Start Here
+
+**First time?** Begin with these:
+
+- **[Why Struktur?](why-struktur.md)** - Philosophy, positioning, and when to use it
+- **[Use Cases](use-cases.md)** - Real-world examples across 7 domains
+- **[Quickstart](quickstart.md)** - 5 minutes from install to first build
+
 ## 📚 Learning Path
 
-**New to Struktur?** Start here:
+**Ready to build?** Follow this path:
 
 1. **[Quickstart](quickstart.md)** - 5 minutes from install to first build
 2. **[Tutorial: Your First Stack](tutorial-first-stack.md)** - Build a simple blog from scratch
@@ -49,9 +57,12 @@ Real-world patterns and practices:
 
 **I want to...**
 
+- **...understand if Struktur fits my use case** → [Why Struktur?](why-struktur.md)
+- **...see what Struktur can do** → [Use Cases](use-cases.md)
 - **...get started fast** → [Quickstart](quickstart.md)
 - **...understand the mental model** → [Concepts](concepts-build-pipeline.md)
 - **...see working examples** → [Docked](../examples/docked/README.md) or [Skribe](../examples/skribe/README.md)
+- **...compare to alternatives** → [Why Struktur? (Comparisons)](why-struktur.md#struktur-vs-alternatives)
 - **...look up a CLI flag** → [CLI Reference](cli-reference.md)
 - **...find a template helper** → [Helper Reference](helpers-reference.md)
 - **...fix an error** → [Troubleshooting](errors-troubleshooting.md)
@@ -60,6 +71,14 @@ Real-world patterns and practices:
 
 ---
 
+## 📊 Documentation Status
+
+**Recently Added:**
+- ✅ [Why Struktur?](why-struktur.md) - Philosophy, comparisons, decision criteria (375 lines)
+- ✅ [Use Cases](use-cases.md) - 7 domains with concrete examples (373 lines)
+- ✅ [Template Best Practices](concepts-templates.md) - HTML escaping, troubleshooting (updated)
+- ✅ Example Design Philosophy - Opinionated and minimal framing (3 examples updated)
+
 **Version**: 0.2.5-alpha  
 **Status**: Alpha (breaking changes expected before 1.0)  
-**Tests**: 415/415 passing ✅
+**Tests**: 451/451 passing ✅ (448 pass, 3 skip, 0 fail)
