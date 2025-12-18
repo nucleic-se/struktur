@@ -1,0 +1,10 @@
+{
+  "id": "postgres-data",
+  "class": "docked_volume",
+  "description": "Persistent storage for PostgreSQL database files",
+  "aspects": {
+    "docker_volume": {
+      "driver": "local"
+    }
+  }
+}

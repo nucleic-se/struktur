@@ -3,5 +3,18 @@
   "aspects": ["../universal/aspects", "aspects"],
   "instances": ["instances"],
   "templates": ["../universal/templates", "templates"],
-  "build_dir": "build"
+  "build_dir": "build",
+  "render": [
+    {"viewer.html": "/index.html"},
+    {"nginx-index.html": "/nginx/index.html"},
+    {"docker-compose.yml": "/docker-compose.yml"},
+    {"dot.env.example": "/.env.example"},
+    {"grafana-datasources.yml": "/grafana-datasources.yml"},
+    {".env.development": "/.env.development"},
+    {".env.staging": "/.env.staging"},
+    {".env.production": "/.env.production"},
+    {"nginx.conf": "/nginx.conf"},
+    {"api/server.js": "/api/server.js"},
+    {"api/package.json": "/api/package.json"}
+  ]
 }

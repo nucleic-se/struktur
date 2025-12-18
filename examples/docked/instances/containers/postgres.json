@@ -1,0 +1,45 @@
+{
+  "id": "postgres",
+  "class": "docked_container",
+  "description": "PostgreSQL database for application data persistence",
+  "domains": ["database"],
+  "aspects": {
+    "docker_container": {
+      "image": "postgres:16-alpine",
+      "description": "Primary application database",
+      "ports": ["5432:5432"],
+      "networks": ["docked"],
+      "restart_policy": "unless-stopped",
+      "volumes": [
+        "postgres-data:/var/lib/postgresql/data"
+      ],
+      "environment": {
+        "POSTGRES_DB": "${POSTGRES_DB:-docked_app}",
+        "POSTGRES_USER": "${POSTGRES_USER:-docked}",
+        "POSTGRES_PASSWORD": "${POSTGRES_PASSWORD}"
+      },
+      "healthcheck": {
+        "test": ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-docked}"],
+        "interval": "10s",
+        "timeout": "5s",
+        "retries": 5,
+        "start_period": "10s"
+      },
+      "deploy": {
+        "resources": {
+          "limits": {
+            "cpus": "2.0",
+            "memory": "2G"
+          },
+          "reservations": {
+            "cpus": "0.5",
+            "memory": "512M"
+          }
+        }
+      }
+    }
+  },
+  "relations": {
+    "stores/stored_in": []
+  }
+}

@@ -25,6 +25,12 @@ services:
 {{/if}}
 {{/if}}
     container_name: {{id}}
+{{#if aspects.docker_container.command}}
+    command: {{aspects.docker_container.command}}
+{{/if}}
+{{#if aspects.docker_container.working_dir}}
+    working_dir: {{aspects.docker_container.working_dir}}
+{{/if}}
 {{#if aspects.docker_container.restart_policy}}
     restart: {{aspects.docker_container.restart_policy}}
 {{/if}}
@@ -46,12 +52,6 @@ services:
       {{@key}}: "{{this}}"
 {{/each}}
 {{/if}}
-{{#if relations.[manages/managed_by]}}
-{{#unless aspects.docker_container.environment}}
-    environment:
-{{/unless}}
-      REDIS_HOSTS: "{{#each relations.[manages/managed_by]}}local:{{this}}:6379{{#unless @last}},{{/unless}}{{/each}}"
-{{/if}}
 {{#if aspects.docker_container.networks}}
     networks:
 {{#each aspects.docker_container.networks}}
@@ -63,22 +63,56 @@ services:
 {{#each aspects.docker_container.depends_on}}
       - {{this}}
 {{/each}}
-{{/if}}
-{{#if relations.[manages/managed_by]}}
-{{#unless aspects.docker_container.depends_on}}
+{{else}}{{#if relations.[manages/managed_by]}}
     depends_on:
-{{/unless}}
 {{#each relations.[manages/managed_by]}}
       - {{this}}
 {{/each}}
-{{/if}}
-{{#if relations.[monitors/monitored_by]}}
-{{#unless (or aspects.docker_container.depends_on relations.[manages/managed_by])}}
+{{else}}{{#if relations.[monitors/monitored_by]}}
     depends_on:
-{{/unless}}
 {{#each relations.[monitors/monitored_by]}}
       - {{this}}
 {{/each}}
+{{/if}}{{/if}}{{/if}}
+{{#if aspects.docker_container.healthcheck}}
+    healthcheck:
+      test: [{{#each aspects.docker_container.healthcheck.test}}"{{this}}"{{#unless @last}}, {{/unless}}{{/each}}]
+{{#if aspects.docker_container.healthcheck.interval}}
+      interval: {{aspects.docker_container.healthcheck.interval}}
+{{/if}}
+{{#if aspects.docker_container.healthcheck.timeout}}
+      timeout: {{aspects.docker_container.healthcheck.timeout}}
+{{/if}}
+{{#if aspects.docker_container.healthcheck.retries}}
+      retries: {{aspects.docker_container.healthcheck.retries}}
+{{/if}}
+{{#if aspects.docker_container.healthcheck.start_period}}
+      start_period: {{aspects.docker_container.healthcheck.start_period}}
+{{/if}}
+{{/if}}
+{{#if aspects.docker_container.deploy}}
+    deploy:
+{{#if aspects.docker_container.deploy.resources}}
+      resources:
+{{#if aspects.docker_container.deploy.resources.limits}}
+        limits:
+{{#if aspects.docker_container.deploy.resources.limits.cpus}}
+          cpus: '{{aspects.docker_container.deploy.resources.limits.cpus}}'
+{{/if}}
+{{#if aspects.docker_container.deploy.resources.limits.memory}}
+          memory: {{aspects.docker_container.deploy.resources.limits.memory}}
+{{/if}}
+{{/if}}
+{{#if aspects.docker_container.deploy.resources.reservations}}
+        reservations:
+{{#if aspects.docker_container.deploy.resources.reservations.cpus}}
+          cpus: '{{aspects.docker_container.deploy.resources.reservations.cpus}}'
+{{/if}}
+{{#if aspects.docker_container.deploy.resources.reservations.memory}}
+          memory: {{aspects.docker_container.deploy.resources.reservations.memory}}
+{{/if}}
+{{/if}}
+{{/if}}
 {{/if}}
 {{/unless}}{{/if}}{{/each}}
 

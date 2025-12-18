@@ -1,19 +1,43 @@
 {
   "id": "nginx",
   "class": "docked_container",
-  "description": "Web server serving the docked stack viewer and example content",
-  "domains": ["web"],
+  "description": "Reverse proxy and static file server for the application",
+  "domains": ["web", "proxy"],
   "aspects": {
     "docker_container": {
       "image": "nginx:alpine",
-      "description": "Web server for docked viewer",
+      "description": "Reverse proxy routing to API and serving static content",
       "web_ui": "http://localhost:8080",
       "ports": ["8080:80"],
       "networks": ["docked"],
       "restart_policy": "unless-stopped",
       "volumes": [
-        "./nginx:/usr/share/nginx/html:ro"
-      ]
+        "./nginx:/usr/share/nginx/html:ro",
+        "./nginx.conf:/etc/nginx/nginx.conf:ro"
+      ],
+      "depends_on": ["api"],
+      "healthcheck": {
+        "test": ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/health"],
+        "interval": "10s",
+        "timeout": "3s",
+        "retries": 3,
+        "start_period": "10s"
+      },
+      "deploy": {
+        "resources": {
+          "limits": {
+            "cpus": "0.5",
+            "memory": "256M"
+          },
+          "reservations": {
+            "cpus": "0.1",
+            "memory": "64M"
+          }
+        }
+      }
     }
+  },
+  "relations": {
+    "proxies/proxied_by": ["api"]
   }
 }
