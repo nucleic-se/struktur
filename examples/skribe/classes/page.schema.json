@@ -1,20 +1,11 @@
 {
   "class": "page",
   "parent": "content_base",
-  "content": "",
-  "menu": "header",
+  "aspect_types": ["page"],
   "schema": {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
-    "properties": {
-      "content": {
-        "type": "string"
-      },
-      "menu": {
-        "type": "string",
-        "enum": ["header", "footer", "both", "none"],
-        "description": "Where to show this page link: header nav, footer, both, or none"
-      }
-    }
+    "properties": {},
+    "additionalProperties": true
   }
 }

@@ -4,6 +4,10 @@
   "title": "Guide",
   "slug": "guide",
   "description": "Learn how to use Skribe",
-  "menu": "header",
-  "content": "Skribe is built on three simple concepts: classes define structure, instances provide data, and templates render output. To create a new blog post, add a JSON file to instances/ with class 'blog_post'. Include required fields: title, slug, date, author, and content. Tags are optional but useful for organization.\n\nPages work the same way but use class 'page' instead. The menu field controls navigation placement: 'header' for main nav, 'footer' for bottom links, 'both' for ubiquitous pages like About, or 'none' to exclude from navigation entirely.\n\nTemplates use Handlebars with Struktur's custom helpers. The file helper is particularly powerful—it lets one template generate multiple output files by iterating over instances. Check index.html to see how a single template creates the homepage, all blog post pages, and all static pages in one build pass."
+  "aspects": {
+    "page": {
+      "content": "Skribe is built on three simple concepts: classes define structure, instances provide data, and templates render output. To create a new blog post, add a JSON file to instances/ with class 'blog_post'. Include required fields: title, slug, date, author, and content. Tags are optional but useful for organization.\n\nPages work the same way but use class 'page' instead. The menu field controls navigation placement: 'header' for main nav, 'footer' for bottom links, 'both' for ubiquitous pages like About, or 'none' to exclude from navigation entirely.\n\nTemplates use Handlebars with Struktur's custom helpers. The file helper is particularly powerful—it lets one template generate multiple output files by iterating over instances. Check index.html to see how a single template creates the homepage, all blog post pages, and all static pages in one build pass.",
+      "menu": "header"
+    }
+  }
 }

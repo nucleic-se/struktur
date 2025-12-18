@@ -13,11 +13,11 @@
   <article class="post">
     <h3><a href="posts/{{slug}}.html">{{title}}</a></h3>
     <div class="post-meta">
-      {{date}} • {{author}}
+      {{aspects.blog_post.date}} • {{aspects.blog_post.author}}
     </div>
     <p>{{description}}</p>
-    {{#if tags}}
-    {{> partials/tags}}
+    {{#if aspects.blog_post.tags}}
+    {{> partials/tags tags=aspects.blog_post.tags}}
     {{/if}}
   </article>
   {{/if}}
@@ -42,6 +42,6 @@
 {{/each}}
 
 {{!-- Generate tag index pages --}}
-{{#each (unique (flatten (pluck (where instances "class" "blog_post") "tags")))}}
-{{render_file "layouts/tag" (concat "tags/" this ".html") tagName=this posts=(where_includes @root.instances "tags" this) pathPrefix="../"}}
+{{#each (unique (flatten (pluck (where instances "class" "blog_post") "aspects.blog_post.tags")))}}
+{{render_file "layouts/tag" (concat "tags/" this ".html") tagName=this posts=(where_includes @root.instances "aspects.blog_post.tags" this) pathPrefix="../"}}
 {{/each}}

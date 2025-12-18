@@ -1,0 +1,35 @@
+{
+  "aspect": "blog_post",
+  "date": "",
+  "content": "",
+  "author": "",
+  "tags": [],
+  "schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "required": ["date"],
+    "properties": {
+      "date": {
+        "type": "string",
+        "minLength": 1
+      },
+      "content": {
+        "type": "string"
+      },
+      "author": {
+        "type": "string"
+      },
+      "tags": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "pattern": "^[a-z0-9]([a-z0-9-]*[a-z0-9])?$",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "maxItems": 20,
+        "description": "Array of URL-safe tags (lowercase, alphanumeric, hyphens)"
+      }
+    }
+  }
+}

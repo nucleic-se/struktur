@@ -1,11 +1,17 @@
 {
-  "class": "blog_post",
   "id": "deterministic-by-design",
+  "class": "blog_post",
   "title": "Why Determinism Matters",
   "slug": "deterministic-by-design",
-  "date": "2025-12-09",
-  "author": "Struktur Team",
-  "tags": ["concepts", "best-practices"],
   "description": "Understanding Struktur's deterministic guarantees",
-  "content": "Determinism means the same inputs always produce the same outputs. Every time. Without exception. Struktur achieves this through obsessive engineering.\n\n**Stable merge order:** Instances are sorted by sourceIndex (which source directory they came from) then alphabetically by file path. This means the order is predictable and reproducible. No dependency on filesystem iteration order, which varies by OS and can even change between builds on the same machine.\n\n**Sorted iterations:** Template helpers that iterate over collections sort them first. Tag pages are generated in alphabetical order. Blog posts are sorted by date. This isn't just for user experience—it's for build reproducibility. Same data, same output order, every time.\n\n**No temporal data in outputs:** Struktur doesn't inject timestamps like 'Generated on 2025-12-12' into outputs. If your templates need dates, they come from your data, not from `Date.now()`. This means building the same source twice produces identical outputs, byte for byte.\n\n**Hashed build directories:** Build outputs go to directories named by a hash of the input source paths. This prevents accidental overwrites and makes it easy to compare builds. Change a source directory? Different hash, different output location. Same sources? Same hash, same location.\n\nWhy does this matter? **Deterministic builds are diffable.** You can compare two builds and see exactly what changed. This makes debugging trivial and code review meaningful. **They're reproducible.** Check out old code, rebuild, get the exact same output that was deployed months ago. **They're trustworthy.** If it builds in CI, it builds in production. No 'works on my machine' problems.\n\nThis isn't just a nice feature. It's the foundation that makes everything else reliable. When your build tool is deterministic, you can focus on content and logic instead of fighting toolchain unpredictability."
+  "aspects": {
+    "blog_post": {
+      "date": "2025-12-09",
+      "content": "Determinism means the same inputs always produce the same outputs. Every time. Without exception. Struktur achieves this through obsessive engineering.\n\n**Stable merge order:** Instances are sorted by sourceIndex (which source directory they came from) then alphabetically by file path. This means the order is predictable and reproducible. No dependency on filesystem iteration order, which varies by OS and can even change between builds on the same machine.\n\n**Sorted iterations:** Template helpers that iterate over collections sort them first. Tag pages are generated in alphabetical order. Blog posts are sorted by date. This isn't just for user experience—it's for build reproducibility. Same data, same output order, every time.\n\n**No temporal data in outputs:** Struktur doesn't inject timestamps like 'Generated on 2025-12-12' into outputs. If your templates need dates, they come from your data, not from `Date.now()`. This means building the same source twice produces identical outputs, byte for byte.\n\n**Hashed build directories:** Build outputs go to directories named by a hash of the input source paths. This prevents accidental overwrites and makes it easy to compare builds. Change a source directory? Different hash, different output location. Same sources? Same hash, same location.\n\nWhy does this matter? **Deterministic builds are diffable.** You can compare two builds and see exactly what changed. This makes debugging trivial and code review meaningful. **They're reproducible.** Check out old code, rebuild, get the exact same output that was deployed months ago. **They're trustworthy.** If it builds in CI, it builds in production. No 'works on my machine' problems.\n\nThis isn't just a nice feature. It's the foundation that makes everything else reliable. When your build tool is deterministic, you can focus on content and logic instead of fighting toolchain unpredictability.",
+      "tags": [
+        "concepts",
+        "best-practices"
+      ]
+    }
+  }
 }

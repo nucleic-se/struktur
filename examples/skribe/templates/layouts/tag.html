@@ -13,13 +13,13 @@
       <article class="post-summary">
         <h2><a href="{{../pathPrefix}}posts/{{slug}}.html">{{title}}</a></h2>
         <p class="post-meta">
-          <time datetime="{{date}}">{{date}}</time>
-          {{#if author}}by {{author}}{{/if}}
+          <time datetime="{{aspects.blog_post.date}}">{{aspects.blog_post.date}}</time>
+          {{#if aspects.blog_post.author}}by {{aspects.blog_post.author}}{{/if}}
         </p>
         {{#if description}}
         <p>{{description}}</p>
         {{/if}}
-        {{> partials/tags pathPrefix=../../pathPrefix}}
+        {{> partials/tags pathPrefix=../../pathPrefix tags=aspects.blog_post.tags}}
       </article>
       {{/each}}
     </section>

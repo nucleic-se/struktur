@@ -7,13 +7,13 @@
   <article>
     <h1>{{title}}</h1>
     <div class="post-meta">
-      {{date}} • {{author}}
+      {{aspects.blog_post.date}} • {{aspects.blog_post.author}}
     </div>
     <div class="post-content">
-      <p>{{{replace (escape content) "\n\n" "</p><p>"}}}</p>
+      <p>{{{replace (escape aspects.blog_post.content) "\n\n" "</p><p>"}}}</p>
     </div>
-    {{#if tags}}
-    {{> partials/tags pathPrefix=pathPrefix}}
+    {{#if aspects.blog_post.tags}}
+    {{> partials/tags pathPrefix=pathPrefix tags=aspects.blog_post.tags}}
     {{/if}}
   </article>
 

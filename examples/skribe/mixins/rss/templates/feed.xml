@@ -15,12 +15,12 @@
       <title>{{title}}</title>
       <link>{{@root.global.rss.link}}/posts/{{slug}}.html</link>
       <guid>{{@root.global.rss.link}}/posts/{{slug}}.html</guid>
-      <pubDate>{{date}}</pubDate>
+      <pubDate>{{aspects.blog_post.date}}</pubDate>
       <description>{{description}}</description>
-      {{#if author}}
-      <author>{{author}}</author>
+      {{#if aspects.blog_post.author}}
+      <author>{{aspects.blog_post.author}}</author>
       {{/if}}
-      {{#each tags}}
+      {{#each aspects.blog_post.tags}}
       <category>{{this}}</category>
       {{/each}}
     </item>

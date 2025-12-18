@@ -45,10 +45,13 @@ Open `build/index.html` in your browser.
 
 ```
 skribe/
+  aspects/              # Aspect type definitions
+    blog_post.aspect.json     # Blog post fields: date, content, author, tags
+    page.aspect.json          # Page fields: content, menu placement
   classes/              # Content type definitions
-    content_base.class.json   # Shared: title, slug, content, author
-    blog_post.class.json      # Adds: date (required), tags
-    page.class.json           # Static pages with menu placement
+    content_base.schema.json  # Shared: title, slug, description
+    blog_post.schema.json     # Extends content_base, uses blog_post aspect
+    page.schema.json          # Extends content_base, uses page aspect
   instances/            # Content organized by type
     posts/              # 16 blog posts
       welcome.json
@@ -86,14 +89,25 @@ skribe/
 
 ### Core Struktur Features
 
-**Class inheritance**: All content types extend `content_base`
+**Class inheritance + aspects**: All content types extend `content_base` and declare aspect types
 ```json
 {
   "class": "blog_post",
   "parent": "content_base",
-  "fields": { "date": "", "tags": [] }
+  "aspect_types": ["blog_post"],
+  "aspect_defaults": {
+    "blog_post": {
+      "author": "Struktur Team"
+    }
+  }
 }
 ```
+
+**Aspect defaults for DRY configuration**: Class-level defaults eliminate duplication
+- All 16 blog posts inherit `"author": "Struktur Team"` from class definition
+- Instances only specify author if different from default
+- Single source of truth—change once, applies everywhere
+- Same pattern used in `docked` and `backbone` examples for infrastructure
 
 **Schema validation**: Required fields enforced at build time
 ```json
@@ -155,11 +169,14 @@ struktur build base mixin1 mixin2  # Later sources merge into earlier
 {{> partials/head}}                   <!-- From root -->
 ```
 
-**Menu placement control**: Pages specify where they appear
+**Menu placement control**: Pages specify where they appear via page aspect
 ```json
 {
-  "class": "page",
-  "menu": "header"     // Options: "header", "footer", "both", or omit
+  "aspects": {
+    "page": {
+      "menu": "header"  // Options: "header", "footer", "both", "none"
+    }
+  }
 }
 ```
 
@@ -199,13 +216,19 @@ Create `instances/posts/my-post.json`:
   "class": "blog_post",
   "title": "My First Post",
   "slug": "my-first-post",
-  "date": "2025-12-14",
-  "author": "Your Name",
-  "tags": ["tutorial"],
   "description": "A short description for listings and RSS",
-  "content": "First paragraph.\n\nSecond paragraph.\n\nThird paragraph."
+  "aspects": {
+    "blog_post": {
+      "date": "2025-12-14",
+      "author": "Your Name",
+      "tags": ["tutorial"],
+      "content": "First paragraph.\n\nSecond paragraph.\n\nThird paragraph."
+    }
+  }
 }
 ```
+
+**Note**: Author defaults to "Struktur Team" (from class `aspect_defaults`). Only specify if different.
 
 **Note**: Use `\n\n` to separate paragraphs. The template converts these to `</p><p>` tags.
 
@@ -218,17 +241,25 @@ Create `instances/pages/team.json`:
   "class": "page",
   "title": "Our Team",
   "slug": "team",
-  "menu": "header",
-  "content": "Meet the team..."
+  "aspects": {
+    "page": {
+      "menu": "header",
+      "content": "Meet the team..."
+    }
+  }
 }
 ```
 
 ### Create a new tag
 
-Just add it to a post's `tags` array. Tag pages generate automatically:
+Just add it to a post's `tags` array in the blog_post aspect. Tag pages generate automatically:
 ```json
 {
-  "tags": ["tutorial", "my-new-tag"]
+  "aspects": {
+    "blog_post": {
+      "tags": ["tutorial", "my-new-tag"]
+    }
+  }
 }
 ```
 
@@ -245,35 +276,116 @@ Edit `templates/custom.css`:
 
 ### Add a new content type
 
-1. Create `classes/tutorial.class.json`:
+**Best Practice**: Define aspect first (data structure), then class (ties aspect to content_base hierarchy).
+
+1. Create `aspects/tutorial.aspect.json` (defines tutorial-specific fields):
+```json
+{
+  "aspect": "tutorial",
+  "difficulty": "beginner",
+  "duration": "30min",
+  "prerequisites": [],
+  "schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "required": ["difficulty"],
+    "properties": {
+      "difficulty": { 
+        "type": "string", 
+        "enum": ["beginner", "intermediate", "advanced"] 
+      },
+      "duration": { "type": "string" },
+      "prerequisites": { 
+        "type": "array", 
+        "items": { "type": "string" }
+      }
+    }
+  }
+}
+```
+
+2. Create `classes/tutorial.schema.json` (extends content_base, uses tutorial aspect):
 ```json
 {
   "class": "tutorial",
   "parent": "content_base",
-  "fields": {
-    "difficulty": "beginner",
-    "duration": "30min"
+  "aspect_types": ["tutorial"],
+  "aspect_defaults": {
+    "tutorial": {
+      "difficulty": "beginner",
+      "duration": "30 minutes"
+    }
+  },
+  "schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {},
+    "additionalProperties": true
   }
 }
 ```
 
-2. Create `classes/tutorial.schema.json`:
+3. Create instance `instances/tutorials/first-tutorial.json`:
 ```json
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "type": "object",
-  "allOf": [{ "$ref": "content_base.schema.json" }],
-  "required": ["difficulty"],
-  "properties": {
-    "difficulty": { "type": "string", "enum": ["beginner", "intermediate", "advanced"] },
-    "duration": { "type": "string" }
+  "id": "first-tutorial",
+  "class": "tutorial",
+  "title": "Getting Started Tutorial",
+  "slug": "getting-started-tutorial",
+  "description": "Learn the basics",
+  "aspects": {
+    "tutorial": {
+      "difficulty": "beginner",
+      "prerequisites": ["Basic HTML knowledge"]
+      // duration inherited from aspect_defaults
+    }
   }
 }
 ```
 
-3. Create a layout in `templates/layouts/tutorial.html`
+4. Create template `templates/layouts/tutorial.html`:
+```handlebars
+<!DOCTYPE html>
+<html lang="en">
+{{> partials/head pageTitle=title pathPrefix=pathPrefix}}
+<body>
+  {{> partials/nav pathPrefix=pathPrefix}}
+  <article>
+    <h1>{{title}}</h1>
+    <div class="tutorial-meta">
+      Difficulty: {{aspects.tutorial.difficulty}} | 
+      Duration: {{aspects.tutorial.duration}}
+    </div>
+    {{#if aspects.tutorial.prerequisites}}
+    <div class="prerequisites">
+      <h3>Prerequisites</h3>
+      <ul>
+        {{#each aspects.tutorial.prerequisites}}
+        <li>{{this}}</li>
+        {{/each}}
+      </ul>
+    </div>
+    {{/if}}
+  </article>
+  {{> partials/footer pathPrefix=pathPrefix}}
+</body>
+</html>
+```
 
-4. Update `templates/index.html` to render tutorials
+5. Update `templates/index.html` to render tutorials:
+```handlebars
+{{#each instances}}
+{{#if (eq class "tutorial")}}
+{{render_file "layouts/tutorial" (concat "tutorials/" slug ".html") pathPrefix="../"}}
+{{/if}}
+{{/each}}
+```
+
+**Key Design Principles**:
+- **Aspects define data structure** - field names, types, validation
+- **Classes define inheritance** - parent relationships, aspect composition
+- **aspect_defaults eliminate duplication** - common values defined once
+- **Instances provide unique data** - only what differs from defaults
 
 ## Mixin System
 
@@ -336,10 +448,10 @@ Example - Generate post pages:
 
 Example - Filter and sort posts:
 ```handlebars
-{{#each (sort_by (filterList instances class="blog_post") "date")}}
+{{#each (sort_by (filterList instances class="blog_post") "aspects.blog_post.date")}}
   <article>
     <h2>{{title}}</h2>
-    <time>{{date}}</time>
+    <time>{{aspects.blog_post.date}}</time>
   </article>
 {{/each}}
 ```

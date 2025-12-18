@@ -1,6 +1,14 @@
 {
+  "aspects": ["aspects"],
   "classes": ["classes"],
   "instances": ["instances", "mixins/rss/instances", "mixins/dark-theme/instances"],
   "templates": ["templates", "mixins/rss/templates", "mixins/dark-theme/templates"],
-  "build_dir": "build"
+  "build_dir": "build",
+  "render": [
+    {"index.html": "/index.html"},
+    {"style.css": "/style.css"},
+    {"custom.css": "/custom.css"},
+    {"dark-theme.css": "/dark-theme.css"},
+    {"feed.xml": "/feed.xml"}
+  ]
 }
