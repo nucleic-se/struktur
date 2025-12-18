@@ -111,11 +111,13 @@ A **fully functional collaborative todo list** application demonstrating:
 ### Struktur Capabilities Demonstrated
 
 - **Extending Universal**: Domain-specific docker_container classes build on universal base
+- **Aspect defaults**: Common configuration (networks, restart_policy, healthcheck defaults) defined once in class, inherited by all instances
 - **Multi-output templates**: One canonical model generates docker-compose.yml, nginx.conf, API code, and frontend
 - **Smart template escaping**: Triple-stash `{{{...}}}` prevents HTML entity encoding in configs
 - **Relationship-driven config**: Container dependencies automatically generate `depends_on` chains
 - **Schema validation**: Catches configuration errors before deployment
 - **Aspect-based organization**: Docker concerns (ports, volumes, env vars) separated from business logic
+- **DRY configuration**: Single source of truth eliminates duplication across instances
 
 ## Quick start
 
@@ -345,8 +347,6 @@ cat > my-services/containers/myapp.json << 'EOF'
     "docker_container": {
       "image": "myorg/myapp:latest",
       "ports": ["8000:8000"],
-      "networks": ["docked"],
-      "restart_policy": "unless-stopped",
       "environment": {
         "APP_ENV": "${APP_ENV:-development}",
         "DATABASE_URL": "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
@@ -354,14 +354,15 @@ cat > my-services/containers/myapp.json << 'EOF'
       "depends_on": ["postgres"],
       "healthcheck": {
         "test": ["CMD", "curl", "-f", "http://localhost:8000/health"],
-        "interval": "15s",
-        "timeout": "5s",
-        "retries": 3
+        "interval": "15s"
       }
     }
   }
 }
 EOF
+```
+
+**Note:** Common fields like `networks: ["docked"]`, `restart_policy: "unless-stopped"`, and default healthcheck values (`interval`, `timeout`, `retries`) are inherited from the `docked_container` class via `aspect_defaults`. You only need to specify what's unique to your service.
 ```
 
 **3. Build with both instance folders:**
@@ -419,7 +420,6 @@ cd build && docker compose up -d myapp
     "docker_container": {
       "image": "myorg/worker:latest",
       "command": "npm run worker",
-      "restart_policy": "unless-stopped",
       "depends_on": ["redis", "postgres"],
       "deploy": {
         "resources": {

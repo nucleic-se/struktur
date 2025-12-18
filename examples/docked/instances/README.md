@@ -24,12 +24,13 @@ instances/
   "aspects": {
     "docker_container": {
       "image": "myorg/myapp:latest",
-      "ports": ["8000:8000"],
-      "networks": ["docked"]
+      "ports": ["8000:8000"]
     }
   }
 }
 ```
+
+**Note:** `networks: ["docked"]` and `restart_policy: "unless-stopped"` are inherited automatically from the `docked_container` class defaults.
 
 ### With Environment Variables
 ```json
@@ -68,17 +69,31 @@ instances/
 
 ## Available Fields
 
+### Automatically Inherited (via aspect_defaults)
+
+All `docked_container` instances automatically inherit:
+- `networks: ["docked"]` - Attached to the docked network
+- `restart_policy: "unless-stopped"` - Restarts on failure but not on manual stop
+- `healthcheck.interval: "10s"` - Check every 10 seconds
+- `healthcheck.timeout: "5s"` - 5 second timeout
+- `healthcheck.retries: 5` - Retry 5 times before unhealthy
+
+**You only need to specify these if you want to override the defaults.**
+
+### Required Fields
+
+- `image` - Docker image name (required)
+
+### Optional Fields
+
 See existing files for examples of:
-- `image` - Docker image name
 - `command` - Override container command
 - `working_dir` - Set working directory
 - `ports` - Port mappings ["host:container"]
 - `volumes` - Volume mounts
 - `environment` - Environment variables (use ${VAR} for .env file)
-- `networks` - Network attachments
 - `depends_on` - Service dependencies
-- `restart_policy` - Restart behavior
-- `healthcheck` - Health check configuration
+- `healthcheck.test` - Health check command (overrides defaults for interval/timeout/retries)
 - `deploy.resources` - CPU/memory limits
 
 ## Workflow
