@@ -29,7 +29,8 @@ export async function buildStack(options) {
     quiet = false,
     logger,
     deterministic = false,
-    failOnCollisions = true
+    failOnCollisions = true,
+    renderTasks = []
   } = options;
 
   // Validate required inputs
@@ -208,22 +209,15 @@ export async function buildStack(options) {
     await renderer.registerHelpers(canonical);
     await renderer.loadPartials(templateDirs);
 
-    // Collect build arrays from all instances (not just global)
-    const buildArray = [];
-    for (const instance of canonical.instances) {
-      if (instance.build && Array.isArray(instance.build)) {
-        buildArray.push(...instance.build);
-      }
-    }
-    
-    if (buildArray.length === 0) {
-      log.log(`  ℹ No build tasks found (no instances with "build" array)`);
+    // Use render tasks from config
+    if (renderTasks.length === 0) {
+      log.log(`  ℹ No render tasks found (no "render" array in config)`);
       log.log(`     Templates will not be rendered. This is OK if you only need canonical output.`);
     } else {
-      log.log(`  Found ${buildArray.length} build tasks`);
+      log.log(`  Found ${renderTasks.length} render tasks`);
       
       // Render all templates
-      const result = await renderer.renderAll(buildArray, canonical, buildDir);
+      const result = await renderer.renderAll(renderTasks, canonical, buildDir);
       renderedCount = result.renderedCount;
 
       if (renderedCount > 0) {

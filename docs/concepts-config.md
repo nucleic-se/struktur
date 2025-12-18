@@ -46,6 +46,23 @@ These are merged in order (last wins for conflicts).
 
 - **`build_dir`** - Output directory for build artifacts (default: `"build"`)
 - **`template_engine`** - Template engine to use: `"handlebars"` or `"nunjucks"` (default: `"handlebars"`)
+- **`render`** - Array of templates to render (required for template output)
+
+#### Render Array Format
+
+The `render` field specifies which templates to render and where to output them:
+
+```json
+{
+  "render": [
+    { "nginx.conf.hbs": "/nginx.conf" },
+    { "docker-compose.yml.hbs": "/docker-compose.yml" },
+    { "README.md.hbs": "/README.md" }
+  ]
+}
+```
+
+Each entry maps a template file to an output path (relative to `build_dir`).
 
 ### Validation Options
 
@@ -71,6 +88,11 @@ These are merged in order (last wins for conflicts).
   "templates": ["../universal/templates", "templates"],
   "build_dir": "build",
   "template_engine": "handlebars",
+  "render": [
+    { "index.html.hbs": "/index.html" },
+    { "api/docs.html.hbs": "/api/docs.html" },
+    { "config/nginx.conf.hbs": "/nginx.conf" }
+  ],
   "exact": true,
   "warn_extra_fields": true,
   "warnings_as_errors": true,
@@ -78,6 +100,24 @@ These are merged in order (last wins for conflicts).
   "quiet": false
 }
 ```
+
+## Template-Only Projects
+
+You can build template outputs without any instances:
+
+```json
+{
+  "templates": ["templates"],
+  "build_dir": "build",
+  "template_engine": "handlebars",
+  "render": [
+    { "site.html.hbs": "/index.html" },
+    { "about.html.hbs": "/about.html" }
+  ]
+}
+```
+
+No `classes`, `aspects`, or `instances` needed - just templates and the `render` array.
 
 ## Naming Convention
 
@@ -111,11 +151,14 @@ struktur build --template-engine nunjucks
 |-------------|----------|---------|
 | `build_dir` | `--build-dir` | `"build"` |
 | `template_engine` | `--engine` | `"handlebars"` |
+| `render` | *(config only)* | `[]` |
 | `exact` | `--exact` | `false` |
 | `warn_extra_fields` | `--warn-extra-fields` | `true` |
 | `warnings_as_errors` | `--warnings-as-errors` | `true` |
 | `allow_template_collisions` | `--allow-template-collisions` | `false` |
 | `quiet` | `--quiet` | `false` |
+
+**Note:** The `render` field is config-only - there's no CLI equivalent. This makes configs the single source of truth for what gets rendered.
 
 ## Multiple Configs
 

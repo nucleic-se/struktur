@@ -529,7 +529,8 @@ program
         engine: options.engine,
         quiet: options.quiet || options.json,
         deterministic: options.exact ? false : options.deterministic,  // --exact overrides deterministic
-        failOnCollisions: !options.allowTemplateCollisions  // Invert: default strict, opt-out permissive
+        failOnCollisions: !options.allowTemplateCollisions,  // Invert: default strict, opt-out permissive
+        renderTasks: configFromFile.render  // Config render array
       });
 
       if (options.json) {
