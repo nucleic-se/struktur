@@ -89,15 +89,24 @@
         button:active {
             transform: translateY(1px);
         }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
         .status {
             margin-top: 15px;
             padding: 12px;
             border-radius: 6px;
             font-size: 14px;
             text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         .status.success { background: #d4edda; color: #155724; }
         .status.error { background: #f8d7da; color: #721c24; }
+        .status.loading { background: #e7f3ff; color: #004085; }
         .tech-stack {
             margin-top: 30px;
             padding-top: 30px;
@@ -138,6 +147,11 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+        @media (max-width: 640px) {
+            .container { padding: 24px; }
+            h1 { font-size: 24px; }
+            .tech-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -191,6 +205,8 @@
         async function loadStats() {
             try {
                 const response = await fetch('/api/stats');
+                if (!response.ok) throw new Error('API unavailable');
+                
                 const data = await response.json();
                 const cacheHeader = response.headers.get('X-Cache');
                 
@@ -201,6 +217,8 @@
                     `<span class="cache-badge ${cacheClass}">${cacheHeader}</span>`;
             } catch (error) {
                 console.error('Failed to load stats:', error);
+                document.getElementById('totalViews').textContent = 'Error';
+                document.getElementById('cacheStatus').textContent = 'Unavailable';
             }
         }
 
@@ -217,8 +235,12 @@
 
         async function trackView() {
             const statusEl = document.getElementById('status');
-            statusEl.innerHTML = '<span class="spinner"></span>';
-            statusEl.className = 'status';
+            const button = document.querySelector('button');
+            
+            // Disable button and show loading
+            button.disabled = true;
+            statusEl.innerHTML = '<span class="spinner"></span> Saving...';
+            statusEl.className = 'status loading';
             
             try {
                 const response = await fetch('/api/track', {
@@ -234,14 +256,19 @@
                     // Reload stats after tracking
                     setTimeout(() => loadStats(), 100);
                 } else {
-                    throw new Error('Failed to track view');
+                    throw new Error(`API error: ${response.status}`);
                 }
             } catch (error) {
-                statusEl.textContent = '✗ Failed to track view';
+                statusEl.textContent = `✗ Failed: ${error.message}`;
                 statusEl.className = 'status error';
+            } finally {
+                button.disabled = false;
             }
             
-            setTimeout(() => statusEl.textContent = '', 3000);
+            setTimeout(() => {
+                statusEl.textContent = '';
+                statusEl.className = '';
+            }, 3000);
         }
 
         // Load initial data
