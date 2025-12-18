@@ -211,7 +211,7 @@ Start small (5-10 instances) to validate the pattern before scaling up.
 
 ## See Also
 
-- [Concepts: Classes](concepts-classes.md) - How to define types
+- [Concepts: Classes](concepts-classes-schemas.md) - How to define types
 - [Concepts: Aspects](concepts-aspects.md) - Composable extensions
 - [Concepts: Templates](concepts-templates.md) - Output generation
 - [Examples](../examples/) - Working reference implementations

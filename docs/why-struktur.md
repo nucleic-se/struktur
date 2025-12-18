@@ -356,5 +356,5 @@ Current status: Alpha (v0.2.x). Core is stable, API may have breaking changes. U
 
 - [Use Cases](use-cases.md) - Non-infrastructure examples
 - [Quick Start](quickstart.md) - Get started in 5 minutes
-- [Concepts](concepts-overview.md) - Core mental models
+- [Concepts](concepts-build-pipeline.md) - Core mental models
 - [Examples](../examples/) - Working code to learn from
