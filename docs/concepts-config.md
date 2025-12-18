@@ -1,16 +1,26 @@
 # Configuration Files
 
-Struktur uses `struktur.build.json` configuration files to define stack builds. Config files are optional - you can use CLI flags for everything - but they make builds repeatable and self-documenting.
+Struktur uses configuration files to define stack builds. Config files are optional - you can use CLI flags for everything - but they make builds repeatable and self-documenting.
+
+## File Naming
+
+Any file ending in `.build.json` is recognized as a config file:
+- `struktur.build.json` (default, recommended)
+- `dev.build.json`, `prod.build.json` (environment-specific)
+- `fast.build.json`, `full.build.json` (build variants)
+- Whatever makes sense for your project!
 
 ## Location
 
-By default, struktur looks for `struktur.build.json` in:
+Struktur automatically looks for any `*.build.json` file in:
 1. The stack directory (if you run `struktur build my-stack/`)
 2. The current working directory
 
-You can specify a different config file with `--config`:
+**Preference:** If multiple `.build.json` files exist, struktur prefers `struktur.build.json`, otherwise uses the first found.
+
+Specify an exact config file with `--config`:
 ```bash
-struktur build --config my-custom-config.json
+struktur build --config prod.build.json
 ```
 
 ## Basic Structure
@@ -160,28 +170,59 @@ struktur build --template-engine nunjucks
 
 **Note:** The `render` field is config-only - there's no CLI equivalent. This makes configs the single source of truth for what gets rendered.
 
+## Generating Configs from CLI
+
+Instead of writing configs manually, generate them from successful builds:
+
+```bash
+# Experiment with CLI flags
+struktur build my-stack/ --engine nunjucks --exact --build-dir dist
+
+# Works! Save it as a config
+struktur build my-stack/ --engine nunjucks --exact --build-dir dist --save-config prod.build.json
+
+# Now use the config
+struktur build --config prod.build.json
+```
+
+The `--save-config` flag:
+- Saves only non-default values (minimal config)
+- Uses relative paths (portable)
+- Preserves `render` tasks from loaded config
+- Writes config after successful build only
+
+**Workflow:**
+1. Experiment with CLI → find what works
+2. Save with `--save-config` → capture settings
+3. Tweak config → adjust as needed
+4. Use with `--config` → repeatable builds
+
 ## Multiple Configs
 
 You can have multiple configs for different build profiles:
 
 ```bash
-# Production build with Handlebars
-struktur build --config struktur.build.json
+# Name configs by purpose or environment
+dev.build.json          # Fast iteration
+prod.build.json         # Production settings
+test.build.json         # CI/testing
+handlebars.build.json   # Handlebars build
+nunjucks.build.json     # Nunjucks build
 
-# Development build with Nunjucks  
-struktur build --config struktur.nunjucks.build.json
+# Struktur auto-detects any *.build.json
+struktur build                        # Uses first *.build.json found
 
-# CI build with strict validation
-struktur build --config struktur.ci.build.json
+# Or specify explicitly
+struktur build --config prod.build.json
 ```
 
 ## Best Practices
 
-1. **Commit config files** - Makes builds reproducible across team
+1. **Commit config files** - Makes builds reproducible
 2. **Use relative paths** - Keeps configs portable
-3. **Name configs clearly** - `struktur.production.build.json`, `struktur.dev.build.json`
-4. **Document differences** - Add comments (JSON5) or README explaining multiple configs
-5. **Keep configs simple** - Override with CLI flags for one-off experiments
+3. **Name configs clearly** - Purpose over format (e.g., `fast.build.json` not `config1.json`)
+4. **Generate from CLI** - Use `--save-config` to avoid typos
+5. **Keep configs minimal** - Only include non-default values
 
 ## Migration from Old Format
 

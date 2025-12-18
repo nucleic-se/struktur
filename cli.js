@@ -411,7 +411,8 @@ program
   .option('-i, --instances <dirs...>', 'Directories containing instance files')
   .option('-t, --templates <dirs...>', 'Template directories to render')
   .option('-b, --build-dir <dir>', 'Build output directory', './build')
-  .option('--config <file>', 'Path to struktur.build.json config file')
+  .option('--config <file>', 'Path to config file (defaults to first *.build.json found)')
+  .option('--save-config <file>', 'Save successful build settings to config file')
   .option('--engine <name>', 'Template engine (handlebars, nunjucks)', 'handlebars')
   .option('-q, --quiet', 'Suppress output except errors')
   .option('--json', 'Output results as JSON')
@@ -424,19 +425,42 @@ program
       let configFromFile = {};
 
       // Try to load config file
-      // If a single stack dir is provided and no explicit config, check for config in that directory
       let configPath = options.config;
-      if (!configPath && stackDirs && stackDirs.length === 1) {
-        const stackConfigPath = path.join(stackDirs[0], 'struktur.build.json');
-        try {
-          await fs.access(stackConfigPath);
-          configPath = stackConfigPath;
-        } catch {
-          // Fall back to current directory
+      
+      if (!configPath) {
+        // Auto-detect: look for any *.build.json file
+        const searchDirs = [];
+        
+        // If single stack dir provided, check there first
+        if (stackDirs && stackDirs.length === 1) {
+          searchDirs.push(stackDirs[0]);
+        }
+        
+        // Then check current directory
+        searchDirs.push(process.cwd());
+        
+        for (const dir of searchDirs) {
+          try {
+            const files = await fs.readdir(dir);
+            const buildConfigs = files.filter(f => f.endsWith('.build.json'));
+            
+            if (buildConfigs.length > 0) {
+              // Prefer struktur.build.json if it exists, otherwise use first found
+              const defaultConfig = buildConfigs.includes('struktur.build.json') 
+                ? 'struktur.build.json' 
+                : buildConfigs[0];
+              configPath = path.join(dir, defaultConfig);
+              break;
+            }
+          } catch {
+            // Directory doesn't exist or not readable, continue
+          }
+        }
+        
+        // Fallback to default name
+        if (!configPath) {
           configPath = path.join(process.cwd(), 'struktur.build.json');
         }
-      } else {
-        configPath = configPath || path.join(process.cwd(), 'struktur.build.json');
       }
       
       try {
@@ -532,6 +556,68 @@ program
         failOnCollisions: !options.allowTemplateCollisions,  // Invert: default strict, opt-out permissive
         renderTasks: configFromFile.render  // Config render array
       });
+
+      // Save config if requested
+      if (options.saveConfig) {
+        const saveConfigPath = path.resolve(options.saveConfig);
+        const saveConfigDir = path.dirname(saveConfigPath);
+        
+        // Build config object with only non-default values
+        const config = {};
+        
+        // Add directories as relative paths
+        if (classDirs.length > 0) {
+          config.classes = classDirs.map(d => path.relative(saveConfigDir, d));
+        }
+        if (aspectDirs.length > 0) {
+          config.aspects = aspectDirs.map(d => path.relative(saveConfigDir, d));
+        }
+        if (instanceDirs.length > 0) {
+          config.instances = instanceDirs.map(d => path.relative(saveConfigDir, d));
+        }
+        if (templateDirs.length > 0) {
+          config.templates = templateDirs.map(d => path.relative(saveConfigDir, d));
+        }
+        
+        // Add build_dir if not default
+        if (options.buildDir !== './build') {
+          config.build_dir = path.relative(saveConfigDir, options.buildDir);
+        }
+        
+        // Add template_engine if not default
+        if (options.engine !== 'handlebars') {
+          config.template_engine = options.engine;
+        }
+        
+        // Add boolean flags if not default
+        if (options.exact) {
+          config.exact = true;
+        }
+        if (options.allowTemplateCollisions) {
+          config.allow_template_collisions = true;
+        }
+        if (options.warnExtraFields !== undefined) {
+          config.warn_extra_fields = options.warnExtraFields;
+        }
+        if (options.warningsAsErrors !== undefined) {
+          config.warnings_as_errors = options.warningsAsErrors;
+        }
+        if (options.quiet) {
+          config.quiet = true;
+        }
+        
+        // Add render tasks if present
+        if (configFromFile.render) {
+          config.render = configFromFile.render;
+        }
+        
+        // Write config file
+        await fs.writeFile(saveConfigPath, JSON.stringify(config, null, 2), 'utf-8');
+        
+        if (!options.quiet && !options.json) {
+          console.log(`💾 Saved config to ${path.relative(process.cwd(), saveConfigPath)}`);
+        }
+      }
 
       if (options.json) {
         console.log(JSON.stringify({
