@@ -1,6 +1,62 @@
 # Concepts: Templates
 
-Understanding template loading, rendering, and the render_file helper.
+Understanding template loading, rendering, and the critical escaping rules you need to know.
+
+## ⚠️ CRITICAL: HTML Escaping Rules
+
+**TL;DR:** Use `{{{...}}}` (triple-stash) for environment variables, commands, and URLs. Use `{{...}}` (double-stash) for everything else.
+
+### The Problem
+
+Handlebars escapes HTML special characters by default, **which breaks configuration files:**
+
+```handlebars
+❌ WRONG - Gets HTML escaped
+command: {{aspects.docker_container.command}}
+# Result: sh -c &#x27;npm install&#x27; (BROKEN!)
+
+environment:
+  DATABASE_URL: "{{database_url}}"
+# Result: postgresql://user:pass@host:5432/db (= becomes &#x3D;)
+
+✅ CORRECT - No escaping
+command: {{{aspects.docker_container.command}}}
+# Result: sh -c 'npm install' (WORKS!)
+
+environment:
+  DATABASE_URL: "{{{database_url}}}"
+# Result: postgresql://user:pass@host:5432/db (WORKS!)
+```
+
+### When to Use Triple-Stash `{{{...}}}`
+
+**Always use triple-stash for:**
+- ✅ Environment variable values (contain `=`, `:`, `@`, special chars)
+- ✅ Command-line arguments (contain `=`, quotes, special chars)
+- ✅ Shell commands (contain quotes, operators)
+- ✅ URLs (contain `://`, `=`, `&`)
+- ✅ Connection strings (contain `=`, `@`, `:`)
+- ✅ Any value that could have `=`, `&`, `<`, `>`, `"`, `'`
+
+### When to Use Double-Stash `{{...}}`
+
+**Use double-stash for:**
+- ✅ Simple identifiers (service names, IDs)
+- ✅ Numbers (ports, counts)
+- ✅ Booleans (true/false)
+- ✅ Template control flow (`{{#if}}`, `{{#each}}`)
+
+### Nunjucks Users
+
+Use the `| safe` filter:
+```nunjucks
+environment:
+  DATABASE_URL: {{ database_url | safe }}
+```
+
+**See [Template Best Practices](#best-practices) section below for complete guide.**
+
+---
 
 ## Overview
 
@@ -693,6 +749,155 @@ Error: Output path contains invalid characters
 **Fix:** Use `slugify` for safe paths:
 ```handlebars
 {{render_file "page.html.hbs" (concat (slugify title) ".html") this}}
+```
+
+---
+
+## Best Practices
+
+### 1. Always Quote Environment Values
+
+```handlebars
+✅ GOOD
+environment:
+{{#each aspects.docker_container.environment}}
+  {{@key}}: "{{{this}}}"
+{{/each}}
+
+❌ BAD
+environment:
+{{#each aspects.docker_container.environment}}
+  {{@key}}: {{{this}}}
+{{/each}}
+```
+
+### 2. Check Before Iterating
+
+```handlebars
+✅ GOOD
+{{#if aspects.docker_container.volumes}}
+{{#if (gt aspects.docker_container.volumes.length 0)}}
+volumes:
+{{#each aspects.docker_container.volumes}}
+  - {{this}}
+{{/each}}
+{{/if}}
+{{/if}}
+
+❌ BAD (outputs empty "volumes:" if array is empty)
+{{#if aspects.docker_container.volumes}}
+volumes:
+{{#each aspects.docker_container.volumes}}
+  - {{this}}
+{{/each}}
+{{/if}}
+```
+
+### 3. Avoid Deep Nesting
+
+```handlebars
+❌ BAD - Hard to maintain
+{{#if condition1}}
+  {{#if condition2}}
+    {{#if condition3}}
+      <!-- Deep nesting -->
+    {{/if}}
+  {{/if}}
+{{/if}}
+
+✅ GOOD - Use helpers
+{{#if (and condition1 condition2 condition3)}}
+  <!-- Clean logic -->
+{{/if}}
+```
+
+### 4. Document Complex Templates
+
+```handlebars
+{{!--
+  Template: docker-compose.yml
+  Inputs:
+    - instances: All instances with docker_container aspect
+    - buildContext: Build metadata
+  Outputs:
+    - docker-compose.yml: Service definitions
+  
+  Required aspects:
+    - docker_container.image OR docker_container.build
+--}}
+```
+
+### 5. Test Edge Cases
+
+Always test your templates with:
+- Empty arrays (`volumes: []`)
+- Null values (`command: null`)
+- Special characters in strings
+- Missing optional fields
+
+### 6. Use Partials for Reusability
+
+```handlebars
+{{!-- partials/healthcheck.hbs --}}
+{{#if healthcheck}}
+healthcheck:
+  test: {{healthcheck.test}}
+{{/if}}
+
+{{!-- main template --}}
+{{> healthcheck healthcheck=aspects.docker_container.healthcheck}}
+```
+
+---
+
+## Troubleshooting
+
+### Mismatched Template Tags
+
+**Error:** `Expecting 'if' but got 'each'`
+
+**Cause:** Unclosed or incorrectly nested tags.
+
+**Fix:** Count your opening/closing tags:
+```handlebars
+{{#if condition}}      # 1 open
+  {{#each items}}      # 2 open
+  {{/each}}            # 2 close
+{{/if}}                # 1 close
+```
+
+### HTML Escaping Issues
+
+**Symptom:** Environment variables contain `&#x3D;`, `&#x27;`, etc.
+
+**Fix:** Use triple-stash `{{{...}}}` for environment variables and commands.
+
+### Empty Sections
+
+**Symptom:** Empty YAML sections like:
+```yaml
+volumes:
+```
+
+**Fix:** Check array length before outputting section headers:
+```handlebars
+{{#if (gt aspects.docker_container.volumes.length 0)}}
+volumes:
+{{#each aspects.docker_container.volumes}}
+  - {{this}}
+{{/each}}
+{{/if}}
+```
+
+### Whitespace Problems
+
+**Symptom:** Extra blank lines in output.
+
+**Fix:** Use `~` to strip whitespace:
+```handlebars
+{{#each items~}}
+{{name}}
+{{~/each}}
 ```
 
 ---

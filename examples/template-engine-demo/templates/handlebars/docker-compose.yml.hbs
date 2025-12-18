@@ -11,8 +11,8 @@ services:
     ports:
       - "{{aspects.web_service.port}}:{{aspects.web_service.port}}"
     environment:
-      - SERVICE_NAME={{name}}
-      - WORKERS={{aspects.web_service.workers}}
+      - SERVICE_NAME={{{name}}}
+      - WORKERS={{{aspects.web_service.workers}}}
 {{#if aspects.web_service.ssl_enabled}}
       - SSL_ENABLED=true
     volumes:
