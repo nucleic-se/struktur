@@ -74,13 +74,18 @@ struktur build [options] [stack-dirs...]
 - `-i, --instances <dirs...>` - Instance file directories  
 - `-t, --templates <dirs...>` - Template directories to render
 - `-b, --build-dir <dir>` - Build output directory (default: `./build`)
-- `--config <file>` - Path to `struktur.build.json` config file
+- `--config <file>` - Path to build config file (auto-discovers `*.build.json`)
+- `--save-config <file>` - Save successful build settings to config file
 - `--engine <name>` - Template engine: `handlebars` or `nunjucks` (default: `handlebars`)
 - `-q, --quiet` - Suppress output except errors
 - `--json` - Output build results as JSON
 - `--exact` - Use exact build directory path without hash suffix (recommended)
 - `--no-deterministic` - Disable deterministic build directories (allows overwrites)
 - `--allow-template-collisions` - Allow templates with same name in multiple directories (last wins)
+- `--warn-extra-fields` - Warn about fields not in schema (default: true)
+- `--no-warn-extra-fields` - Disable warnings for extra fields
+- `--warnings-as-errors` - Treat validation warnings as errors (default: true)
+- `--no-warnings-as-errors` - Allow warnings without failing build
 - `-h, --help` - Show command help
 
 **Examples:**
@@ -135,9 +140,11 @@ build/build-88b76788/     # Hash-based directory
 
 **Config File Auto-Discovery:**
 When you run `struktur build mystack`:
-1. Checks for `mystack/struktur.build.json`
-2. If found, loads config and resolves paths relative to config file directory
-3. CLI flags override config file values
+1. Searches for any `*.build.json` file in `mystack/`
+2. Prefers `struktur.build.json` if multiple files exist
+3. If found, loads config and resolves paths relative to config file directory
+4. CLI flags override config file values
+5. Fallback: Uses `struktur.build.json` in current directory if not found in stack dir
 
 ---
 
@@ -280,13 +287,19 @@ struktur init --example skribe my-site --force
 
 ## Configuration File
 
-### `struktur.build.json`
+### Build Config File
 
 Optional configuration file for build settings. Automatically discovered when building a directory.
 
-**Location:**
-- `<stack-dir>/struktur.build.json` (auto-discovered)
-- Or specify with `--config <file>`
+**Naming:**
+- Auto-discovers any `*.build.json` file in stack directory
+- Prefers `struktur.build.json` if multiple exist
+- Or specify explicitly with `--config <file>`
+
+**Examples:**
+- `struktur.build.json` (standard name)
+- `my-stack.build.json` (custom name, auto-discovered)
+- `dev.build.json`, `prod.build.json` (environment-specific)
 
 **Schema:**
 
@@ -296,8 +309,13 @@ Optional configuration file for build settings. Automatically discovered when bu
   "aspects": ["./aspects"],
   "instances": ["./instances"],
   "templates": ["./templates"],
-  "buildDir": "./build",
-  "engine": "handlebars"
+  "build_dir": "./build",
+  "template_engine": "handlebars",
+  "exact": true,
+  "allow_template_collisions": false,
+  "warn_extra_fields": true,
+  "warnings_as_errors": true,
+  "quiet": false
 }
 ```
 
@@ -306,8 +324,15 @@ Optional configuration file for build settings. Automatically discovered when bu
 - `aspects` (string | string[]) - Aspect directories (relative to config file)
 - `instances` (string | string[]) - Instance directories (relative to config file)
 - `templates` (string | string[]) - Template directories (relative to config file)
-- `buildDir` (string) - Build output directory (relative to config file)
-- `engine` (string) - Template engine: `handlebars` or `nunjucks`
+- `build_dir` (string) - Build output directory (relative to config file)
+- `template_engine` (string) - Template engine: `handlebars` or `nunjucks` (default: `handlebars`)
+- `exact` (boolean) - Use exact build directory without hash suffix (default: false)
+- `allow_template_collisions` (boolean) - Allow template name conflicts (default: false)
+- `warn_extra_fields` (boolean) - Warn about fields not in schema (default: true)
+- `warnings_as_errors` (boolean) - Treat warnings as errors (default: true)
+- `quiet` (boolean) - Suppress non-error output (default: false)
+
+**Note:** All field names use `snake_case` for consistency with CLI flags.
 
 **Path Resolution:**
 - **In config file**: Paths are relative to the config file's directory
@@ -317,11 +342,13 @@ Optional configuration file for build settings. Automatically discovered when bu
 **Example Usage:**
 
 ```bash
-# Config file at mystack/struktur.build.json
+# Config file at mystack/my-stack.build.json (auto-discovered)
 {
   "classes": ["../universal/classes", "./classes"],
   "instances": ["./instances"],
-  "templates": ["./templates"]
+  "templates": ["./templates"],
+  "build_dir": "./build",
+  "exact": true
 }
 
 # Build uses paths relative to mystack/
@@ -329,7 +356,17 @@ struktur build mystack
 
 # Override template dir
 struktur build mystack -t other-templates/
+
+# Save current CLI flags to config file
+struktur build mystack --exact --save-config mystack/struktur.build.json
 ```
+
+**--save-config Flag:**
+- Captures successful build settings and saves to config file
+- Includes all directories used (classes, aspects, instances, templates)
+- Saves paths relative to config file directory (portable across machines)
+- Only saves non-default values (keeps config minimal)
+- Example: `struktur build -c classes/ -i instances/ --exact --save-config my.build.json`
 
 ---
 
