@@ -7,13 +7,13 @@
     "docker_container": {
       "image": "node:20-alpine",
       "description": "Backend API connecting database, cache, and frontend",
-      "command": "node server.js",
+      "command": "sh -c 'npm install && node server.js'",
       "working_dir": "/app",
       "ports": ["3001:3001"],
       "networks": ["docked"],
       "restart_policy": "unless-stopped",
       "volumes": [
-        "./api:/app:ro"
+        "./api:/app"
       ],
       "environment": {
         "NODE_ENV": "${NODE_ENV:-development}",

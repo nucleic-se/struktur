@@ -1,44 +1,121 @@
-# Docked Full-Stack Application
+# Docked - Docker Stack Example
 
-**Docked** is a complete, production-ready full-stack web application stack generated from canonical data. It demonstrates how all layers of a modern web application work together: frontend, backend API, database, and cache.
+**Docked** demonstrates a complete Docker-based web application stack generated entirely from canonical data using Struktur. It showcases real-world container orchestration patterns: multi-service dependencies, caching strategies, health checks, and production-ready configuration management.
 
 **⚠️ Important**: Docked is an **extension** of Universal, not a standalone stack. You must build it with Universal's base classes.
 
-## What You Get
+## Docker Tech Stack
 
-A **working web application** with:
+### Container Architecture
 
-- **Frontend**: Modern single-page app served by Nginx
-- **Backend API**: Node.js REST API with 3 endpoints
-- **Database**: PostgreSQL for persistent data
-- **Cache**: Redis for session/query caching
-- **Reverse Proxy**: Nginx routing frontend + API
+Docked orchestrates **4 Docker containers** that work together as a cohesive application:
+
+#### 1. **PostgreSQL** (postgres:16-alpine)
+- **Purpose**: Primary data store for application state
+- **Container**: `postgres`
+- **Port**: `5432`
+- **Features**:
+  - Persistent volume (`postgres-data:/var/lib/postgresql/data`)
+  - Health checks via `pg_isready`
+  - Resource limits: 2 CPU cores, 2GB memory max
+  - Environment-based configuration (database name, user, password)
+- **Dependencies**: None (infrastructure layer)
+
+#### 2. **Redis** (redis:alpine)
+- **Purpose**: Cache layer for API response optimization
+- **Container**: `redis`
+- **Port**: `6379`
+- **Features**:
+  - AOF persistence (`redis-data:/data`)
+  - Password authentication
+  - 30-second TTL for todo lists, 10-second TTL for stats
+  - Automatic cache invalidation on writes
+  - Health checks via `redis-cli ping`
+- **Dependencies**: None (infrastructure layer)
+
+#### 3. **Node.js API** (node:20-alpine)
+- **Purpose**: REST API backend with cache coordination
+- **Container**: `api`
+- **Port**: `3001`
+- **Endpoints**:
+  - `GET /health` - Service health with database/cache status
+  - `GET /todos` - List all todos (cached 30s in Redis)
+  - `POST /todos` - Create todo (invalidates cache)
+  - `PUT /todos/:id` - Update todo (invalidates cache)
+  - `DELETE /todos/:id` - Delete todo (invalidates cache)
+  - `GET /stats` - Statistics with cache hit rate
+- **Features**:
+  - Connection pooling to PostgreSQL
+  - Smart cache invalidation strategy
+  - Tracks cache hits/misses/DB queries
+  - Health checks via wget on `/health`
+- **Dependencies**: Waits for `postgres` and `redis` to be healthy before starting
+
+#### 4. **Nginx** (nginx:alpine)
+- **Purpose**: Reverse proxy and static file server
+- **Container**: `nginx`
+- **Port**: `8080` (exposed to host)
+- **Features**:
+  - Serves frontend SPA from `/usr/share/nginx/html`
+  - Reverse proxies `/api/*` to Node.js backend
+  - Gzip compression
+  - Static file caching (1 year for assets)
+  - Security headers (X-Frame-Options, X-Content-Type-Options)
+  - Health check endpoint
+- **Dependencies**: Waits for `api` to be healthy before starting
+
+### Container Interactions
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  User Browser → http://localhost:8080                       │
+└─────────────────────────────────────────────────────────────┘
+                           ↓
+┌─────────────────────────────────────────────────────────────┐
+│  Nginx Container (:8080)                                    │
+│  • Serves frontend HTML/CSS/JS                              │
+│  • Proxies /api/* → api:3001                                │
+└─────────────────────────────────────────────────────────────┘
+                           ↓
+┌─────────────────────────────────────────────────────────────┐
+│  Node.js API Container (:3001)                              │
+│  • Handles REST requests                                    │
+│  • Checks Redis cache first                                 │
+│  • Queries PostgreSQL on cache miss                         │
+│  • Invalidates cache on writes                              │
+└─────────────────────────────────────────────────────────────┘
+                     ↓           ↓
+          ┌──────────┘           └──────────┐
+          ↓                                  ↓
+┌───────────────────────┐      ┌───────────────────────┐
+│  PostgreSQL (:5432)   │      │  Redis (:6379)        │
+│  • Stores todos       │      │  • Caches queries     │
+│  • ACID transactions  │      │  • 30s/10s TTL        │
+│  • Persistent volume  │      │  • Hit rate tracking  │
+└───────────────────────┘      └───────────────────────┘
+```
+
+### What You Get
+
+A **fully functional collaborative todo list** application demonstrating:
+
+- **CRUD operations**: Create, read, update, delete todos via REST API
+- **Smart caching**: Redis caches todo lists (30s) and stats (10s)
+- **Cache invalidation**: Writes automatically clear stale cache entries
+- **Optimistic updates**: UI updates immediately, rollback on errors
+- **Real-time metrics**: Live cache hit rate, DB query count
+- **Production patterns**: Health checks, resource limits, dependency ordering
 
 **Access it at**: http://localhost:8080 after starting the stack
 
-### The Complete Stack
-
-```
-User Browser
-    ↓
-Nginx :8080 (Frontend + Reverse Proxy)
-    ↓
-Node.js API :3001
-    ↓
-PostgreSQL :5432  +  Redis :6379
-```
-
-### Production Features
-- **Multi-environment configs**: Dev/staging/production with secrets management patterns
-- **Health checks**: All services monitor themselves and dependencies
-- **Resource limits**: CPU and memory constraints ready for production
-- **Dependency management**: Services start in correct order (DB → API → Frontend)
-
 ### Struktur Capabilities Demonstrated
-- **Extending Universal**: Domain-specific classes layer on base vocabulary
-- **Multi-output templates**: One model generates compose, configs, and application code
-- **Schema validation**: Catches errors before deployment
-- **Aspect-based organization**: Docker concerns separated from business logic
+
+- **Extending Universal**: Domain-specific docker_container classes build on universal base
+- **Multi-output templates**: One canonical model generates docker-compose.yml, nginx.conf, API code, and frontend
+- **Smart template escaping**: Triple-stash `{{{...}}}` prevents HTML entity encoding in configs
+- **Relationship-driven config**: Container dependencies automatically generate `depends_on` chains
+- **Schema validation**: Catches configuration errors before deployment
+- **Aspect-based organization**: Docker concerns (ports, volumes, env vars) separated from business logic
 
 ## Quick start
 
@@ -80,17 +157,11 @@ struktur build \
   -b build
 ```
 
-### 4. Install API dependencies
+### 4. Launch the stack
 
 ```bash
-cd build/api
-npm install
-cd ..
-```
+cd build
 
-### 5. Launch the stack
-
-```bash
 # Use development environment
 cp .env.development .env
 
@@ -98,7 +169,9 @@ cp .env.development .env
 docker compose up -d
 ```
 
-### 6. Open the application
+API dependencies install automatically on first container startup (takes ~30 seconds).
+
+### 5. Open the application
 
 **Visit http://localhost:8080** in your browser
 
@@ -189,8 +262,9 @@ Paths are relative to the config file. CLI flags override config values.
 ### Templates
 
 - `docker-compose.yml` - Main compose file generation
-- `cards/container.html` - Container-specific viewer cards
-- `.env.example` - Environment variable documentation
+- `nginx.conf` - Nginx reverse proxy configuration
+- `api/server.js` - Node.js REST API with PostgreSQL and Redis
+- `frontend.html` - Interactive todo list frontend
 - Plus inherited Universal templates (viewer.html, partials)
 
 ## Production patterns demonstrated
@@ -232,26 +306,6 @@ Nginx acts as a single entry point:
 - Health checks for container orchestration
 - Security headers and caching
 
-## What we learned (Dogfooding Results)
-
-This example was built to **dogfood Struktur** - use it to build real infrastructure and find missing features. Key findings:
-
-### ✅ What works well
-1. **Schema validation catches errors early** - Invalid port formats, missing fields detected before deployment
-2. **Template flexibility** - Adding health checks, resource limits, complex nested structures works smoothly
-3. **Config system is practical** - The new `render` field and flexible naming makes real projects manageable
-4. **Aspect layering scales** - Docker-specific aspects layer cleanly on Universal base
-
-### ⚠️ Issues discovered
-1. **HTML escaping in templates** - Handlebars escapes `=` to `&#x3D;` in environment variables, breaking some configs
-2. **Template complexity for conditionals** - Managing multiple relation types in depends_on requires careful nesting
-3. **No template inheritance yet** - Would be useful for nginx configs with base + environment overrides
-
-### 📋 Potential improvements
-1. **Environment variable interpolation** - Could pre-process ${VAR} references before rendering
-2. **Secret management helpers** - Templates for integrating with AWS Secrets Manager, Vault, etc.
-3. **Validation for environment-specific values** - Ensure production configs don't have default passwords
-
 ## How layering works
 
 Docked doesn't duplicate Universal—it **extends** it:
@@ -270,15 +324,18 @@ When you build with `-c universal/classes -c docked/classes`, Struktur loads bot
 
 ### Quick Start: Add Your Own Service
 
-**1. Create a new container instance:**
+**Recommended approach:** Use external instances folder to avoid modifying the docked stack.
+
+**1. Create your custom instances:**
 
 ```bash
-cp instances/containers/api.json instances/containers/myapp.json
+mkdir -p my-services/containers
 ```
 
-**2. Edit the basics:**
+**2. Define your service:**
 
-```json
+```bash
+cat > my-services/containers/myapp.json << 'EOF'
 {
   "id": "myapp",
   "class": "docked_container",
@@ -304,11 +361,28 @@ cp instances/containers/api.json instances/containers/myapp.json
     }
   }
 }
+EOF
 ```
 
-**3. Rebuild:**
+**3. Build with both instance folders:**
 
 ```bash
+struktur build \
+  -c ../universal/classes classes \
+  -a ../universal/aspects aspects \
+  -i instances \
+  -i my-services \
+  -t templates \
+  -b build
+
+cd build && docker compose up -d myapp
+```
+
+**Alternative:** Modify docked instances directly (simpler but less maintainable):
+
+```bash
+cp instances/containers/api.json instances/containers/myapp.json
+# Edit myapp.json, then:
 struktur build --exact
 cd build && docker compose up -d myapp
 ```
@@ -387,9 +461,9 @@ MONGO_PASSWORD=dev-password
 
 ### Remove What You Don't Need
 
-Don't need Grafana? Delete `instances/containers/grafana.json` and rebuild. 
+Don't need the API? Delete `instances/containers/api.json` and update nginx to serve only static files.
 
-Don't need Redis Commander? Delete `instances/containers/redis-commander.json`.
+Don't need todos? Modify the API to implement different endpoints and update the frontend.
 
 The stack will regenerate with only what you've defined.
 
@@ -461,8 +535,9 @@ docked/
 │   └── global.json       # Stack metadata
 └── templates/            # Output generators
     ├── docker-compose.yml
-    ├── cards/container.html
-    └── .env.example
+    ├── nginx.conf
+    ├── api/server.js
+    └── frontend.html
 ```
 
 ## Next steps

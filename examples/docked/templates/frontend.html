@@ -3,9 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Docked Stack Demo</title>
+    <title>Docked Todo - PostgreSQL + Redis Demo</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -22,6 +55,8 @@
             max-width: 600px;
             width: 100%;
             padding: 40px;
+            animation: slideInUp 0.6s ease-out;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         h1 {
             color: #333;
@@ -38,6 +73,7 @@
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 20px;
+            animation: fadeIn 0.8s ease-out 0.2s backwards;
         }
         .stat-row {
             display: flex;
@@ -60,6 +96,11 @@
             font-size: 24px;
             font-weight: bold;
             color: #667eea;
+            transition: transform 0.2s ease, color 0.2s ease;
+        }
+        .stat-value:hover {
+            transform: scale(1.1);
+            color: #5568d3;
         }
         .cache-badge {
             display: inline-block;
@@ -111,6 +152,7 @@
             margin-top: 30px;
             padding-top: 30px;
             border-top: 2px solid #e1e8ed;
+            animation: fadeIn 0.8s ease-out 0.4s backwards;
         }
         .tech-stack h3 {
             color: #333;
@@ -128,6 +170,13 @@
             border-radius: 6px;
             font-size: 13px;
             color: #555;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+            cursor: default;
+        }
+        .tech-item:hover {
+            transform: translateY(-2px);
+            background: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
         .tech-item strong {
             color: #333;
@@ -148,135 +197,484 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            background: white;
+            color: #333;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+            font-weight: 500;
+            animation: slideInRight 0.4s ease-out;
+            z-index: 1000;
+            max-width: 320px;
+            font-size: 14px;
+        }
+        .toast.success {
+            border-left: 4px solid #10b981;
+        }
+        .toast.error {
+            border-left: 4px solid #ef4444;
+        }
+        @keyframes fadeOut {
+            to { opacity: 0; transform: translateX(20px); }
+        }
+        /* Todo-specific styles */
+        .add-todo {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 8px;
+            animation: fadeIn 0.8s ease-out 0.3s backwards;
+        }
+        #todoInput {
+            flex: 1;
+            padding: 14px 16px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        #todoInput:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .add-btn {
+            padding: 14px 24px;
+            background: #10b981;
+            white-space: nowrap;
+        }
+        .add-btn:hover {
+            background: #059669;
+        }
+        #addStatus {
+            min-height: 20px;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+        .todos-list {
+            margin-bottom: 24px;
+            min-height: 200px;
+            animation: fadeIn 0.8s ease-out 0.4s backwards;
+        }
+        .todo-item {
+            background: white;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s ease;
+        }
+        .todo-item.new-item {
+            animation: slideInUp 0.3s ease-out;
+        }
+        .todo-item:hover {
+            border-color: #667eea;
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .todo-item.completed {
+            opacity: 0.6;
+            background: #f7f9fc;
+        }
+        .todo-item.completed .todo-title {
+            text-decoration: line-through;
+            color: #999;
+        }
+        .todo-checkbox {
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .todo-title {
+            flex: 1;
+            font-size: 15px;
+            color: #333;
+            word-break: break-word;
+        }
+        .todo-delete {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 4px;
+            border-radius: 6px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+        .todo-delete:hover {
+            background: #dc2626;
+        }
+        .todo-time {
+            font-size: 11px;
+            color: #999;
+            flex-shrink: 0;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        .cache-info {
+            margin-top: 16px;
+            padding: 12px;
+            background: #f7f9fc;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #666;
+            font-family: 'Courier New', monospace;
+        }
+        
         @media (max-width: 640px) {
             .container { padding: 24px; }
             h1 { font-size: 24px; }
             .tech-grid { grid-template-columns: 1fr; }
+            .add-todo { flex-direction: column; }
+            .todo-item { flex-wrap: wrap; }
+            .todo-time { width: 100%; margin-top: 8px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🐋 Docked Stack</h1>
-        <p class="subtitle">Production-ready Docker infrastructure with PostgreSQL, Redis, Node.js, and Nginx</p>
+        <h1>✓ Docked Todo</h1>
+        <p class="subtitle">Collaborative todo list powered by PostgreSQL & Redis</p>
         
+        <!-- Stats Bar -->
         <div class="stats">
             <div class="stat-row">
-                <span class="stat-label">Total Page Views</span>
-                <span class="stat-value" id="totalViews">-</span>
+                <span class="stat-label">Total Tasks</span>
+                <span class="stat-value" id="totalTodos">-</span>
             </div>
             <div class="stat-row">
-                <span class="stat-label">Cache Status</span>
+                <span class="stat-label">Completed</span>
+                <span class="stat-value" id="completedTodos">-</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Cache</span>
                 <span id="cacheStatus">-</span>
-            </div>
-            <div class="stat-row">
-                <span class="stat-label">Environment</span>
-                <span id="environment">-</span>
             </div>
         </div>
 
-        <button onclick="trackView()">Track Page View</button>
-        <div id="status"></div>
+        <!-- Add Todo Form -->
+        <div class="add-todo">
+            <input 
+                type="text" 
+                id="todoInput" 
+                placeholder="What needs to be done?" 
+                autocomplete="off"
+                onkeypress="if(event.key==='Enter') addTodo()"
+            />
+            <button onclick="addTodo()" class="add-btn">Add Task</button>
+        </div>
+        <div id="addStatus"></div>
 
+        <!-- Todos List -->
+        <div id="todosList" class="todos-list">
+            <div class="loading">Loading todos...</div>
+        </div>
+
+        <!-- Tech Info -->
         <div class="tech-stack">
-            <h3>Technology Stack</h3>
+            <h3>Container Interactions</h3>
             <div class="tech-grid">
                 <div class="tech-item">
-                    <strong>Frontend</strong>
-                    Nginx serving static HTML
+                    <strong>PostgreSQL</strong>
+                    CRUD operations, data persistence
                 </div>
                 <div class="tech-item">
-                    <strong>Backend</strong>
-                    Node.js 20 API
+                    <strong>Redis</strong>
+                    30s cache, invalidation on write
                 </div>
                 <div class="tech-item">
-                    <strong>Database</strong>
-                    PostgreSQL 16
+                    <strong>Node.js API</strong>
+                    REST endpoints, cache logic
                 </div>
                 <div class="tech-item">
-                    <strong>Cache</strong>
-                    Redis with AOF
+                    <strong>Nginx</strong>
+                    Reverse proxy, static files
                 </div>
             </div>
+            <div class="cache-info" id="cacheInfo"></div>
         </div>
     </div>
 
     <script>
+        let todos = [];
+        
+        // Toast notification system
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'fadeOut 0.4s ease-out';
+                setTimeout(() => toast.remove(), 400);
+            }, 3000);
+        }
+
+        // Animated counter
+        function animateCounter(element, target) {
+            const start = parseInt(element.textContent) || 0;
+            const duration = 800;
+            const startTime = performance.now();
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+                const current = Math.floor(start + (target - start) * easeOut);
+                element.textContent = current;
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                } else {
+                    element.textContent = target;
+                }
+            }
+
+            requestAnimationFrame(update);
+        }
+
+        // Format time ago
+        function timeAgo(date) {
+            const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+            if (seconds < 60) return 'just now';
+            const minutes = Math.floor(seconds / 60);
+            if (minutes < 60) return `${minutes}m ago`;
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `${hours}h ago`;
+            return `${Math.floor(hours / 24)}d ago`;
+        }
+
+        // Load todos from API
+        async function loadTodos() {
+            try {
+                const response = await fetch('/api/todos');
+                if (!response.ok) throw new Error('API unavailable');
+                
+                const cacheHeader = response.headers.get('X-Cache');
+                todos = await response.json();
+                
+                renderTodos();
+                updateCacheStatus(cacheHeader);
+            } catch (error) {
+                console.error('Failed to load todos:', error);
+                document.getElementById('todosList').innerHTML = 
+                    '<div class="error">Failed to load todos. Check API connection.</div>';
+            }
+        }
+
+        // Render todos in UI
+        function renderTodos(animateNew = false) {
+            const container = document.getElementById('todosList');
+            
+            if (todos.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📝</div>
+                        <div>No todos yet. Add one above to get started!</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const newItemClass = animateNew ? 'new-item' : '';
+            container.innerHTML = todos.map((todo, index) => `
+                <div class="todo-item ${todo.completed ? 'completed' : ''} ${index === 0 && animateNew ? newItemClass : ''}" data-id="${todo.id}">
+                    <input 
+                        type="checkbox" 
+                        class="todo-checkbox" 
+                        ${todo.completed ? 'checked' : ''}
+                        onchange="toggleTodo(${todo.id}, this.checked)"
+                    />
+                    <div class="todo-title">${escapeHtml(todo.title)}</div>
+                    <span class="todo-time">${timeAgo(todo.created_at)}</span>
+                    <button class="todo-delete" onclick="deleteTodo(${todo.id})" title="Delete todo">×</button>
+                </div>
+            `).join('');
+        }
+
+        // Add new todo
+        async function addTodo() {
+            const input = document.getElementById('todoInput');
+            const statusEl = document.getElementById('addStatus');
+            const title = input.value.trim();
+            
+            if (!title) {
+                showToast('Please enter a todo title', 'error');
+                input.focus();
+                return;
+            }
+
+            statusEl.innerHTML = '<span class="spinner"></span> Adding...';
+            statusEl.className = 'status loading';
+
+            try {
+                const response = await fetch('/api/todos', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title })
+                });
+                
+                if (!response.ok) throw new Error('Failed to add todo');
+                
+                const newTodo = await response.json();
+                todos.unshift(newTodo);
+                
+                input.value = '';
+                renderTodos(true); // Animate the new item
+                loadStats();
+                
+                showToast('✓ Todo added!', 'success');
+                statusEl.textContent = '';
+                statusEl.className = '';
+            } catch (error) {
+                showToast(`✗ ${error.message}`, 'error');
+                statusEl.textContent = '';
+                statusEl.className = '';
+            }
+        }
+
+        // Toggle todo completion
+        async function toggleTodo(id, completed) {
+            const todo = todos.find(t => t.id === id);
+            if (todo) {
+                todo.completed = completed;
+                renderTodos();
+            }
+
+            try {
+                const response = await fetch(`/api/todos/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ completed })
+                });
+                
+                if (!response.ok) throw new Error('Failed to update todo');
+                
+                const updated = await response.json();
+                const index = todos.findIndex(t => t.id === id);
+                if (index !== -1) todos[index] = updated;
+                
+                loadStats();
+                showToast(completed ? '✓ Todo completed!' : '↻ Todo reopened', 'success');
+            } catch (error) {
+                if (todo) {
+                    todo.completed = !completed;
+                    renderTodos();
+                }
+                showToast(`✗ ${error.message}`, 'error');
+            }
+        }
+
+        // Delete todo
+        async function deleteTodo(id) {
+            if (!confirm('Delete this todo?')) return;
+
+            const index = todos.findIndex(t => t.id === id);
+            const removed = todos.splice(index, 1);
+            renderTodos();
+
+            try {
+                const response = await fetch(`/api/todos/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response.ok) throw new Error('Failed to delete todo');
+                
+                loadStats();
+                showToast('✓ Todo deleted', 'success');
+            } catch (error) {
+                todos.splice(index, 0, ...removed);
+                renderTodos();
+                showToast(`✗ ${error.message}`, 'error');
+            }
+        }
+
+        // Load and display stats
         async function loadStats() {
             try {
                 const response = await fetch('/api/stats');
-                if (!response.ok) throw new Error('API unavailable');
+                if (!response.ok) return;
                 
                 const data = await response.json();
                 const cacheHeader = response.headers.get('X-Cache');
                 
-                document.getElementById('totalViews').textContent = data.total_views;
+                const totalEl = document.getElementById('totalTodos');
+                const completedEl = document.getElementById('completedTodos');
                 
-                const cacheClass = cacheHeader === 'HIT' ? 'cache-hit' : 'cache-miss';
-                document.getElementById('cacheStatus').innerHTML = 
-                    `<span class="cache-badge ${cacheClass}">${cacheHeader}</span>`;
-            } catch (error) {
-                console.error('Failed to load stats:', error);
-                document.getElementById('totalViews').textContent = 'Error';
-                document.getElementById('cacheStatus').textContent = 'Unavailable';
-            }
-        }
-
-        async function loadHealth() {
-            try {
-                const response = await fetch('/api/health');
-                const data = await response.json();
-                document.getElementById('environment').textContent = 
-                    data.environment || 'unknown';
-            } catch (error) {
-                console.error('Failed to load health:', error);
-            }
-        }
-
-        async function trackView() {
-            const statusEl = document.getElementById('status');
-            const button = document.querySelector('button');
-            
-            // Disable button and show loading
-            button.disabled = true;
-            statusEl.innerHTML = '<span class="spinner"></span> Saving...';
-            statusEl.className = 'status loading';
-            
-            try {
-                const response = await fetch('/api/track', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ path: window.location.pathname })
-                });
+                const currentTotal = parseInt(totalEl.textContent) || 0;
+                const currentCompleted = parseInt(completedEl.textContent) || 0;
                 
-                if (response.ok) {
-                    statusEl.textContent = '✓ View tracked successfully!';
-                    statusEl.className = 'status success';
-                    
-                    // Reload stats after tracking
-                    setTimeout(() => loadStats(), 100);
+                if (currentTotal !== data.total && !isNaN(currentTotal)) {
+                    animateCounter(totalEl, data.total);
+                    animateCounter(completedEl, data.completed);
                 } else {
-                    throw new Error(`API error: ${response.status}`);
+                    totalEl.textContent = data.total;
+                    completedEl.textContent = data.completed;
+                }
+                
+                updateCacheStatus(cacheHeader);
+                
+                if (data.cache_stats) {
+                    const hitRate = data.cache_stats.cacheMisses === 0 ? 100 :
+                        ((data.cache_stats.cacheHits / (data.cache_stats.cacheHits + data.cache_stats.cacheMisses)) * 100).toFixed(1);
+                    document.getElementById('cacheInfo').textContent = 
+                        `Cache: ${data.cache_stats.cacheHits} hits, ${data.cache_stats.cacheMisses} misses (${hitRate}% hit rate) | DB queries: ${data.cache_stats.dbQueries}`;
                 }
             } catch (error) {
-                statusEl.textContent = `✗ Failed: ${error.message}`;
-                statusEl.className = 'status error';
-            } finally {
-                button.disabled = false;
+                console.error('Failed to load stats:', error);
             }
-            
-            setTimeout(() => {
-                statusEl.textContent = '';
-                statusEl.className = '';
-            }, 3000);
         }
 
-        // Load initial data
+        function updateCacheStatus(cacheHeader) {
+            const cacheClass = cacheHeader === 'HIT' ? 'cache-hit' : 'cache-miss';
+            document.getElementById('cacheStatus').innerHTML = 
+                `<span class="cache-badge ${cacheClass}">${cacheHeader || 'N/A'}</span>`;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Initialize
+        loadTodos();
         loadStats();
-        loadHealth();
         
-        // Refresh stats every 5 seconds
-        setInterval(loadStats, 5000);
+        // Auto-refresh every 10 seconds
+        setInterval(() => {
+            loadTodos();
+            loadStats();
+        }, 10000);
     </script>
 </body>
 </html>

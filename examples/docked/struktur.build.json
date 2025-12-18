@@ -8,7 +8,6 @@
     {"viewer.html": "/index.html"},
     {"frontend.html": "/frontend/index.html"},
     {"docker-compose.yml": "/docker-compose.yml"},
-    {"dot.env.example": "/.env.example"},
     {".env.development": "/.env.development"},
     {".env.staging": "/.env.staging"},
     {".env.production": "/.env.production"},
