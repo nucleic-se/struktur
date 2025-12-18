@@ -3,5 +3,5 @@
   "aspects": ["../universal/aspects", "aspects"],
   "instances": ["instances"],
   "templates": ["../universal/templates", "templates"],
-  "buildDir": "build"
+  "build_dir": "build"
 }

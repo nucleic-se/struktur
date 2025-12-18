@@ -456,8 +456,8 @@ program
       // Resolve paths from config relative to config file directory
       const configDir = path.dirname(configPath);
       resolveConfigPaths(configFromFile, configDir, ['classes', 'aspects', 'instances', 'templates']);
-      if (configFromFile.buildDir) {
-        configFromFile.buildDir = path.resolve(configDir, configFromFile.buildDir);
+      if (configFromFile.build_dir) {
+        configFromFile.build_dir = path.resolve(configDir, configFromFile.build_dir);
       }
 
       // CLI flags override config file, config file overrides defaults
@@ -468,12 +468,33 @@ program
         instanceDirs = normalizePathArray(options.instances || configFromFile.instances);
         templateDirs = normalizePathArray(options.templates || configFromFile.templates);
 
-        // Use build dir from CLI flag, then config, then default
+        // Build dir: CLI > config > default
         if (options.buildDir !== './build') {
-          // CLI flag was explicitly set
           options.buildDir = options.buildDir;
-        } else if (configFromFile.buildDir) {
-          options.buildDir = configFromFile.buildDir;
+        } else if (configFromFile.build_dir) {
+          options.buildDir = configFromFile.build_dir;
+        }
+        
+        // Engine: CLI > config > default
+        if (options.engine === 'handlebars' && configFromFile.template_engine) {
+          options.engine = configFromFile.template_engine;
+        }
+        
+        // Boolean flags: CLI > config > defaults
+        if (options.exact === undefined && configFromFile.exact !== undefined) {
+          options.exact = configFromFile.exact;
+        }
+        if (options.allowTemplateCollisions === undefined && configFromFile.allow_template_collisions !== undefined) {
+          options.allowTemplateCollisions = configFromFile.allow_template_collisions;
+        }
+        if (options.warnExtraFields === undefined && configFromFile.warn_extra_fields !== undefined) {
+          options.warnExtraFields = configFromFile.warn_extra_fields;
+        }
+        if (options.warningsAsErrors === undefined && configFromFile.warnings_as_errors !== undefined) {
+          options.warningsAsErrors = configFromFile.warnings_as_errors;
+        }
+        if (options.quiet === undefined && configFromFile.quiet !== undefined) {
+          options.quiet = configFromFile.quiet;
         }
 
         // If no directories specified at all and no config, try stack-dirs mode

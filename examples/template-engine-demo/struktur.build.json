@@ -3,5 +3,5 @@
   "aspects": ["../universal/aspects"],
   "instances": ["instances", "build-tasks/handlebars"],
   "templates": ["templates/handlebars"],
-  "buildDir": "build/handlebars"
+  "build_dir": "build/handlebars"
 }
