@@ -233,9 +233,153 @@ Universal (base)           Docked (extension)
 
 When you build with `-c universal/classes -c docked/classes`, Struktur loads both class directories in order. Docked's classes inherit from Universal's base classes, gaining all the aspect/domain/relation infrastructure without reimplementing it.
 
-## Customizing
+## Using This as a Template
 
-Edit instances to model your own containers:
+### Quick Start: Add Your Own Service
+
+**1. Create a new container instance:**
+
+```bash
+cp instances/containers/api.json instances/containers/myapp.json
+```
+
+**2. Edit the basics:**
+
+```json
+{
+  "id": "myapp",
+  "class": "docked_container",
+  "description": "My custom application",
+  "domains": ["application"],
+  "aspects": {
+    "docker_container": {
+      "image": "myorg/myapp:latest",
+      "ports": ["8000:8000"],
+      "networks": ["docked"],
+      "restart_policy": "unless-stopped",
+      "environment": {
+        "APP_ENV": "${APP_ENV:-development}",
+        "DATABASE_URL": "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
+      },
+      "depends_on": ["postgres"],
+      "healthcheck": {
+        "test": ["CMD", "curl", "-f", "http://localhost:8000/health"],
+        "interval": "15s",
+        "timeout": "5s",
+        "retries": 3
+      }
+    }
+  }
+}
+```
+
+**3. Rebuild:**
+
+```bash
+struktur build --exact
+cd build && docker compose up -d myapp
+```
+
+### Common Patterns
+
+**Database container:**
+```json
+{
+  "id": "mongodb",
+  "class": "docked_container",
+  "domains": ["database"],
+  "aspects": {
+    "docker_container": {
+      "image": "mongo:7",
+      "ports": ["27017:27017"],
+      "volumes": ["mongo-data:/data/db"],
+      "environment": {
+        "MONGO_INITDB_ROOT_USERNAME": "${MONGO_USER}",
+        "MONGO_INITDB_ROOT_PASSWORD": "${MONGO_PASSWORD}"
+      }
+    }
+  }
+}
+```
+
+**Worker/background job:**
+```json
+{
+  "id": "worker",
+  "class": "docked_container",
+  "domains": ["application"],
+  "aspects": {
+    "docker_container": {
+      "image": "myorg/worker:latest",
+      "command": "npm run worker",
+      "restart_policy": "unless-stopped",
+      "depends_on": ["redis", "postgres"],
+      "deploy": {
+        "resources": {
+          "limits": {"cpus": "0.5", "memory": "512M"}
+        }
+      }
+    }
+  }
+}
+```
+
+**Volume for persistence:**
+```json
+{
+  "id": "mongo-data",
+  "class": "docked_volume",
+  "description": "MongoDB data storage",
+  "aspects": {
+    "docker_volume": {
+      "driver": "local"
+    }
+  }
+}
+```
+
+### Environment Variables
+
+Add your variables to `.env.development` (copy from build output):
+
+```bash
+# Your app
+APP_ENV=development
+APP_SECRET=change-me-in-production
+
+# MongoDB (if you added it)
+MONGO_USER=admin
+MONGO_PASSWORD=dev-password
+```
+
+### Remove What You Don't Need
+
+Don't need Grafana? Delete `instances/containers/grafana.json` and rebuild. 
+
+Don't need Redis Commander? Delete `instances/containers/redis-commander.json`.
+
+The stack will regenerate with only what you've defined.
+
+### Multi-Environment Deployment
+
+```bash
+# Development
+cp .env.development .env
+docker compose up -d
+
+# Staging
+cp .env.staging .env
+# Add real secrets, then:
+docker compose up -d
+
+# Production
+# Use secrets manager (AWS Secrets Manager, Vault, etc.)
+# Never commit .env.production with real secrets!
+```
+
+## Customizing (Advanced)
+
+For deeper customization, edit the JSON instances directly:
 
 ```json
 // instances/containers/myapp.json
