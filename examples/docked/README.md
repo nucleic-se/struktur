@@ -4,6 +4,30 @@
 
 **⚠️ Important**: Docked is an **extension** of Universal, not a standalone stack. You must build it with Universal's base classes.
 
+## Design Philosophy
+
+This stack is **opinionated and minimal**:
+
+✅ **One obvious way** to structure Docker containers in Struktur  
+✅ **Minimal viable example** (not production-hardened)  
+✅ **Best practices** baked in (health checks, dependencies, resource limits)  
+✅ **Clear tradeoffs** documented (relationship-driven config, dynamic port extraction)
+
+**Not included:**
+- Every possible Docker option (keeps examples learnable)
+- Production secrets management (you add that)
+- Organization-specific conventions
+
+**Use this as:**
+- **Learning reference** (understand Struktur patterns)
+- **Starting point** (fork and customize)
+- **Best practice guide** (see what works)
+
+**Don't expect:**
+- Production-ready out of box
+- Every use case covered
+- Your exact requirements
+
 ## Docker Tech Stack
 
 ### Container Architecture

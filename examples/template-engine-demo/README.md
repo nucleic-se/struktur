@@ -2,6 +2,30 @@
 
 This example demonstrates **Struktur's pluggable template engine support** by implementing the exact same stack using both **Handlebars** and **Nunjucks**.
 
+## Design Philosophy
+
+This stack is **opinionated and minimal**:
+
+✅ **Side-by-side comparison** (same data, different engines)  
+✅ **Minimal syntax examples** (not exhaustive reference)  
+✅ **Production patterns** (escaping, conditionals, iteration)  
+✅ **Clear tradeoffs** documented (when to use each engine)
+
+**Not included:**
+- Every template engine feature (use official docs for that)
+- Complex template logic (keep templates simple)
+- Engine-specific optimizations
+
+**Use this as:**
+- **Decision guide** (choosing between engines)
+- **Syntax reference** (quick lookup for common patterns)
+- **Migration template** (converting between engines)
+
+**Don't expect:**
+- Comprehensive engine documentation
+- Performance benchmarks
+- Advanced template patterns
+
 ## Overview
 
 - **Same Data**: Both use identical `classes/`, `aspects/`, and instance files

@@ -2,6 +2,30 @@
 
 A complete static site generator built with Struktur, demonstrating structured data, inheritance, multi-file outputs, dynamic tag pages, and composable theming.
 
+## Design Philosophy
+
+This stack is **opinionated and minimal**:
+
+✅ **One obvious way** to structure content in Struktur  
+✅ **Minimal viable blog** (not a CMS replacement)  
+✅ **Best practices** baked in (structured content, schema validation, deterministic builds)  
+✅ **Clear extension points** (mixins for RSS, dark theme)
+
+**Not included:**
+- Complex CMS features (comments, auth, admin UI)
+- Production optimization (minification, CDN, etc.)
+- Theme customization system
+
+**Use this as:**
+- **Learning reference** (structured content patterns)
+- **Blog starter** (fork and write posts)
+- **Static site pattern** (adapt for docs, portfolios, etc.)
+
+**Don't expect:**
+- WordPress-level features
+- Theme marketplace
+- Real-time updates
+
 ## Features
 
 - **Blog posts with tags**: 16 example posts across 4 tag categories

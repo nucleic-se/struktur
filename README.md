@@ -5,6 +5,43 @@
 [![npm version](https://img.shields.io/npm/v/@nucleic-se/struktur.svg)](https://www.npmjs.com/package/@nucleic-se/struktur)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
+## Who Struktur Is For
+
+Struktur is designed for people who:
+
+✅ **Prefer build-time failures** over runtime surprises  
+✅ **Like structured data** with schemas and validation  
+✅ **Hate YAML spaghetti** and want deterministic configuration  
+✅ **Want composition** (aspects) without inheritance hell  
+✅ **Need traceability** (know where each value came from)  
+✅ **Avoid DSLs** but appreciate type safety
+
+**You'll love Struktur if you:**
+- Manage infrastructure as code (Kubernetes, Docker, Terraform)
+- Generate configuration files from structured data
+- Need multi-environment deployments (dev/staging/prod)
+- Want schema validation without learning a new language
+- Prefer explicit over implicit (no magic)
+- Like build systems (Make, Bazel) that fail fast
+
+**Struktur might not be for you if:**
+- You prefer runtime configuration (environment variables only)
+- You like DSLs and custom languages (HCL, CUE, Jsonnet)
+- You want dynamic runtime overlays
+- You prefer convention over explicit configuration
+- You need runtime service discovery
+
+## What is a Stack?
+
+**Stack** = Directory-level composition of:
+- **Classes** (schemas that define types)
+- **Aspects** (composable extensions)
+- **Instances** (concrete data)
+- **Templates** (output generators)  
+→ **Deterministic artifacts** (YAML, JSON, HTML, configs)
+
+**Example:** A Docker stack has container classes, `docker_container` aspects, postgres/redis/nginx instances, and docker-compose.yml templates.
+
 ## How It Works
 
 Struktur's pipeline has three stages:
@@ -73,6 +110,19 @@ Run `struktur build`, and Struktur:
 3. Validates everything against schemas
 4. Renders templates into `build/`
 
+## Beyond Infrastructure
+
+Struktur isn't just for ops! The same pattern works for:
+
+📦 **Inventories** — Asset tracking, equipment catalogs  
+📚 **Content** — Blog posts, documentation, course materials  
+🏢 **Policies** — Compliance docs, procedures, audit trails  
+🎨 **Assets** — Design systems, component libraries  
+📊 **Catalogs** — Product data, service catalogs  
+🔧 **Dev Tools** — ESLint configs, project scaffolds
+
+**Key insight:** Anywhere you have **structured data + templates** = Struktur can help.
+
 ## When to Use Struktur
 
 Struktur shines when you need:
@@ -94,6 +144,36 @@ Struktur shines when you need:
 - **Deterministic** — Same inputs always produce identical outputs
 - **Composable** — Multi-parent inheritance + aspect-based composition
 - **Auditable** — Full transparency into what was merged and how
+
+## Struktur vs Alternatives
+
+### vs Helm/Kustomize (Kubernetes-specific)
+- ✅ **Struktur**: Works for any config format (Docker, Terraform, Ansible, etc.)
+- ✅ **Struktur**: JSON Schema validation (type-safe, IDE support)
+- ❌ **Helm**: YAML + Go templates, hard to debug
+- ❌ **Kustomize**: Kubernetes-only, limited composition
+
+### vs Terraform Modules (HCL-specific)
+- ✅ **Struktur**: Language-agnostic, generates Terraform HCL
+- ✅ **Struktur**: Aspect composition vs module nesting
+- ❌ **Terraform**: HCL only, runtime state management
+
+### vs CUE/Jsonnet (DSL-heavy)
+- ✅ **Struktur**: Standard JSON Schema, no new language
+- ✅ **Struktur**: Templates in Handlebars/Nunjucks (familiar)
+- ❌ **CUE/Jsonnet**: New syntax to learn, steep curve
+
+### vs Ansible (imperative)
+- ✅ **Struktur**: Declarative data → artifacts
+- ✅ **Struktur**: Generates Ansible inventory/playbooks
+- ❌ **Ansible**: Imperative tasks, harder to validate
+
+**When to choose Struktur:**
+- You manage multi-environment configs
+- You want schema validation without DSLs
+- You need composition (aspects) not inheritance
+- You prefer build-time errors to runtime failures
+- You like explicit, traceable configuration
 
 ## Installation
 
