@@ -24,13 +24,13 @@ Welcome to Struktur's documentation. This is your central hub for learning and r
 
 Understanding Struktur's data model:
 
+- **[Build Pipeline](concepts-build-pipeline.md)** - Four-phase deterministic builds (start here for the big picture)
 - **[Classes & Schemas](concepts-classes-schemas.md)** - Define data shapes with inheritance
 - **[Instances](concepts-instances.md)** - Your actual data, validated and merged
 - **[Aspects](concepts-aspects.md)** - Composable data namespaces
+- **[Canonical Output](concepts-canonical.md)** - Merged data structure
 - **[Validation](concepts-validation.md)** - Multi-layer schema checking
 - **[Templates](concepts-templates.md)** - Generate text from validated data
-- **[Canonical Output](concepts-canonical.md)** - Merged data structure
-- **[Build Pipeline](concepts-build-pipeline.md)** - Four-phase deterministic builds
 
 ## 📖 Reference
 
