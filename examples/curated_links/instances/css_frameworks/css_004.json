@@ -1,0 +1,15 @@
+{
+  "id": "css_004",
+  "class": "tool_link",
+  "url": "https://bulma.io",
+  "title": "Bulma",
+  "description": "Modern CSS framework based on Flexbox with clean and simple syntax",
+  "category": "Component Libraries",
+  "github_stars": 49000,
+  "language": "CSS",
+  "license": "MIT",
+  "tags": [
+    "component-library",
+    "css-framework"
+  ]
+}

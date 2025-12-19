@@ -1,0 +1,25 @@
+{
+  "id": "link_024",
+  "class": "tool_link",
+  "url": "https://turbo.build",
+  "title": "Turborepo",
+  "description": "High-performance build system for JavaScript and TypeScript monorepos",
+  "category": "Monorepo Tools",
+  "tags": [
+    "general"
+  ],
+  "date_added": "2025-12-19",
+  "language": "Rust",
+  "github_stars": 26000,
+  "license": "MPL-2.0",
+  "github_url": "https://github.com/vercel/turbo",
+  "aspects": {
+    "quality": {
+      "is_maintained": true,
+      "is_free": true,
+      "popularity_score": 4,
+      "requires_signup": false,
+      "last_updated": "2025-12-19"
+    }
+  }
+}

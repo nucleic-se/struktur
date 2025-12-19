@@ -1,0 +1,15 @@
+{
+  "id": "css_011",
+  "class": "tool_link",
+  "url": "https://chakra-ui.com",
+  "title": "Chakra UI",
+  "description": "Simple, modular and accessible component library for React",
+  "category": "Component Libraries",
+  "github_stars": 37000,
+  "language": "TypeScript",
+  "license": "MIT",
+  "tags": [
+    "component-library",
+    "css-framework"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "class": "collection_metadata",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "id": {"type": "string"},
+      "class": {"type": "string"},
+      "title": {"type": "string"},
+      "description": {"type": "string"},
+      "url": {"type": "string"}
+    },
+    "required": ["id", "class", "title", "description", "url"]
+  }
+}

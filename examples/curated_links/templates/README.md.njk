@@ -1,0 +1,75 @@
+# {{ instances_by_id['metadata'].title }}
+
+{{ instances_by_id['metadata'].description }}
+
+**Total Links:** {% set count = 0 %}{% for i in instances %}{% if i.class == 'tool_link' %}{% set count = count + 1 %}{% endif %}{% endfor %}{{ count }}
+
+---
+
+## Table of Contents
+
+{% set links = [] %}{% for i in instances %}{% if i.class == 'tool_link' %}{% set links = links.concat([i]) %}{% endif %}{% endfor %}
+{% set categories = [] %}
+{% for instance in links %}
+  {% if instance.category and instance.category not in categories %}
+    {% set categories = categories.concat([instance.category]) %}
+  {% endif %}
+{% endfor %}
+{% set categories = categories | sort %}
+{% for category in categories %}
+- [{{ category }}](#{{ category | lower | replace(" ", "-") }})
+{% endfor %}
+
+---
+
+{% for category in categories %}
+{% set category_links = [] %}
+{% for instance in links %}
+  {% if instance.category == category %}
+    {% set category_links = category_links.concat([instance]) %}
+  {% endif %}
+{% endfor %}
+{% if category_links | length > 0 %}
+## {{ category }}
+
+| Tool | Description | Stars | Language | License |
+|------|-------------|-------|----------|---------|
+{% for link in category_links | sort(attribute='title') %}
+| [{{ link.title }}]({{ link.url }}) | {{ link.description }} | {% if link.github_stars %}⭐ {{ link.github_stars | int | string }}{% else %}N/A{% endif %} | {{ link.language or 'N/A' }} | {{ link.license or 'N/A' }} |
+{% endfor %}
+
+{% endif %}
+{% endfor %}
+
+---
+
+## Tags
+
+Popular tags in this collection:
+
+{% set all_tags_nested = [] %}
+{% for instance in instances if instance.id != 'global' %}
+  {% if instance.tags %}
+    {% set all_tags_nested = all_tags_nested.concat([instance.tags]) %}
+  {% endif %}
+{% endfor %}
+{% set all_tags = [] %}
+{% for tag_array in all_tags_nested %}
+  {% set all_tags = all_tags.concat(tag_array) %}
+{% endfor %}
+
+{% set unique_tags = [] %}
+{% for tag in all_tags %}
+  {% if tag not in unique_tags %}
+    {% set _ = unique_tags.push(tag) %}
+  {% endif %}
+{% endfor %}
+{% for tag in unique_tags | sort %}
+`{{ tag }}` {% endfor %}
+
+---
+
+<div align="center">
+  <p><strong>Made with ⚡ <a href="https://github.com/nucleic-se/struktur">Struktur</a></strong></p>
+  <p><em>Build system for coordinated configuration</em></p>
+</div>

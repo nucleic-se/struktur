@@ -1,0 +1,15 @@
+{
+  "id": "test_014",
+  "class": "tool_link",
+  "title": "MSW",
+  "url": "https://mswjs.io",
+  "description": "Seamless REST/GraphQL API mocking library for browser and Node.js",
+  "category": "Mocking",
+  "github_stars": 15000,
+  "language": "TypeScript",
+  "license": "MIT",
+  "tags": [
+    "mocking",
+    "testing"
+  ]
+}

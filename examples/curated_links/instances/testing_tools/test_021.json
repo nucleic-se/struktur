@@ -1,0 +1,15 @@
+{
+  "id": "test_021",
+  "class": "tool_link",
+  "url": "https://testcafe.io",
+  "title": "TestCafe",
+  "description": "Node.js tool to automate end-to-end web testing",
+  "category": "E2E Testing",
+  "github_stars": 10000,
+  "language": "JavaScript",
+  "license": "MIT",
+  "tags": [
+    "e2e-testing",
+    "testing"
+  ]
+}

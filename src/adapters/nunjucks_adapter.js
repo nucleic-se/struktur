@@ -106,21 +106,39 @@ export default class NunjucksAdapter extends TemplateAdapter {
     return new Promise((resolve, reject) => {
       this.env.render(templateName, context, (err, result) => {
         if (err) {
-          // Try with .njk extension if original failed
-          if (!templateName.endsWith('.njk')) {
+          // Check if it's a "not found" error vs render error
+          const isNotFound = err.message.includes('template not found');
+          
+          // Try with .njk extension if original failed with "not found"
+          if (isNotFound && !templateName.endsWith('.njk')) {
             this.env.render(`${templateName}.njk`, context, (err2, result2) => {
               if (err2) {
-                reject(new Error(`Template not found: ${templateName} (searched: ${this.searchPaths.join(', ')})`));
+                // Check if second attempt also failed
+                const isNotFound2 = err2.message.includes('template not found');
+                
+                if (isNotFound2) {
+                  // Both attempts couldn't find the file
+                  reject(new Error(`Template not found: ${templateName} (searched: ${this.searchPaths.join(', ')})`));
+                } else {
+                  // Found the file but render failed
+                  const location = err2.message.match(/\[Line (\d+), Column (\d+)\]/);
+                  const locationStr = location ? ` at line ${location[1]}, column ${location[2]}` : '';
+                  reject(new Error(`Template render error in ${templateName}.njk${locationStr}:\n  ${err2.message}`));
+                }
               } else {
                 resolve(result2);
               }
             });
           } else {
-            // Normalize error message to match expected format
-            const errorMsg = err.message.includes('template not found')
-              ? `Template not found: ${templateName} (searched: ${this.searchPaths.join(', ')})`
-              : `Failed to render ${templateName}: ${err.message}`;
-            reject(new Error(errorMsg));
+            // Either already has .njk extension or it's a render error (not "not found")
+            if (isNotFound) {
+              reject(new Error(`Template not found: ${templateName} (searched: ${this.searchPaths.join(', ')})`));
+            } else {
+              // Render error - extract location if available
+              const location = err.message.match(/\[Line (\d+), Column (\d+)\]/);
+              const locationStr = location ? ` at line ${location[1]}, column ${location[2]}` : '';
+              reject(new Error(`Template render error in ${templateName}${locationStr}:\n  ${err.message}`));
+            }
           }
         } else {
           resolve(result);

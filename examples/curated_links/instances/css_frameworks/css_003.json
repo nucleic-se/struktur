@@ -1,0 +1,15 @@
+{
+  "id": "css_003",
+  "class": "tool_link",
+  "url": "https://get.foundation",
+  "title": "Foundation",
+  "description": "Advanced responsive front-end framework for professional websites and applications",
+  "category": "Component Libraries",
+  "github_stars": 29000,
+  "language": "CSS",
+  "license": "MIT",
+  "tags": [
+    "component-library",
+    "css-framework"
+  ]
+}

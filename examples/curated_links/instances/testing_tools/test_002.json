@@ -1,0 +1,15 @@
+{
+  "id": "test_002",
+  "class": "tool_link",
+  "url": "https://vitest.dev",
+  "title": "Vitest",
+  "description": "Blazing fast unit test framework powered by Vite with Jest-compatible API",
+  "category": "Unit Testing",
+  "github_stars": 13000,
+  "language": "TypeScript",
+  "license": "MIT",
+  "tags": [
+    "unit-testing",
+    "testing"
+  ]
+}

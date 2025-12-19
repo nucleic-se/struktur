@@ -1,0 +1,14 @@
+{
+  "id": "test_020",
+  "class": "tool_link",
+  "title": "Lighthouse",
+  "url": "https://github.com/GoogleChrome/lighthouse",
+  "description": "Automated auditing, performance metrics, and best practices for web apps",
+  "category": "Performance",
+  "github_stars": 28000,
+  "language": "JavaScript",
+  "license": "Apache-2.0",
+  "tags": [
+    "general"
+  ]
+}

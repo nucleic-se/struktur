@@ -1,0 +1,14 @@
+{
+  "id": "test_035",
+  "class": "tool_link",
+  "url": "https://storybook.js.org/addons/@storybook/addon-storyshots",
+  "title": "Storyshots",
+  "description": "Snapshot testing for Storybook",
+  "category": "Visual Testing",
+  "github_stars": 84000,
+  "language": "TypeScript",
+  "license": "MIT",
+  "tags": [
+    "general"
+  ]
+}

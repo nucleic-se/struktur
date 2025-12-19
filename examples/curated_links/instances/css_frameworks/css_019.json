@@ -1,0 +1,15 @@
+{
+  "id": "css_019",
+  "class": "tool_link",
+  "url": "https://stylus-lang.com",
+  "title": "Stylus",
+  "description": "Expressive, dynamic, robust CSS preprocessor with Python-like syntax",
+  "category": "Preprocessors",
+  "github_stars": 11000,
+  "language": "JavaScript",
+  "license": "MIT",
+  "tags": [
+    "preprocessor",
+    "css-tool"
+  ]
+}

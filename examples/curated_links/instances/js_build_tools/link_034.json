@@ -1,0 +1,25 @@
+{
+  "id": "link_034",
+  "class": "tool_link",
+  "url": "https://storybook.js.org",
+  "title": "Storybook",
+  "description": "Frontend workshop for building UI components and pages in isolation",
+  "category": "Development Tools",
+  "tags": [
+    "general"
+  ],
+  "date_added": "2025-12-19",
+  "language": "TypeScript",
+  "github_stars": 84000,
+  "license": "MIT",
+  "github_url": "https://github.com/storybookjs/storybook",
+  "aspects": {
+    "quality": {
+      "is_maintained": true,
+      "is_free": true,
+      "popularity_score": 5,
+      "requires_signup": false,
+      "last_updated": "2025-12-19"
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "link_025",
+  "class": "tool_link",
+  "url": "https://nx.dev",
+  "title": "Nx",
+  "description": "Smart, fast and extensible build system with first class monorepo support",
+  "category": "Monorepo Tools",
+  "tags": [
+    "general"
+  ],
+  "date_added": "2025-12-19",
+  "language": "TypeScript",
+  "github_stars": 23000,
+  "license": "MIT",
+  "github_url": "https://github.com/nrwl/nx",
+  "aspects": {
+    "quality": {
+      "is_maintained": true,
+      "is_free": true,
+      "popularity_score": 4,
+      "requires_signup": false,
+      "last_updated": "2025-12-19"
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "test_008",
+  "class": "tool_link",
+  "title": "Puppeteer",
+  "url": "https://pptr.dev",
+  "description": "Node.js library for controlling Chrome/Chromium over DevTools Protocol",
+  "category": "E2E Testing",
+  "github_stars": 88000,
+  "language": "TypeScript",
+  "license": "Apache-2.0",
+  "tags": [
+    "e2e-testing",
+    "testing"
+  ]
+}

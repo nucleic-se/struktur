@@ -1,0 +1,15 @@
+{
+  "id": "css_030",
+  "class": "tool_link",
+  "url": "https://linaria.dev",
+  "title": "Linaria",
+  "description": "Zero-runtime CSS in JS library with ahead-of-time compilation",
+  "category": "CSS-in-JS",
+  "github_stars": 12000,
+  "language": "TypeScript",
+  "license": "MIT",
+  "tags": [
+    "css-in-js",
+    "javascript"
+  ]
+}

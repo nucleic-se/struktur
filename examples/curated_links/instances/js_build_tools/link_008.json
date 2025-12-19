@@ -1,0 +1,26 @@
+{
+  "id": "link_008",
+  "class": "tool_link",
+  "url": "https://www.typescriptlang.org",
+  "title": "TypeScript",
+  "description": "Typed superset of JavaScript that compiles to plain JavaScript",
+  "category": "Transpilers",
+  "tags": [
+    "transpiler",
+    "compiler"
+  ],
+  "date_added": "2025-12-19",
+  "language": "TypeScript",
+  "github_stars": 100000,
+  "license": "Apache-2.0",
+  "github_url": "https://github.com/microsoft/TypeScript",
+  "aspects": {
+    "quality": {
+      "is_maintained": true,
+      "is_free": true,
+      "popularity_score": 5,
+      "requires_signup": false,
+      "last_updated": "2025-12-19"
+    }
+  }
+}

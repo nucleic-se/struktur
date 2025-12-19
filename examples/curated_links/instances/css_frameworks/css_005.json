@@ -1,0 +1,15 @@
+{
+  "id": "css_005",
+  "class": "tool_link",
+  "url": "https://styled-components.com",
+  "title": "styled-components",
+  "description": "CSS-in-JS library for styling React components with tagged template literals",
+  "category": "CSS-in-JS",
+  "github_stars": 40000,
+  "language": "JavaScript",
+  "license": "MIT",
+  "tags": [
+    "css-in-js",
+    "javascript"
+  ]
+}

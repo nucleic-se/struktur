@@ -1,0 +1,15 @@
+{
+  "id": "css_025",
+  "class": "tool_link",
+  "url": "https://vuetifyjs.com",
+  "title": "Vuetify",
+  "description": "Material Design component framework for Vue.js",
+  "category": "Component Libraries",
+  "github_stars": 40000,
+  "language": "TypeScript",
+  "license": "MIT",
+  "tags": [
+    "component-library",
+    "css-framework"
+  ]
+}

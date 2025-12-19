@@ -1,0 +1,15 @@
+{
+  "id": "css_006",
+  "class": "tool_link",
+  "url": "https://emotion.sh",
+  "title": "Emotion",
+  "description": "Performant and flexible CSS-in-JS library with powerful composition",
+  "category": "CSS-in-JS",
+  "github_stars": 17000,
+  "language": "JavaScript",
+  "license": "MIT",
+  "tags": [
+    "css-in-js",
+    "javascript"
+  ]
+}

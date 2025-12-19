@@ -1,0 +1,15 @@
+{
+  "id": "css_038",
+  "class": "tool_link",
+  "url": "https://css.master.co",
+  "title": "Master CSS",
+  "description": "Virtual CSS language with enhanced syntax",
+  "category": "Utility-First",
+  "github_stars": 1800,
+  "language": "TypeScript",
+  "license": "MIT",
+  "tags": [
+    "utility-first",
+    "css-framework"
+  ]
+}

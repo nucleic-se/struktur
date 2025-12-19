@@ -1,0 +1,15 @@
+{
+  "id": "test_026",
+  "class": "tool_link",
+  "url": "https://wallabyjs.com",
+  "title": "Wallaby.js",
+  "description": "Intelligent test runner for JavaScript with real-time feedback",
+  "category": "Unit Testing",
+  "github_stars": 3000,
+  "language": "JavaScript",
+  "license": "Commercial",
+  "tags": [
+    "unit-testing",
+    "testing"
+  ]
+}

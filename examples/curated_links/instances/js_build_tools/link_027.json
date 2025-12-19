@@ -1,0 +1,26 @@
+{
+  "id": "link_027",
+  "class": "tool_link",
+  "url": "https://terser.org",
+  "title": "Terser",
+  "description": "JavaScript mangler and compressor toolkit for ES6+",
+  "category": "Minifiers",
+  "tags": [
+    "minifier",
+    "optimization"
+  ],
+  "date_added": "2025-12-19",
+  "language": "JavaScript",
+  "github_stars": 8500,
+  "license": "BSD-2-Clause",
+  "github_url": "https://github.com/terser/terser",
+  "aspects": {
+    "quality": {
+      "is_maintained": true,
+      "is_free": true,
+      "popularity_score": 4,
+      "requires_signup": false,
+      "last_updated": "2025-12-19"
+    }
+  }
+}

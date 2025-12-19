@@ -1,0 +1,14 @@
+{
+  "id": "css_035",
+  "class": "tool_link",
+  "url": "https://michalsnik.github.io/aos",
+  "title": "AOS",
+  "description": "Animate On Scroll library using CSS3",
+  "category": "Animation",
+  "github_stars": 26000,
+  "language": "JavaScript",
+  "license": "MIT",
+  "tags": [
+    "general"
+  ]
+}

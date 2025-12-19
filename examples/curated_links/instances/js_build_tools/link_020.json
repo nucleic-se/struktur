@@ -1,0 +1,25 @@
+{
+  "id": "link_020",
+  "class": "tool_link",
+  "url": "https://deno.com",
+  "title": "Deno",
+  "description": "Secure runtime for JavaScript and TypeScript with built-in tooling",
+  "category": "Runtimes",
+  "tags": [
+    "general"
+  ],
+  "date_added": "2025-12-19",
+  "language": "Rust",
+  "github_stars": 94000,
+  "license": "MIT",
+  "github_url": "https://github.com/denoland/deno",
+  "aspects": {
+    "quality": {
+      "is_maintained": true,
+      "is_free": true,
+      "popularity_score": 4,
+      "requires_signup": false,
+      "last_updated": "2025-12-19"
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "id": "link_005",
+  "class": "tool_link",
+  "url": "https://parceljs.org",
+  "title": "Parcel",
+  "description": "Zero configuration build tool for the web with blazing fast performance",
+  "category": "Bundlers",
+  "tags": [
+    "bundler",
+    "build-tool"
+  ],
+  "date_added": "2025-12-19",
+  "language": "JavaScript",
+  "github_stars": 43000,
+  "license": "MIT",
+  "github_url": "https://github.com/parcel-bundler/parcel",
+  "aspects": {
+    "quality": {
+      "is_maintained": true,
+      "is_free": true,
+      "popularity_score": 4,
+      "requires_signup": false,
+      "last_updated": "2025-12-19"
+    }
+  }
+}

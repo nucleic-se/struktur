@@ -1,0 +1,26 @@
+{
+  "id": "link_014",
+  "class": "tool_link",
+  "url": "https://prettier.io",
+  "title": "Prettier",
+  "description": "Opinionated code formatter that supports many languages",
+  "category": "Formatters",
+  "tags": [
+    "formatter",
+    "code-style"
+  ],
+  "date_added": "2025-12-19",
+  "language": "JavaScript",
+  "github_stars": 49000,
+  "license": "MIT",
+  "github_url": "https://github.com/prettier/prettier",
+  "aspects": {
+    "quality": {
+      "is_maintained": true,
+      "is_free": true,
+      "popularity_score": 5,
+      "requires_signup": false,
+      "last_updated": "2025-12-19"
+    }
+  }
+}

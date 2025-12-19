@@ -1,0 +1,27 @@
+{
+  "collection": {
+    "title": "{{ instances_by_id['metadata'].title }}",
+    "description": "{{ instances_by_id['metadata'].description }}",
+    "url": "{{ instances_by_id['metadata'].url }}",
+    "total_links": {% set count = 0 %}{% for i in instances %}{% if i.class == 'tool_link' %}{% set count = count + 1 %}{% endif %}{% endfor %}{{ count }}
+  },
+  "links": [
+    {% for link in instances %}{% if link.class == 'tool_link' %}
+    {
+      "id": "{{ link.id }}",
+      "title": "{{ link.title }}",
+      "url": "{{ link.url }}",
+      "description": "{{ link.description }}",
+      "category": "{{ link.category }}",
+      {% if link.github_stars %}"github_stars": {{ link.github_stars }},{% endif %}
+      {% if link.language %}"language": "{{ link.language }}",{% endif %}
+      {% if link.license %}"license": "{{ link.license }}",{% endif %}
+      {% if link.tags %}"tags": {{ link.tags | dump | safe }}{% else %}"tags": []{% endif %}
+    }{% if not loop.last %},{% endif %}
+    {% endif %}{% endfor %}
+  ],
+  "metadata": {
+    "generated_by": "Struktur",
+    "format_version": "1.0"
+  }
+}

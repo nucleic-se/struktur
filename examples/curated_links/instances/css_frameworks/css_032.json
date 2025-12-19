@@ -1,0 +1,15 @@
+{
+  "id": "css_032",
+  "class": "tool_link",
+  "url": "https://github.com/ben-rogerson/twin.macro",
+  "title": "Twin.macro",
+  "description": "Blends Tailwind classes with css-in-js",
+  "category": "CSS-in-JS",
+  "github_stars": 7900,
+  "language": "JavaScript",
+  "license": "MIT",
+  "tags": [
+    "css-in-js",
+    "javascript"
+  ]
+}

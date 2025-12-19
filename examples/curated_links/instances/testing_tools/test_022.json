@@ -1,0 +1,15 @@
+{
+  "id": "test_022",
+  "class": "tool_link",
+  "url": "https://nightwatchjs.org",
+  "title": "Nightwatch.js",
+  "description": "Integrated testing framework powered by Node.js and Selenium",
+  "category": "E2E Testing",
+  "github_stars": 12000,
+  "language": "JavaScript",
+  "license": "MIT",
+  "tags": [
+    "e2e-testing",
+    "testing"
+  ]
+}

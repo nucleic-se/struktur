@@ -1,0 +1,15 @@
+{
+  "id": "css_020",
+  "class": "tool_link",
+  "url": "https://stitches.dev",
+  "title": "Stitches",
+  "description": "CSS-in-JS with near-zero runtime, SSR, multi-variant support",
+  "category": "CSS-in-JS",
+  "github_stars": 7800,
+  "language": "TypeScript",
+  "license": "MIT",
+  "tags": [
+    "css-in-js",
+    "javascript"
+  ]
+}

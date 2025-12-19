@@ -1,0 +1,14 @@
+{
+  "id": "css_028",
+  "class": "tool_link",
+  "url": "https://watercss.kognise.dev",
+  "title": "Water.css",
+  "description": "Just-add-water CSS framework with no classes needed",
+  "category": "Lightweight",
+  "github_stars": 8000,
+  "language": "CSS",
+  "license": "MIT",
+  "tags": [
+    "general"
+  ]
+}

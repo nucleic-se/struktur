@@ -1,0 +1,25 @@
+{
+  "id": "link_039",
+  "class": "tool_link",
+  "url": "https://github.com/google/wireit",
+  "title": "Wireit",
+  "description": "Upgrades npm scripts to make them smarter and more efficient",
+  "category": "Development Tools",
+  "tags": [
+    "general"
+  ],
+  "date_added": "2025-12-19",
+  "language": "TypeScript",
+  "github_stars": 5700,
+  "license": "Apache-2.0",
+  "github_url": "https://github.com/google/wireit",
+  "aspects": {
+    "quality": {
+      "is_maintained": true,
+      "is_free": true,
+      "popularity_score": 3,
+      "requires_signup": false,
+      "last_updated": "2025-12-19"
+    }
+  }
+}

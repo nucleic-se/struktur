@@ -1,0 +1,15 @@
+{
+  "id": "test_013",
+  "class": "tool_link",
+  "title": "Sinon",
+  "url": "https://sinonjs.org",
+  "description": "Standalone test spies, stubs and mocks for JavaScript",
+  "category": "Mocking",
+  "github_stars": 9600,
+  "language": "JavaScript",
+  "license": "BSD-3-Clause",
+  "tags": [
+    "mocking",
+    "testing"
+  ]
+}

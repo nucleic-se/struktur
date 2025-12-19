@@ -1,0 +1,14 @@
+{
+  "id": "css_015",
+  "class": "tool_link",
+  "url": "https://purecss.io",
+  "title": "PureCSS",
+  "description": "Set of small, responsive CSS modules that you can use in every web project",
+  "category": "Lightweight",
+  "github_stars": 23000,
+  "language": "CSS",
+  "license": "BSD",
+  "tags": [
+    "general"
+  ]
+}

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ instances_by_id['metadata'].title }}</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    h1 { font-size: 2.5rem; margin-bottom: 1rem; }
+    .subtitle { font-size: 1.2rem; opacity: 0.9; }
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 1.5rem;
+      font-size: 0.9rem;
+    }
+    .search-filter {
+      padding: 2rem;
+      background: #f8f9fa;
+      border-bottom: 1px solid #e9ecef;
+    }
+    .search-box {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    input[type="text"] {
+      flex: 1;
+      min-width: 250px;
+      padding: 0.75rem 1rem;
+      border: 2px solid #dee2e6;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    select {
+      padding: 0.75rem 1rem;
+      border: 2px solid #dee2e6;
+      border-radius: 8px;
+      font-size: 1rem;
+      background: white;
+      cursor: pointer;
+    }
+    .tags-filter {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .tag {
+      padding: 0.4rem 0.8rem;
+      background: #e9ecef;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .tag:hover {
+      background: #dee2e6;
+    }
+    .tag.active {
+      background: #667eea;
+      color: white;
+    }
+    .content {
+      padding: 2rem;
+    }
+    .link-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 1.5rem;
+    }
+    .link-card {
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      padding: 1.5rem;
+      transition: all 0.2s;
+      background: white;
+    }
+    .link-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transform: translateY(-2px);
+    }
+    .link-card h3 {
+      margin-bottom: 0.5rem;
+      color: #667eea;
+    }
+    .link-card a {
+      color: #667eea;
+      text-decoration: none;
+      font-size: 1.2rem;
+    }
+    .link-card a:hover {
+      text-decoration: underline;
+    }
+    .description {
+      color: #666;
+      margin: 0.5rem 0 1rem;
+      font-size: 0.95rem;
+    }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      font-size: 0.85rem;
+      color: #666;
+      padding-top: 1rem;
+      border-top: 1px solid #f0f0f0;
+    }
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .link-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin-top: 0.5rem;
+    }
+    .link-tag {
+      padding: 0.2rem 0.5rem;
+      background: #f8f9fa;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      color: #666;
+    }
+    .no-results {
+      text-align: center;
+      padding: 3rem;
+      color: #999;
+      font-size: 1.1rem;
+    }
+    footer {
+      text-align: center;
+      padding: 2rem;
+      background: #f8f9fa;
+      border-top: 1px solid #e9ecef;
+      color: #666;
+    }
+    footer a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>{{ instances_by_id['metadata'].title }}</h1>
+      <p class="subtitle">{{ instances_by_id['metadata'].description }}</p>
+      <div class="stats">
+        <span>📦 {% set count = 0 %}{% for i in instances %}{% if i.class == 'tool_link' %}{% set count = count + 1 %}{% endif %}{% endfor %}{{ count }} tools</span>
+      </div>
+    </header>
+
+    <div class="search-filter">
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="🔍 Search tools by name or description...">
+        <select id="categoryFilter">
+          <option value="">All Categories</option>
+          {% set categories = [] %}
+          {% for instance in instances %}
+            {% if instance.category and instance.category not in categories %}
+              {% set categories = categories.concat([instance.category]) %}
+            {% endif %}
+          {% endfor %}
+          {% for category in categories | sort %}
+          <option value="{{ category }}">{{ category }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="tags-filter" id="tagsFilter"></div>
+    </div>
+
+    <div class="content">
+      <div class="link-grid" id="linkGrid"></div>
+      <div class="no-results" id="noResults" style="display: none;">
+        No tools match your search criteria.
+      </div>
+    </div>
+
+    <footer>
+      <p><strong>Made with ⚡ <a href="https://github.com/nucleic-se/struktur" target="_blank">Struktur</a></strong></p>
+      <p><em>Build system for coordinated configuration</em></p>
+    </footer>
+  </div>
+
+  <script>
+    const links = [
+      {% for link in instances %}{% if link.class == 'tool_link' %}{
+        id: "{{ link.id }}",
+        title: "{{ link.title }}",
+        url: "{{ link.url }}",
+        description: "{{ link.description }}",
+        category: "{{ link.category }}",
+        {% if link.github_stars %}github_stars: {{ link.github_stars }},{% endif %}
+        {% if link.language %}language: "{{ link.language }}",{% endif %}
+        {% if link.license %}license: "{{ link.license }}",{% endif %}
+        tags: [{% if link.tags %}{% for tag in link.tags %}"{{ tag }}"{% if not loop.last %}, {% endif %}{% endfor %}{% endif %}]
+      },{% endif %}{% endfor %}
+    ];
+    
+    let activeTags = new Set();
+    let allTags = new Set();
+
+    // Extract all unique tags
+    links.forEach(link => {
+      if (link.tags) {
+        link.tags.forEach(tag => allTags.add(tag));
+      }
+    });
+
+    // Render tag filters
+    const tagsFilter = document.getElementById('tagsFilter');
+    Array.from(allTags).sort().forEach(tag => {
+      const tagEl = document.createElement('span');
+      tagEl.className = 'tag';
+      tagEl.textContent = tag;
+      tagEl.onclick = () => toggleTag(tag, tagEl);
+      tagsFilter.appendChild(tagEl);
+    });
+
+    function toggleTag(tag, element) {
+      if (activeTags.has(tag)) {
+        activeTags.delete(tag);
+        element.classList.remove('active');
+      } else {
+        activeTags.add(tag);
+        element.classList.add('active');
+      }
+      filterLinks();
+    }
+
+    function filterLinks() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const categoryFilter = document.getElementById('categoryFilter').value;
+
+      const filtered = links.filter(link => {
+        // Search filter
+        const matchesSearch = !searchTerm || 
+          link.title.toLowerCase().includes(searchTerm) ||
+          link.description.toLowerCase().includes(searchTerm);
+
+        // Category filter
+        const matchesCategory = !categoryFilter || link.category === categoryFilter;
+
+        // Tag filter
+        const matchesTags = activeTags.size === 0 || 
+          (link.tags && Array.from(activeTags).some(tag => link.tags.includes(tag)));
+
+        return matchesSearch && matchesCategory && matchesTags;
+      });
+
+      renderLinks(filtered);
+    }
+
+    function renderLinks(linksToShow) {
+      const grid = document.getElementById('linkGrid');
+      const noResults = document.getElementById('noResults');
+
+      if (linksToShow.length === 0) {
+        grid.style.display = 'none';
+        noResults.style.display = 'block';
+        return;
+      }
+
+      grid.style.display = 'grid';
+      noResults.style.display = 'none';
+
+      grid.innerHTML = linksToShow.map(link => `
+        <div class="link-card">
+          <h3><a href="${link.url}" target="_blank">${link.title}</a></h3>
+          <p class="description">${link.description}</p>
+          <div class="meta">
+            ${link.github_stars ? `<span class="meta-item">⭐ ${link.github_stars.toLocaleString()}</span>` : ''}
+            ${link.language ? `<span class="meta-item">💻 ${link.language}</span>` : ''}
+            ${link.license ? `<span class="meta-item">📄 ${link.license}</span>` : ''}
+          </div>
+          ${link.tags ? `
+            <div class="link-tags">
+              ${link.tags.map(tag => `<span class="link-tag">${tag}</span>`).join('')}
+            </div>
+          ` : ''}
+        </div>
+      `).join('');
+    }
+
+    // Event listeners
+    document.getElementById('searchInput').addEventListener('input', filterLinks);
+    document.getElementById('categoryFilter').addEventListener('change', filterLinks);
+
+    // Initial render
+    renderLinks(links);
+  </script>
+</body>
+</html>

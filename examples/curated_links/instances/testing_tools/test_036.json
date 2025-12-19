@@ -1,0 +1,14 @@
+{
+  "id": "test_036",
+  "class": "tool_link",
+  "url": "https://applitools.com",
+  "title": "Applitools",
+  "description": "AI-powered visual testing and monitoring platform",
+  "category": "Visual Testing",
+  "github_stars": 500,
+  "language": "JavaScript",
+  "license": "Commercial",
+  "tags": [
+    "general"
+  ]
+}

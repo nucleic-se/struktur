@@ -1,0 +1,15 @@
+{
+  "id": "css_009",
+  "class": "tool_link",
+  "url": "https://mui.com",
+  "title": "Material-UI",
+  "description": "Popular React UI framework implementing Google's Material Design",
+  "category": "Component Libraries",
+  "github_stars": 93000,
+  "language": "JavaScript",
+  "license": "MIT",
+  "tags": [
+    "component-library",
+    "css-framework"
+  ]
+}

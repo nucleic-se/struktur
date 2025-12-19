@@ -1,0 +1,15 @@
+{
+  "id": "test_004",
+  "class": "tool_link",
+  "url": "https://playwright.dev",
+  "title": "Playwright",
+  "description": "Cross-browser automation library for reliable end-to-end testing",
+  "category": "E2E Testing",
+  "github_stars": 65000,
+  "language": "TypeScript",
+  "license": "Apache-2.0",
+  "tags": [
+    "e2e-testing",
+    "testing"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "id": "css_024",
+  "class": "tool_link",
+  "url": "https://primeng.org",
+  "title": "PrimeNG",
+  "description": "Rich UI component library for Angular applications",
+  "category": "Component Libraries",
+  "github_stars": 10000,
+  "language": "TypeScript",
+  "license": "MIT",
+  "tags": [
+    "component-library",
+    "css-framework"
+  ]
+}

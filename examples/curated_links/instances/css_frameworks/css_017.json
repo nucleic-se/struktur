@@ -1,0 +1,14 @@
+{
+  "id": "css_017",
+  "class": "tool_link",
+  "url": "https://animate.style",
+  "title": "Animate.css",
+  "description": "Cross-browser library of ready-to-use CSS animations",
+  "category": "Animation",
+  "github_stars": 80000,
+  "language": "CSS",
+  "license": "MIT",
+  "tags": [
+    "general"
+  ]
+}

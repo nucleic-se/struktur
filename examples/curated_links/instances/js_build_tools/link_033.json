@@ -1,0 +1,26 @@
+{
+  "id": "link_033",
+  "class": "tool_link",
+  "url": "https://typedoc.org",
+  "title": "TypeDoc",
+  "description": "Documentation generator for TypeScript projects",
+  "category": "Documentation",
+  "tags": [
+    "documentation",
+    "tooling"
+  ],
+  "date_added": "2025-12-19",
+  "language": "TypeScript",
+  "github_stars": 7500,
+  "license": "Apache-2.0",
+  "github_url": "https://github.com/TypeStrong/typedoc",
+  "aspects": {
+    "quality": {
+      "is_maintained": true,
+      "is_free": true,
+      "popularity_score": 4,
+      "requires_signup": false,
+      "last_updated": "2025-12-19"
+    }
+  }
+}

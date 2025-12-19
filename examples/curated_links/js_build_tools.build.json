@@ -1,0 +1,14 @@
+{
+  "classes": ["classes"],
+  "instances": ["instances/js_build_tools"],
+  "templates": ["templates"],
+  "build_dir": "build/js_build_tools",
+  "exact": true,
+  "template_engine": "nunjucks",
+  "render": [
+    {"README.md.njk": "/README.md"},
+    {"index.html.njk": "/index.html"},
+    {"api.json.njk": "/api.json"},
+    {"feed.rss.njk": "/feed.rss"}
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "id": "css_023",
+  "class": "tool_link",
+  "url": "https://daisyui.com",
+  "title": "DaisyUI",
+  "description": "Tailwind CSS component library with clean HTML and customizable themes",
+  "category": "Component Libraries",
+  "github_stars": 33000,
+  "language": "CSS",
+  "license": "MIT",
+  "tags": [
+    "component-library",
+    "css-framework"
+  ]
+}

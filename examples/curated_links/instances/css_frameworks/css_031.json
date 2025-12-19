@@ -1,0 +1,15 @@
+{
+  "id": "css_031",
+  "class": "tool_link",
+  "url": "https://vanilla-extract.style",
+  "title": "Vanilla Extract",
+  "description": "Zero-runtime Stylesheets in TypeScript with type-safe styles",
+  "category": "CSS-in-JS",
+  "github_stars": 9500,
+  "language": "TypeScript",
+  "license": "MIT",
+  "tags": [
+    "css-in-js",
+    "javascript"
+  ]
+}

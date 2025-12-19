@@ -1,0 +1,25 @@
+{
+  "id": "link_030",
+  "class": "tool_link",
+  "url": "https://sass-lang.com",
+  "title": "Sass",
+  "description": "Mature, stable, and powerful professional grade CSS extension language",
+  "category": "CSS Tools",
+  "tags": [
+    "general"
+  ],
+  "date_added": "2025-12-19",
+  "language": "Dart",
+  "github_stars": 15000,
+  "license": "MIT",
+  "github_url": "https://github.com/sass/sass",
+  "aspects": {
+    "quality": {
+      "is_maintained": true,
+      "is_free": true,
+      "popularity_score": 5,
+      "requires_signup": false,
+      "last_updated": "2025-12-19"
+    }
+  }
+}

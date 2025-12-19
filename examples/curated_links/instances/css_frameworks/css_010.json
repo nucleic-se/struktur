@@ -1,0 +1,15 @@
+{
+  "id": "css_010",
+  "class": "tool_link",
+  "url": "https://ant.design",
+  "title": "Ant Design",
+  "description": "Enterprise-class UI design system and React component library",
+  "category": "Component Libraries",
+  "github_stars": 91000,
+  "language": "TypeScript",
+  "license": "MIT",
+  "tags": [
+    "component-library",
+    "css-framework"
+  ]
+}

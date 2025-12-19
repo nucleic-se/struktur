@@ -1,0 +1,14 @@
+{
+  "id": "css_033",
+  "class": "tool_link",
+  "url": "https://www.minimamente.com/project/magic",
+  "title": "Magic",
+  "description": "CSS3 animations with special effects",
+  "category": "Animation",
+  "github_stars": 8000,
+  "language": "CSS",
+  "license": "MIT",
+  "tags": [
+    "general"
+  ]
+}

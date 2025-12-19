@@ -1,0 +1,15 @@
+{
+  "id": "test_023",
+  "class": "tool_link",
+  "url": "https://www.protractortest.org",
+  "title": "Protractor",
+  "description": "End-to-end test framework for Angular applications",
+  "category": "E2E Testing",
+  "github_stars": 9000,
+  "language": "JavaScript",
+  "license": "MIT",
+  "tags": [
+    "e2e-testing",
+    "testing"
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "id": "link_010",
+  "class": "tool_link",
+  "url": "https://swc.rs",
+  "title": "SWC",
+  "description": "Super-fast TypeScript/JavaScript compiler written in Rust",
+  "category": "Transpilers",
+  "tags": [
+    "transpiler",
+    "compiler"
+  ],
+  "date_added": "2025-12-19",
+  "language": "Rust",
+  "github_stars": 31000,
+  "license": "Apache-2.0",
+  "github_url": "https://github.com/swc-project/swc",
+  "aspects": {
+    "quality": {
+      "is_maintained": true,
+      "is_free": true,
+      "popularity_score": 4,
+      "requires_signup": false,
+      "last_updated": "2025-12-19"
+    }
+  }
+}

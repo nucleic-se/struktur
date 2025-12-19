@@ -1,0 +1,15 @@
+{
+  "id": "test_030",
+  "class": "tool_link",
+  "url": "https://fakerjs.dev",
+  "title": "Faker.js",
+  "description": "Generate massive amounts of fake data in the browser and Node.js",
+  "category": "Mocking",
+  "github_stars": 13000,
+  "language": "TypeScript",
+  "license": "MIT",
+  "tags": [
+    "mocking",
+    "testing"
+  ]
+}
