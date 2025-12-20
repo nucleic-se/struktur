@@ -32,7 +32,7 @@
 {{!-- Generate individual blog post pages using render_file helper --}}
 {{#each instances}}
 {{#if (eq class "blog_post")}}
-{{render_file "layouts/blog-post" (concat "posts/" slug ".html") pathPrefix="../"}}
+{{render_file "layouts/blog-post" (concat "posts/" slug ".html")}}
 {{/if}}
 {{/each}}
 
@@ -45,5 +45,5 @@
 
 {{!-- Generate tag index pages --}}
 {{#each (unique (flatten (pluck (where instances "class" "blog_post") "aspects.blog_post.tags")))}}
-{{render_file "layouts/tag" (concat "tags/" this ".html") tagName=this posts=(where_includes @root.instances "aspects.blog_post.tags" this) pathPrefix="../"}}
+{{render_file "layouts/tag" (concat "tags/" this ".html") tagName=this posts=(where_includes @root.instances "aspects.blog_post.tags" this)}}
 {{/each}}

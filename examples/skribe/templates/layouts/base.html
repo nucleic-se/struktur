@@ -9,12 +9,12 @@
   {{/each}}
 </head>
 <body>
-  {{> partials/nav pathPrefix=pathPrefix}}
+  {{> partials/nav}}
 
   <main>
     {{{yield "content"}}}
   </main>
 
-  {{> partials/footer pathPrefix=pathPrefix}}
+  {{> partials/footer}}
 </body>
 </html>

@@ -264,9 +264,14 @@ export default class NunjucksAdapter extends TemplateAdapter {
         return '';
       }
       
+      // Calculate relative path prefix based on output depth
+      // E.g., 'posts/article.html' → '../', 'tags/tutorial.html' → '../'
+      const pathDepth = outputPath.split('/').length - 1;
+      const autoPathPrefix = pathDepth > 0 ? '../'.repeat(pathDepth) : '';
+      
       // Merge current context with provided context
       // IMPORTANT: Preserve __context for buffer system
-      const mergedContext = { ...this.ctx, ...context };
+      const mergedContext = { ...this.ctx, pathPrefix: autoPathPrefix, ...context };
       
       // Explicitly preserve __context reference
       if (this.ctx && typeof this.ctx === 'object' && this.ctx.__context) {

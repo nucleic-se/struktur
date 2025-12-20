@@ -280,23 +280,28 @@ export class HandlebarsAdapter extends TemplateAdapter {
         return '';
       }
       
+      // Calculate relative path prefix based on output depth
+      // E.g., 'posts/article.html' → '../', 'tags/tutorial.html' → '../'
+      const pathDepth = outputPath.split('/').length - 1;
+      const autoPathPrefix = pathDepth > 0 ? '../'.repeat(pathDepth) : '';
+      
       // Merge context with hash parameters
       // 'this' in a regular function is the Handlebars template context (the instance)
       // IMPORTANT: Preserve __context for buffer system from root context
       let context;
       if (options.hash) {
-        context = { ...this, ...options.hash };
+        context = { ...this, pathPrefix: autoPathPrefix, ...options.hash };
         // Preserve __context from root context (where it's attached)
         const rootContext = options.data?.root;
         if (rootContext && typeof rootContext === 'object' && rootContext.__context) {
           context.__context = rootContext.__context;
         }
       } else {
-        context = this;
+        context = { ...this, pathPrefix: autoPathPrefix };
         // Also check root context when no hash params
         const rootContext = options.data?.root;
-        if (rootContext && typeof rootContext === 'object' && rootContext.__context && !context.__context) {
-          context = { ...this, __context: rootContext.__context };
+        if (rootContext && typeof rootContext === 'object' && rootContext.__context) {
+          context.__context = rootContext.__context;
         }
       }
       
