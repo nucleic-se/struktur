@@ -31,6 +31,7 @@ Understanding Struktur's data model:
 - **[Canonical Output](concepts-canonical.md)** - Merged data structure
 - **[Validation](concepts-validation.md)** - Multi-layer schema checking
 - **[Templates](concepts-templates.md)** - Generate text from validated data
+- **[Template Buffers](concepts-template-buffers.md)** - Named content buffers for layouts and multi-file output
 
 ## 📖 Reference
 

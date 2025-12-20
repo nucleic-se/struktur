@@ -805,6 +805,92 @@ Resolve tag values (e.g., `@domain.name`).
 
 ---
 
+## Template Composition Helpers
+
+### `buffer` / `yield()`
+
+Named content buffers for template composition and multi-file output.
+
+**Write to buffer:**
+
+**Nunjucks:**
+```nunjucks
+{% buffer name="sidebar" %}
+  <div class="sidebar">Navigation</div>
+{% endbuffer %}
+```
+
+**Handlebars:**
+```handlebars
+{{#buffer name="sidebar"}}
+  <div class="sidebar">Navigation</div>
+{{/buffer}}
+```
+
+**Read from buffer:**
+
+**Nunjucks:**
+```nunjucks
+<aside>{{ yield('sidebar') }}</aside>
+```
+
+**Handlebars:**
+```handlebars
+<aside>{{{yield "sidebar"}}}</aside>
+```
+
+**Parameters:**
+- `name` - Buffer name (string)
+- `mode` - Write mode: `"replace"` (default), `"append"`, or `"prepend"`
+- `destination` - Optional file path for multi-file output
+
+**Write Modes:**
+
+```nunjucks
+{# Replace (default) - overwrites previous content #}
+{% buffer name="title" %}My Page{% endbuffer %}
+
+{# Append - adds to end #}
+{% buffer name="scripts" mode="append" %}
+  <script src="base.js"></script>
+{% endbuffer %}
+{% buffer name="scripts" mode="append" %}
+  <script src="extra.js"></script>
+{% endbuffer %}
+
+{# Prepend - adds to beginning #}
+{% buffer name="styles" mode="prepend" %}
+  <link href="reset.css">  {# Will appear first #}
+{% endbuffer %}
+```
+
+**Multi-File Output:**
+
+```nunjucks
+{# Write to docker-compose.yml #}
+{% buffer name="service" destination="docker-compose.yml" mode="append" %}
+services:
+  {{id}}:
+    image: {{image}}
+{% endbuffer %}
+
+{# Write to README.md #}
+{% buffer name="docs" destination="README.md" mode="append" %}
+## {{id}}
+Documentation here.
+{% endbuffer %}
+```
+
+**Common Use Cases:**
+- Layout templates with content areas
+- Accumulating scripts/styles from components
+- Generating multiple output files from one template
+- Template composition without inheritance
+
+**See:** [Concepts: Template Buffers](concepts-template-buffers.md) for comprehensive guide with examples.
+
+---
+
 ## Engine-Specific Helpers
 
 ### `render_file(template, outputPath, context)`

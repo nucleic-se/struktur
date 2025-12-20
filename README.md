@@ -604,6 +604,28 @@ universal_base → validates common fields
 docked_container → validates container-specific fields
 ```
 
+### Template Buffers
+
+Named content buffers for layouts and multi-file output:
+
+```nunjucks
+{# Write to buffers #}
+{% buffer name="content" %}
+  <h1>{{title}}</h1>
+  <p>{{description}}</p>
+{% endbuffer %}
+
+{# Read from buffers in layout #}
+<main>{{ yield('content') }}</main>
+
+{# Multi-file output #}
+{% buffer name="config" destination="docker-compose.yml" mode="append" %}
+  {{id}}: ...
+{% endbuffer %}
+```
+
+**See:** [Concepts: Template Buffers](docs/concepts-template-buffers.md)
+
 ## Template Helpers
 
 ### Built-in Helpers

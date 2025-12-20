@@ -13,7 +13,7 @@ Validated Data + Template = Generated Output
 **Key Features:**
 - **Pre-flight validation** - All template errors found before rendering starts
 - **Smart error messages** - File paths, line numbers, and helpful suggestions
-- **Buffer system** - Support for template composition (extends/yields pattern)
+- **Buffer system** - Named content buffers for layouts and multi-file output (see [Concepts: Template Buffers](concepts-template-buffers.md))
 - **Flexible formats** - Both old and new task formats supported
 
 ---
