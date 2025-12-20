@@ -65,14 +65,16 @@ The `render` field specifies which templates to render and where to output them:
 ```json
 {
   "render": [
-    { "nginx.conf.hbs": "/nginx.conf" },
-    { "docker-compose.yml.hbs": "/docker-compose.yml" },
-    { "README.md.hbs": "/README.md" }
+    { "template": "nginx.conf.hbs", "output": "/nginx.conf" },
+    { "template": "docker-compose.yml.hbs", "output": "/docker-compose.yml" },
+    { "template": "README.md.hbs", "output": "/README.md" }
   ]
 }
 ```
 
-Each entry maps a template file to an output path (relative to `build_dir`).
+Each entry requires:
+- **`template`** - Template file name (with extension)
+- **`output`** - Output path (relative to `build_dir`)
 
 ### Validation Options
 
@@ -99,9 +101,9 @@ Each entry maps a template file to an output path (relative to `build_dir`).
   "build_dir": "build",
   "template_engine": "handlebars",
   "render": [
-    { "index.html.hbs": "/index.html" },
-    { "api/docs.html.hbs": "/api/docs.html" },
-    { "config/nginx.conf.hbs": "/nginx.conf" }
+    { "template": "index.html.hbs", "output": "/index.html" },
+    { "template": "api/docs.html.hbs", "output": "/api/docs.html" },
+    { "template": "config/nginx.conf.hbs", "output": "/nginx.conf" }
   ],
   "exact": true,
   "warn_extra_fields": true,
@@ -121,8 +123,8 @@ You can build template outputs without any instances:
   "build_dir": "build",
   "template_engine": "handlebars",
   "render": [
-    { "site.html.hbs": "/index.html" },
-    { "about.html.hbs": "/about.html" }
+    { "template": "site.html.hbs", "output": "/index.html" },
+    { "template": "about.html.hbs", "output": "/about.html" }
   ]
 }
 ```

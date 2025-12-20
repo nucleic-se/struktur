@@ -6,9 +6,9 @@
   "exact": true,
   "template_engine": "nunjucks",
   "render": [
-    {"README.md.njk": "/README.md"},
-    {"index.html.njk": "/index.html"},
-    {"api.json.njk": "/api.json"},
-    {"feed.rss.njk": "/feed.rss"}
+    {"template": "README.md.njk", "output": "/README.md"},
+    {"template": "index.html.njk", "output": "/index.html"},
+    {"template": "api.json.njk", "output": "/api.json"},
+    {"template": "feed.rss.njk", "output": "/feed.rss"}
   ]
 }
