@@ -1,16 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-{{> partials/head pageTitle=title pathPrefix=pathPrefix}}
-<body>
-  {{> partials/nav pathPrefix=pathPrefix}}
+{{!-- Page Layout using Buffer System --}}
 
+{{!-- Set page metadata --}}
+{{#buffer name="page_title"}}{{title}}{{/buffer}}
+{{#buffer name="title_separator"}} - {{/buffer}}
+
+{{!-- Main content --}}
+{{#buffer name="content"}}
   <article>
     <h1>{{title}}</h1>
     <div class="page-content">
       <p>{{{replace (escape aspects.page.content) "\n\n" "</p><p>"}}}</p>
     </div>
   </article>
+{{/buffer}}
 
-  {{> partials/footer pathPrefix=pathPrefix}}
-</body>
-</html>
+{{!-- Render with base layout --}}
+{{> layouts/base}}

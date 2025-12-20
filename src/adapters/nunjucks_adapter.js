@@ -265,7 +265,13 @@ export default class NunjucksAdapter extends TemplateAdapter {
       }
       
       // Merge current context with provided context
+      // IMPORTANT: Preserve __context for buffer system
       const mergedContext = { ...this.ctx, ...context };
+      
+      // Explicitly preserve __context reference
+      if (this.ctx && typeof this.ctx === 'object' && this.ctx.__context) {
+        mergedContext.__context = this.ctx.__context;
+      }
       
       try {
         // Render the template

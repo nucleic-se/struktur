@@ -282,7 +282,23 @@ export class HandlebarsAdapter extends TemplateAdapter {
       
       // Merge context with hash parameters
       // 'this' in a regular function is the Handlebars template context (the instance)
-      const context = options.hash ? { ...this, ...options.hash } : this;
+      // IMPORTANT: Preserve __context for buffer system from root context
+      let context;
+      if (options.hash) {
+        context = { ...this, ...options.hash };
+        // Preserve __context from root context (where it's attached)
+        const rootContext = options.data?.root;
+        if (rootContext && typeof rootContext === 'object' && rootContext.__context) {
+          context.__context = rootContext.__context;
+        }
+      } else {
+        context = this;
+        // Also check root context when no hash params
+        const rootContext = options.data?.root;
+        if (rootContext && typeof rootContext === 'object' && rootContext.__context && !context.__context) {
+          context = { ...this, __context: rootContext.__context };
+        }
+      }
       
       // Create data frame
       const data = handlebars.createFrame(options.data || {});

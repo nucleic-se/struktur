@@ -1,9 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-{{> partials/head pageTitle=title pathPrefix=pathPrefix}}
-<body>
-  {{> partials/nav pathPrefix=pathPrefix}}
+{{!-- Blog Post Layout using Buffer System --}}
 
+{{!-- Set page metadata --}}
+{{#buffer name="page_title"}}{{title}}{{/buffer}}
+{{#buffer name="title_separator"}} - {{/buffer}}
+
+{{!-- Main content --}}
+{{#buffer name="content"}}
   <article>
     <h1>{{title}}</h1>
     <div class="post-meta">
@@ -16,7 +18,7 @@
     {{> partials/tags pathPrefix=pathPrefix tags=aspects.blog_post.tags}}
     {{/if}}
   </article>
+{{/buffer}}
 
-  {{> partials/footer pathPrefix=pathPrefix}}
-</body>
-</html>
+{{!-- Render with base layout --}}
+{{> layouts/base}}

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{{yield "page_title"}}}{{{yield "title_separator"}}}{{@root.global.site.title}}</title>
+  {{#each @root.global.stylesheets}}
+  <link rel="stylesheet" href="{{{../pathPrefix}}}{{this}}">
+  {{/each}}
+</head>
+<body>
+  {{> partials/nav pathPrefix=pathPrefix}}
+
+  <main>
+    {{{yield "content"}}}
+  </main>
+
+  {{> partials/footer pathPrefix=pathPrefix}}
+</body>
+</html>

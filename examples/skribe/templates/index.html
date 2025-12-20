@@ -1,9 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-{{> partials/head}}
-<body>
-  {{> partials/nav}}
+{{!-- Homepage using Buffer System --}}
 
+{{!-- Set page metadata --}}
+{{#buffer name="page_title"}}{{global.site.title}}{{/buffer}}
+{{#buffer name="title_separator"}}{{/buffer}}
+
+{{!-- Main content --}}
+{{#buffer name="content"}}
   <h1>{{global.site.title}}</h1>
   <p>{{global.site.description}}</p>
 
@@ -22,10 +24,10 @@
   </article>
   {{/if}}
   {{/each}}
+{{/buffer}}
 
-  {{> partials/footer}}
-</body>
-</html>
+{{!-- Render with base layout --}}
+{{> layouts/base}}
 
 {{!-- Generate individual blog post pages using render_file helper --}}
 {{#each instances}}
