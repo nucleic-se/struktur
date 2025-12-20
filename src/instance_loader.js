@@ -166,24 +166,26 @@ export async function loadInstancesFromDir(dirPath, options = {}) {
             const data = JSON.parse(content);
 
             if (Array.isArray(data)) {
-              // Process each item in array
-              for (const item of data) {
-                if (item && typeof item === 'object' && item.id) {
-                  if (item.class) {
-                    instances.push({ ...item, _source_file: fullPath });
-                  } else {
-                    // Reject classless instances
-                    classlessRejects.push({ id: item.id, file: path.basename(fullPath) });
-                  }
-                }
+              // Reject array instance files
+              if (logger?.warn) {
+                logger.warn(
+                  `Array instance files are not supported: ${fullPath}\n\n` +
+                  'Each instance must be in its own file.\n' +
+                  'If you have multiple instances, create multiple files:\n' +
+                  '  instances/server1.json\n' +
+                  '  instances/server2.json'
+                );
               }
-            } else if (data && typeof data === 'object' && data.id) {
+              continue;
+            }
+            
+            if (data && typeof data === 'object' && data.id) {
               // Single object with id
-              if (data.class) {
-                instances.push({ ...data, _source_file: fullPath });
-              } else {
+              if (!data.class) {
                 // Reject classless instances
                 classlessRejects.push({ id: data.id, file: path.basename(fullPath) });
+              } else {
+                instances.push({ ...data, _source_file: fullPath });
               }
             }
           } catch (error) {
