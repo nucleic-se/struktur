@@ -9,6 +9,11 @@ import fs from 'fs/promises';
 import path from 'path';
 import { TemplateAdapter } from '../template_adapter.js';
 import { resolveOutputPath } from '../template_helpers/engine/index.js';
+import {
+  TemplateNotFoundError,
+  TemplateSyntaxError,
+  TemplateRenderError
+} from '../template_errors.js';
 
 export class HandlebarsAdapter extends TemplateAdapter {
   constructor(config = {}) {
@@ -32,13 +37,41 @@ export class HandlebarsAdapter extends TemplateAdapter {
   async render(templatePath, context) {
     // Resolve template path
     const resolvedPath = await this._resolveTemplatePath(templatePath);
+    
+    if (!resolvedPath) {
+      // Template not found
+      const searchedPaths = this.searchPaths.map(p => path.join(p, templatePath));
+      const suggestions = [];
+      
+      if (!templatePath.endsWith('.hbs') && !templatePath.endsWith('.html')) {
+        suggestions.push(`Use explicit extension: ${templatePath}.hbs`);
+      }
+      
+      throw new TemplateNotFoundError(templatePath, searchedPaths, suggestions);
+    }
 
-    // Load and compile template
-    const templateSource = await fs.readFile(resolvedPath, 'utf-8');
-    const template = this.handlebars.compile(templateSource);
+    try {
+      // Load and compile template
+      const templateSource = await fs.readFile(resolvedPath, 'utf-8');
+      const template = this.handlebars.compile(templateSource);
 
-    // Render with context
-    return template(context);
+      // Render with context
+      return template(context);
+    } catch (error) {
+      // Check if it's a syntax/parse error
+      const isSyntaxError = error.message.match(/parse error|expecting|unexpected/i);
+      
+      if (isSyntaxError) {
+        // Try to extract line/column from Handlebars errors
+        const location = error.message.match(/line (\d+)|:(\d+):(\d+)/);
+        const line = location ? parseInt(location[1] || location[2], 10) : null;
+        const column = location ? parseInt(location[3], 10) : null;
+        throw new TemplateSyntaxError(templatePath, line, column, error.message);
+      }
+      
+      // Runtime render error
+      throw new TemplateRenderError(templatePath, error.message, error.stack);
+    }
   }
 
   /**
@@ -120,11 +153,17 @@ export class HandlebarsAdapter extends TemplateAdapter {
   /**
    * Resolve template path using search paths
    * @private
+   * @returns {Promise<string|null>} Resolved path or null if not found
    */
   async _resolveTemplatePath(templatePath) {
-    // If absolute path, use it
+    // If absolute path, check it exists
     if (path.isAbsolute(templatePath)) {
-      return templatePath;
+      try {
+        await fs.access(templatePath);
+        return templatePath;
+      } catch {
+        return null;
+      }
     }
 
     // Try each search path
@@ -138,8 +177,65 @@ export class HandlebarsAdapter extends TemplateAdapter {
       }
     }
 
-    // If no search paths or not found, treat as relative to cwd
-    return templatePath;
+    // Not found in any search path
+    return null;
+  }
+
+  /**
+   * Validate template syntax without rendering
+   * @param {string} templatePath - Template filename
+   * @returns {Promise<{valid: boolean, error?: Error}>}
+   */
+  async validate(templatePath) {
+    if (this.searchPaths.length === 0) {
+      return {
+        valid: false,
+        error: new Error('No template search paths configured')
+      };
+    }
+
+    try {
+      // Resolve template path
+      const resolvedPath = await this._resolveTemplatePath(templatePath);
+      
+      if (!resolvedPath) {
+        const searchedPaths = this.searchPaths.map(p => path.join(p, templatePath));
+        const suggestions = [];
+        
+        if (!templatePath.endsWith('.hbs') && !templatePath.endsWith('.html')) {
+          suggestions.push(`Use explicit extension: ${templatePath}.hbs`);
+        }
+        
+        return {
+          valid: false,
+          error: new TemplateNotFoundError(templatePath, searchedPaths, suggestions)
+        };
+      }
+      
+      // Try to compile (syntax check)
+      const templateSource = await fs.readFile(resolvedPath, 'utf-8');
+      this.handlebars.compile(templateSource);
+      
+      return { valid: true };
+    } catch (error) {
+      // Syntax error
+      const isSyntaxError = error.message.match(/parse error|expecting|unexpected/i);
+      
+      if (isSyntaxError) {
+        const location = error.message.match(/line (\d+)|:(\d+):(\d+)/);
+        const line = location ? parseInt(location[1] || location[2], 10) : null;
+        const column = location ? parseInt(location[3], 10) : null;
+        return {
+          valid: false,
+          error: new TemplateSyntaxError(templatePath, line, column, error.message)
+        };
+      }
+      
+      return {
+        valid: false,
+        error: error
+      };
+    }
   }
 
   /**

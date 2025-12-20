@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+{# Import reusable macros #}
+{% import "_macros.njk" as m %}
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:github="https://github.com/">
   <channel>
     <title>{{ instances_by_id['metadata'].title }}</title>
     <description>{{ instances_by_id['metadata'].description }}</description>
     <link>{{ instances_by_id['metadata'].url }}</link>
     <atom:link href="{{ instances_by_id['metadata'].url }}/feed.rss" rel="self" type="application/rss+xml" />
+    <language>en-us</language>
+    <item:count>{{ m.toolCount(instances) }}</item:count>
     
     {% for link in instances %}{% if link.class == 'tool_link' %}
-    <item>
-      <title>{{ link.title }}</title>
-      <link>{{ link.url }}</link>
-      <description><![CDATA[{{ link.description }}]]></description>
-      <category>{{ link.category }}</category>
-      <guid isPermaLink="false">{{ link.id }}</guid>
-      {% if link.github_stars %}<comments>⭐ {{ link.github_stars }} stars on GitHub</comments>{% endif %}
-    </item>
+{{ m.rssItem(link) }}
     {% endif %}{% endfor %}
   </channel>
 </rss>

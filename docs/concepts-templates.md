@@ -1,6 +1,22 @@
 # Concepts: Templates
 
-Understanding template loading, rendering, and the critical escaping rules you need to know.
+Understanding template loading, rendering, validation, and error handling.
+
+## Overview
+
+Templates transform validated data into output files. Struktur uses template engines (Handlebars or Nunjucks) to render text-based outputs: HTML, YAML, JSON, shell scripts, configuration files, or any text format.
+
+```
+Validated Data + Template = Generated Output
+```
+
+**Key Features:**
+- **Pre-flight validation** - All template errors found before rendering starts
+- **Smart error messages** - File paths, line numbers, and helpful suggestions
+- **Buffer system** - Support for template composition (extends/yields pattern)
+- **Flexible formats** - Both old and new task formats supported
+
+---
 
 ## ⚠️ CRITICAL: HTML Escaping Rules
 
@@ -58,14 +74,6 @@ environment:
 
 ---
 
-## Overview
-
-Templates transform validated data into output files. Struktur uses template engines (Handlebars by default, Nunjucks optional) to render text-based outputs: HTML, YAML, JSON, shell scripts, configuration files, or any text format.
-
-```
-Validated Data + Template = Generated Output
-```
-
 ---
 
 ## Template Engines
@@ -101,6 +109,44 @@ Python Jinja2-inspired with filters:
 ```bash
 struktur build . --engine nunjucks
 ```
+
+---
+
+## Pre-Flight Validation
+
+Struktur validates all templates **before** rendering begins, catching errors early:
+
+### What's Validated
+
+1. **Template Existence** - All templates referenced in config must exist
+2. **File Resolution** - Templates are located in search paths
+3. **Circular Extends** - Detects infinite template inheritance loops
+4. **Smart Suggestions** - Missing extension? Wrong path? Struktur helps you fix it
+
+### Error Messages
+
+When validation fails, you get clear, actionable errors:
+
+```
+⚠️  Pre-flight validation found issues:
+
+❌ Template not found: posts/article.njk
+
+Searched in:
+  /project/templates/posts/article.njk
+  /project/common/posts/article.njk
+
+💡 Suggestions:
+  • Did you mean "posts/article.html.njk"? Add extension to build config
+  • Verify build config render array matches actual files
+  • Check template directory path in build config
+```
+
+### Benefits
+
+- **Fail Fast** - All errors shown at once, no partial builds
+- **Better DX** - Fix all issues before waiting for render
+- **No Surprises** - Know if build will succeed before it starts
 
 ---
 

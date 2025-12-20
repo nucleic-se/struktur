@@ -2,6 +2,11 @@ import nunjucks from 'nunjucks';
 import path from 'path';
 import { promises as fs } from 'fs';
 import { TemplateAdapter } from '../template_adapter.js';
+import {
+  TemplateNotFoundError,
+  TemplateSyntaxError,
+  TemplateRenderError
+} from '../template_errors.js';
 
 /**
  * Nunjucks template engine adapter
@@ -106,38 +111,38 @@ export default class NunjucksAdapter extends TemplateAdapter {
     return new Promise((resolve, reject) => {
       this.env.render(templateName, context, (err, result) => {
         if (err) {
-          // Check if it's a "not found" error vs render error
+          // Check if it's a "not found" error vs render/syntax error
           const isNotFound = err.message.includes('template not found');
           
-          // Try with .njk extension if original failed with "not found"
-          if (isNotFound && !templateName.endsWith('.njk')) {
-            this.env.render(`${templateName}.njk`, context, (err2, result2) => {
-              if (err2) {
-                // Check if second attempt also failed
-                const isNotFound2 = err2.message.includes('template not found');
-                
-                if (isNotFound2) {
-                  // Both attempts couldn't find the file
-                  reject(new Error(`Template not found: ${templateName} (searched: ${this.searchPaths.join(', ')})`));
-                } else {
-                  // Found the file but render failed
-                  const location = err2.message.match(/\[Line (\d+), Column (\d+)\]/);
-                  const locationStr = location ? ` at line ${location[1]}, column ${location[2]}` : '';
-                  reject(new Error(`Template render error in ${templateName}.njk${locationStr}:\n  ${err2.message}`));
-                }
-              } else {
-                resolve(result2);
-              }
-            });
+          if (isNotFound) {
+            // Template not found - provide helpful error with search paths
+            const searchedPaths = this.searchPaths.map(p => path.join(p, templateName));
+            const suggestions = [];
+            
+            // Suggest adding .njk extension if missing
+            if (!templateName.endsWith('.njk') && !templateName.endsWith('.html')) {
+              suggestions.push(`Use explicit extension: ${templateName}.njk`);
+            }
+            
+            reject(new TemplateNotFoundError(templateName, searchedPaths, suggestions));
           } else {
-            // Either already has .njk extension or it's a render error (not "not found")
-            if (isNotFound) {
-              reject(new Error(`Template not found: ${templateName} (searched: ${this.searchPaths.join(', ')})`));
+            // Syntax or render error - extract location if available
+            const location = err.message.match(/\[Line (\d+), Column (\d+)\]/);
+            
+            if (location) {
+              // Syntax error with line/column
+              const line = parseInt(location[1], 10);
+              const column = parseInt(location[2], 10);
+              reject(new TemplateSyntaxError(templateName, line, column, err.message));
             } else {
-              // Render error - extract location if available
-              const location = err.message.match(/\[Line (\d+), Column (\d+)\]/);
-              const locationStr = location ? ` at line ${location[1]}, column ${location[2]}` : '';
-              reject(new Error(`Template render error in ${templateName}${locationStr}:\n  ${err.message}`));
+              // Check if it's a syntax/parse error (even without line/column)
+              const isSyntaxError = err.message.match(/expected|unexpected|parse error|syntax/i);
+              if (isSyntaxError) {
+                reject(new TemplateSyntaxError(templateName, null, null, err.message));
+              } else {
+                // Runtime render error (undefined variable, etc.)
+                reject(new TemplateRenderError(templateName, err.message, err.stack));
+              }
             }
           }
         } else {
@@ -145,6 +150,77 @@ export default class NunjucksAdapter extends TemplateAdapter {
         }
       });
     });
+  }
+
+  /**
+   * Validate template syntax without rendering
+   * @param {string} templateName - Template filename
+   * @returns {Promise<{valid: boolean, error?: Error}>}
+   */
+  async validate(templateName) {
+    if (this.searchPaths.length === 0) {
+      return {
+        valid: false,
+        error: new Error('No template search paths configured')
+      };
+    }
+
+    try {
+      // Try to render with empty context (forces full parsing + syntax check)
+      await new Promise((resolve, reject) => {
+        this.env.render(templateName, {}, (err, result) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(result);
+          }
+        });
+      });
+      
+      return { valid: true };
+    } catch (err) {
+      const isNotFound = err.message.includes('template not found');
+      
+      if (isNotFound) {
+        const searchedPaths = this.searchPaths.map(p => path.join(p, templateName));
+        const suggestions = [];
+        
+        if (!templateName.endsWith('.njk') && !templateName.endsWith('.html')) {
+          suggestions.push(`Use explicit extension: ${templateName}.njk`);
+        }
+        
+        return {
+          valid: false,
+          error: new TemplateNotFoundError(templateName, searchedPaths, suggestions)
+        };
+      }
+      
+      // Parse/syntax error - try to extract line/column if available
+      const location = err.message.match(/\[Line (\d+), Column (\d+)\]/);
+      if (location) {
+        const line = parseInt(location[1], 10);
+        const column = parseInt(location[2], 10);
+        return {
+          valid: false,
+          error: new TemplateSyntaxError(templateName, line, column, err.message)
+        };
+      }
+      
+      // Syntax error without line/column info - still a syntax error
+      // Common patterns: "expected variable end", "unexpected token", etc.
+      const isSyntaxError = err.message.match(/expected|unexpected|parse error|syntax/i);
+      if (isSyntaxError) {
+        return {
+          valid: false,
+          error: new TemplateSyntaxError(templateName, null, null, err.message)
+        };
+      }
+      
+      return {
+        valid: false,
+        error: err
+      };
+    }
   }
 
   /**

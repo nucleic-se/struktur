@@ -1,6 +1,7 @@
 import { describe, test, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert';
 import NunjucksAdapter from '../src/adapters/nunjucks_adapter.js';
+import { TemplateNotFoundError, TemplateSyntaxError } from '../src/template_errors.js';
 import { promises as fs } from 'fs';
 import path from 'path';
 import os from 'os';
@@ -229,7 +230,7 @@ describe('NunjucksAdapter', () => {
       );
     });
 
-    test('auto-adds .njk extension if needed', async () => {
+    test('requires explicit .njk extension', async () => {
       await fs.writeFile(
         path.join(tempDir, 'test.njk'),
         'Hello {{ name }}!',
@@ -237,7 +238,15 @@ describe('NunjucksAdapter', () => {
       );
 
       adapter.setSearchPaths([tempDir]);
-      const result = await adapter.render('test', { name: 'World' });
+      
+      // Should fail without extension
+      await assert.rejects(
+        async () => await adapter.render('test', { name: 'World' }),
+        /Template not found/
+      );
+      
+      // Should work with explicit extension
+      const result = await adapter.render('test.njk', { name: 'World' });
       assert.strictEqual(result, 'Hello World!');
     });
   });
@@ -309,6 +318,90 @@ describe('NunjucksAdapter', () => {
       adapter.setSearchPaths([tempDir]);
       const result = await adapter.render('trim.njk', {});
       assert.strictEqual(result.trim(), 'content');
+    });
+  });
+
+  describe('validate', () => {
+    test('validates existing template successfully', async () => {
+      await fs.writeFile(
+        path.join(tempDir, 'valid.njk'),
+        'Hello {{ name }}!',
+        'utf-8'
+      );
+
+      adapter.setSearchPaths([tempDir]);
+      const result = await adapter.validate('valid.njk');
+      
+      assert.strictEqual(result.valid, true);
+      assert.strictEqual(result.error, undefined);
+    });
+
+    test('returns TemplateNotFoundError for missing template', async () => {
+      adapter.setSearchPaths([tempDir]);
+      const result = await adapter.validate('missing.njk');
+      
+      assert.strictEqual(result.valid, false);
+      assert.ok(result.error instanceof TemplateNotFoundError);
+      assert.ok(result.error.message.includes('missing.njk'));
+    });
+
+    test('returns TemplateSyntaxError for syntax errors', async () => {
+      await fs.writeFile(
+        path.join(tempDir, 'syntax-error.njk'),
+        '{{ unclosed',
+        'utf-8'
+      );
+
+      adapter.setSearchPaths([tempDir]);
+      const result = await adapter.validate('syntax-error.njk');
+      
+      assert.strictEqual(result.valid, false);
+      assert.ok(result.error instanceof TemplateSyntaxError);
+    });
+
+    test('suggests explicit extension for missing extension', async () => {
+      adapter.setSearchPaths([tempDir]);
+      const result = await adapter.validate('missing');
+      
+      assert.strictEqual(result.valid, false);
+      assert.ok(result.error instanceof TemplateNotFoundError);
+      assert.ok(result.error.context.suggestions.some(s => s.includes('missing.njk')));
+    });
+  });
+
+  describe('structured errors', () => {
+    test('throws TemplateNotFoundError with search paths', async () => {
+      adapter.setSearchPaths([tempDir]);
+      
+      try {
+        await adapter.render('missing.njk', {});
+        assert.fail('Should have thrown TemplateNotFoundError');
+      } catch (err) {
+        assert.ok(err instanceof TemplateNotFoundError);
+        assert.strictEqual(err.phase, 'Template Loading');
+        assert.ok(err.context.searchedPaths.length > 0);
+        assert.ok(err.format().includes('Template not found'));
+      }
+    });
+
+    test('throws TemplateSyntaxError with line and column', async () => {
+      await fs.writeFile(
+        path.join(tempDir, 'bad-syntax.njk'),
+        'line1\n{{ unclosed\nline3',
+        'utf-8'
+      );
+
+      adapter.setSearchPaths([tempDir]);
+      
+      try {
+        await adapter.render('bad-syntax.njk', {});
+        assert.fail('Should have thrown TemplateSyntaxError');
+      } catch (err) {
+        assert.ok(err instanceof TemplateSyntaxError);
+        assert.strictEqual(err.phase, 'Template Parsing');
+        assert.ok(err.context.line >= 1);
+        assert.ok(err.context.column >= 1);
+      }
     });
   });
 });

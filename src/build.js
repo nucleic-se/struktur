@@ -204,8 +204,9 @@ export async function buildStack(options) {
     const adapter = createTemplateAdapter(engine);
     adapter.setSearchPaths(templateDirs);
 
-    // Create renderer and configure it
+    // Create renderer and register all helpers
     const renderer = new TemplateRenderer(adapter, { log, quiet });
+    renderer.setSearchPaths(templateDirs);  // For template resolution
     await renderer.registerHelpers(canonical);
     await renderer.loadPartials(templateDirs);
 
@@ -216,7 +217,7 @@ export async function buildStack(options) {
     } else {
       log.log(`  Found ${renderTasks.length} render tasks`);
       
-      // Render all templates
+      // Render all tasks with pre-flight validation and buffer support
       const result = await renderer.renderAll(renderTasks, canonical, buildDir);
       renderedCount = result.renderedCount;
 
