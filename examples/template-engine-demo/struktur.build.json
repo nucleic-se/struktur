@@ -5,8 +5,8 @@
   "templates": ["templates/handlebars"],
   "build_dir": "build/handlebars",
   "render": [
-    { "nginx.conf.hbs": "/nginx.conf" },
-    { "docker-compose.yml.hbs": "/docker-compose.yml" },
-    { "README.md.hbs": "/README.md" }
+    {"template": "nginx.conf.hbs", "output": "/nginx.conf"},
+    {"template": "docker-compose.yml.hbs", "output": "/docker-compose.yml"},
+    {"template": "README.md.hbs", "output": "/README.md"}
   ]
 }

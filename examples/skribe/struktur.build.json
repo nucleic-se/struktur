@@ -5,10 +5,10 @@
   "templates": ["templates", "mixins/rss/templates", "mixins/dark-theme/templates"],
   "build_dir": "build",
   "render": [
-    {"index.html": "/index.html"},
-    {"css/style.css": "/css/style.css"},
-    {"css/custom.css": "/css/custom.css"},
-    {"css/dark-theme.css": "/css/dark-theme.css"},
-    {"feed.xml": "/feed.xml"}
+    {"template": "index.html", "output": "/index.html"},
+    {"template": "css/style.css", "output": "/css/style.css"},
+    {"template": "css/custom.css", "output": "/css/custom.css"},
+    {"template": "css/dark-theme.css", "output": "/css/dark-theme.css"},
+    {"template": "feed.xml", "output": "/feed.xml"}
   ]
 }

@@ -174,62 +174,48 @@ describe('TemplateRenderer Integration', () => {
   });
 
   describe('Task Format Normalization', () => {
-    it('should accept old format [{template: output}]', async () => {
+    it('should accept format [{template, output}]', async () => {
       const adapter = new NunjucksAdapter();
       adapter.setSearchPaths([fixturesDir]);
       
       const renderer = new TemplateRenderer(adapter);
       renderer.setSearchPaths([fixturesDir]);
       
-      const canonical = { name: 'Old Format' };
+      const canonical = { name: 'Test' };
       const tasks = [
-        { 'simple.njk': '/old_format.txt' }
+        { template: 'simple.njk', output: '/format_test.txt' }
       ];
       
       const result = await renderer.renderAll(tasks, canonical, tempDir);
       
       assert.equal(result.renderedCount, 1);
       
-      const content = await fs.readFile(path.join(tempDir, 'old_format.txt'), 'utf-8');
-      assert.equal(content, 'Hello Old Format!');
+      const content = await fs.readFile(path.join(tempDir, 'format_test.txt'), 'utf-8');
+      assert.equal(content, 'Hello Test!');
     });
     
-    it('should accept new format [{template, output}]', async () => {
+    it('should reject tasks without template field', async () => {
       const adapter = new NunjucksAdapter();
-      adapter.setSearchPaths([fixturesDir]);
-      
       const renderer = new TemplateRenderer(adapter);
-      renderer.setSearchPaths([fixturesDir]);
       
-      const canonical = { name: 'New Format' };
-      const tasks = [
-        { template: 'simple.njk', output: '/new_format.txt' }
-      ];
+      const tasks = [{ output: '/test.txt' }];
       
-      const result = await renderer.renderAll(tasks, canonical, tempDir);
-      
-      assert.equal(result.renderedCount, 1);
-      
-      const content = await fs.readFile(path.join(tempDir, 'new_format.txt'), 'utf-8');
-      assert.equal(content, 'Hello New Format!');
+      await assert.rejects(
+        () => renderer.renderAll(tasks, {}, tempDir),
+        /Render tasks must use format/
+      );
     });
     
-    it('should handle mixed format tasks', async () => {
+    it('should reject tasks without output field', async () => {
       const adapter = new NunjucksAdapter();
-      adapter.setSearchPaths([fixturesDir]);
-      
       const renderer = new TemplateRenderer(adapter);
-      renderer.setSearchPaths([fixturesDir]);
       
-      const canonical = { name: 'Mixed', items: [{title: 'A'}] };
-      const tasks = [
-        { 'simple.njk': '/mixed1.txt' },
-        { template: 'list.njk', output: '/mixed2.txt' }
-      ];
+      const tasks = [{ template: 'simple.njk' }];
       
-      const result = await renderer.renderAll(tasks, canonical, tempDir);
-      
-      assert.equal(result.renderedCount, 2);
+      await assert.rejects(
+        () => renderer.renderAll(tasks, {}, tempDir),
+        /Render tasks must use format/
+      );
     });
   });
 

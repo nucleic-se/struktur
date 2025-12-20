@@ -125,11 +125,7 @@ export class TemplateRenderer {
   /**
    * Render all templates with pre-flight validation and buffer support
    * 
-   * Accepts two formats for backward compatibility:
-   * 1. New format: [{template: 'page.njk', output: '/page.html'}]
-   * 2. Old format: [{'page.njk': '/page.html'}]
-   * 
-   * @param {Array<Object>} renderTasks - Render tasks (see above for formats)
+   * @param {Array<Object>} renderTasks - Render tasks: [{template: 'page.njk', output: '/page.html'}]
    * @param {Object} canonical - Canonical data (instances)
    * @param {string} buildDir - Build output directory
    * @param {Object} metadata - Build metadata (optional)
@@ -213,21 +209,17 @@ export class TemplateRenderer {
   
   /**
    * Normalize render tasks to standard format
-   * Supports both old format [{'tpl.njk': '/out'}] and new format [{template, output}]
+   * Only supports {template, output} format
    */
   normalizeTasks(tasks) {
-    return tasks.flatMap(task => {
-      // New format: {template, output}
-      if (task.template && task.output) {
-        return [task];
+    return tasks.map(task => {
+      if (!task.template || !task.output) {
+        throw new Error(
+          'Render tasks must use format: {"template": "...", "output": "..."}\n' +
+          `Got: ${JSON.stringify(task)}`
+        );
       }
-      
-      // Old format: {'template.njk': '/output/path'}
-      return Object.entries(task).map(([template, output]) => ({
-        template,
-        output,
-        extends: task.extends // Preserve extends if present
-      }));
+      return task;
     });
   }
   
