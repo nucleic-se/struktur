@@ -30,18 +30,18 @@
 {{!-- Generate individual blog post pages using render_file helper --}}
 {{#each instances}}
 {{#if (eq class "blog_post")}}
-{{render_file "blog-post" (concat "posts/" slug ".html")}}
+{{render_file "blog-post.html" (concat "posts/" slug ".html")}}
 {{/if}}
 {{/each}}
 
 {{!-- Generate individual page files using render_file helper --}}
 {{#each instances}}
 {{#if (eq class "page")}}
-{{render_file "page" (concat slug ".html")}}
+{{render_file "page.html" (concat slug ".html")}}
 {{/if}}
 {{/each}}
 
 {{!-- Generate tag index pages --}}
 {{#each (unique (flatten (pluck (where instances "class" "blog_post") "aspects.blog_post.tags")))}}
-{{render_file "tag" (concat "tags/" this ".html") tagName=this posts=(where_includes @root.instances "aspects.blog_post.tags" this)}}
+{{render_file "tag.html" (concat "tags/" this ".html") tagName=this posts=(where_includes @root.instances "aspects.blog_post.tags" this)}}
 {{/each}}

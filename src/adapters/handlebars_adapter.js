@@ -314,8 +314,7 @@ export class HandlebarsAdapter extends TemplateAdapter {
           errorMsg += `\n\nDid you mean:\n${suggestions.map(s => `  - ${s}`).join('\n')}`;
         }
         errorMsg += '\n\nNote: Struktur requires explicit file extensions for all partial references.';
-        log?.warn?.(errorMsg);
-        return '';
+        throw new Error(errorMsg);
       }
       
       // Resolve output path with security checks
@@ -389,14 +388,14 @@ export class HandlebarsAdapter extends TemplateAdapter {
             errorMsg += `\n\nDid you mean:\n${suggestions.map(s => `  - ${s}`).join('\n')}`;
           }
           errorMsg += '\n\nNote: Struktur requires explicit file extensions for all partial references.';
-          log?.warn?.(errorMsg);
-        } else {
-          // Render the layout with the same context (which has all the buffers)
-          const compiledLayout = typeof layoutPartial === 'function'
-            ? layoutPartial
-            : handlebars.compile(layoutPartial);
-          content = compiledLayout(context, { data }) || '';
+          throw new Error(errorMsg);
         }
+        
+        // Render the layout with the same context (which has all the buffers)
+        const compiledLayout = typeof layoutPartial === 'function'
+          ? layoutPartial
+          : handlebars.compile(layoutPartial);
+        content = compiledLayout(context, { data }) || '';
         
         // Clear extendedLayout so nested renders don't inherit it
         delete context.__context.extendedLayout;

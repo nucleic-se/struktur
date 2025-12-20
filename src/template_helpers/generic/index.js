@@ -19,19 +19,17 @@ export const genericHelpers = {
   
   // Strings
   ...strings,
-  title_case: strings.titleCase, // Alias for snake_case convention
-  upper: strings.uppercase, // Alias for documentation
-  lower: strings.lowercase, // Alias for documentation
+  title_case: strings.titleCase,
   
   // Collections
   ...collections,
-  where_includes: collections.whereIncludes, // Alias for snake_case convention
-  sort_by: collections.sortBy, // Alias for snake_case convention
-  group_by: collections.groupBy, // Alias for snake_case convention
+  where_includes: collections.whereIncludes,
+  sort_by: collections.sortBy,
+  group_by: collections.groupBy,
   
   // Utility
   ...utility,
-  default: utility.defaultTo // Alias for documentation compatibility
+  default_value: utility.defaultTo
 };
 
 /**
