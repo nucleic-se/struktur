@@ -10,7 +10,7 @@ import { resolveOutputPath } from './template_helpers/engine/index.js';
 import { createLogger } from './utils/logger.js';
 import { checkCollision, writeManifest, generateDeterministicBuildDir } from './utils/build_manifest.js';
 import { mergeInstances, getMergeStats } from './instance_merger.js';
-import { loadInstancesFromDir } from './utils/load_instances.js';
+import { loadInstancesFromDir } from './instance_loader.js';
 import { TemplateRenderer } from './template_renderer.js';
 
 /**

@@ -9,7 +9,7 @@ import { createStruktur, generateCanonicalWithValidation, HandlebarsAdapter } fr
 import NunjucksAdapter from './src/adapters/nunjucks_adapter.js';
 import { buildStack } from './src/build.js';
 import { mergeInstances, getMergeStats } from './src/instance_merger.js';
-import { loadInstancesFromDir } from './src/utils/load_instances.js';
+import { loadInstancesFromDir } from './src/instance_loader.js';
 import { normalizePathArray, discoverStackDirs, resolveConfigPaths, handleCommandError } from './src/cli_helpers.js';
 import fs from 'fs/promises';
 import path from 'path';
