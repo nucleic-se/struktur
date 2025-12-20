@@ -125,7 +125,7 @@ export function formatCollisionReport(report, options = {}) {
     
     for (let i = 0; i < collision.sources.length; i++) {
       const source = collision.sources[i];
-      const isWinner = i === 0; // First directory wins in search path order
+      const isWinner = i === collision.sources.length - 1; // Last directory wins in search path order
       const marker = isWinner ? '→ USED' : '  overridden';
       lines.push(`    ${marker}: ${source}`);
     }
