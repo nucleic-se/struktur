@@ -1,8 +1,9 @@
 {{!-- Homepage using Buffer System --}}
 
-{{!-- Set page metadata --}}
-{{#buffer name="page_title"}}{{global.site.title}}{{/buffer}}
-{{#buffer name="title_separator"}}{{/buffer}}
+{{!-- Extend base layout --}}
+{{extends "layouts/base.html"}}
+
+{{!-- Home page - no page_title means just site title will be used --}}
 
 {{!-- Main content --}}
 {{#buffer name="content"}}
@@ -26,24 +27,21 @@
   {{/each}}
 {{/buffer}}
 
-{{!-- Render with base layout --}}
-{{> layouts/base}}
-
 {{!-- Generate individual blog post pages using render_file helper --}}
 {{#each instances}}
 {{#if (eq class "blog_post")}}
-{{render_file "layouts/blog-post" (concat "posts/" slug ".html")}}
+{{render_file "blog-post" (concat "posts/" slug ".html")}}
 {{/if}}
 {{/each}}
 
 {{!-- Generate individual page files using render_file helper --}}
 {{#each instances}}
 {{#if (eq class "page")}}
-{{render_file "layouts/page" (concat slug ".html")}}
+{{render_file "page" (concat slug ".html")}}
 {{/if}}
 {{/each}}
 
 {{!-- Generate tag index pages --}}
 {{#each (unique (flatten (pluck (where instances "class" "blog_post") "aspects.blog_post.tags")))}}
-{{render_file "layouts/tag" (concat "tags/" this ".html") tagName=this posts=(where_includes @root.instances "aspects.blog_post.tags" this)}}
+{{render_file "tag" (concat "tags/" this ".html") tagName=this posts=(where_includes @root.instances "aspects.blog_post.tags" this)}}
 {{/each}}

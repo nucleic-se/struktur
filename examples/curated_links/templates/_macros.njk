@@ -1,0 +1,44 @@
+{# Reusable Nunjucks macros for curated links #}
+
+{# Count tool links in instances #}
+{% macro toolCount(instances) %}
+{{ instances | selectattr('class', 'equalto', 'tool_link') | list | length }}
+{%- endmacro %}
+
+{# Macro to render a link with metadata #}
+{% macro renderLink(link) %}
+**[{{ link.title }}]({{ link.url }})**{% if link.description %} - {{ link.description }}{% endif %}
+{%- if link.tags %} `{{ link.tags | join('`, `') }}`{% endif %}
+{% endmacro %}
+
+{# Macro to render category section #}
+{% macro categorySection(category, links) %}
+## {{ category }}
+
+{% for link in links | selectattr('category', 'equalto', category) %}
+{{ renderLink(link) }}
+{% endfor %}
+{% endmacro %}
+
+{# Macro to render link as JSON object #}
+{% macro linkJSON(link, isLast) %}
+    {
+      "id": "{{ link.id }}",
+      "title": "{{ link.title }}",
+      "url": "{{ link.url }}",
+      "description": "{{ link.description | default('') }}",
+      "category": "{{ link.category | default('') }}",
+      "tags": [{% if link.tags %}{% for tag in link.tags %}"{{ tag }}"{% if not loop.last %}, {% endif %}{% endfor %}{% endif %}]
+    }{% if not isLast %},{% endif %}
+{%- endmacro %}
+
+{# Macro to render RSS item #}
+{% macro rssItem(link) %}
+    <item>
+      <title>{{ link.title }}</title>
+      <link>{{ link.url }}</link>
+      <description>{{ link.description | default('') }}</description>
+      <guid>{{ link.url }}</guid>
+      {% if link.category %}<category>{{ link.category }}</category>{% endif %}
+    </item>
+{%- endmacro %}

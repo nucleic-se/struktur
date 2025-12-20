@@ -2,11 +2,11 @@
   "id": "global",
   "class": "global",
   "stylesheets": [
-    "dark-theme.css"
+    "css/dark-theme.css"
   ],
   "build": [
     {
-      "dark-theme.css": "/dark-theme.css"
+      "css/dark-theme.css": "/css/dark-theme.css"
     }
   ]
 }

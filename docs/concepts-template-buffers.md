@@ -68,6 +68,35 @@ Output buffer content anywhere using the `yield()` function:
 
 ---
 
+## Optional Buffers
+
+Buffers can be optional with default values:
+
+**With default value:**
+```nunjucks
+{# Returns empty string if 'sidebar' doesn't exist #}
+<aside>{{ yield('sidebar', '') }}</aside>
+
+{# Returns default HTML if 'extra_head' doesn't exist #}
+<head>
+  <title>My Site</title>
+  {{{ yield('extra_head', '<meta name="default" content="value">') }}}
+</head>
+```
+
+**Check if buffer exists:**
+```handlebars
+{{#if (buffer_exists "sidebar")}}
+  <aside>{{{yield "sidebar"}}}</aside>
+{{else}}
+  <aside><p>No sidebar content</p></aside>
+{{/if}}
+```
+
+**Use case:** Optional layout sections like sidebars, extra metadata, or conditional content areas.
+
+---
+
 ## Write Modes
 
 Buffers support three write modes to control how content is accumulated:
@@ -159,6 +188,9 @@ Add content to the beginning:
 
 ```nunjucks
 {# templates/page.njk #}
+{# Extend layout - buffers can be in any order #}
+{% extends "layout.njk" %}
+
 {% buffer name="title" %}My Page{% endbuffer %}
 
 {% buffer name="header" %}
@@ -175,9 +207,6 @@ Add content to the beginning:
 {% buffer name="footer" %}
   <p>&copy; 2025 {{company_name}}</p>
 {% endbuffer %}
-
-{# Include layout to render final page #}
-{% include 'layout.njk' %}
 ```
 
 **Result:** Full HTML page with consistent structure and custom content.
@@ -380,19 +409,16 @@ Keep buffer logic shallow for maintainability:
 
 ✅ **Good:**
 ```nunjucks
-{# Content writes to buffers #}
+{# Content writes to buffers and extends layout #}
+{% extends "layout.njk" %}
 {% buffer name="content" %}...{% endbuffer %}
-
-{# Layout yields buffers #}
-{% include 'layout.njk' %}
 ```
 
 ❌ **Confusing:**
 ```nunjucks
-{# Layout includes content that includes another layout #}
-{% include 'layout1.njk' %}  {# Which includes... #}
-  {% include 'content.njk' %}  {# Which includes... #}
-    {% include 'layout2.njk' %}  {# Buffer scope unclear #}
+{# Cannot extend multiple layouts #}
+{% extends "layout1.njk" %}
+{% extends "layout2.njk" %}  {# ERROR: Only one extends per template #}
 ```
 
 ---
@@ -484,13 +510,13 @@ templates/
 
 **home.njk:**
 ```nunjucks
+{% extends "layout.njk" %}
+
 {% buffer name="title" %}Home - My Site{% endbuffer %}
 {% buffer name="heading" %}Welcome Home{% endbuffer %}
 {% buffer name="content" %}
   <p>This is the home page content.</p>
 {% endbuffer %}
-
-{% include 'layout.njk' %}
 ```
 
 **Result (home.html):**

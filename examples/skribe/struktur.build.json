@@ -6,9 +6,9 @@
   "build_dir": "build",
   "render": [
     {"index.html": "/index.html"},
-    {"style.css": "/style.css"},
-    {"custom.css": "/custom.css"},
-    {"dark-theme.css": "/dark-theme.css"},
+    {"css/style.css": "/css/style.css"},
+    {"css/custom.css": "/css/custom.css"},
+    {"css/dark-theme.css": "/css/dark-theme.css"},
     {"feed.xml": "/feed.xml"}
   ]
 }

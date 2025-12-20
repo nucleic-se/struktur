@@ -146,7 +146,22 @@ export default class NunjucksAdapter extends TemplateAdapter {
             }
           }
         } else {
-          resolve(result);
+          // Check if template extended a layout
+          if (context.__context?.extendedLayout) {
+            const layoutName = context.__context.extendedLayout;
+            // Clear the extends so the layout doesn't try to extend itself
+            delete context.__context.extendedLayout;
+            // Render the layout with the current context (which has all buffers)
+            this.env.render(layoutName, context, (layoutErr, layoutResult) => {
+              if (layoutErr) {
+                reject(new TemplateRenderError(layoutName, layoutErr.message, layoutErr.stack));
+              } else {
+                resolve(layoutResult);
+              }
+            });
+          } else {
+            resolve(result);
+          }
         }
       });
     });

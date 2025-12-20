@@ -89,14 +89,15 @@ skribe/
     global.json         # Site config, stylesheet array, build manifest
   templates/
     index.html          # Homepage: lists posts, generates all pages via render_file
-    style.css           # Base styles
-    custom.css          # Theme variables (CSS custom properties)
-    layouts/            # Page layouts
-      blog-post.html    # Individual post layout
-      page.html         # Static page layout
-      tag.html          # Tag index page layout
+    blog-post.html      # Individual post layout
+    page.html           # Static page layout
+    tag.html            # Tag index page layout
+    css/                # Stylesheets
+      style.css         # Base styles
+      custom.css        # Theme variables (CSS custom properties)
+    layouts/            # HTML layouts (html/body tags)
+      base.html         # Base layout with head/body structure
     partials/           # Reusable components
-      head.html         # <head> block with dynamic stylesheets
       nav.html          # Navigation with menu items
       footer.html       # Footer links
       tags.html         # Tag list component
@@ -105,8 +106,8 @@ skribe/
       instances/rss_feed.json
       templates/feed.xml
     dark-theme/         # Optional dark color scheme
-      instances/global.json    # Adds dark-theme.css to stylesheets array
-      templates/dark-theme.css # Dark theme CSS overrides
+      instances/global.json        # Adds css/dark-theme.css to stylesheets array
+      templates/css/dark-theme.css # Dark theme CSS overrides
 ```
 
 ## What Skribe Demonstrates
@@ -153,7 +154,7 @@ skribe/
 ```handlebars
 {{#each instances}}
 {{#if (eq class "blog_post")}}
-{{render_file "layouts/blog-post" (concat "posts/" slug ".html") pathPrefix="../"}}
+{{render_file "blog-post" (concat "posts/" slug ".html")}}
 {{/if}}
 {{/each}}
 ```
@@ -166,7 +167,7 @@ struktur build base mixin1 mixin2  # Later sources merge into earlier
 **Array-based extensibility**: Global stylesheets array allows dynamic CSS inclusion
 ```json
 {
-  "stylesheets": ["style.css", "custom.css"]  // Mixins can add more
+  "stylesheets": ["css/style.css", "css/custom.css"]  // Mixins can add more
 }
 ```
 
@@ -174,13 +175,13 @@ struktur build base mixin1 mixin2  # Later sources merge into earlier
 
 **CSS custom properties for theming**: Light theme in base, dark theme overlays via cascade
 ```css
-/* custom.css - base light theme */
+/* css/custom.css - base light theme */
 :root {
   --bg-primary: #ffffff;
   --text-primary: #333333;
 }
 
-/* dark-theme.css - mixin override */
+/* css/dark-theme.css - mixin override */
 :root {
   --bg-primary: #1a1a1a;
   --text-primary: #e0e0e0;
@@ -222,9 +223,9 @@ Running `struktur build . --build-dir build` generates:
 - `tags/*.html` - 4 tag index pages (tutorial, best-practices, concepts, advanced)
 
 **3 CSS files**:
-- `style.css` - Base layout and typography
-- `custom.css` - Theme variables (colors, spacing)
-- `dark-theme.css` - Only when built with dark-theme mixin
+- `css/style.css` - Base layout and typography
+- `css/custom.css` - Theme variables (colors, spacing)
+- `css/dark-theme.css` - Only when built with dark-theme mixin
 
 **1 XML feed** (with RSS mixin):
 - `feed.xml` - RSS 2.0 feed of blog posts
@@ -289,7 +290,7 @@ Just add it to a post's `tags` array in the blog_post aspect. Tag pages generate
 
 ### Customize colors
 
-Edit `templates/custom.css`:
+Edit `templates/css/custom.css`:
 ```css
 :root {
   --bg-primary: #f8f9fa;      /* Light gray background */
@@ -438,8 +439,8 @@ Configure feed in `mixins/rss/instances/rss_feed.json`:
 
 Adds dark color scheme via CSS cascade:
 - **Source**: `mixins/dark-theme/`
-- **What it does**: Adds `dark-theme.css` to global stylesheets array
-- **How it works**: CSS loaded after `custom.css`, overrides via cascade (no template replacement)
+- **What it does**: Adds `css/dark-theme.css` to global stylesheets array
+- **How it works**: CSS loaded after `css/custom.css`, overrides via cascade (no template replacement)
 - **Usage**: `struktur build . mixins/dark-theme --build-dir build`
 
 This demonstrates **array-based extensibility**—mixins add items to arrays rather than replacing files.
@@ -465,7 +466,7 @@ Example - Generate post pages:
 ```handlebars
 {{#each instances}}
 {{#if (eq class "blog_post")}}
-{{render_file "layouts/blog-post" (concat "posts/" slug ".html") pathPrefix="../"}}
+{{render_file "blog-post" (concat "posts/" slug ".html")}}
 {{/if}}
 {{/each}}
 ```
@@ -605,7 +606,7 @@ struktur build . --build-dir build  # Validation runs automatically
 **Missing stylesheet**: Verify `global.stylesheets` array includes it
 ```json
 {
-  "stylesheets": ["style.css", "custom.css"]
+  "stylesheets": ["css/style.css", "css/custom.css"]
 }
 ```
 

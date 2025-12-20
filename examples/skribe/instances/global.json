@@ -8,18 +8,18 @@
     "description": "A static site generator powered by Struktur"
   },
   "stylesheets": [
-    "style.css",
-    "custom.css"
+    "css/style.css",
+    "css/custom.css"
   ],
   "build": [
     {
       "index.html": "/index.html"
     },
     {
-      "style.css": "/style.css"
+      "css/style.css": "/css/style.css"
     },
     {
-      "custom.css": "/custom.css"
+      "css/custom.css": "/css/custom.css"
     }
   ]
 }

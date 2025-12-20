@@ -832,19 +832,56 @@ Named content buffers for template composition and multi-file output.
 **Nunjucks:**
 ```nunjucks
 <aside>{{ yield('sidebar') }}</aside>
+
+{# With optional default value #}
+<aside>{{ yield('sidebar', '<p>No sidebar</p>') }}</aside>
 ```
 
 **Handlebars:**
 ```handlebars
 <aside>{{{yield "sidebar"}}}</aside>
+
+{{!-- With optional default value --}}
+<aside>{{{yield "sidebar" "<p>No sidebar</p>"}}}}</aside>
 ```
 
 **Parameters:**
 - `name` - Buffer name (string)
+- `defaultValue` - Optional default if buffer doesn't exist (string)
 - `mode` - Write mode: `"replace"` (default), `"append"`, or `"prepend"`
 - `destination` - Optional file path for multi-file output
 
-**Write Modes:**
+---
+
+### `buffer_exists()`
+
+Check if a buffer has been written.
+
+**Nunjucks:**
+```nunjucks
+{% if buffer_exists('sidebar') %}
+  <aside>{{ yield('sidebar') }}</aside>
+{% else %}
+  <aside><p>Default sidebar</p></aside>
+{% endif %}
+```
+
+**Handlebars:**
+```handlebars
+{{#if (buffer_exists "sidebar")}}
+  <aside>{{{yield "sidebar"}}}</aside>
+{{else}}
+  <aside><p>Default sidebar</p></aside>
+{{/if}}
+```
+
+**Returns:** Boolean - `true` if buffer exists, `false` otherwise
+
+**Use case:** Conditional layout sections that may or may not be populated.
+
+---
+
+### Buffer Write Modes
 
 ```nunjucks
 {# Replace (default) - overwrites previous content #}
@@ -880,6 +917,70 @@ services:
 Documentation here.
 {% endbuffer %}
 ```
+
+---
+
+### `extends()`
+
+**Recommended Pattern**: Declare layout extension for order-independent template composition.
+
+**Nunjucks:**
+```nunjucks
+{# Extend a layout - can appear anywhere in template #}
+{% extends "layouts/base.html" %}
+
+{# Write buffers in any order #}
+{% buffer name="content" %}
+  <h1>{{title}}</h1>
+  <p>{{description}}</p>
+{% endbuffer %}
+
+{% buffer name="title" %}{{title}}{% endbuffer %}
+```
+
+**Handlebars:**
+```handlebars
+{{!-- Extend a layout - can appear anywhere in template --}}
+{{extends "layouts/base.html"}}
+
+{{!-- Write buffers in any order --}}
+{{#buffer name="content"}}
+  <h1>{{title}}</h1>
+  <p>{{description}}</p>
+{{/buffer}}
+
+{{#buffer name="title"}}{{title}}{{/buffer}}
+```
+
+**Layout template:**
+```handlebars
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{{{yield "title" "Default Title"}}}</title>
+  {{{yield "extra_head" ""}}}
+</head>
+<body>
+  <main>{{{yield "content"}}}</main>
+</body>
+</html>
+```
+
+**Parameters:**
+- `layoutName` - Layout template filename (string, must include extension)
+
+**Behavior:**
+- Template writes buffers first
+- Layout renders after with access to all buffers
+- Buffer writing order doesn't matter
+- More flexible than include-at-end pattern
+
+**Error Handling:**
+- Throws if layout not found
+- Throws if multiple `extends` calls in same template
+- Yields throw `BufferNotFoundError` if buffer missing (unless default provided)
+
+**Best Practice:** Use `extends` at top of template for clarity, but placement doesn't affect behavior.
 
 **Common Use Cases:**
 - Layout templates with content areas

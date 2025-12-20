@@ -1,5 +1,8 @@
 {{!-- Tag Index Layout using Buffer System --}}
 
+{{!-- Extend base layout --}}
+{{extends "layouts/base.html"}}
+
 {{!-- Set page metadata --}}
 {{#buffer name="page_title"}}Tag: {{tagName}}{{/buffer}}
 {{#buffer name="title_separator"}} - {{/buffer}}
@@ -16,8 +19,7 @@
         <h2><a href="{{../pathPrefix}}posts/{{slug}}.html">{{title}}</a></h2>
         <p class="post-meta">
           <time datetime="{{aspects.blog_post.date}}">{{aspects.blog_post.date}}</time>
-          {{#if aspects.blog_post.author}}by {{aspects.blog_post.author}}{{/if}}
-        </p>
+          {{#if aspects.blog_post.author}}by {{aspects.blog_post.author}}{{/if}}\n        </p>
         {{#if description}}
         <p>{{description}}</p>
         {{/if}}
@@ -27,6 +29,3 @@
     </section>
   </article>
 {{/buffer}}
-
-{{!-- Render with base layout --}}
-{{> layouts/base}}

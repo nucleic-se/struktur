@@ -45,29 +45,95 @@ export function bufferHelper(options) {
 /**
  * Yield helper - read from buffer
  * 
- * Usage (Nunjucks): {{ yield("content") }}
- * Usage (Handlebars): {{{yield "content"}}}
+ * Supports optional default value for missing buffers.
+ * 
+ * Usage (Nunjucks): {{ yield("content") }} or {{ yield("sidebar", "<p>Default</p>") }}
+ * Usage (Handlebars): {{{yield "content"}}} or {{{yield "sidebar" "<p>Default</p>"}}}
  * 
  * @param {string} name - Buffer name to yield
- * @returns {string} Buffer content
- * @throws {BufferNotFoundError} If buffer doesn't exist
+ * @param {string} [defaultValue] - Optional default value if buffer doesn't exist
+ * @returns {string} Buffer content or default value
+ * @throws {BufferNotFoundError} If buffer doesn't exist and no default provided
  */
-export function yieldHelper(name) {
+export function yieldHelper(name, defaultValue) {
   if (!name || typeof name !== 'string') {
     throw new Error('Yield helper requires a buffer name (string)');
   }
   
-  if (this.__context) {
-    if (!this.__context.hasBuffer(name)) {
-      throw new BufferNotFoundError(
-        name,
-        'current template',
-        this.__context.getAvailableBuffers()
-      );
-    }
-    return this.__context.readBuffer(name);
+  if (!this.__context) {
+    throw new Error('Buffer system not initialized. Buffers can only be used in templates rendered by Struktur.');
   }
-  return '';
+  
+  // In Handlebars, the last argument is always the options object
+  // Check if we have a real default value (not just the options object)
+  const hasDefault = arguments.length > 1 && 
+    (typeof defaultValue === 'string' || typeof defaultValue === 'number');
+  
+  if (!this.__context.hasBuffer(name)) {
+    if (hasDefault) {
+      return defaultValue || '';
+    }
+    throw new BufferNotFoundError(
+      name,
+      'current template',
+      this.__context.getAvailableBuffers()
+    );
+  }
+  return this.__context.readBuffer(name);
+}
+
+/**
+ * Buffer exists helper - check if buffer has been written
+ * 
+ * Usage (Nunjucks): {% if buffer_exists("sidebar") %}...{% endif %}
+ * Usage (Handlebars): {{#if (buffer_exists "sidebar")}}...{{/if}}
+ * 
+ * @param {string} name - Buffer name to check
+ * @returns {boolean} True if buffer exists
+ */
+export function bufferExistsHelper(name) {
+  if (!name || typeof name !== 'string') {
+    return false;
+  }
+  
+  if (this.__context) {
+    return this.__context.hasBuffer(name);
+  }
+  return false;
+}
+
+/**
+ * Extends helper - declare layout to extend
+ * 
+ * Sets the layout that this template extends. The layout will be rendered
+ * after all buffers are collected, with access to all buffer content.
+ * 
+ * Usage (Nunjucks): {{ extends("layouts/base") }}
+ * Usage (Handlebars): {{extends "layouts/base"}}
+ * 
+ * @param {string} layoutName - Name of layout to extend
+ * @returns {string} Empty string (no output)
+ * @throws {Error} If layout already extended or context not initialized
+ */
+export function extendsHelper(layoutName) {
+  if (!layoutName || typeof layoutName !== 'string') {
+    throw new Error('Extends helper requires a layout name (string)');
+  }
+  
+  if (!this.__context) {
+    throw new Error('Buffer system not initialized. Extends can only be used in templates rendered by Struktur.');
+  }
+  
+  // Check if THIS specific context (not prototype chain) already has extendedLayout
+  if (this.__context.hasOwnProperty('extendedLayout')) {
+    throw new Error(
+      `Layout already extended: ${this.__context.extendedLayout}\n` +
+      `Cannot extend multiple layouts. A template can only extend one layout.`
+    );
+  }
+  
+  this.__context.extendedLayout = layoutName;
+  return ''; // No output
 }
 
 /**
@@ -78,5 +144,7 @@ export function yieldHelper(name) {
 export function registerBufferHelpers(adapter) {
   adapter.registerHelper('buffer', bufferHelper);
   adapter.registerHelper('yield', yieldHelper);
+  adapter.registerHelper('buffer_exists', bufferExistsHelper);
+  adapter.registerHelper('extends', extendsHelper);
 }
 

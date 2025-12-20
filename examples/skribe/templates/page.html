@@ -1,5 +1,8 @@
 {{!-- Page Layout using Buffer System --}}
 
+{{!-- Extend base layout --}}
+{{extends "layouts/base.html"}}
+
 {{!-- Set page metadata --}}
 {{#buffer name="page_title"}}{{title}}{{/buffer}}
 {{#buffer name="title_separator"}} - {{/buffer}}
@@ -13,6 +16,3 @@
     </div>
   </article>
 {{/buffer}}
-
-{{!-- Render with base layout --}}
-{{> layouts/base}}

@@ -56,7 +56,34 @@ export class HandlebarsAdapter extends TemplateAdapter {
       const template = this.handlebars.compile(templateSource);
 
       // Render with context
-      return template(context);
+      const output = template(context);
+      
+      // Check if template extended a layout
+      if (context.__context?.extendedLayout) {
+        const layoutName = context.__context.extendedLayout;
+        // Clear it before rendering layout to avoid conflicts
+        delete context.__context.extendedLayout;
+        
+        // Look up and render the layout partial with all buffers available
+        const partials = this.handlebars.partials || {};
+        const layoutPartial = partials[layoutName];
+        
+        if (!layoutPartial) {
+          throw new TemplateRenderError(
+            templatePath,
+            `Extended layout not found: ${layoutName}`,
+            `Template extends "${layoutName}" but this partial is not registered`
+          );
+        }
+        
+        // Compile if needed, then render the layout (which will yield from buffers)
+        const compiledLayout = typeof layoutPartial === 'function'
+          ? layoutPartial
+          : this.handlebars.compile(layoutPartial);
+        return compiledLayout(context);
+      }
+      
+      return output;
     } catch (error) {
       // Check if it's a syntax/parse error
       const isSyntaxError = error.message.match(/parse error|expecting|unexpected/i);
@@ -287,21 +314,33 @@ export class HandlebarsAdapter extends TemplateAdapter {
       
       // Merge context with hash parameters
       // 'this' in a regular function is the Handlebars template context (the instance)
-      // IMPORTANT: Preserve __context for buffer system from root context
+      // IMPORTANT: Create isolated __context for buffer system
+      // We need a NEW RenderContext so buffers don't leak between renders
       let context;
       if (options.hash) {
         context = { ...this, pathPrefix: autoPathPrefix, ...options.hash };
-        // Preserve __context from root context (where it's attached)
+        // Create NEW RenderContext for isolated buffers
         const rootContext = options.data?.root;
         if (rootContext && typeof rootContext === 'object' && rootContext.__context) {
-          context.__context = rootContext.__context;
+          // Import RenderContext at top of file
+          const RenderContext = rootContext.__context.constructor;
+          context.__context = new RenderContext(
+            rootContext.__context.canonical,
+            rootContext.__context.buildDir,
+            rootContext.__context.metadata
+          );
         }
       } else {
         context = { ...this, pathPrefix: autoPathPrefix };
-        // Also check root context when no hash params
+        // Also create new context when no hash params
         const rootContext = options.data?.root;
         if (rootContext && typeof rootContext === 'object' && rootContext.__context) {
-          context.__context = rootContext.__context;
+          const RenderContext = rootContext.__context.constructor;
+          context.__context = new RenderContext(
+            rootContext.__context.canonical,
+            rootContext.__context.buildDir,
+            rootContext.__context.metadata
+          );
         }
       }
       
@@ -314,7 +353,26 @@ export class HandlebarsAdapter extends TemplateAdapter {
         ? partial 
         : handlebars.compile(partial);
       
-      const content = compiledPartial(context, { data }) || '';
+      let content = compiledPartial(context, { data }) || '';
+      
+      // Check if the rendered template extended a layout
+      if (context.__context?.extendedLayout) {
+        const layoutName = context.__context.extendedLayout;
+        const layoutPartial = partials[layoutName];
+        
+        if (!layoutPartial) {
+          log?.warn?.(`render_file: extended layout '${layoutName}' not found`);
+        } else {
+          // Render the layout with the same context (which has all the buffers)
+          const compiledLayout = typeof layoutPartial === 'function'
+            ? layoutPartial
+            : handlebars.compile(layoutPartial);
+          content = compiledLayout(context, { data }) || '';
+        }
+        
+        // Clear extendedLayout so nested renders don't inherit it
+        delete context.__context.extendedLayout;
+      }
       
       // Queue for writing (atomic rendering)
       outputs.push({ 
