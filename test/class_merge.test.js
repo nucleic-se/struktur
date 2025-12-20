@@ -4,7 +4,7 @@
 
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
-import { deepMerge } from '../src/utils/deep_merge.js';
+import { classMerge } from '../src/utils/class_merge.js';
 import { ClassLoader } from '../src/class_loader.js';
 import { ClassResolver } from '../src/class_resolver.js';
 import fs from 'fs/promises';
@@ -18,7 +18,7 @@ describe('Deep Merge Utility', () => {
   it('should merge flat objects', () => {
     const target = { a: 1, b: 2 };
     const source = { b: 3, c: 4 };
-    const result = deepMerge(target, source);
+    const result = classMerge(target, source);
     
     assert.deepStrictEqual(result, { a: 1, b: 3, c: 4 });
   });
@@ -35,7 +35,7 @@ describe('Deep Merge Utility', () => {
         timeout: 60
       }
     };
-    const result = deepMerge(target, source);
+    const result = classMerge(target, source);
     
     assert.deepStrictEqual(result, {
       config: {
@@ -48,7 +48,7 @@ describe('Deep Merge Utility', () => {
   it('should replace arrays (not merge)', () => {
     const target = { tags: ['a', 'b'] };
     const source = { tags: ['c', 'd'] };
-    const result = deepMerge(target, source);
+    const result = classMerge(target, source);
     
     assert.deepStrictEqual(result, { tags: ['c', 'd'] });
   });
@@ -72,7 +72,7 @@ describe('Deep Merge Utility', () => {
         }
       }
     };
-    const result = deepMerge(target, source);
+    const result = classMerge(target, source);
     
     assert.deepStrictEqual(result, {
       server: {

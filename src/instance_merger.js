@@ -10,10 +10,16 @@
  * - Type mismatch: Throws error with path context
  * - Tracks source files for debugging
  * 
- * NOTE: This is separate from utils/deep_merge.js which is more lenient.
- * The two implementations serve different purposes:
- * - utils/deep_merge.js: Lenient merge for class defaults (design-time)
- * - instance_merger.js: Strict merge for instances (build-time, fail-fast)
+ * NOTE: This is intentionally different from utils/class_merge.js
+ * See utils/class_merge.js header for detailed comparison table.
+ * 
+ * USE CASE: Merging multi-file instance definitions
+ * 
+ * BEHAVIOR:
+ * - Arrays: Concatenated and deduped (accumulate)
+ * - Type checking: Strict (throws on mismatch)
+ * - Path tracking: Full path in errors
+ * - Build-time: Fails fast on conflicts
  */
 
 /**

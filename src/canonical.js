@@ -5,7 +5,7 @@
  */
 
 import { createRequire } from 'module';
-import { deepMerge } from './utils/deep_merge.js';
+import { classMerge } from './utils/class_merge.js';
 import { createLogger } from './utils/logger.js';
 
 const require = createRequire(import.meta.url);
@@ -22,7 +22,7 @@ function mergeInstanceWithFields(instance, resolvedClass = {}, aspectLoader = nu
   const fields = resolvedClass.fields || {};
   
   // Deep merge: start with empty object, merge defaults, then instance (instance wins)
-  const merged = deepMerge(deepMerge({}, fields), instance);
+  const merged = classMerge(classMerge({}, fields), instance);
 
   // Three-layer aspect data merge
   // Collect all aspect names from: instance, class aspect_types, class aspect_defaults
@@ -53,18 +53,18 @@ function mergeInstanceWithFields(instance, resolvedClass = {}, aspectLoader = nu
         const aspectDef = aspectLoader.aspects.get(aspectKey);
         if (aspectDef) {
           const { aspect, schema, ...defaults } = aspectDef;
-          aspectData = deepMerge(aspectData, defaults);
+          aspectData = classMerge(aspectData, defaults);
         }
       }
       
       // Layer 2: Class hierarchy aspect_defaults (from resolved class)
       if (resolvedClass.aspect_defaults && resolvedClass.aspect_defaults[aspectName]) {
-        aspectData = deepMerge(aspectData, resolvedClass.aspect_defaults[aspectName]);
+        aspectData = classMerge(aspectData, resolvedClass.aspect_defaults[aspectName]);
       }
       
       // Layer 3: Instance aspect values (always win)
       if (instance.aspects && instance.aspects[aspectName]) {
-        aspectData = deepMerge(aspectData, instance.aspects[aspectName]);
+        aspectData = classMerge(aspectData, instance.aspects[aspectName]);
       }
       
       merged.aspects[aspectName] = aspectData;

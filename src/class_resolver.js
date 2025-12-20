@@ -4,7 +4,7 @@
  * Key principle: Build lineage chain, keep schemas separate
  */
 
-import { deepMerge } from './utils/deep_merge.js';
+import { classMerge } from './utils/class_merge.js';
 import { analyzeSchemaConstraints, formatConflicts } from './schema_constraint_validator.js';
 
 export class ClassResolver {
@@ -133,7 +133,7 @@ export class ClassResolver {
     for (const className of lineage) {
       const classDef = this.classLoader.getClass(className);
       if (classDef.fields) {
-        merged = deepMerge(merged, classDef.fields);
+        merged = classMerge(merged, classDef.fields);
       }
     }
 
@@ -222,7 +222,7 @@ export class ClassResolver {
           if (!merged[aspectName]) {
             merged[aspectName] = {};
           }
-          merged[aspectName] = deepMerge(merged[aspectName], defaults);
+          merged[aspectName] = classMerge(merged[aspectName], defaults);
         }
       }
     }
