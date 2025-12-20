@@ -126,7 +126,7 @@ describe('HandlebarsAdapter', () => {
       await adapter.loadPartials(partialsDir);
 
       const templatePath = path.join(FIXTURES_DIR, 'with-footer.hbs');
-      await fs.writeFile(templatePath, '{{> footer}}');
+      await fs.writeFile(templatePath, '{{> footer.hbs}}');
 
       const result = await adapter.render(templatePath, { text: 'Copyright 2025' });
       assert.strictEqual(result, '<footer>Copyright 2025</footer>');

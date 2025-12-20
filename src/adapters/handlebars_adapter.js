@@ -69,10 +69,22 @@ export class HandlebarsAdapter extends TemplateAdapter {
         const layoutPartial = partials[layoutName];
         
         if (!layoutPartial) {
+          // Suggest similar files with extensions
+          const availablePartials = Object.keys(partials);
+          const suggestions = availablePartials
+            .filter(name => name.startsWith(layoutName) || name.includes(path.basename(layoutName)))
+            .slice(0, 3);
+          
+          let errorDetails = `Template extends "${layoutName}" but this partial is not registered.`;
+          if (suggestions.length > 0) {
+            errorDetails += `\n\nDid you mean:\n${suggestions.map(s => `  - ${s}`).join('\n')}`;
+          }
+          errorDetails += '\n\nNote: Struktur requires explicit file extensions for all partial references.';
+          
           throw new TemplateRenderError(
             templatePath,
             `Extended layout not found: ${layoutName}`,
-            `Template extends "${layoutName}" but this partial is not registered`
+            errorDetails
           );
         }
         
@@ -165,14 +177,8 @@ export class HandlebarsAdapter extends TemplateAdapter {
         const normalizedPath = relativePath.replace(/\\/g, '/');
         
         // Register with full path including extension
+        // ONLY full filename - explicit extensions required
         this.registerPartial(normalizedPath, source);
-        
-        // Also register without extension (v1 pattern: {{> partials/head}} finds partials/head.html)
-        const ext = path.extname(normalizedPath);
-        if (ext) {
-          const nameWithoutExt = normalizedPath.slice(0, -ext.length);
-          this.registerPartial(nameWithoutExt, source);
-        }
       }
     }
   }
@@ -297,7 +303,18 @@ export class HandlebarsAdapter extends TemplateAdapter {
       const partial = partials[partialName];
       
       if (!partial) {
-        log?.warn?.(`render_file: partial '${partialName}' not found`);
+        // Suggest similar files with extensions
+        const availablePartials = Object.keys(partials);
+        const suggestions = availablePartials
+          .filter(name => name.startsWith(partialName) || name.includes(path.basename(partialName)))
+          .slice(0, 3);
+        
+        let errorMsg = `render_file: partial '${partialName}' not found`;
+        if (suggestions.length > 0) {
+          errorMsg += `\n\nDid you mean:\n${suggestions.map(s => `  - ${s}`).join('\n')}`;
+        }
+        errorMsg += '\n\nNote: Struktur requires explicit file extensions for all partial references.';
+        log?.warn?.(errorMsg);
         return '';
       }
       
@@ -361,7 +378,18 @@ export class HandlebarsAdapter extends TemplateAdapter {
         const layoutPartial = partials[layoutName];
         
         if (!layoutPartial) {
-          log?.warn?.(`render_file: extended layout '${layoutName}' not found`);
+          // Suggest similar files with extensions
+          const availablePartials = Object.keys(partials);
+          const suggestions = availablePartials
+            .filter(name => name.startsWith(layoutName) || name.includes(path.basename(layoutName)))
+            .slice(0, 3);
+          
+          let errorMsg = `render_file: extended layout '${layoutName}' not found`;
+          if (suggestions.length > 0) {
+            errorMsg += `\n\nDid you mean:\n${suggestions.map(s => `  - ${s}`).join('\n')}`;
+          }
+          errorMsg += '\n\nNote: Struktur requires explicit file extensions for all partial references.';
+          log?.warn?.(errorMsg);
         } else {
           // Render the layout with the same context (which has all the buffers)
           const compiledLayout = typeof layoutPartial === 'function'

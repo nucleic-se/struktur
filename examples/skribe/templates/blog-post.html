@@ -18,7 +18,7 @@
       <p>{{{replace (escape aspects.blog_post.content) "\n\n" "</p><p>"}}}</p>
     </div>
     {{#if aspects.blog_post.tags}}
-    {{> partials/tags tags=aspects.blog_post.tags}}
+    {{> partials/tags.html tags=aspects.blog_post.tags}}
     {{/if}}
   </article>
 {{/buffer}}
