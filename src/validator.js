@@ -10,6 +10,12 @@ import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
 import { SemanticValidator } from './semantic_validator.js';
 import { LintValidator } from './lint_validator.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export class MultiPassValidator {
   constructor(options = {}) {
@@ -23,6 +29,12 @@ export class MultiPassValidator {
       ...options.ajvOptions
     });
     addFormats(this.ajv, { mode: 'full' });
+
+    // Load and compile base schema for all instances
+    const baseSchemaPath = path.join(__dirname, '../schemas/instance_base.schema.json');
+    const baseSchemaData = fs.readFileSync(baseSchemaPath, 'utf8');
+    const baseSchema = JSON.parse(baseSchemaData);
+    this.baseValidator = this.ajv.compile(baseSchema);
 
     // Cache compiled validators
     /** @type {Map<string, Function>} */
@@ -78,6 +90,14 @@ export class MultiPassValidator {
   validate(instance, resolvedClass) {
     const errors = [];
     const { lineage, aspects } = resolvedClass;
+
+    // Pass 0: Validate against base instance schema (id, class, render)
+    const baseValid = this.baseValidator(instance);
+    if (!baseValid && this.baseValidator.errors) {
+      for (const err of this.baseValidator.errors) {
+        errors.push(this._formatBaseSchemaError(err, instance.id));
+      }
+    }
 
     // Pass 1: Validate against each schema in lineage
     for (const layerName of lineage) {
@@ -226,6 +246,35 @@ export class MultiPassValidator {
       level: 'error',
       code: 'schema_validation',
       layer: layerName,
+      message: msg,
+      path,
+      instance: instanceId,
+      ajvError: err
+    };
+  }
+
+  /**
+   * Format base schema validation error
+   * @private
+   */
+  _formatBaseSchemaError(err, instanceId) {
+    const path = err.instancePath || '/';
+    let msg = `[instance_base] ${path}`;
+
+    if (err.keyword === 'required') {
+      msg += ` missing required field: ${err.params.missingProperty}`;
+    } else if (err.keyword === 'type') {
+      msg += ` must be ${err.params.type}`;
+    } else if (err.keyword === 'additionalProperties') {
+      msg += ` has unexpected field: ${err.params.additionalProperty}`;
+    } else {
+      msg += ` ${err.message}`;
+    }
+
+    return {
+      level: 'error',
+      code: 'base_schema_validation',
+      layer: 'instance_base',
       message: msg,
       path,
       instance: instanceId,

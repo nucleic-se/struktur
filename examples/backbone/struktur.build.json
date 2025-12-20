@@ -3,5 +3,16 @@
   "aspects": ["../universal/aspects", "aspects", "mixins/terraform/aspects", "mixins/ansible/aspects"],
   "instances": ["../universal/instances", "instances", "mixins/terraform/instances", "mixins/ansible/instances"],
   "templates": ["../universal/templates", "mixins/terraform/templates", "mixins/ansible/templates"],
-  "build_dir": "build"
+  "build_dir": "build",
+  "template_engine": "handlebars",
+  "render": [
+    {"template": "viewer.html", "output": "/viewer.html"},
+    {"template": "terraform/main.tf.j2", "output": "/terraform/main.tf"},
+    {"template": "terraform/variables.tf.j2", "output": "/terraform/variables.tf"},
+    {"template": "ansible/inventory.ini.j2", "output": "/ansible/inventory.ini"},
+    {"template": "ansible/pihole_custom.list.j2", "output": "/ansible/pihole_custom.list"},
+    {"template": "ansible/playbook_dns.yml.j2", "output": "/ansible/playbook_dns.yml"},
+    {"template": "ansible/playbook_proxy.yml.j2", "output": "/ansible/playbook_proxy.yml"},
+    {"template": "ansible/playbook_web.yml.j2", "output": "/ansible/playbook_web.yml"}
+  ]
 }

@@ -96,7 +96,9 @@ async function createTestStack(tempDir, configFile = null) {
   const global = {
     id: 'global',
     class: 'test_class',
-    render: ['output.txt']
+    render: [
+      { template: 'output.txt', output: '/output.txt' }
+    ]
   };
   await fs.writeFile(
     join(tempDir, 'instances', 'global.json'),

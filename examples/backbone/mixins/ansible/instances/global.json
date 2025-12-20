@@ -1,11 +1,4 @@
 {
   "id": "global",
-  "class": "global",
-  "build": [
-    { "ansible/inventory.ini.j2": "/ansible/inventory.ini" },
-    { "ansible/pihole_custom.list.j2": "/ansible/pihole_custom.list" },
-    { "ansible/playbook_dns.yml.j2": "/ansible/playbook_dns.yml" },
-    { "ansible/playbook_proxy.yml.j2": "/ansible/playbook_proxy.yml" },
-    { "ansible/playbook_web.yml.j2": "/ansible/playbook_web.yml" }
-  ]
+  "class": "global"
 }

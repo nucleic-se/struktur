@@ -5,7 +5,7 @@
   "templates": ["../universal/templates", "templates"],
   "build_dir": "build",
   "render": [
-    {"template": "viewer.html", "output": "/index.html"},
+    {"template": "viewer.html", "output": "/viewer.html"},
     {"template": "frontend.html", "output": "/frontend/index.html"},
     {"template": "docker-compose.yml", "output": "/docker-compose.yml"},
     {"template": ".env.development", "output": "/.env.development"},

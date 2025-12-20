@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "instance_base.schema.json",
+  "title": "Instance Base Schema",
+  "description": "Base schema that all Struktur instances must validate against, regardless of class",
+  "type": "object",
+  "required": ["id", "class"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique identifier for this instance"
+    },
+    "class": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Class name this instance belongs to"
+    },
+    "render": {
+      "type": "array",
+      "description": "Optional array of render tasks for this instance",
+      "items": {
+        "type": "object",
+        "required": ["template", "output"],
+        "properties": {
+          "template": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Template file name (with extension)"
+          },
+          "output": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Output path (relative to build_dir)"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "_source_file": {
+      "type": "string",
+      "description": "Internal: source file path (added by loader)"
+    }
+  }
+}

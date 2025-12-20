@@ -182,6 +182,18 @@ export async function buildStack(options) {
   await fs.writeFile(validationPath, JSON.stringify(canonical.validation, null, 2), 'utf-8');
   log.log('  ✓ meta/validation.json');
 
+  // Step 6.5: Extract render tasks from instances and merge with config render tasks
+  const instanceRenderTasks = canonical.instances
+    .filter(inst => inst.render && Array.isArray(inst.render) && inst.render.length > 0)
+    .flatMap(inst => inst.render);
+  
+  // Merge: config tasks first, then instance tasks
+  const allRenderTasks = [...renderTasks, ...instanceRenderTasks];
+  
+  if (instanceRenderTasks.length > 0) {
+    log.log(`  ℹ Found ${instanceRenderTasks.length} render tasks from instances`);
+  }
+
   // Step 7: Render templates if provided (v1-compatible with global.build array)
   let renderedCount = 0;
   if (templateDirs.length > 0) {
@@ -210,15 +222,15 @@ export async function buildStack(options) {
     await renderer.registerHelpers(canonical);
     await renderer.loadPartials(templateDirs);
 
-    // Use render tasks from config
-    if (renderTasks.length === 0) {
-      log.log(`  ℹ No render tasks found (no "render" array in config)`);
+    // Use merged render tasks
+    if (allRenderTasks.length === 0) {
+      log.log(`  ℹ No render tasks found (no "render" array in config or instances)`);
       log.log(`     Templates will not be rendered. This is OK if you only need canonical output.`);
     } else {
-      log.log(`  Found ${renderTasks.length} render tasks`);
+      log.log(`  Found ${allRenderTasks.length} render tasks`);
       
       // Render all tasks with pre-flight validation and buffer support
-      const result = await renderer.renderAll(renderTasks, canonical, buildDir);
+      const result = await renderer.renderAll(allRenderTasks, canonical, buildDir);
       renderedCount = result.renderedCount;
 
       if (renderedCount > 0) {

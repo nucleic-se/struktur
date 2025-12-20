@@ -156,6 +156,7 @@ describe('MultiPassValidator', () => {
 
       const instance = {
         id: 'test-1',
+        class: 'simple',
         name: 'Test Instance'
       };
 
@@ -184,7 +185,8 @@ describe('MultiPassValidator', () => {
       validator.registerClass(resolvedClass);
 
       const instance = {
-        id: 'test-1'
+        id: 'test-1',
+        class: 'simple'
         // missing name
       };
 
@@ -218,6 +220,7 @@ describe('MultiPassValidator', () => {
 
       const instance = {
         id: 'test-1',
+        class: 'typed',
         count: 'not-a-number'
       };
 
@@ -252,6 +255,7 @@ describe('MultiPassValidator', () => {
       // Valid against both schemas
       const validInstance = {
         id: 'test-1',
+        class: 'child',
         name: 'Test'
       };
 
@@ -260,6 +264,7 @@ describe('MultiPassValidator', () => {
 
       // Invalid - missing property required by parent
       const invalidInstance = {
+        class: 'child',
         name: 'Test'
         // missing id required by parent
       };
@@ -297,6 +302,7 @@ describe('MultiPassValidator', () => {
 
       const instance = {
         id: 'test-1',
+        class: 'with_aspect',
         aspects: {
           test_aspect: {
             value: 'test-value'
@@ -336,6 +342,7 @@ describe('MultiPassValidator', () => {
 
       const instance = {
         id: 'test-1',
+        class: 'with_aspect',
         aspects: {
           test_aspect: {
             // missing required value
@@ -373,7 +380,8 @@ describe('MultiPassValidator', () => {
       validator.registerAspect(aspectDef);
 
       const instance = {
-        id: 'test-1'
+        id: 'test-1',
+        class: 'with_optional_aspect'
         // no aspects provided
       };
 
@@ -391,7 +399,7 @@ describe('MultiPassValidator', () => {
       };
 
       // Don't register the class
-      const instance = { id: 'test' };
+      const instance = { id: 'test', class: 'test' };
 
       const result = validator.validate(instance, resolvedClass);
 
@@ -415,6 +423,7 @@ describe('MultiPassValidator', () => {
 
       const instance = {
         id: 'test',
+        class: 'test',
         aspects: {
           unregistered_aspect: { value: 'something' }
         }
@@ -552,6 +561,8 @@ describe('MultiPassValidator', () => {
       validator.registerClass(resolvedClass);
 
       const instance = {
+        id: 'test',
+        class: 'test',
         nested: {
           // missing value
         }
@@ -600,6 +611,7 @@ describe('MultiPassValidator', () => {
 
       const instance = {
         id: 'test',
+        class: 'test',
         aspects: {
           test_aspect: {
             config: {
@@ -637,7 +649,8 @@ describe('MultiPassValidator', () => {
       validator.registerClass(resolvedClass);
 
       const instance = {
-        id: 'my-instance-123'
+        id: 'my-instance-123',
+        class: 'test'
         // missing value
       };
 
@@ -659,7 +672,7 @@ describe('MultiPassValidator', () => {
         aspects: []
       };
 
-      const instance = { id: 'test' };
+      const instance = { id: 'test', class: 'test' };
       const result = validator.validate(instance, resolvedClass);
 
       assert.strictEqual(result.valid, true);
@@ -677,7 +690,7 @@ describe('MultiPassValidator', () => {
 
       validator.registerClass(resolvedClass);
 
-      const instance = { id: 'test' };
+      const instance = { id: 'test', class: 'test' };
       const result = validator.validate(instance, resolvedClass);
 
       assert.strictEqual(result.valid, true);
@@ -709,7 +722,8 @@ describe('MultiPassValidator', () => {
 
       // Missing required aspect
       const instance = {
-        id: 'test'
+        id: 'test',
+        class: 'test'
         // no aspects
       };
 
@@ -721,7 +735,7 @@ describe('MultiPassValidator', () => {
       ));
     });
 
-    it('should handle instances without id field', () => {
+    it('should require id field via base schema', () => {
       const resolvedClass = {
         class: 'test',
         lineage: ['test'],
@@ -736,15 +750,18 @@ describe('MultiPassValidator', () => {
       validator.registerClass(resolvedClass);
 
       const instance = {
+        class: 'test',
         value: 'test'
-        // no id field
+        // no id field - should fail base schema validation
       };
 
       const result = validator.validate(instance, resolvedClass);
 
-      assert.strictEqual(result.valid, true);
-      // Errors should have undefined instance id
-      assert.strictEqual(result.errors.length, 0);
+      assert.strictEqual(result.valid, false);
+      // Should have base schema validation error for missing id
+      assert.ok(result.errors.some(e => 
+        e.code === 'base_schema_validation' && e.message.includes('id')
+      ));
     });
   });
 });

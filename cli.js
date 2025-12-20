@@ -631,8 +631,6 @@ program
           },
           canonical: result.canonical
         }, null, 2));
-      } else if (!options.quiet) {
-        console.log(`\n✨ Open ${result.buildDir}/index.html to view your stack`);
       }
 
       process.exit(0);
