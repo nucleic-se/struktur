@@ -781,7 +781,7 @@ program
   });
 
 /**
- * Recursively copy directory contents
+ * Recursively copy directory contents (including empty directories)
  */
 async function copyDirectory(src, dest) {
   // Ensure destination directory exists
@@ -794,6 +794,7 @@ async function copyDirectory(src, dest) {
     const destPath = path.join(dest, entry.name);
 
     if (entry.isDirectory()) {
+      // Recursively copy subdirectory (creates even if empty)
       await copyDirectory(srcPath, destPath);
     } else {
       await fs.copyFile(srcPath, destPath);

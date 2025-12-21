@@ -17,20 +17,21 @@ Common errors, their causes, and solutions.
 
 ## Path Resolution Errors
 
-### Error: Cannot find classes directory
+### Error: Directory not found
 
 ```
-Error: Cannot find classes directory: ../universal/classes
-ENOENT: no such file or directory
+❌ Build failed: Classes directory not found: ../universal/classes
+  This directory was explicitly configured via CLI or config file
+  Hint: Check path spelling or remove it from configuration
 ```
 
 **Cause:**
-Relative path not found from current working directory or config file directory.
+Directory specified via CLI flag or config file doesn't exist.
 
 **Solution:**
 
 1. **Check path resolution context:**
-   - CLI arguments (`-c`, `-i`, `-t`): Relative to current working directory
+   - CLI arguments (`-c`, `-a`, `-i`, `-t`): Relative to current working directory
    - Config file paths: Relative to config file's directory
 
 2. **Verify directory exists:**
@@ -42,12 +43,58 @@ Relative path not found from current working directory or config file directory.
    ls -la /full/path/to/universal/classes
    ```
 
-3. **Use absolute paths if needed:**
+3. **Check for typos in path:**
+   ```bash
+   # Common mistakes:
+   -c ../univeral/classes    # Missing 's' in universal
+   -c ../universal/class     # Missing 'es' in classes
+   ```
+
+4. **Use absolute paths if unsure:**
    ```bash
    struktur build -c /full/path/to/classes
    ```
 
-4. **Check struktur.build.json path resolution:**
+5. **Remove unnecessary paths from config:**
+   If you don't need a particular directory (e.g., universal doesn't have aspects), remove it from your config:
+   ```json
+   {
+     "classes": ["../universal/classes", "classes"],
+     "aspects": ["aspects"]  // Don't include ../universal/aspects if it doesn't exist
+   }
+   ```
+
+### Error: Path is not a directory
+
+```
+❌ Build failed: Classes path is not a directory: ./classes.json
+  This path was explicitly configured via CLI or config file
+  Hint: Ensure the path points to a directory, not a file
+```
+
+**Cause:**
+Specified path points to a file instead of a directory.
+
+**Solution:**
+Point to the directory containing the files, not a file itself:
+```bash
+# Wrong
+struktur build -c ./classes.json
+
+# Right
+struktur build -c ./classes
+```
+
+### Legacy: Cannot find classes directory
+
+```
+Error: Cannot find classes directory: ../universal/classes
+ENOENT: no such file or directory
+```
+
+This error format was used in older versions. See "Directory not found" above for current error format and solutions.
+
+**Path Resolution in Config Files:**
    ```json
    {
      "classes": ["../universal/classes", "./classes"]

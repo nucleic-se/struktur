@@ -56,6 +56,33 @@ struktur build \
   -t templates/
 ```
 
+### Directory Validation
+
+**Explicit directories are validated before loading:**
+
+When you specify directories via CLI flags or config file, Struktur validates they exist before attempting to load from them:
+
+```bash
+struktur build -c /path/does-not-exist
+```
+
+```
+❌ Build failed: Classes directory not found: /path/does-not-exist
+  This directory was explicitly configured via CLI or config file
+  Hint: Check path spelling or remove it from configuration
+```
+
+**Why validate early?**
+- Fails fast with clear context about what's wrong
+- No partial loading that could mask configuration errors
+- Better error messages (knows it's from config, not a runtime issue)
+
+**Default directories (auto-discovery) are optional:**
+```bash
+struktur build  # Looks for ./classes, ./instances, etc.
+```
+If `./classes` doesn't exist, no error—just uses what's available.
+
 ### Load Order
 
 **Classes:** Loaded in directory order, then alphabetically

@@ -177,9 +177,9 @@ Or use explicit flags:
 ```bash
 struktur build \
   -c ../universal/classes classes \
-  -a ../universal/aspects aspects \
+  -a aspects \
   -i instances \
-  -t templates \
+  -t ../universal/templates templates \
   -b build
 ```
 
@@ -259,14 +259,14 @@ The build creates a complete application:
 ```json
 {
   "classes": ["../universal/classes", "classes"],
-  "aspects": ["../universal/aspects", "aspects"],
+  "aspects": ["aspects"],
   "instances": ["instances"],
-  "templates": ["templates"],
+  "templates": ["../universal/templates", "templates"],
   "buildDir": "build"
 }
 ```
 
-Paths are relative to the config file. CLI flags override config values.
+Paths are relative to the config file. CLI flags override config values. Note that Universal provides base classes and templates, while docked adds its Docker-specific aspects and extensions.
 
 ## What's included
 
@@ -394,10 +394,10 @@ EOF
 ```bash
 struktur build \
   -c ../universal/classes classes \
-  -a ../universal/aspects aspects \
+  -a aspects \
   -i instances \
   -i my-services \
-  -t templates \
+  -t ../universal/templates templates \
   -b build
 
 cd build && docker compose up -d myapp
@@ -534,10 +534,11 @@ Then rebuild:
 
 ```bash
 struktur build \
-  -c ../universal/classes -c . \
-  -a ../universal/aspects -a aspects \
-  -i instances -t templates \
-  -b build/docked
+  -c ../universal/classes classes \
+  -a aspects \
+  -i instances \
+  -t ../universal/templates templates \
+  -b build
 ```
 
 The generated `docker-compose.yml` will include your new service.

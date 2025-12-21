@@ -75,6 +75,37 @@ function validateRenderTasks(renderTasks, sourceLabel) {
 }
 
 /**
+ * Validate that all explicitly configured directories exist
+ * @param {Array} dirEntries - Normalized directory entries
+ * @param {string} label - Label for error messages (e.g., 'classes', 'aspects')
+ */
+async function validateExplicitDirectories(dirEntries, label) {
+  for (const entry of dirEntries) {
+    if (entry.explicit) {
+      try {
+        const stats = await fs.stat(entry.path);
+        if (!stats.isDirectory()) {
+          throw new Error(
+            `${label.charAt(0).toUpperCase() + label.slice(1)} path is not a directory: ${entry.path}\n` +
+            `  This path was explicitly configured via CLI or config file\n` +
+            `  Hint: Ensure the path points to a directory, not a file`
+          );
+        }
+      } catch (error) {
+        if (error.code === 'ENOENT') {
+          throw new Error(
+            `${label.charAt(0).toUpperCase() + label.slice(1)} directory not found: ${entry.path}\n` +
+            `  This directory was explicitly configured via CLI or config file\n` +
+            `  Hint: Check path spelling or remove it from configuration`
+          );
+        }
+        throw error;
+      }
+    }
+  }
+}
+
+/**
  * Build a stack with organized output directory
  * @param {Object} options - Build options
  * @returns {Promise<Object>} Build result
@@ -106,6 +137,12 @@ export async function buildStack(options) {
   const normalizedInstanceDirs = normalizeDirEntries(instanceDirs, './instances');
   const normalizedTemplateDirs = normalizeDirEntries(templateDirs, './templates');
   const templatePaths = extractDirPaths(normalizedTemplateDirs);
+  
+  // Validate that all explicit directories exist before proceeding
+  await validateExplicitDirectories(normalizedClassDirs, 'classes');
+  await validateExplicitDirectories(normalizedAspectDirs, 'aspects');
+  await validateExplicitDirectories(normalizedInstanceDirs, 'instances');
+  await validateExplicitDirectories(normalizedTemplateDirs, 'templates');
   
   // Generate deterministic build dir by default (disable with deterministic=false)
   let buildDir = requestedBuildDir;

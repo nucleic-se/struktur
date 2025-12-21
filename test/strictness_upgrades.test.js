@@ -76,7 +76,7 @@ describe('Strictness upgrades', () => {
           quiet: true
         });
       },
-      /Class directory not found/i
+      /Classes directory not found/i
     );
   });
 
