@@ -6,7 +6,6 @@
     "mixins/ansible/classes"
   ],
   "aspects": [
-    "../universal/aspects",
     "aspects",
     "mixins/terraform/aspects",
     "mixins/ansible/aspects"
