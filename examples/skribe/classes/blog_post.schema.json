@@ -1,8 +1,8 @@
 {
   "class": "blog_post",
   "parent": "content_base",
-  "aspect_types": ["blog_post"],
-  "aspect_defaults": {
+  "$uses_aspects": ["blog_post"],
+  "$aspect_defaults": {
     "blog_post": {
       "author": "Struktur Team"
     }

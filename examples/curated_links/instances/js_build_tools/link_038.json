@@ -14,7 +14,7 @@
   "github_stars": 2500,
   "license": "MIT",
   "github_url": "https://github.com/farm-fe/farm",
-  "aspects": {
+  "$aspects": {
     "quality": {
       "is_maintained": true,
       "is_free": true,

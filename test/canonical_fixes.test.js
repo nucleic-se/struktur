@@ -140,7 +140,7 @@ describe('Canonical classes_by_id Format', () => {
     assert.strictEqual(canonical.classes_by_id.container.class, 'container', 'Should have class name');
     assert.ok(Array.isArray(canonical.classes_by_id.container.lineage), 'Should have lineage array');
     assert.strictEqual(canonical.classes_by_id.container.pretty_name, 'Container', 'Should have pretty_name');
-    assert.ok(Array.isArray(canonical.classes_by_id.container.aspect_types), 'Should have kinds array');
+    assert.ok(Array.isArray(canonical.classes_by_id.container.$uses_aspects), 'Should have uses_aspects array');
   });
 
   it('should include all resolved class metadata', async () => {
@@ -154,7 +154,7 @@ describe('Canonical classes_by_id Format', () => {
     classLoader.classes.set('app', {
       class: 'app',
       parent: ['base'],
-      aspect_types: ['web_app'],
+      $uses_aspects: ['web_app'],
       pretty_name: 'Application',
       domains: ['frontend'],
       schema: { type: 'object' },
@@ -171,8 +171,8 @@ describe('Canonical classes_by_id Format', () => {
     assert.ok(Array.isArray(appClass.lineage), 'Should have lineage array');
     assert.ok(appClass.lineage.includes('base'), 'Lineage should include base');
     assert.ok(appClass.lineage.includes('app'), 'Lineage should include app');
-    assert.ok(Array.isArray(appClass.aspect_types), 'Should have kinds array');
-    assert.ok(appClass.aspect_types.includes('web_app'), 'Should include web_app kind');
+    assert.ok(Array.isArray(appClass.$uses_aspects), 'Should have uses_aspects array');
+    assert.ok(appClass.$uses_aspects.includes('web_app'), 'Should include web_app aspect');
     assert.strictEqual(appClass.pretty_name, 'Application');
     assert.ok(Array.isArray(appClass.domains), 'Should have domains array');
     assert.ok(appClass.domains.includes('frontend'), 'Should include frontend domain');

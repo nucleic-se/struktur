@@ -273,17 +273,17 @@ Add content to the beginning:
 {% buffer name="service" destination="docker-compose.yml" mode="append" %}
 services:
   {{id}}:
-    image: {{aspects.docker_container.image}}
+    image: {{$aspects.docker_container.image}}
     ports:
-      - "{{aspects.docker_container.port}}:80"
+      - "{{$aspects.docker_container.port}}:80"
 {% endbuffer %}
 
 {# Write to README.md #}
 {% buffer name="docs" destination="README.md" mode="append" %}
 ## Service: {{id}}
 
-**Image:** {{aspects.docker_container.image}}
-**Port:** {{aspects.docker_container.port}}
+**Image:** {{$aspects.docker_container.image}}
+**Port:** {{$aspects.docker_container.port}}
 {% endbuffer %}
 ```
 
@@ -544,9 +544,9 @@ templates/
 {# Write service to docker-compose.yml #}
 {% buffer name="docker_service" destination="docker-compose.yml" mode="append" %}
   {{id}}:
-    image: {{aspects.docker_container.image}}
+    image: {{$aspects.docker_container.image}}
     ports:
-      - "{{aspects.docker_container.port}}:{{aspects.docker_container.internal_port}}"
+      - "{{$aspects.docker_container.port}}:{{$aspects.docker_container.internal_port}}"
     environment:
       NODE_ENV: production
 {% endbuffer %}
@@ -555,8 +555,8 @@ templates/
 {% buffer name="service_docs" destination="README.md" mode="append" %}
 ### {{id}}
 
-- **Image:** {{aspects.docker_container.image}}
-- **Port:** {{aspects.docker_container.port}}
+- **Image:** {{$aspects.docker_container.image}}
+- **Port:** {{$aspects.docker_container.port}}
 - **Status:** {{status}}
 {% endbuffer %}
 ```
@@ -564,8 +564,8 @@ templates/
 **Instances:**
 ```json
 [
-  {"id": "web", "class": "service", "aspects": {"docker_container": {"image": "nginx", "port": 80, "internal_port": 80}}},
-  {"id": "api", "class": "service", "aspects": {"docker_container": {"image": "node:18", "port": 3000, "internal_port": 3000}}}
+  {"id": "web", "class": "service", "$aspects": {"docker_container": {"image": "nginx", "port": 80, "internal_port": 80}}},
+  {"id": "api", "class": "service", "$aspects": {"docker_container": {"image": "node:18", "port": 3000, "internal_port": 3000}}}
 ]
 ```
 

@@ -3,7 +3,7 @@
   "name": "Proxmox Hypervisor",
   "class": "proxmox_node",
   "domains": ["physical"],
-  "aspects": {
+  "$aspects": {
     "infrastructure": {
       "notes": "Primary Proxmox VE host - Change host_node references in guests to match your Proxmox node name"
     },

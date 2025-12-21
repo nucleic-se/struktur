@@ -98,7 +98,7 @@ entity → service → web_service → api_service
 {
   "id": "api",
   "class": "service",
-  "aspects": {
+  "$aspects": {
     "web_service": { "port": 8080 },
     "database": { "connection": "postgres://..." },
     "monitoring": { "metrics_port": 9090 }
@@ -125,7 +125,7 @@ services:
   "id": "api",
   "class": "service",  // ← Inherited: replicas: 1
   "port": 8080,        // ← Explicit override
-  "aspects": {
+  "$aspects": {
     "web_service": {   // ← Aspect adds: proxy_pass
       "upstream": "backend:3000"
     }

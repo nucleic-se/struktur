@@ -24,14 +24,14 @@
             "type": "string",
             "description": "Class name this instance belongs to"
           },
-          "aspects": {
+          "$aspects": {
             "type": "object",
             "description": "Aspect data keyed by aspect name"
           },
-          "aspect_types": {
+          "$uses_aspects": {
             "type": "array",
             "items": { "type": "string" },
-            "description": "List of aspect names (auto-derived from aspects keys)"
+            "description": "List of aspect names (from class $uses_aspects + derived from instance $aspects keys)"
           },
           "_source_file": {
             "type": "string",
@@ -82,7 +82,7 @@
             "type": "object",
             "description": "Default field values"
           },
-          "aspects": {
+          "$aspects": {
             "description": "Required/optional aspects for this class",
             "oneOf": [
               {
@@ -132,7 +132,7 @@
             "type": "object",
             "description": "Default field values"
           },
-          "aspects": {
+          "$aspects": {
             "description": "Required/optional aspects for this class",
             "oneOf": [
               {

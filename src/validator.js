@@ -89,7 +89,7 @@ export class MultiPassValidator {
    */
   validate(instance, resolvedClass) {
     const errors = [];
-    const { lineage, aspects } = resolvedClass;
+    const { lineage, $aspects } = resolvedClass;
 
     // Pass 0: Validate against base instance schema (id, class, render)
     const baseValid = this.baseValidator(instance);
@@ -123,12 +123,12 @@ export class MultiPassValidator {
     }
 
     // Pass 2: Validate aspects
-    // aspects is now always an object: {aspectName: {required: boolean}, ...}
-    const aspectList = Object.keys(aspects || {});
+    // $aspects is now always an object: {aspectName: {required: boolean}, ...}
+    const aspectList = Object.keys($aspects || {});
 
     for (const aspectName of aspectList) {
-      const aspectData = instance.aspects?.[aspectName];
-      const requirement = aspects[aspectName];
+      const aspectData = instance.$aspects?.[aspectName];
+      const requirement = $aspects[aspectName];
       const isRequired = requirement?.required === true;
 
       // Check required

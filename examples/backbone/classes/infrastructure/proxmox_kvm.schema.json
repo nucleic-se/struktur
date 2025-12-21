@@ -8,7 +8,7 @@
   "domains": [
     "virtual"
   ],
-  "aspect_types": [],
+  "$uses_aspects": [],
   "schema": {
     "type": "object",
     "description": "Proxmox KVM virtual machine",

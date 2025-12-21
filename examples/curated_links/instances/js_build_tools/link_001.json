@@ -14,7 +14,7 @@
   "github_stars": 64500,
   "license": "MIT",
   "github_url": "https://github.com/webpack/webpack",
-  "aspects": {
+  "$aspects": {
     "quality": {
       "is_maintained": true,
       "is_free": true,

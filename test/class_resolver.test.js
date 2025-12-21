@@ -65,7 +65,7 @@ describe('ClassResolver', () => {
       const resolved = resolver.resolve('service');
 
       // Should have aspects from lineage
-      assert.ok(resolved.aspects);
+      assert.ok(resolved.$aspects);
     });
 
     it('should throw error for unknown class', () => {

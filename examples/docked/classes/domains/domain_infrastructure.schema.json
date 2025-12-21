@@ -4,7 +4,7 @@
   "domains": [
     "infrastructure"
   ],
-  "aspects": {
+  "$aspects": {
     "domain": {
       "name": "Infrastructure",
       "description": "Core infrastructure and networking components"
@@ -20,7 +20,7 @@
           "type": "string"
         }
       },
-      "aspects": {
+      "$aspects": {
         "type": "object",
         "properties": {
           "domain": {

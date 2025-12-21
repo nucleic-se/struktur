@@ -2,7 +2,7 @@
   "class": "web_service",
   "parent": "entity_base",
   "pretty_name": "Web Services",
-  "aspect_types": ["web_service"],
+  "$uses_aspects": ["web_service"],
   "domains": [],
   "name": "Example Service",
   "description": "A web service",

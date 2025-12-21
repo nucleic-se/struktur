@@ -3,7 +3,7 @@
   "name": "Reverse Proxy",
   "class": "proxmox_lxc",
   "domains": ["virtual"],
-  "aspects": {
+  "$aspects": {
     "infrastructure": {
       "notes": "Terraform-managed reverse proxy"
     },

@@ -21,7 +21,7 @@
         "type": "string",
         "description": "Specific type within domain"
       },
-      "aspects": {
+      "$aspects": {
         "type": "object",
         "properties": {
           "docker_network": {
@@ -43,16 +43,16 @@
     "required": [
       "id",
       "class",
-      "aspects"
+      "$aspects"
     ],
     "additionalProperties": true
   },
   "fields": {
     "pretty_name": "Networks",
-    "aspect_types": [
+    "$uses_aspects": [
       "docker_network"
     ],
     "domains": []
   },
-  "aspects": null
+  "$aspects": null
 }

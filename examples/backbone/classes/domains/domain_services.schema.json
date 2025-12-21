@@ -4,7 +4,7 @@
   "domains": [
     "services"
   ],
-  "aspects": {
+  "$aspects": {
     "domain": {
       "name": "Service Infrastructure",
       "description": "Applications and services running on the infrastructure"

@@ -2,7 +2,7 @@
   "id": "redis",
   "class": "docked_container",
   "domains": ["application"],
-  "aspects": {
+  "$aspects": {
     "docker_container": {
       "image": "redis:alpine",
       "description": "Redis in-memory data store",

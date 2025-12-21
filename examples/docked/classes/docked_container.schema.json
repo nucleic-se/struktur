@@ -2,11 +2,11 @@
   "class": "docked_container",
   "parent": "entity_base",
   "pretty_name": "Containers",
-  "aspect_types": [
+  "$uses_aspects": [
     "docker_container"
   ],
   "domains": [],
-  "aspect_defaults": {
+  "$aspect_defaults": {
     "docker_container": {
       "networks": ["docked"],
       "restart_policy": "unless-stopped",
@@ -36,7 +36,7 @@
         },
         "description": "Domain classifications (inherited from universal)"
       },
-      "aspects": {
+      "$aspects": {
         "type": "object",
         "properties": {
           "docker_container": {
@@ -129,7 +129,7 @@
     "required": [
       "id",
       "class",
-      "aspects"
+      "$aspects"
     ],
     "additionalProperties": true
   }

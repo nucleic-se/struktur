@@ -21,7 +21,7 @@
         "type": "string",
         "description": "Specific type within domain (e.g., metrics, cache, webserver)"
       },
-      "aspects": {
+      "$aspects": {
         "type": "object",
         "properties": {
           "docker_container": {
@@ -114,16 +114,16 @@
     "required": [
       "id",
       "class",
-      "aspects"
+      "$aspects"
     ],
     "additionalProperties": true
   },
   "fields": {
     "pretty_name": "Containers",
-    "aspect_types": [
+    "$uses_aspects": [
       "docker_container"
     ],
     "domains": []
   },
-  "aspects": null
+  "$aspects": null
 }

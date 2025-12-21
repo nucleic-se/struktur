@@ -13,7 +13,7 @@
   "github_stars": 29000,
   "license": "MIT",
   "github_url": "https://github.com/pnpm/pnpm",
-  "aspects": {
+  "$aspects": {
     "quality": {
       "is_maintained": true,
       "is_free": true,

@@ -61,7 +61,7 @@
         "type": "string",
         "description": "Optional display name"
       },
-      "aspects": {
+      "$aspects": {
         "type": "object",
         "description": "Aspect metadata",
         "additionalProperties": true,
@@ -120,7 +120,7 @@
     }
   },
   "fields": {
-    "aspects": {
+    "$aspects": {
       "aspect": {
         "kind": "docker_volume",
         "description": "Docker volumes for persistent data storage"

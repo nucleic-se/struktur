@@ -2,7 +2,7 @@
   "class": "network_service",
   "parent": "service_entity",
   "pretty_name": "Network Service",
-  "aspect_types": [],
+  "$uses_aspects": [],
   "kinds": [
     "service"
   ],

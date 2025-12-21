@@ -3,7 +3,7 @@
   "name": "Web Application 02",
   "class": "proxmox_lxc",
   "domains": ["virtual"],
-  "aspects": {
+  "$aspects": {
     "infrastructure": {
       "notes": "Terraform-managed web container"
     },

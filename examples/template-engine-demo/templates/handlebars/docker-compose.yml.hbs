@@ -9,15 +9,15 @@ services:
     image: nginx:alpine
     container_name: {{id}}
     ports:
-      - "{{aspects.web_service.port}}:{{aspects.web_service.port}}"
+      - "{{$aspects.web_service.port}}:{{$aspects.web_service.port}}"
     environment:
       - SERVICE_NAME={{{name}}}
-      - WORKERS={{{aspects.web_service.workers}}}
-{{#if aspects.web_service.ssl_enabled}}
+      - WORKERS={{{$aspects.web_service.workers}}}
+{{#if $aspects.web_service.ssl_enabled}}
       - SSL_ENABLED=true
     volumes:
-      - {{aspects.web_service.ssl_cert}}:{{aspects.web_service.ssl_cert}}:ro
-      - {{aspects.web_service.ssl_key}}:{{aspects.web_service.ssl_key}}:ro
+      - {{$aspects.web_service.ssl_cert}}:{{$aspects.web_service.ssl_cert}}:ro
+      - {{$aspects.web_service.ssl_key}}:{{$aspects.web_service.ssl_key}}:ro
 {{else}}
       - SSL_ENABLED=false
 {{/if}}

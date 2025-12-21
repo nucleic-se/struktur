@@ -68,16 +68,16 @@ Outputs are identical except for generator comment.
 ```handlebars
 {{#each (where instances "class" "web_service")}}
   server {
-    listen {{aspects.web_service.port}};
-    server_name {{aspects.web_service.hostname}};
+    listen {{$aspects.web_service.port}};
+    server_name {{$aspects.web_service.hostname}};
   }
 {{/each}}
 ```
 
 **Conditionals:**
 ```handlebars
-{{#if aspects.web_service.ssl_enabled}}
-  ssl_certificate {{aspects.web_service.ssl_cert}};
+{{#if $aspects.web_service.ssl_enabled}}
+  ssl_certificate {{$aspects.web_service.ssl_cert}};
 {{/if}}
 ```
 
@@ -93,8 +93,8 @@ Outputs are identical except for generator comment.
 {% for instance in instances %}
 {% if instance.class == "web_service" %}
   server {
-    listen {{ instance.aspects.web_service.port }};
-    server_name {{ instance.aspects.web_service.hostname }};
+    listen {{ instance.$aspects.web_service.port }};
+    server_name {{ instance.$aspects.web_service.hostname }};
   }
 {% endif %}
 {% endfor %}
@@ -102,8 +102,8 @@ Outputs are identical except for generator comment.
 
 **Conditionals:**
 ```nunjucks
-{% if instance.aspects.web_service.ssl_enabled %}
-  ssl_certificate {{ instance.aspects.web_service.ssl_cert }};
+{% if instance.$aspects.web_service.ssl_enabled %}
+  ssl_certificate {{ instance.$aspects.web_service.ssl_cert }};
 {% endif %}
 ```
 

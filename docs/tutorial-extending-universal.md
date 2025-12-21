@@ -169,7 +169,7 @@ Use **entity_base** class with the **server aspect**.
   "name": "Web Server 01",
   "description": "Primary web server",
   "domains": ["web-tier"],
-  "aspects": {
+  "$aspects": {
     "server": {
       "hostname": "web-01",
       "ip_address": "10.0.1.10",
@@ -189,7 +189,7 @@ Use **entity_base** class with the **server aspect**.
   "name": "Web Server 02",
   "description": "Secondary web server",
   "domains": ["web-tier"],
-  "aspects": {
+  "$aspects": {
     "server": {
       "hostname": "web-02",
       "ip_address": "10.0.1.11",
@@ -275,12 +275,12 @@ Universal includes a global instance with viewer.html template. Override it for 
 
 ## Servers
 {{#each instances}}
-{{#if aspects.server}}
+{{#if $aspects.server}}
 ### {{name}}
-- Hostname: {{aspects.server.hostname}}
-- IP: {{aspects.server.ip_address}}
-- OS: {{aspects.server.os}}
-- Resources: {{aspects.server.cpu_cores}} cores, {{aspects.server.memory_gb}}GB RAM
+- Hostname: {{$aspects.server.hostname}}
+- IP: {{$aspects.server.ip_address}}
+- OS: {{$aspects.server.os}}
+- Resources: {{$aspects.server.cpu_cores}} cores, {{$aspects.server.memory_gb}}GB RAM
 - Domains: {{#each domains}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
 
 {{/if}}
@@ -288,8 +288,8 @@ Universal includes a global instance with viewer.html template. Override it for 
 ```
 
 **Aspect access:**
-- Check presence: \`{{#if aspects.server}}\`
-- Access data: \`{{aspects.server.hostname}}\`
+- Check presence: \`{{#if $aspects.server}}\`
+- Access data: \`{{$aspects.server.hostname}}\`
 - Filter: iterate all instances, check for aspect
 
 ---
@@ -451,7 +451,7 @@ Apply to instances:
 {
   "id": "web-01",
   "class": "entity_base",
-  "aspects": {
+  "$aspects": {
     "server": {...},
     "monitoring": {
       "metrics_port": 9090,
@@ -492,8 +492,8 @@ Open \`build/index.html\` to see your domain hierarchy visualized.
 ### Conditional Aspects
 
 ```handlebars
-{{#if aspects.monitoring}}
-Monitoring: {{aspects.monitoring.metrics_port}}
+{{#if $aspects.monitoring}}
+Monitoring: {{$aspects.monitoring.metrics_port}}
 {{/if}}
 ```
 
@@ -501,7 +501,7 @@ Monitoring: {{aspects.monitoring.metrics_port}}
 
 ```handlebars
 {{#each instances}}
-  {{#if aspects.server}}
+  {{#if $aspects.server}}
     {{!-- Has server aspect --}}
   {{/if}}
 {{/each}}
@@ -511,7 +511,7 @@ Monitoring: {{aspects.monitoring.metrics_port}}
 
 ```json
 {
-  "aspects": {
+  "$aspects": {
     "server": {...},
     "monitoring": {...},
     "backup": {...}
@@ -522,8 +522,8 @@ Monitoring: {{aspects.monitoring.metrics_port}}
 ### Aspect Types (Auto-Computed)
 
 ```handlebars
-{{!-- aspect_types is automatically populated --}}
-Aspects: {{#each aspect_types}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+{{!-- $uses_aspects is automatically populated --}}
+Aspects: {{#each $uses_aspects}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
 ```
 
 ---
@@ -538,7 +538,7 @@ Aspects: {{#each aspect_types}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
 ```json
 {
   "class": "entity_base",
-  "aspects": {
+  "$aspects": {
     "your_aspect": {
       "custom_field": "value"
     }
@@ -556,9 +556,9 @@ Aspects: {{#each aspect_types}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
 
 **Problem:** Accessing aspect data incorrectly.
 
-**Solution:** Use \`aspects.aspect_name.field\`:
+**Solution:** Use \`$aspects.aspect_name.field\`:
 ```handlebars
-{{aspects.server.hostname}}
+{{$aspects.server.hostname}}
 ```
 
 ---

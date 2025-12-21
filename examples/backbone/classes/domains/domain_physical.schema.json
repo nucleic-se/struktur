@@ -4,7 +4,7 @@
   "domains": [
     "physical"
   ],
-  "aspects": {
+  "$aspects": {
     "domain": {
       "name": "Physical Infrastructure",
       "description": "Physical hardware: servers, compute nodes, network devices, storage arrays"

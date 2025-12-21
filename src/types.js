@@ -11,7 +11,9 @@
  * @property {string|Array<string>} [parent] - Parent class name (or array for multi-parent)
  * @property {Object} schema - JSON Schema (NOT merged with parents)
  * @property {Object.<string, any>} [fields] - Default field values
- * @property {Array<string>|Object.<string, AspectRequirement>} [aspects] - Aspect requirements (array or object)
+ * @property {Array<string>|Object.<string, AspectRequirement>} [$aspects] - Aspect requirements (array or object)
+ * @property {Array<string>} [$uses_aspects] - Aspect list for class accumulation
+ * @property {Object.<string, any>} [$aspect_defaults] - Default aspect values
  */
 
 /**
@@ -23,7 +25,6 @@
  * @typedef {Object} AspectDefinition
  * Aspect definition loaded from filesystem
  * @property {string} aspect - Aspect name
- * @property {string} [kind] - Aspect category
  * @property {string} [description] - Human-readable description
  * @property {Object} schema - JSON Schema for aspect data
  * @property {Object.<string, any>} [defaults] - Default values
@@ -36,7 +37,7 @@
  * @property {Array<string>} lineage - Full inheritance chain (root to leaf)
  * @property {Array<Object>} schemas - Schema chain (one per lineage entry)
  * @property {Object.<string, any>} fields - Merged default fields
- * @property {Array<string>} aspects - Merged aspect requirements
+ * @property {Object.<string, AspectRequirement>} $aspects - Merged aspect requirements
  */
 
 /**

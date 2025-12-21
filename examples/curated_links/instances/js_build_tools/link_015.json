@@ -13,7 +13,7 @@
   "github_stars": 8500,
   "license": "Artistic-2.0",
   "github_url": "https://github.com/npm/cli",
-  "aspects": {
+  "$aspects": {
     "quality": {
       "is_maintained": true,
       "is_free": true,

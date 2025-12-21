@@ -14,7 +14,7 @@
   "github_stars": 9000,
   "license": "MIT",
   "github_url": "https://github.com/web-infra-dev/rspack",
-  "aspects": {
+  "$aspects": {
     "quality": {
       "is_maintained": true,
       "is_free": true,

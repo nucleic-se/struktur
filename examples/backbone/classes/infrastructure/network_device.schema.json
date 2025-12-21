@@ -1,7 +1,7 @@
 {
   "class": "network_device",
   "parent": "infrastructure_entity",
-  "aspect_types": ["network_device"],
+  "$uses_aspects": ["network_device"],
   "pretty_name": "Network Device",
   "schema": {
     "type": "object",

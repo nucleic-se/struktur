@@ -49,13 +49,13 @@
     "domains": [],
     "replicas": 1
   },
-  "aspects": {
+  "$aspects": {
     "network_interface": {
       "required": true
     }
   },
-  "aspect_types": [],
-  "aspect_defaults": {},
+  "$uses_aspects": [],
+  "$aspect_defaults": {},
   "pretty_name": "service",
   "domains": [],
   "parent": [

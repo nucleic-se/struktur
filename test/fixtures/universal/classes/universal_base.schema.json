@@ -31,7 +31,7 @@
         },
         "description": "Build instructions for template rendering"
       },
-      "aspect_types": {
+      "$uses_aspects": {
         "type": "array",
         "items": {
           "type": "string"
@@ -45,7 +45,7 @@
         },
         "description": "Domain classifications for this instance"
       },
-      "aspects": {
+      "$aspects": {
         "type": "object",
         "additionalProperties": true,
         "description": "Aspect-specific data organized by aspect type"

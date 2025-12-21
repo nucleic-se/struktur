@@ -42,13 +42,13 @@
   "fields": {
     "domains": []
   },
-  "aspects": {
+  "$aspects": {
     "network_interface": {
       "required": false
     }
   },
-  "aspect_types": [],
-  "aspect_defaults": {},
+  "$uses_aspects": [],
+  "$aspect_defaults": {},
   "pretty_name": "optional_service2",
   "domains": [],
   "parent": [

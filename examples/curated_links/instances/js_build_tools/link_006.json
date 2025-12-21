@@ -14,7 +14,7 @@
   "github_stars": 25000,
   "license": "MPL-2.0",
   "github_url": "https://github.com/vercel/turbo",
-  "aspects": {
+  "$aspects": {
     "quality": {
       "is_maintained": true,
       "is_free": true,

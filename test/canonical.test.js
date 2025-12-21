@@ -128,7 +128,7 @@ describe('Canonical Output', () => {
       {
         id: 'test1',
         class: 'entity_base',
-        aspects: {
+        $aspects: {
           test_aspect: {
             value: 'test'
           }
@@ -138,8 +138,8 @@ describe('Canonical Output', () => {
 
     const canonical = generateCanonical(instances, resolver);
 
-    assert.ok(canonical.instances[0].aspects, 'Should preserve aspects');
-    assert.equal(canonical.instances[0].aspects.test_aspect.value, 'test', 'Should preserve aspect data');
+    assert.ok(canonical.instances[0].$aspects, 'Should preserve aspects');
+    assert.equal(canonical.instances[0].$aspects.test_aspect.value, 'test', 'Should preserve aspect data');
   });
 
   it('should handle unknown classes gracefully', async () => {

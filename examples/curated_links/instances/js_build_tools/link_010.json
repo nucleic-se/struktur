@@ -14,7 +14,7 @@
   "github_stars": 31000,
   "license": "Apache-2.0",
   "github_url": "https://github.com/swc-project/swc",
-  "aspects": {
+  "$aspects": {
     "quality": {
       "is_maintained": true,
       "is_free": true,

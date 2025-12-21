@@ -4,7 +4,7 @@
   "domains": [
     "network"
   ],
-  "aspects": {
+  "$aspects": {
     "domain": {
       "name": "Network Infrastructure",
       "description": "Routers, switches, and network configuration"

@@ -10,15 +10,15 @@ services:
     image: nginx:alpine
     container_name: {{ instance.id }}
     ports:
-      - "{{ instance.aspects.web_service.port }}:{{ instance.aspects.web_service.port }}"
+      - "{{ instance.$aspects.web_service.port }}:{{ instance.$aspects.web_service.port }}"
     environment:
       - SERVICE_NAME={{ instance.name | safe }}
-      - WORKERS={{ instance.aspects.web_service.workers | safe }}
-{% if instance.aspects.web_service.ssl_enabled %}
+      - WORKERS={{ instance.$aspects.web_service.workers | safe }}
+{% if instance.$aspects.web_service.ssl_enabled %}
       - SSL_ENABLED=true
     volumes:
-      - {{ instance.aspects.web_service.ssl_cert }}:{{ instance.aspects.web_service.ssl_cert }}:ro
-      - {{ instance.aspects.web_service.ssl_key }}:{{ instance.aspects.web_service.ssl_key }}:ro
+      - {{ instance.$aspects.web_service.ssl_cert }}:{{ instance.$aspects.web_service.ssl_cert }}:ro
+      - {{ instance.$aspects.web_service.ssl_key }}:{{ instance.$aspects.web_service.ssl_key }}:ro
 {% else %}
       - SSL_ENABLED=false
 {% endif %}

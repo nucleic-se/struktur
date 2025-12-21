@@ -367,7 +367,7 @@ cat > my-services/containers/myapp.json << 'EOF'
   "class": "docked_container",
   "description": "My custom application",
   "domains": ["application"],
-  "aspects": {
+  "$aspects": {
     "docker_container": {
       "image": "myorg/myapp:latest",
       "ports": ["8000:8000"],
@@ -386,7 +386,7 @@ cat > my-services/containers/myapp.json << 'EOF'
 EOF
 ```
 
-**Note:** Common fields like `networks: ["docked"]`, `restart_policy: "unless-stopped"`, and default healthcheck values (`interval`, `timeout`, `retries`) are inherited from the `docked_container` class via `aspect_defaults`. You only need to specify what's unique to your service.
+**Note:** Common fields like `networks: ["docked"]`, `restart_policy: "unless-stopped"`, and default healthcheck values (`interval`, `timeout`, `retries`) are inherited from the `docked_container` class via `$aspect_defaults`. You only need to specify what's unique to your service.
 ```
 
 **3. Build with both instance folders:**
@@ -420,7 +420,7 @@ cd build && docker compose up -d myapp
   "id": "mongodb",
   "class": "docked_container",
   "domains": ["database"],
-  "aspects": {
+  "$aspects": {
     "docker_container": {
       "image": "mongo:7",
       "ports": ["27017:27017"],
@@ -440,7 +440,7 @@ cd build && docker compose up -d myapp
   "id": "worker",
   "class": "docked_container",
   "domains": ["application"],
-  "aspects": {
+  "$aspects": {
     "docker_container": {
       "image": "myorg/worker:latest",
       "command": "npm run worker",
@@ -461,7 +461,7 @@ cd build && docker compose up -d myapp
   "id": "mongo-data",
   "class": "docked_volume",
   "description": "MongoDB data storage",
-  "aspects": {
+  "$aspects": {
     "docker_volume": {
       "driver": "local"
     }

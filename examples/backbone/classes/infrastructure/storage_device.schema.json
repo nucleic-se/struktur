@@ -1,7 +1,7 @@
 {
   "class": "storage_device",
   "parent": "infrastructure_entity",
-  "aspect_types": ["storage_device"],
+  "$uses_aspects": ["storage_device"],
   "pretty_name": "Storage Device",
   "schema": {
     "type": "object",

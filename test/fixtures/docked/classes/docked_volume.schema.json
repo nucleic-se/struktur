@@ -21,7 +21,7 @@
         "type": "string",
         "description": "Specific type within domain"
       },
-      "aspects": {
+      "$aspects": {
         "type": "object",
         "properties": {
           "docker_volume": {
@@ -44,16 +44,16 @@
     "required": [
       "id",
       "class",
-      "aspects"
+      "$aspects"
     ],
     "additionalProperties": true
   },
   "fields": {
     "pretty_name": "Volumes",
-    "aspect_types": [
+    "$uses_aspects": [
       "docker_volume"
     ],
     "domains": []
   },
-  "aspects": null
+  "$aspects": null
 }

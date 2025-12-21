@@ -73,7 +73,7 @@ struktur generate -c classes/ -i instances/ -o canonical.json
 
 **`aspects`** (Array)
 - All aspect definitions
-- Schema and kind information
+- Schema and descriptive metadata
 
 **`aspects_by_id`** (Object)
 - Aspects keyed by ID
@@ -187,7 +187,7 @@ Each instance in the array contains:
   "auto_restart": true,        // From parent class default
   "domain": "@production",     // Tag reference
   "labels": ["web", "nginx"],  // Array field (merged)
-  "aspects": {                 // Aspect data
+  "$aspects": {                 // Aspect data
     "monitoring": {
       "port": 9090
     }
@@ -246,10 +246,8 @@ Each instance in the array contains:
 
 ```json
 {
-  "id": "monitoring",
-  "class": "aspect_base",
-  "name": "Monitoring Configuration",
-  "kind": "optional",
+  "aspect": "monitoring",
+  "description": "Monitoring configuration",
   "schema": {
     "type": "object",
     "properties": {
@@ -262,7 +260,7 @@ Each instance in the array contains:
 
 **Used for:**
 - Aspect validation
-- Template checks (`{{#if aspects.monitoring}}`)
+- Template checks (`{{#if $aspects.monitoring}}`)
 - Documentation generation
 
 ---

@@ -21,7 +21,7 @@ instances/
   "class": "docked_container",
   "description": "My application",
   "domains": ["application"],
-  "aspects": {
+  "$aspects": {
     "docker_container": {
       "image": "myorg/myapp:latest",
       "ports": ["8000:8000"]
@@ -37,7 +37,7 @@ instances/
 {
   "id": "api",
   "class": "docked_container",
-  "aspects": {
+  "$aspects": {
     "docker_container": {
       "image": "node:20-alpine",
       "environment": {
@@ -54,7 +54,7 @@ instances/
 {
   "id": "webapp",
   "class": "docked_container",
-  "aspects": {
+  "$aspects": {
     "docker_container": {
       "image": "nginx:alpine",
       "depends_on": ["api"],
@@ -69,7 +69,7 @@ instances/
 
 ## Available Fields
 
-### Automatically Inherited (via aspect_defaults)
+### Automatically Inherited (via $aspect_defaults)
 
 All `docked_container` instances automatically inherit:
 - `networks: ["docked"]` - Attached to the docked network

@@ -3,7 +3,7 @@
   "name": "DNS Server",
   "class": "proxmox_lxc",
   "domains": ["virtual"],
-  "aspects": {
+  "$aspects": {
     "infrastructure": {
       "notes": "Terraform-managed DNS server"
     },

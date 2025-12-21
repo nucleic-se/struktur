@@ -8,8 +8,8 @@
   "domains": [
     "virtual"
   ],
-  "aspect_types": [],
-  "aspect_defaults": {
+  "$uses_aspects": [],
+  "$aspect_defaults": {
     "proxmox_guest": {
       "host_node": "polaris",
       "ostemplate": "local:vztmpl/debian-13-standard_13.1-2_amd64.tar.zst",

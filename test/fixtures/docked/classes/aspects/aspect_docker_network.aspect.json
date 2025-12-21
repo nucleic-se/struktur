@@ -13,7 +13,7 @@
     }
   },
   "fields": {
-    "aspects": {
+    "$aspects": {
       "aspect": {
         "kind": "docker_network",
         "description": "Docker networks for container communication"

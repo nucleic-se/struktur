@@ -13,7 +13,7 @@
   "github_stars": 94000,
   "license": "MIT",
   "github_url": "https://github.com/denoland/deno",
-  "aspects": {
+  "$aspects": {
     "quality": {
       "is_maintained": true,
       "is_free": true,

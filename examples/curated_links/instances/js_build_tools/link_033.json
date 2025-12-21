@@ -14,7 +14,7 @@
   "github_stars": 7500,
   "license": "Apache-2.0",
   "github_url": "https://github.com/TypeStrong/typedoc",
-  "aspects": {
+  "$aspects": {
     "quality": {
       "is_maintained": true,
       "is_free": true,

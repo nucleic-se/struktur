@@ -13,7 +13,7 @@
   "github_stars": 23000,
   "license": "MIT",
   "github_url": "https://github.com/nrwl/nx",
-  "aspects": {
+  "$aspects": {
     "quality": {
       "is_maintained": true,
       "is_free": true,

@@ -1,41 +1,41 @@
 <div class="card h-100">
   <div class="card-header">
-    <h5 class="card-title mb-0">{{aspects.employee.name}}</h5>
+    <h5 class="card-title mb-0">{{$aspects.employee.name}}</h5>
     <small class="text-muted">{{id}}</small>
   </div>
   <div class="card-body">
-    {{#if aspects.employee}}
+    {{#if $aspects.employee}}
       <div class="mb-2">
         <strong class="text-uppercase small text-muted">Email</strong>
-        <div>{{aspects.employee.email}}</div>
+        <div>{{$aspects.employee.email}}</div>
       </div>
       
-      {{#if aspects.employee.department}}
+      {{#if $aspects.employee.department}}
       <div class="mb-2">
         <strong class="text-uppercase small text-muted">Department</strong>
-        <div>{{aspects.employee.department}}</div>
+        <div>{{$aspects.employee.department}}</div>
       </div>
       {{/if}}
       
-      {{#if aspects.employee.role}}
+      {{#if $aspects.employee.role}}
       <div class="mb-2">
         <strong class="text-uppercase small text-muted">Role</strong>
-        <div>{{aspects.employee.role}}</div>
+        <div>{{$aspects.employee.role}}</div>
       </div>
       {{/if}}
       
-      {{#if aspects.employee.description}}
+      {{#if $aspects.employee.description}}
       <div class="mb-2">
         <strong class="text-uppercase small text-muted">Description</strong>
-        <div>{{aspects.employee.description}}</div>
+        <div>{{$aspects.employee.description}}</div>
       </div>
       {{/if}}
       
-      {{#if aspects.employee.responsibilities}}
+      {{#if $aspects.employee.responsibilities}}
       <div class="mb-2">
         <strong class="text-uppercase small text-muted">Responsibilities</strong>
         <ul class="mb-0">
-          {{#each aspects.employee.responsibilities}}
+          {{#each $aspects.employee.responsibilities}}
           <li>{{this}}</li>
           {{/each}}
         </ul>

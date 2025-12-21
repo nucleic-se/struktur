@@ -40,7 +40,7 @@ The original use case, but worth highlighting the breadth:
   "id": "strict-typescript",
   "class": "eslint_config",
   "extends": ["base-typescript"],
-  "aspects": {
+  "$aspects": {
     "typescript": {
       "strict": true,
       "no_explicit_any": "error"
@@ -94,7 +94,7 @@ The original use case, but worth highlighting the breadth:
   "id": "button",
   "class": "component",
   "category": "forms",
-  "aspects": {
+  "$aspects": {
     "design": {
       "variants": ["primary", "secondary", "danger"],
       "props": ["onClick", "disabled", "size"]
@@ -130,7 +130,7 @@ The original use case, but worth highlighting the breadth:
   "class": "equipment",
   "serial": "ABC123",
   "assigned_to": "jane.doe",
-  "aspects": {
+  "$aspects": {
     "hardware": {
       "make": "Dell",
       "model": "Precision 5560",
@@ -200,7 +200,7 @@ All these use cases share characteristics that make Struktur a good fit:
 Pick a use case above that resonates, then:
 
 1. **Define your class** - What fields does each instance need?
-2. **Add aspects** - What optional features can items have?
+2. **Add $aspects** - What optional features can items have?
 3. **Create instances** - Your actual data
 4. **Write templates** - How should output look?
 5. **Build** - `struktur build` and iterate

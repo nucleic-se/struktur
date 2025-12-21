@@ -75,7 +75,9 @@ Validates aspect-specific requirements:
 // Instance missing aspect field → Aspect validation fails
 {
   "id": "vm-01",
-  "aspects": ["terraform"]
+  "$aspects": {
+    "terraform": {}
+  }
   // Missing: resource_type
 }
 ```

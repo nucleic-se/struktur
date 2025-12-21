@@ -54,7 +54,7 @@ Open `build/build-{hash}/index.html` in your browser to explore the infrastructu
 This stack demonstrates the three-layer aspect data merge:
 
 1. **Aspect Definition Defaults** - Defined in `aspects/*.aspect.json`
-2. **Class Defaults** - Defined in `classes/*/*.schema.json` via `aspect_defaults`
+2. **Class Defaults** - Defined in `classes/*/*.schema.json` via `$aspect_defaults`
 3. **Instance Values** - Defined in `instances/*/*.json`
 
 Example: Network configuration inherits from aspect defaults:
@@ -114,7 +114,7 @@ Edit class defaults in `classes/infrastructure/proxmox_lxc.schema.json`:
 
 ```json
 {
-  "aspect_defaults": {
+  "$aspect_defaults": {
     "proxmox_guest": {
       "host_node": "polaris",
       "ostemplate": "local:vztmpl/debian-13-standard_13.1-2_amd64.tar.zst",
@@ -135,7 +135,7 @@ Each instance only needs unique values:
 {
   "id": "backbone_dns",
   "class": "proxmox_lxc",
-  "aspects": {
+  "$aspects": {
     "proxmox_guest": {
       "vmid": 400100  // Only override vmid
     },

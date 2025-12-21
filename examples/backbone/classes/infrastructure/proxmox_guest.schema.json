@@ -2,7 +2,7 @@
   "class": "proxmox_guest",
   "parent": "compute_node",
   "pretty_name": "Proxmox Guest",
-  "aspect_types": ["proxmox_guest", "network_interface"],
+  "$uses_aspects": ["proxmox_guest", "network_interface"],
   "schema": {
     "type": "object",
     "description": "Base class for Proxmox guest virtual machines and containers"

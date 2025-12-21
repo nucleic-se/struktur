@@ -9,5 +9,5 @@
       }
     }
   },
-  "aspects": ["network_interface"]
+  "$aspects": ["network_interface"]
 }

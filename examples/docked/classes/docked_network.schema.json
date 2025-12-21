@@ -2,7 +2,7 @@
   "class": "docked_network",
   "parent": "entity_base",
   "pretty_name": "Networks",
-  "aspect_types": [
+  "$uses_aspects": [
     "docker_network"
   ],
   "domains": [],
@@ -26,7 +26,7 @@
         "type": "string",
         "description": "Specific type within domain"
       },
-      "aspects": {
+      "$aspects": {
         "type": "object",
         "properties": {
           "docker_network": {
@@ -48,7 +48,7 @@
     "required": [
       "id",
       "class",
-      "aspects"
+      "$aspects"
     ],
     "additionalProperties": true
   }

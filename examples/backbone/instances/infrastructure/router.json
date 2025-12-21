@@ -3,7 +3,7 @@
   "name": "Network Router",
   "class": "router",
   "domains": ["physical", "network"],
-  "aspects": {
+  "$aspects": {
     "infrastructure": {
       "environment": "lab",
       "location": "Network Closet",

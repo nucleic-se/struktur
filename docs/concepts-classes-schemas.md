@@ -48,8 +48,8 @@ A class is a `.schema.json` file that defines:
 
 - `class` (required) — Unique identifier, must match filename
 - `parent` (optional) — Single parent or array of parents
-- `aspect_types` (optional) — Array of aspect names this class uses (accumulates through inheritance)
-- `aspect_defaults` (optional) — Default values for aspect data (see [Aspect Defaults](#aspect-defaults))
+- `$uses_aspects` (optional) — Array of aspect names this class uses (accumulates through inheritance)
+- `$aspect_defaults` (optional) — Default values for aspect data (see [Aspect Defaults](#aspect-defaults))
 - All other fields — Default values for instances
 
 ### The `class` Field Requirement
@@ -143,15 +143,15 @@ entity_base
 
 ### Defining Aspect Defaults in Classes
 
-Classes can provide default values for aspect data using the `aspect_defaults` field:
+Classes can provide default values for aspect data using the `$aspect_defaults` field:
 
 ```json
 // classes/proxmox_lxc.schema.json
 {
   "class": "proxmox_lxc",
   "parent": "proxmox_guest",
-  "aspect_types": ["proxmox_guest", "network_interface"],
-  "aspect_defaults": {
+  "$uses_aspects": ["proxmox_guest", "network_interface"],
+  "$aspect_defaults": {
     "proxmox_guest": {
       "host_node": "polaris",
       "ostemplate": "local:vztmpl/debian-13-standard_13.1-2_amd64.tar.zst",
@@ -170,13 +170,13 @@ Classes can provide default values for aspect data using the `aspect_defaults` f
 
 ### Inheritance and Accumulation
 
-Like other class fields, `aspect_defaults` deep merge through the inheritance chain:
+Like other class fields, `$aspect_defaults` deep merge through the inheritance chain:
 
 ```json
 // parent class
 {
   "class": "base_container",
-  "aspect_defaults": {
+  "$aspect_defaults": {
     "docker": {
       "restart": "unless-stopped",
       "network_mode": "bridge"
@@ -188,7 +188,7 @@ Like other class fields, `aspect_defaults` deep merge through the inheritance ch
 {
   "class": "web_container",
   "parent": "base_container",
-  "aspect_defaults": {
+  "$aspect_defaults": {
     "docker": {
       "restart": "always"  // Overrides parent
       // network_mode inherited from parent
@@ -212,8 +212,8 @@ Like other class fields, `aspect_defaults` deep merge through the inheritance ch
 Aspect data merges from three sources:
 
 1. **Aspect definition defaults** (base layer)
-2. **Class aspect_defaults** (class-specific overrides)
-3. **Instance aspects** (highest priority)
+2. **Class $aspect_defaults** (class-specific overrides)
+3. **Instance $aspects** (highest priority)
 
 See [Concepts: Aspects - Aspect Defaults](concepts-aspects.md#aspect-defaults) for complete details.
 

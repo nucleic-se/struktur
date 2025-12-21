@@ -2,7 +2,7 @@
   "id": "whoami",
   "class": "docked_container",
   "domains": ["web"],
-  "aspects": {
+  "$aspects": {
     "docker_container": {
       "image": "traefik/whoami:latest",
       "description": "Simple HTTP server that returns request information",

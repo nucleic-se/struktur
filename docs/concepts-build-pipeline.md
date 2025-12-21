@@ -104,10 +104,10 @@ Combine data from multiple sources into complete instances.
 ### Process
 
 1. **Resolve class inheritance** (build lineage)
-2. **Accumulate aspect_types and aspect_defaults** (parent → child)
+2. **Accumulate $uses_aspects and $aspect_defaults** (parent → child)
 3. **Merge class defaults** (parent → child)
 4. **Merge multi-file instances** (same ID)
-5. **Apply three-layer aspect merge** (aspect.defaults → class.aspect_defaults → instance.aspects)
+5. **Apply three-layer aspect merge** (aspect.defaults → class.$aspect_defaults → instance.$aspects)
 6. **Build canonical structure**
 
 ### Merge Order
@@ -129,8 +129,8 @@ Later sources override earlier sources
 **For aspect data specifically:**
 ```
 1. Aspect definition defaults      (from aspect file)
-2. Parent class aspect_defaults    (accumulated through inheritance)
-3. Child class aspect_defaults     (deep merged with parents)
+2. Parent class $aspect_defaults    (accumulated through inheritance)
+3. Child class $aspect_defaults     (deep merged with parents)
 4. Instance aspects                (highest priority)
 
 Each layer deep merges with previous, instance always wins

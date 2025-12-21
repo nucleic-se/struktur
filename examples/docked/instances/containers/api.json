@@ -3,7 +3,7 @@
   "class": "docked_container",
   "description": "Backend API service handling business logic and data access",
   "domains": ["application", "api"],
-  "aspects": {
+  "$aspects": {
     "docker_container": {
       "image": "node:20-alpine",
       "description": "Backend API connecting database, cache, and frontend",

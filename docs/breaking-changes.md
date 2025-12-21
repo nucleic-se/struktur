@@ -52,22 +52,22 @@ See [Concepts: Instances - Render Arrays](concepts-instances.md#render-arrays) f
 **New Feature**: Aspect data now merges from three sources automatically.
 
 **What Changed**:
-- aspect_types accumulate through inheritance (no manual cumulative lists needed)
-- aspect_defaults deep merge through parent chain
-- Three-layer merge: aspect.defaults ⊕ class.aspect_defaults ⊕ instance.aspects
+- $uses_aspects accumulates through inheritance (no manual cumulative lists needed)
+- $aspect_defaults deep merges through parent chain
+- Three-layer merge: aspect.defaults ⊕ class.$aspect_defaults ⊕ instance.$aspects
 
 **Fully Backward Compatible**:
 ```json
 // Old style (explicit cumulative lists) - still works
 {
   "class": "proxmox_lxc",
-  "aspect_types": ["infrastructure", "compute_node", "proxmox_guest"]
+  "$uses_aspects": ["infrastructure", "compute_node", "proxmox_guest"]
 }
 
 // New style (minimal declarations) - now works too
 {
   "class": "proxmox_lxc",
-  "aspect_types": ["proxmox_guest"]  // Others inherited automatically
+  "$uses_aspects": ["proxmox_guest"]  // Others inherited automatically
 }
 ```
 
@@ -127,7 +127,7 @@ See [Concepts: Aspects - Aspect Defaults](concepts-aspects.md#aspect-defaults) f
 |----------|----------|--------|
 | `objects` | `instances` | More accurate terminology |
 | `aspects_by_kind` | `aspects_by_id` | Consistent with `classes_by_id` |
-| `kinds` (overloaded) | `aspect_types` | Separate from class `types` |
+| `kinds` (overloaded) | `$uses_aspects` | Separate from class `types` |
 
 **Migration**: Update any code parsing canonical.json to use new field names.
 

@@ -19,7 +19,7 @@
   "fields": {
     "replicas": 1
   },
-  "aspects": {
+  "$aspects": {
     "network_interface": {
       "required": true
     }

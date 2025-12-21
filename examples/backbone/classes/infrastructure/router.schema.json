@@ -3,7 +3,7 @@
   "parent": ["network_device", "domain_physical", "domain_network"],
   "pretty_name": "Router",
   "domains": ["physical", "network"],
-  "aspect_types": ["network_interface"],
+  "$uses_aspects": ["network_interface"],
   "schema": {
     "type": "object",
     "description": "Network router or gateway device",

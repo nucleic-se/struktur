@@ -14,7 +14,7 @@
   "github_stars": 11000,
   "license": "MIT",
   "github_url": "https://github.com/oxc-project/oxc",
-  "aspects": {
+  "$aspects": {
     "quality": {
       "is_maintained": true,
       "is_free": true,

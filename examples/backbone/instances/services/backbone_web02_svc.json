@@ -1,7 +1,7 @@
 {
   "id": "backbone_web02_svc",
   "name": "Web Service 02",
-  "class": "network_service",  "domains": ["services"],  "aspects": {
+  "class": "network_service",  "domains": ["services"],  "$aspects": {
     "infrastructure": {
       "environment": "production",
       "notes": "Generic web application service",

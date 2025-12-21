@@ -3,7 +3,7 @@
  * 
  * Tests the merge hierarchy:
  * 1. Aspect definition defaults (from .aspect.json files)
- * 2. Class aspect_defaults (from class hierarchy)
+ * 2. Class $aspect_defaults (from class hierarchy)
  * 3. Instance values (highest priority)
  */
 
@@ -71,13 +71,13 @@ describe('Aspect Defaults Three-Layer Merge', () => {
         'classes/server.schema.json': {
           class: 'server',
           parent: 'entity_base',
-          aspect_types: ['network'],
+          $uses_aspects: ['network'],
           schema: { type: 'object' }
         },
         'instances/test_server.json': {
           id: 'test_server',
           class: 'server',
-          aspects: {
+          $aspects: {
             network: {
               ip: '192.168.1.100'
             }
@@ -104,9 +104,9 @@ describe('Aspect Defaults Three-Layer Merge', () => {
       });
 
       const server = canonical.instances_by_id.test_server;
-      assert.strictEqual(server.aspects.network.ip, '192.168.1.100', 'Instance value present');
-      assert.strictEqual(server.aspects.network.bridge, 'vmbr0', 'Aspect default applied');
-      assert.strictEqual(server.aspects.network.gateway, '192.168.1.1', 'Aspect default applied');
+      assert.strictEqual(server.$aspects.network.ip, '192.168.1.100', 'Instance value present');
+      assert.strictEqual(server.$aspects.network.bridge, 'vmbr0', 'Aspect default applied');
+      assert.strictEqual(server.$aspects.network.gateway, '192.168.1.1', 'Aspect default applied');
     });
 
     it('should handle aspect definitions without defaults', async () => {
@@ -123,13 +123,13 @@ describe('Aspect Defaults Three-Layer Merge', () => {
         'classes/disk.schema.json': {
           class: 'disk',
           parent: 'entity_base',
-          aspect_types: ['storage'],
+          $uses_aspects: ['storage'],
           schema: { type: 'object' }
         },
         'instances/test_disk.json': {
           id: 'test_disk',
           class: 'disk',
-          aspects: {
+          $aspects: {
             storage: {
               size: '100G'
             }
@@ -156,13 +156,13 @@ describe('Aspect Defaults Three-Layer Merge', () => {
       });
 
       const disk = canonical.instances_by_id.test_disk;
-      assert.strictEqual(disk.aspects.storage.size, '100G', 'Instance value present');
-      assert.strictEqual(Object.keys(disk.aspects.storage).length, 1, 'No extra defaults added');
+      assert.strictEqual(disk.$aspects.storage.size, '100G', 'Instance value present');
+      assert.strictEqual(Object.keys(disk.$aspects.storage).length, 1, 'No extra defaults added');
     });
   });
 
-  describe('Layer 2: Class Hierarchy aspect_defaults', () => {
-    it('should apply defaults from class aspect_defaults', async () => {
+  describe('Layer 2: Class Hierarchy $aspect_defaults', () => {
+    it('should apply defaults from class $aspect_defaults', async () => {
       await createTestFiles({
         'aspects/aspect_proxmox.aspect.json': {
           aspect: 'aspect_proxmox',
@@ -178,8 +178,8 @@ describe('Aspect Defaults Three-Layer Merge', () => {
         'classes/lxc.schema.json': {
           class: 'lxc',
           parent: 'entity_base',
-          aspect_types: ['proxmox'],
-          aspect_defaults: {
+          $uses_aspects: ['proxmox'],
+          $aspect_defaults: {
             proxmox: {
               host_node: 'pve-01',
               start: true,
@@ -191,7 +191,7 @@ describe('Aspect Defaults Three-Layer Merge', () => {
         'instances/test_lxc.json': {
           id: 'test_lxc',
           class: 'lxc',
-          aspects: {
+          $aspects: {
             proxmox: {
               vmid: 100
             }
@@ -218,13 +218,13 @@ describe('Aspect Defaults Three-Layer Merge', () => {
       });
 
       const lxc = canonical.instances_by_id.test_lxc;
-      assert.strictEqual(lxc.aspects.proxmox.vmid, 100, 'Instance value present');
-      assert.strictEqual(lxc.aspects.proxmox.host_node, 'pve-01', 'Class default applied');
-      assert.strictEqual(lxc.aspects.proxmox.start, true, 'Class default applied');
-      assert.strictEqual(lxc.aspects.proxmox.unprivileged, true, 'Class default applied');
+      assert.strictEqual(lxc.$aspects.proxmox.vmid, 100, 'Instance value present');
+      assert.strictEqual(lxc.$aspects.proxmox.host_node, 'pve-01', 'Class default applied');
+      assert.strictEqual(lxc.$aspects.proxmox.start, true, 'Class default applied');
+      assert.strictEqual(lxc.$aspects.proxmox.unprivileged, true, 'Class default applied');
     });
 
-    it('should accumulate aspect_defaults through inheritance', async () => {
+    it('should accumulate $aspect_defaults through inheritance', async () => {
       await createTestFiles({
         'aspects/aspect_compute.aspect.json': {
           aspect: 'aspect_compute',
@@ -240,8 +240,8 @@ describe('Aspect Defaults Three-Layer Merge', () => {
         'classes/base_vm.schema.json': {
           class: 'base_vm',
           parent: 'entity_base',
-          aspect_types: ['compute'],
-          aspect_defaults: {
+          $uses_aspects: ['compute'],
+          $aspect_defaults: {
             compute: {
               cores: 2,
               memory: 1024
@@ -252,7 +252,7 @@ describe('Aspect Defaults Three-Layer Merge', () => {
         'classes/production_vm.schema.json': {
           class: 'production_vm',
           parent: 'base_vm',
-          aspect_defaults: {
+          $aspect_defaults: {
             compute: {
               cores: 4,
               storage: '50G'
@@ -263,7 +263,7 @@ describe('Aspect Defaults Three-Layer Merge', () => {
         'instances/prod_server.json': {
           id: 'prod_server',
           class: 'production_vm',
-          aspects: {
+          $aspects: {
             compute: {
               memory: 4096
             }
@@ -290,9 +290,9 @@ describe('Aspect Defaults Three-Layer Merge', () => {
       });
 
       const server = canonical.instances_by_id.prod_server;
-      assert.strictEqual(server.aspects.compute.cores, 4, 'Child class default overrides parent');
-      assert.strictEqual(server.aspects.compute.memory, 4096, 'Instance value overrides all');
-      assert.strictEqual(server.aspects.compute.storage, '50G', 'Child class default added');
+      assert.strictEqual(server.$aspects.compute.cores, 4, 'Child class default overrides parent');
+      assert.strictEqual(server.$aspects.compute.memory, 4096, 'Instance value overrides all');
+      assert.strictEqual(server.$aspects.compute.storage, '50G', 'Child class default added');
     });
   });
 
@@ -314,8 +314,8 @@ describe('Aspect Defaults Three-Layer Merge', () => {
         'classes/server.schema.json': {
           class: 'server',
           parent: 'entity_base',
-          aspect_types: ['network'],
-          aspect_defaults: {
+          $uses_aspects: ['network'],
+          $aspect_defaults: {
             network: {
               bridge: 'vmbr1',
               mtu: 1500
@@ -326,7 +326,7 @@ describe('Aspect Defaults Three-Layer Merge', () => {
         'instances/custom_server.json': {
           id: 'custom_server',
           class: 'server',
-          aspects: {
+          $aspects: {
             network: {
               bridge: 'vmbr2',
               gateway: '10.0.0.1',
@@ -355,10 +355,10 @@ describe('Aspect Defaults Three-Layer Merge', () => {
       });
 
       const server = canonical.instances_by_id.custom_server;
-      assert.strictEqual(server.aspects.network.bridge, 'vmbr2', 'Instance overrides all defaults');
-      assert.strictEqual(server.aspects.network.gateway, '10.0.0.1', 'Instance overrides aspect default');
-      assert.strictEqual(server.aspects.network.mtu, 1500, 'Class default applied when not in instance');
-      assert.strictEqual(server.aspects.network.vlan, 100, 'Instance-only value preserved');
+      assert.strictEqual(server.$aspects.network.bridge, 'vmbr2', 'Instance overrides all defaults');
+      assert.strictEqual(server.$aspects.network.gateway, '10.0.0.1', 'Instance overrides aspect default');
+      assert.strictEqual(server.$aspects.network.mtu, 1500, 'Class default applied when not in instance');
+      assert.strictEqual(server.$aspects.network.vlan, 100, 'Instance-only value preserved');
     });
   });
 
@@ -383,8 +383,8 @@ describe('Aspect Defaults Three-Layer Merge', () => {
         'classes/base_server.schema.json': {
           class: 'base_server',
           parent: 'entity_base',
-          aspect_types: ['network'],
-          aspect_defaults: {
+          $uses_aspects: ['network'],
+          $aspect_defaults: {
             network: {
               gateway: '192.168.68.1',
               mtu: 1500
@@ -395,7 +395,7 @@ describe('Aspect Defaults Three-Layer Merge', () => {
         'instances/my_server.json': {
           id: 'my_server',
           class: 'base_server',
-          aspects: {
+          $aspects: {
             network: {
               nameserver: '192.168.68.10',
               ip: '192.168.68.100'
@@ -425,15 +425,15 @@ describe('Aspect Defaults Three-Layer Merge', () => {
       const server = canonical.instances_by_id.my_server;
       
       // Layer 1: Aspect defaults
-      assert.strictEqual(server.aspects.network.bridge, 'vmbr0', 'From aspect definition');
+      assert.strictEqual(server.$aspects.network.bridge, 'vmbr0', 'From aspect definition');
       
       // Layer 2: Class defaults (override layer 1)
-      assert.strictEqual(server.aspects.network.gateway, '192.168.68.1', 'Class overrides aspect');
-      assert.strictEqual(server.aspects.network.mtu, 1500, 'From class defaults');
+      assert.strictEqual(server.$aspects.network.gateway, '192.168.68.1', 'Class overrides aspect');
+      assert.strictEqual(server.$aspects.network.mtu, 1500, 'From class defaults');
       
       // Layer 3: Instance values (override all)
-      assert.strictEqual(server.aspects.network.nameserver, '192.168.68.10', 'Instance overrides aspect');
-      assert.strictEqual(server.aspects.network.ip, '192.168.68.100', 'Instance-only value');
+      assert.strictEqual(server.$aspects.network.nameserver, '192.168.68.10', 'Instance overrides aspect');
+      assert.strictEqual(server.$aspects.network.ip, '192.168.68.100', 'Instance-only value');
     });
 
     it('should populate aspects even when not in instance data', async () => {
@@ -451,13 +451,13 @@ describe('Aspect Defaults Three-Layer Merge', () => {
         'classes/vm.schema.json': {
           class: 'vm',
           parent: 'entity_base',
-          aspect_types: ['terraform'],
+          $uses_aspects: ['terraform'],
           schema: { type: 'object' }
         },
         'instances/test_vm.json': {
           id: 'test_vm',
           class: 'vm',
-          aspects: {}
+          $aspects: {}
         }
       });
 
@@ -480,8 +480,8 @@ describe('Aspect Defaults Three-Layer Merge', () => {
       });
 
       const vm = canonical.instances_by_id.test_vm;
-      assert.ok(vm.aspects.terraform, 'Aspect populated even without instance data');
-      assert.strictEqual(vm.aspects.terraform.enabled, false, 'Aspect default applied');
+      assert.ok(vm.$aspects.terraform, 'Aspect populated even without instance data');
+      assert.strictEqual(vm.$aspects.terraform.enabled, false, 'Aspect default applied');
     });
   });
 
@@ -496,7 +496,7 @@ describe('Aspect Defaults Three-Layer Merge', () => {
         'instances/test.json': {
           id: 'test',
           class: 'simple',
-          aspects: {
+          $aspects: {
             custom: { value: 'test' }
           }
         }
@@ -517,7 +517,7 @@ describe('Aspect Defaults Three-Layer Merge', () => {
       });
 
       const test = canonical.instances_by_id.test;
-      assert.strictEqual(test.aspects.custom.value, 'test', 'Instance value preserved');
+      assert.strictEqual(test.$aspects.custom.value, 'test', 'Instance value preserved');
     });
 
     it('should handle aspect name with aspect_ prefix', async () => {
@@ -535,13 +535,13 @@ describe('Aspect Defaults Three-Layer Merge', () => {
         'classes/test_class.schema.json': {
           class: 'test_class',
           parent: 'entity_base',
-          aspect_types: ['test'],
+          $uses_aspects: ['test'],
           schema: { type: 'object' }
         },
         'instances/test_instance.json': {
           id: 'test_instance',
           class: 'test_class',
-          aspects: {
+          $aspects: {
             test: {}
           }
         }
@@ -566,7 +566,7 @@ describe('Aspect Defaults Three-Layer Merge', () => {
       });
 
       const instance = canonical.instances_by_id.test_instance;
-      assert.strictEqual(instance.aspects.test.default_value, 'from_aspect', 'Aspect default applied despite prefix mismatch');
+      assert.strictEqual(instance.$aspects.test.default_value, 'from_aspect', 'Aspect default applied despite prefix mismatch');
     });
   });
 });

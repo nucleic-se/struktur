@@ -4,7 +4,7 @@
   "domains": [
     "media"
   ],
-  "aspects": {
+  "$aspects": {
     "domain": {
       "name": "Media Services",
       "description": "Media streaming and entertainment platforms"
@@ -20,7 +20,7 @@
           "type": "string"
         }
       },
-      "aspects": {
+      "$aspects": {
         "type": "object",
         "properties": {
           "domain": {

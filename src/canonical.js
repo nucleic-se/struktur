@@ -14,7 +14,7 @@ const { version: PACKAGE_VERSION } = require('../package.json');
 /**
  * Merge instance with class field defaults and aspect defaults
  * @param {Object} instance - Instance data
- * @param {Object} resolvedClass - Resolved class with fields and aspect_defaults
+ * @param {Object} resolvedClass - Resolved class with fields and $aspect_defaults
  * @param {Object} aspectLoader - Aspect loader for aspect definitions
  * @returns {Object} - Merged instance
  */
@@ -25,23 +25,23 @@ function mergeInstanceWithFields(instance, resolvedClass = {}, aspectLoader = nu
   const merged = classMerge(classMerge({}, fields), instance);
 
   // Three-layer aspect data merge
-  // Collect all aspect names from: instance, class aspect_types, class aspect_defaults
+  // Collect all aspect names from: instance, class $uses_aspects, class $aspect_defaults
   const allAspectNames = new Set();
   
-  if (instance.aspects && typeof instance.aspects === 'object') {
-    Object.keys(instance.aspects).forEach(name => allAspectNames.add(name));
+  if (instance.$aspects && typeof instance.$aspects === 'object') {
+    Object.keys(instance.$aspects).forEach(name => allAspectNames.add(name));
   }
   
-  if (resolvedClass.aspect_types && Array.isArray(resolvedClass.aspect_types)) {
-    resolvedClass.aspect_types.forEach(name => allAspectNames.add(name));
+  if (resolvedClass.$uses_aspects && Array.isArray(resolvedClass.$uses_aspects)) {
+    resolvedClass.$uses_aspects.forEach(name => allAspectNames.add(name));
   }
   
-  if (resolvedClass.aspect_defaults) {
-    Object.keys(resolvedClass.aspect_defaults).forEach(name => allAspectNames.add(name));
+  if (resolvedClass.$aspect_defaults) {
+    Object.keys(resolvedClass.$aspect_defaults).forEach(name => allAspectNames.add(name));
   }
   
   if (allAspectNames.size > 0) {
-    merged.aspects = {};
+    merged.$aspects = {};
     
     for (const aspectName of allAspectNames) {
       let aspectData = {};
@@ -57,22 +57,22 @@ function mergeInstanceWithFields(instance, resolvedClass = {}, aspectLoader = nu
         }
       }
       
-      // Layer 2: Class hierarchy aspect_defaults (from resolved class)
-      if (resolvedClass.aspect_defaults && resolvedClass.aspect_defaults[aspectName]) {
-        aspectData = classMerge(aspectData, resolvedClass.aspect_defaults[aspectName]);
+      // Layer 2: Class hierarchy $aspect_defaults (from resolved class)
+      if (resolvedClass.$aspect_defaults && resolvedClass.$aspect_defaults[aspectName]) {
+        aspectData = classMerge(aspectData, resolvedClass.$aspect_defaults[aspectName]);
       }
       
       // Layer 3: Instance aspect values (always win)
-      if (instance.aspects && instance.aspects[aspectName]) {
-        aspectData = classMerge(aspectData, instance.aspects[aspectName]);
+      if (instance.$aspects && instance.$aspects[aspectName]) {
+        aspectData = classMerge(aspectData, instance.$aspects[aspectName]);
       }
       
-      merged.aspects[aspectName] = aspectData;
+      merged.$aspects[aspectName] = aspectData;
     }
     
-    // Auto-populate aspect_types from all merged aspects for convenient filtering
-    if (!merged.aspect_types) {
-      merged.aspect_types = Array.from(allAspectNames);
+    // Auto-populate $uses_aspects from all merged aspects for convenient filtering
+    if (!merged.$uses_aspects) {
+      merged.$uses_aspects = Array.from(allAspectNames);
     }
   }
 

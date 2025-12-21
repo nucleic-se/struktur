@@ -12,13 +12,13 @@
   <article>
     <h1>{{title}}</h1>
     <div class="post-meta">
-      {{aspects.blog_post.date}} • {{aspects.blog_post.author}}
+      {{$aspects.blog_post.date}} • {{$aspects.blog_post.author}}
     </div>
     <div class="post-content">
-      <p>{{{replace (escape aspects.blog_post.content) "\n\n" "</p><p>"}}}</p>
+      <p>{{{replace (escape $aspects.blog_post.content) "\n\n" "</p><p>"}}}</p>
     </div>
-    {{#if aspects.blog_post.tags}}
-    {{> partials/tags.html tags=aspects.blog_post.tags}}
+    {{#if $aspects.blog_post.tags}}
+    {{> partials/tags.html tags=$aspects.blog_post.tags}}
     {{/if}}
   </article>
 {{/buffer}}

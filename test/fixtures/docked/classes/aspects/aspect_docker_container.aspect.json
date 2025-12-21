@@ -310,7 +310,7 @@
     ]
   },
   "fields": {
-    "aspects": {
+    "$aspects": {
       "aspect": {
         "kind": "docker_container",
         "description": "Docker containers running services"

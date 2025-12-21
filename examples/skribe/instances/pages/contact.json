@@ -4,7 +4,7 @@
   "title": "Contact",
   "slug": "contact",
   "description": "Get in touch",
-  "aspects": {
+  "$aspects": {
     "page": {
       "content": "Questions about Struktur or Skribe? Reach out through GitHub issues or email. This page demonstrates a footer-only link—it appears in the footer but not in the main header navigation. Useful for secondary pages like contact, privacy policies, or terms of service that don't need top-level visibility but should remain accessible.",
       "menu": "footer"

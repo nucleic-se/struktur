@@ -2,7 +2,7 @@
   "id": "redis-data",
   "class": "docked_volume",
   "description": "Persistent storage for Redis cache data (AOF persistence)",
-  "aspects": {
+  "$aspects": {
     "docker_volume": {
       "driver": "local"
     }

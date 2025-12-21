@@ -2,7 +2,7 @@
   "id": "redis-commander",
   "class": "docked_container",
   "domains": ["monitoring"],
-  "aspects": {
+  "$aspects": {
     "docker_container": {
       "image": "rediscommander/redis-commander:latest",
       "description": "Redis web UI for managing and viewing data",

@@ -4,7 +4,7 @@
   "domains": [
     "storage"
   ],
-  "aspects": {
+  "$aspects": {
     "domain": {
       "name": "Storage",
       "description": "Data persistence and storage systems"
@@ -20,7 +20,7 @@
           "type": "string"
         }
       },
-      "aspects": {
+      "$aspects": {
         "type": "object",
         "properties": {
           "domain": {

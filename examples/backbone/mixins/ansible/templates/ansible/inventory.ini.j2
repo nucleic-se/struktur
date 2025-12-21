@@ -1,7 +1,7 @@
 [all]
 {{#each instances}}
 {{#if (eq this.class "proxmox_lxc")}}
-{{this.aspects.network_interface.hostname}}.home ansible_host={{this.aspects.network_interface.ip}} ansible_user=root ansible_ssh_common_args='-o StrictHostKeyChecking=no' ansible_python_interpreter=/usr/bin/python3 instance_name="{{this.name}}"
+{{this.$aspects.network_interface.hostname}}.home ansible_host={{this.$aspects.network_interface.ip}} ansible_user=root ansible_ssh_common_args='-o StrictHostKeyChecking=no' ansible_python_interpreter=/usr/bin/python3 instance_name="{{this.name}}"
 {{/if}}
 {{/each}}
 

@@ -28,7 +28,7 @@ Handlebars escapes HTML special characters by default, **which breaks configurat
 
 ```handlebars
 ❌ WRONG - Gets HTML escaped
-command: {{aspects.docker_container.command}}
+command: {{$aspects.docker_container.command}}
 # Result: sh -c &#x27;npm install&#x27; (BROKEN!)
 
 environment:
@@ -36,7 +36,7 @@ environment:
 # Result: postgresql://user:pass@host:5432/db (= becomes &#x3D;)
 
 ✅ CORRECT - No escaping
-command: {{{aspects.docker_container.command}}}
+command: {{{$aspects.docker_container.command}}}
 # Result: sh -c 'npm install' (WORKS!)
 
 environment:
@@ -466,8 +466,8 @@ Templates can use built-in helpers. See [Helper Reference](helpers-reference.md)
   <article>{{content}}</article>
 {{/if}}
 
-{{#if aspects.monitoring}}
-  <div>Monitoring: :{{aspects.monitoring.port}}</div>
+{{#if $aspects.monitoring}}
+  <div>Monitoring: :{{$aspects.monitoring.port}}</div>
 {{/if}}
 ```
 
@@ -806,13 +806,13 @@ Error: Output path contains invalid characters
 ```handlebars
 ✅ GOOD
 environment:
-{{#each aspects.docker_container.environment}}
+{{#each $aspects.docker_container.environment}}
   {{@key}}: "{{{this}}}"
 {{/each}}
 
 ❌ BAD
 environment:
-{{#each aspects.docker_container.environment}}
+{{#each $aspects.docker_container.environment}}
   {{@key}}: {{{this}}}
 {{/each}}
 ```
@@ -821,19 +821,19 @@ environment:
 
 ```handlebars
 ✅ GOOD
-{{#if aspects.docker_container.volumes}}
-{{#if (gt aspects.docker_container.volumes.length 0)}}
+{{#if $aspects.docker_container.volumes}}
+{{#if (gt $aspects.docker_container.volumes.length 0)}}
 volumes:
-{{#each aspects.docker_container.volumes}}
+{{#each $aspects.docker_container.volumes}}
   - {{this}}
 {{/each}}
 {{/if}}
 {{/if}}
 
 ❌ BAD (outputs empty "volumes:" if array is empty)
-{{#if aspects.docker_container.volumes}}
+{{#if $aspects.docker_container.volumes}}
 volumes:
-{{#each aspects.docker_container.volumes}}
+{{#each $aspects.docker_container.volumes}}
   - {{this}}
 {{/each}}
 {{/if}}
@@ -891,7 +891,7 @@ healthcheck:
 {{/if}}
 
 {{!-- main template --}}
-{{> healthcheck healthcheck=aspects.docker_container.healthcheck}}
+{{> healthcheck healthcheck=$aspects.docker_container.healthcheck}}
 ```
 
 ---
@@ -927,9 +927,9 @@ volumes:
 
 **Fix:** Check array length before outputting section headers:
 ```handlebars
-{{#if (gt aspects.docker_container.volumes.length 0)}}
+{{#if (gt $aspects.docker_container.volumes.length 0)}}
 volumes:
-{{#each aspects.docker_container.volumes}}
+{{#each $aspects.docker_container.volumes}}
   - {{this}}
 {{/each}}
 {{/if}}

@@ -8,7 +8,7 @@
   },
   "fields": {
     "pretty_name": "Docker Hosts",
-    "aspects": {
+    "$aspects": {
       "aspect": {
         "kind": "docker_host",
         "description": "Docker daemon hosts running containers"

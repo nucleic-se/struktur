@@ -2,7 +2,7 @@
   "id": "grafana-data",
   "class": "docked_volume",
   "domains": ["storage"],
-  "aspects": {
+  "$aspects": {
     "docker_volume": {
       "driver": "local"
     }

@@ -11,7 +11,7 @@
           "type": "string"
         }
       },
-      "aspects": {
+      "$aspects": {
         "type": "object",
         "properties": {
           "domain": {
@@ -43,12 +43,12 @@
     "domains": [
       "web"
     ],
-    "aspects": {
+    "$aspects": {
       "domain": {
         "name": "Web Services",
         "description": "Web servers and HTTP services"
       }
     }
   },
-  "aspects": null
+  "$aspects": null
 }

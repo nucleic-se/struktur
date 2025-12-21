@@ -18,7 +18,7 @@
         ],
         "description": "Parent class(es) to inherit from"
       },
-      "aspects": {
+      "$aspects": {
         "type": "object",
         "properties": {
           "aspect": {

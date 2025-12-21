@@ -13,7 +13,7 @@
         "type": "string",
         "description": "Display name for the entity (falls back to id if not provided)"
       },
-      "aspect_types": {
+      "$uses_aspects": {
         "type": "array",
         "items": {
           "type": "string"
@@ -27,7 +27,7 @@
         },
         "description": "Domain classifications for this entity"
       },
-      "aspects": {
+      "$aspects": {
         "type": "object",
         "additionalProperties": true,
         "description": "Aspect-specific data for this entity"

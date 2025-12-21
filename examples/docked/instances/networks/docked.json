@@ -3,7 +3,7 @@
   "class": "docked_network",
   "description": "Bridge network connecting all docked containers",
   "domains": ["infrastructure"],
-  "aspects": {
+  "$aspects": {
     "docker_network": {
       "driver": "bridge"
     }

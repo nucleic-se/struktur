@@ -3,7 +3,7 @@
   "class": "docked_container",
   "description": "In-memory data store for caching and session management",
   "domains": ["cache", "application"],
-  "aspects": {
+  "$aspects": {
     "docker_container": {
       "image": "redis:alpine",
       "description": "In-memory cache for application performance",

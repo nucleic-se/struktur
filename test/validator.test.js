@@ -19,7 +19,7 @@ describe('MultiPassValidator', () => {
           { type: 'object', properties: { name: { type: 'string' } } }
         ],
         fields: {},
-        aspects: []
+        $aspects: {}
       };
 
       validator.registerClass(resolvedClass);
@@ -36,7 +36,7 @@ describe('MultiPassValidator', () => {
         lineage: ['test_class'],
         schemas: [{ type: 'object', properties: { id: { type: 'string' } } }],
         fields: {},
-        aspects: []
+        $aspects: {}
       };
 
       validator.registerClass(resolvedClass);
@@ -64,7 +64,7 @@ describe('MultiPassValidator', () => {
           required: ['id', 'count']
         }],
         fields: {},
-        aspects: []
+        $aspects: {}
       };
 
       validator.registerClass(resolvedClass);
@@ -149,7 +149,7 @@ describe('MultiPassValidator', () => {
           required: ['id']
         }],
         fields: {},
-        aspects: []
+        $aspects: {}
       };
 
       validator.registerClass(resolvedClass);
@@ -179,7 +179,7 @@ describe('MultiPassValidator', () => {
           required: ['id', 'name']
         }],
         fields: {},
-        aspects: []
+        $aspects: {}
       };
 
       validator.registerClass(resolvedClass);
@@ -213,7 +213,7 @@ describe('MultiPassValidator', () => {
           }
         }],
         fields: {},
-        aspects: []
+        $aspects: {}
       };
 
       validator.registerClass(resolvedClass);
@@ -247,7 +247,7 @@ describe('MultiPassValidator', () => {
           }
         ],
         fields: {},
-        aspects: []
+        $aspects: {}
       };
 
       validator.registerClass(resolvedClass);
@@ -283,7 +283,7 @@ describe('MultiPassValidator', () => {
           properties: { id: { type: 'string' } }
         }],
         fields: {},
-        aspects: { test_aspect: { required: false } }
+        $aspects: { test_aspect: { required: false } }
       };
 
       const aspectDef = {
@@ -303,7 +303,7 @@ describe('MultiPassValidator', () => {
       const instance = {
         id: 'test-1',
         class: 'with_aspect',
-        aspects: {
+        $aspects: {
           test_aspect: {
             value: 'test-value'
           }
@@ -323,7 +323,7 @@ describe('MultiPassValidator', () => {
           properties: { id: { type: 'string' } }
         }],
         fields: {},
-        aspects: { test_aspect: { required: false } }
+        $aspects: { test_aspect: { required: false } }
       };
 
       const aspectDef = {
@@ -343,7 +343,7 @@ describe('MultiPassValidator', () => {
       const instance = {
         id: 'test-1',
         class: 'with_aspect',
-        aspects: {
+        $aspects: {
           test_aspect: {
             // missing required value
           }
@@ -364,7 +364,7 @@ describe('MultiPassValidator', () => {
           properties: { id: { type: 'string' } }
         }],
         fields: {},
-        aspects: ['optional_aspect']
+        $aspects: { optional_aspect: { required: false } }
       };
 
       const aspectDef = {
@@ -395,7 +395,7 @@ describe('MultiPassValidator', () => {
         lineage: ['unregistered'],
         schemas: [{ type: 'object' }],
         fields: {},
-        aspects: []
+        $aspects: {}
       };
 
       // Don't register the class
@@ -415,7 +415,7 @@ describe('MultiPassValidator', () => {
         lineage: ['test'],
         schemas: [{ type: 'object', properties: { id: { type: 'string' } } }],
         fields: {},
-        aspects: { unregistered_aspect: { required: false } }
+        $aspects: { unregistered_aspect: { required: false } }
       };
 
       validator.registerClass(resolvedClass);
@@ -424,7 +424,7 @@ describe('MultiPassValidator', () => {
       const instance = {
         id: 'test',
         class: 'test',
-        aspects: {
+        $aspects: {
           unregistered_aspect: { value: 'something' }
         }
       };
@@ -452,7 +452,7 @@ describe('MultiPassValidator', () => {
           required: ['id']
         }],
         fields: {},
-        aspects: []
+        $aspects: {}
       };
 
       validator.registerClass(resolvedClass);
@@ -485,7 +485,7 @@ describe('MultiPassValidator', () => {
           required: ['id', 'count']
         }],
         fields: {},
-        aspects: []
+        $aspects: {}
       };
 
       validator.registerClass(resolvedClass);
@@ -515,7 +515,7 @@ describe('MultiPassValidator', () => {
           required: ['id']
         }],
         fields: {},
-        aspects: []
+        $aspects: {}
       };
 
       validator.registerClass(resolvedClass);
@@ -555,7 +555,7 @@ describe('MultiPassValidator', () => {
           required: ['nested']
         }],
         fields: {},
-        aspects: []
+        $aspects: {}
       };
 
       validator.registerClass(resolvedClass);
@@ -586,7 +586,7 @@ describe('MultiPassValidator', () => {
         lineage: ['test'],
         schemas: [{ type: 'object', properties: { id: { type: 'string' } } }],
         fields: {},
-        aspects: { test_aspect: { required: false } }
+        $aspects: { test_aspect: { required: false } }
       };
 
       const aspectDef = {
@@ -612,7 +612,7 @@ describe('MultiPassValidator', () => {
       const instance = {
         id: 'test',
         class: 'test',
-        aspects: {
+        $aspects: {
           test_aspect: {
             config: {
               // missing host
@@ -643,7 +643,7 @@ describe('MultiPassValidator', () => {
           required: ['value']
         }],
         fields: {},
-        aspects: []
+        $aspects: {}
       };
 
       validator.registerClass(resolvedClass);
@@ -669,7 +669,7 @@ describe('MultiPassValidator', () => {
         lineage: [],
         schemas: [],
         fields: {},
-        aspects: []
+        $aspects: {}
       };
 
       const instance = { id: 'test', class: 'test' };
@@ -685,7 +685,7 @@ describe('MultiPassValidator', () => {
         lineage: ['test'],
         schemas: [{ type: 'object' }],
         fields: {},
-        aspects: []
+        $aspects: {}
       };
 
       validator.registerClass(resolvedClass);
@@ -702,7 +702,7 @@ describe('MultiPassValidator', () => {
         lineage: ['test'],
         schemas: [{ type: 'object', properties: { id: { type: 'string' } } }],
         fields: {},
-        aspects: {
+        $aspects: {
           required_aspect: { required: true },
           optional_aspect: { required: false }
         }
@@ -744,7 +744,7 @@ describe('MultiPassValidator', () => {
           properties: { value: { type: 'string' } }
         }],
         fields: {},
-        aspects: []
+        $aspects: {}
       };
 
       validator.registerClass(resolvedClass);

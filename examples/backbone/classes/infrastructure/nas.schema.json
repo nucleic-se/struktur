@@ -2,7 +2,7 @@
   "class": "nas",
   "parent": ["storage_device", "domain_physical"],
   "pretty_name": "NAS",
-  "aspect_types": ["network_interface"],
+  "$uses_aspects": ["network_interface"],
   "schema": {
     "type": "object",
     "description": "Network attached storage device",

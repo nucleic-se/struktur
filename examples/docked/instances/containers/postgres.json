@@ -3,7 +3,7 @@
   "class": "docked_container",
   "description": "PostgreSQL database for application data persistence",
   "domains": ["database"],
-  "aspects": {
+  "$aspects": {
     "docker_container": {
       "image": "postgres:16-alpine",
       "description": "Primary application database",

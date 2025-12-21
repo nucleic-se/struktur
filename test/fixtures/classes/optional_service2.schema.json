@@ -10,7 +10,7 @@
       }
     }
   },
-  "aspects": {
+  "$aspects": {
     "network_interface": {
       "required": false
     }

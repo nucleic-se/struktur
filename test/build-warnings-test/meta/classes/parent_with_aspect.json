@@ -35,13 +35,13 @@
   "fields": {
     "domains": []
   },
-  "aspects": {
+  "$aspects": {
     "network_interface": {
       "required": true
     }
   },
-  "aspect_types": [],
-  "aspect_defaults": {},
+  "$uses_aspects": [],
+  "$aspect_defaults": {},
   "pretty_name": "parent_with_aspect",
   "domains": [],
   "parent": [

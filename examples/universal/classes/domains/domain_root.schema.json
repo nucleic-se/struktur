@@ -12,7 +12,7 @@
         },
         "description": "Domain identifiers for classification"
       },
-      "aspects": {
+      "$aspects": {
         "type": "object",
         "properties": {
           "domain": {

@@ -50,14 +50,14 @@
         },
         "description": "Domain classifications for the stack"
       },
-      "aspect_types": {
+      "$uses_aspects": {
         "type": "array",
         "items": {
           "type": "string"
         },
         "description": "Kind classifications for the stack"
       },
-      "aspects": {
+      "$aspects": {
         "type": "object",
         "additionalProperties": true,
         "description": "Aspect data for the stack root (optional)"

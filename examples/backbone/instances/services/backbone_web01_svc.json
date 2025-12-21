@@ -3,7 +3,7 @@
   "name": "Web Service 01",
   "class": "web_service",
   "domains": ["services"],
-  "aspects": {
+  "$aspects": {
     "infrastructure": {
       "environment": "production",
       "notes": "Generic web application service",

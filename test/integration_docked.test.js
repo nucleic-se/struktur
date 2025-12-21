@@ -174,7 +174,7 @@ describe('Integration: Docked Stack (with Universal base)', () => {
     const resolved = struktur.classResolver.resolve('docked_container');
 
     // docked_container should have aspect requirements
-    assert.ok(resolved.aspects, 'Should have aspects defined');
+    assert.ok(resolved.$aspects, 'Should have aspects defined');
   });
 
   it('should detect missing aspect data in instances', async () => {
@@ -191,7 +191,7 @@ describe('Integration: Docked Stack (with Universal base)', () => {
       id: 'invalid-container',
       class: 'docked_container',
       domains: ['infrastructure'],
-      aspects: {}
+      $aspects: {}
       // Missing: aspect_docker_container data (required)
     };
 
@@ -221,7 +221,6 @@ describe('Integration: Docked Stack (with Universal base)', () => {
     assert.strictEqual(results[0].valid, true);
 
     // Grafana has complex aspect data (ports, volumes, environment)
-    // v1 format uses aspects.docker_container, v2 format is aspects.aspect_docker_container
-    assert.ok(grafana.aspects?.docker_container || grafana.aspects?.aspect_docker_container);
+    assert.ok(grafana.$aspects?.docker_container || grafana.$aspects?.aspect_docker_container);
   });
 });

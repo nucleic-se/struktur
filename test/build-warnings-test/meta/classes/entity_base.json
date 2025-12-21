@@ -30,9 +30,9 @@
   "fields": {
     "domains": []
   },
-  "aspects": {},
-  "aspect_types": [],
-  "aspect_defaults": {},
+  "$aspects": {},
+  "$uses_aspects": [],
+  "$aspect_defaults": {},
   "pretty_name": "entity_base",
   "domains": [],
   "parent": []

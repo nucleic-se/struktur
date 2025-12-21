@@ -3,7 +3,7 @@
   "parent": ["compute_node", "domain_physical"],
   "pretty_name": "Proxmox Node",
   "domains": ["physical"],
-  "aspect_types": ["network_interface"],
+  "$uses_aspects": ["network_interface"],
   "schema": {
     "type": "object",
     "description": "Proxmox hypervisor node",

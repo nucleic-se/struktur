@@ -1,12 +1,12 @@
 {
   "class": "service_entity",
   "parent": ["infrastructure_entity", "domain_services"],
-  "aspect_types": ["service_entity"],
+  "$uses_aspects": ["service_entity"],
   "pretty_name": "Service",
   "schema": {
     "type": "object",
     "properties": {
-      "aspects": {
+      "$aspects": {
         "type": "object",
         "properties": {
           "service": {

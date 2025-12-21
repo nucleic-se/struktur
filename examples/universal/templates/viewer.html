@@ -168,10 +168,10 @@
     
     // Build class hierarchy per aspect tree
     allClasses.forEach(cls => {
-      if (!cls.aspect_types || cls.aspect_types.length === 0) return;
+      if (!cls.$uses_aspects || cls.$uses_aspects.length === 0) return;
       
       // Add class to ALL aspect trees it belongs to
-      cls.aspect_types.forEach(kind => {
+      cls.$uses_aspects.forEach(kind => {
         if (!aspectTrees.has(kind)) {
           aspectTrees.set(kind, { name: kind, classes: new Map(), roots: [] });
         }
@@ -628,7 +628,7 @@
         }
       } else if (selectedKind) {
         filtered = filtered.filter(obj => 
-          obj.aspect_types && obj.aspect_types.includes(selectedKind)
+          obj.$aspects && Object.prototype.hasOwnProperty.call(obj.$aspects, selectedKind)
         );
       }
       
@@ -671,7 +671,7 @@
     
     // Create card HTML - universal renderer
     function createCard(obj) {
-      const aspects = obj.aspects || {};
+      const aspects = obj.$aspects || {};
       const aspectNames = Object.keys(aspects).filter(k => k !== 'domain');
       const displayName = getInstanceName(obj);
       const primaryAspect = aspectNames[0] || '';
@@ -772,10 +772,10 @@
       }
 
       // Kinds and domains badges
-      if ((obj.aspect_types && obj.aspect_types.length) || (obj.domains && obj.domains.length)) {
+      if ((obj.$uses_aspects && obj.$uses_aspects.length) || (obj.domains && obj.domains.length)) {
         html += `<div class="mt-3 pt-3 border-top">`;
-        if (obj.aspect_types) {
-          obj.aspect_types.forEach(k => {
+        if (obj.$uses_aspects) {
+          obj.$uses_aspects.forEach(k => {
             html += `<span class="badge bg-primary me-1">${escapeHtml(k)}</span>`;
           });
         }
@@ -803,7 +803,7 @@
       if (obj.name) return obj.name;
       
       // 2. Fall back to searching aspects (skip 'domain' as it's metadata)
-      const aspects = obj.aspects || {};
+      const aspects = obj.$aspects || {};
       for (const [aspectKey, aspectData] of Object.entries(aspects)) {
         if (aspectKey === 'domain') continue; // Skip domain metadata
         if (aspectData?.name) return aspectData.name;
@@ -875,8 +875,8 @@
       if (!inst) return;
       
       // Find which tree this instance belongs to
-      if (inst.aspect_types && inst.aspect_types.length > 0) {
-        const kind = inst.aspect_types[0];
+      if (inst.$uses_aspects && inst.$uses_aspects.length > 0) {
+        const kind = inst.$uses_aspects[0];
         selectInstance(kind, inst.class, instanceId);
       } else {
         // Fallback: just filter by ID

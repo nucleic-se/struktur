@@ -4,7 +4,7 @@
   "domains": [
     "application"
   ],
-  "aspects": {
+  "$aspects": {
     "domain": {
       "name": "Applications",
       "description": "Application services and runtime environments"
@@ -20,7 +20,7 @@
           "type": "string"
         }
       },
-      "aspects": {
+      "$aspects": {
         "type": "object",
         "properties": {
           "domain": {

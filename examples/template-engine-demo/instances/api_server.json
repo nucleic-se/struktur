@@ -4,7 +4,7 @@
   "name": "API Server",
   "description": "Main REST API service",
   "domains": ["backend", "api"],
-  "aspects": {
+  "$aspects": {
     "web_service": {
       "port": 3000,
       "protocol": "https",

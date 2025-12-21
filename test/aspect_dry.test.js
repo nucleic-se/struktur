@@ -37,8 +37,8 @@ describe('Aspect DRY (Define Once, Use Many)', () => {
     const classB = classLoader.getClass('class_b');
 
     // Both classes reference the same aspect
-    assert.ok(classA.aspects.includes('shared_aspect'));
-    assert.ok(classB.aspects.includes('shared_aspect'));
+    assert.ok(classA.$aspects.includes('shared_aspect'));
+    assert.ok(classB.$aspects.includes('shared_aspect'));
 
     // Aspect is defined only once in aspect registry
     const sharedAspect = aspectLoader.getAspect('shared_aspect');
@@ -54,13 +54,13 @@ describe('Aspect DRY (Define Once, Use Many)', () => {
     const classC = classLoader.getClass('class_c');
 
     // class_c doesn't directly declare shared_aspect
-    const hasAspect = classC.aspects?.includes('shared_aspect');
+    const hasAspect = classC.$aspects?.includes('shared_aspect');
     assert.strictEqual(hasAspect, undefined, 'class_c should not directly declare aspect');
 
     // But it inherits from class_a which has shared_aspect
     const resolved = resolver.resolve('class_c');
-    assert.strictEqual(typeof resolved.aspects, 'object', 'Resolved aspects should be an object');
-    assert.ok(resolved.aspects.shared_aspect, 'Should inherit aspect from parent');
+    assert.strictEqual(typeof resolved.$aspects, 'object', 'Resolved aspects should be an object');
+    assert.ok(resolved.$aspects.shared_aspect, 'Should inherit aspect from parent');
   });
 
   it('should validate all classes using the same aspect schema', () => {
@@ -78,7 +78,7 @@ describe('Aspect DRY (Define Once, Use Many)', () => {
       id: 'inst_a',
       class: 'class_a',
       prop_a: 'value_a',
-      aspects: {
+      $aspects: {
         shared_aspect: {
           shared_prop: 'shared_value',
           shared_number: 123
@@ -94,7 +94,7 @@ describe('Aspect DRY (Define Once, Use Many)', () => {
       id: 'inst_b',
       class: 'class_b',
       prop_b: true,
-      aspects: {
+      $aspects: {
         shared_aspect: {
           shared_prop: 'another_value',
           shared_number: 456
@@ -121,7 +121,7 @@ describe('Aspect DRY (Define Once, Use Many)', () => {
       id: 'invalid_a',
       class: 'class_a',
       prop_a: 'value_a',
-      aspects: {
+      $aspects: {
         shared_aspect: {
           shared_number: 123
           // missing shared_prop
@@ -142,7 +142,7 @@ describe('Aspect DRY (Define Once, Use Many)', () => {
       id: 'invalid_b',
       class: 'class_b',
       prop_b: true,
-      aspects: {
+      $aspects: {
         shared_aspect: {
           shared_number: 456
           // missing shared_prop
@@ -172,7 +172,7 @@ describe('Aspect DRY (Define Once, Use Many)', () => {
       class: 'class_c',
       prop_a: 'value_a',  // from parent
       prop_c: 789,        // from self
-      aspects: {
+      $aspects: {
         shared_aspect: {
           shared_prop: 'inherited_aspect_value',
           shared_number: 999
@@ -204,20 +204,20 @@ describe('Aspect DRY (Define Once, Use Many)', () => {
         id: 'a1',
         class: 'class_a',
         prop_a: 'val',
-        aspects: { shared_aspect: { shared_prop: 'test' } }
+        $aspects: { shared_aspect: { shared_prop: 'test' } }
       },
       {
         id: 'b1',
         class: 'class_b',
         prop_b: false,
-        aspects: { shared_aspect: { shared_prop: 'test' } }
+        $aspects: { shared_aspect: { shared_prop: 'test' } }
       },
       {
         id: 'c1',
         class: 'class_c',
         prop_a: 'val',
         prop_c: 123,
-        aspects: { shared_aspect: { shared_prop: 'test' } }
+        $aspects: { shared_aspect: { shared_prop: 'test' } }
       }
     ];
 

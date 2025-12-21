@@ -14,7 +14,7 @@
   "github_stars": 49000,
   "license": "MIT",
   "github_url": "https://github.com/prettier/prettier",
-  "aspects": {
+  "$aspects": {
     "quality": {
       "is_maintained": true,
       "is_free": true,

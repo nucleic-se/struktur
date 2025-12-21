@@ -1,7 +1,7 @@
 {
   "class": "page",
   "parent": "content_base",
-  "aspect_types": ["page"],
+  "$uses_aspects": ["page"],
   "schema": {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",

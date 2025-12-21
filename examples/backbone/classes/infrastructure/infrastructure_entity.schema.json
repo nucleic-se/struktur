@@ -1,11 +1,11 @@
 {
   "class": "infrastructure_entity",
   "parent": "entity_base",
-  "aspect_types": ["infrastructure"],
+  "$uses_aspects": ["infrastructure"],
   "schema": {
     "type": "object",
     "properties": {
-      "aspects": {
+      "$aspects": {
         "type": "object",
         "properties": {
           "infrastructure": {
