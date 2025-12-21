@@ -408,7 +408,7 @@ Backup schedule: {{$aspects.backup.schedule}}
 Retention: {{$aspects.backup.retention_days}} days
 
 {{!-- With default --}}
-Log level: {{default $aspects.logging.level "info"}}
+Log level: {{default_value $aspects.logging.level "info"}}
 ```
 
 ---
@@ -662,7 +662,7 @@ scrape_configs:
   - job_name: {{$id}}
     static_configs:
       - targets: ['{{hostname}}:{{$aspects.aspect_monitoring.metrics_port}}']
-    metrics_path: {{default $aspects.aspect_monitoring.path "/metrics"}}
+    metrics_path: {{default_value $aspects.aspect_monitoring.path "/metrics"}}
   {{/if}}
 {{/each}}
 ```

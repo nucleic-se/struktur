@@ -705,7 +705,7 @@ Use labels for conditional configuration:
 
 **In template:**
 ```handlebars
-{{#if (whereIncludes labels "ssl-enabled")}}
+{{#if (where_includes labels "ssl-enabled")}}
   ssl_certificate: /etc/ssl/cert.pem
 {{/if}}
 ```

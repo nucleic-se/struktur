@@ -787,7 +787,7 @@ Error: "author" is undefined
 
 **Fix:** Check variable exists or use default:
 ```handlebars
-{{default author "Anonymous"}}
+{{default_value author "Anonymous"}}
 ```
 
 ### Invalid Path

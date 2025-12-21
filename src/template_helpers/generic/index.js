@@ -15,21 +15,58 @@ import * as utility from './utility.js';
  */
 export const genericHelpers = {
   // Comparison
-  ...comparison,
+  eq: comparison.eq,
+  ne: comparison.ne,
+  lt: comparison.lt,
+  lte: comparison.lte,
+  gt: comparison.gt,
+  gte: comparison.gte,
+  and: comparison.and,
+  or: comparison.or,
+  not: comparison.not,
   
   // Strings
-  ...strings,
+  lowercase: strings.lowercase,
+  uppercase: strings.uppercase,
+  capitalize: strings.capitalize,
   title_case: strings.titleCase,
+  slugify: strings.slugify,
+  trim: strings.trim,
+  split: strings.split,
+  replace: strings.replace,
+  escape: strings.escape,
+  substring: strings.substring,
   
   // Collections
-  ...collections,
+  where: collections.where,
   where_includes: collections.whereIncludes,
   sort_by: collections.sortBy,
+  pluck: collections.pluck,
+  flatten: collections.flatten,
+  unique: collections.unique,
   group_by: collections.groupBy,
+  first: collections.first,
+  last: collections.last,
+  reverse: collections.reverse,
+  compact: collections.compact,
+  length: collections.length,
   
   // Utility
-  ...utility,
-  default_value: utility.defaultTo
+  default_value: utility.defaultTo,
+  array: utility.array,
+  identity: utility.identity,
+  json: utility.json,
+  is_array: utility.isArray,
+  is_object: utility.isObject,
+  is_string: utility.isString,
+  is_number: utility.isNumber,
+  is_boolean: utility.isBoolean,
+  is_nil: utility.isNil,
+  type_of: utility.typeOf,
+  values: utility.values,
+  keys: utility.keys,
+  lookup: utility.lookup,
+  concat: utility.concat
 };
 
 /**

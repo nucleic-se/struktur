@@ -546,23 +546,23 @@ Split string by delimiter.
 
 ## Data Helpers
 
-### `default(value, defaultValue)`
+### `default_value(value, defaultValue)`
 
 Provide default for falsy values.
 
 **Handlebars:**
 ```handlebars
-<p>Author: {{default author "Anonymous"}}</p>
+<p>Author: {{default_value author "Anonymous"}}</p>
 <!-- If author is null/undefined → "Anonymous" -->
 
-<span class="{{default priority 'normal'}}">
+<span class="{{default_value priority 'normal'}}">
   {{title}}
 </span>
 ```
 
 **Nunjucks:**
 ```nunjucks
-<p>Author: {{ author | default("Anonymous") }}</p>
+<p>Author: {{ author | default_value("Anonymous") }}</p>
 ```
 
 ---
@@ -621,14 +621,14 @@ Get object values as array.
 ```handlebars
 <!-- $classes_by_id = {post: {...}, page: {...}} -->
 {{#each (values $classes_by_id)}}
-  <li>{{this.class}}</li>
+  <li>{{this.$class}}</li>
 {{/each}}
 ```
 
 **Nunjucks:**
 ```nunjucks
 {% for classObj in $classes_by_id | values %}
-  <li>{{ classObj.class }}</li>
+  <li>{{ classObj.$class }}</li>
 {% endfor %}
 ```
 

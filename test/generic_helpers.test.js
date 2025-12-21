@@ -99,11 +99,11 @@ describe('Generic Helpers', () => {
       assert.equal(genericHelpers.capitalize(''), '');
     });
 
-    it('titleCase - should convert to title case', () => {
-      assert.equal(genericHelpers.titleCase('hello world'), 'Hello World');
-      assert.equal(genericHelpers.titleCase('hello_world'), 'Hello World');
-      assert.equal(genericHelpers.titleCase('hello-world'), 'Hello World');
-      assert.equal(genericHelpers.titleCase('hello world test'), 'Hello World Test');
+    it('title_case - should convert to title case', () => {
+      assert.equal(genericHelpers.title_case('hello world'), 'Hello World');
+      assert.equal(genericHelpers.title_case('hello_world'), 'Hello World');
+      assert.equal(genericHelpers.title_case('hello-world'), 'Hello World');
+      assert.equal(genericHelpers.title_case('hello world test'), 'Hello World Test');
     });
 
     it('slugify - should convert to slug', () => {
@@ -173,40 +173,40 @@ describe('Generic Helpers', () => {
       assert.equal(result.length, 2);
     });
 
-    it('whereIncludes - should filter by array inclusion', () => {
+    it('where_includes - should filter by array inclusion', () => {
       const items = [
         { name: 'a', tags: ['foo', 'bar'] },
         { name: 'b', tags: ['baz'] },
         { name: 'c', tags: ['foo'] }
       ];
       
-      const result = genericHelpers.whereIncludes(items, 'tags', 'foo');
+      const result = genericHelpers.where_includes(items, 'tags', 'foo');
       assert.equal(result.length, 2);
       assert.equal(result[0].name, 'a');
       assert.equal(result[1].name, 'c');
     });
 
-    it('sortBy - should sort by property', () => {
+    it('sort_by - should sort by property', () => {
       const items = [
         { name: 'charlie', age: 30 },
         { name: 'alice', age: 25 },
         { name: 'bob', age: 35 }
       ];
       
-      const result = genericHelpers.sortBy(items, 'name');
+      const result = genericHelpers.sort_by(items, 'name');
       assert.equal(result[0].name, 'alice');
       assert.equal(result[1].name, 'bob');
       assert.equal(result[2].name, 'charlie');
     });
 
-    it('sortBy - should handle reverse option', () => {
+    it('sort_by - should handle reverse option', () => {
       const items = [
         { value: 1 },
         { value: 3 },
         { value: 2 }
       ];
       
-      const result = genericHelpers.sortBy(items, 'value', { reverse: true });
+      const result = genericHelpers.sort_by(items, 'value', { reverse: true });
       assert.equal(result[0].value, 3);
       assert.equal(result[1].value, 2);
       assert.equal(result[2].value, 1);
@@ -235,14 +235,14 @@ describe('Generic Helpers', () => {
       assert.deepEqual(result, [1, 2, 3, 4]);
     });
 
-    it('groupBy - should group by property', () => {
+    it('group_by - should group by property', () => {
       const items = [
         { name: 'a', type: 'foo' },
         { name: 'b', type: 'bar' },
         { name: 'c', type: 'foo' }
       ];
       
-      const result = genericHelpers.groupBy(items, 'type');
+      const result = genericHelpers.group_by(items, 'type');
       assert.equal(result.length, 2);
       assert.equal(result[0].key, 'bar');
       assert.equal(result[0].items.length, 1);
@@ -282,12 +282,12 @@ describe('Generic Helpers', () => {
   });
 
   describe('Utility', () => {
-    it('defaultTo - should return default if null/undefined', () => {
-      assert.equal(genericHelpers.defaultTo(null, 'default'), 'default');
-      assert.equal(genericHelpers.defaultTo(undefined, 'default'), 'default');
-      assert.equal(genericHelpers.defaultTo(0, 'default'), 0);
-      assert.equal(genericHelpers.defaultTo('', 'default'), '');
-      assert.equal(genericHelpers.defaultTo(false, 'default'), false);
+    it('default_value - should return default if null/undefined', () => {
+      assert.equal(genericHelpers.default_value(null, 'default'), 'default');
+      assert.equal(genericHelpers.default_value(undefined, 'default'), 'default');
+      assert.equal(genericHelpers.default_value(0, 'default'), 0);
+      assert.equal(genericHelpers.default_value('', 'default'), '');
+      assert.equal(genericHelpers.default_value(false, 'default'), false);
     });
 
     it('array - should create array from arguments', () => {
@@ -315,60 +315,60 @@ describe('Generic Helpers', () => {
       assert.equal(genericHelpers.concat(1, 2, 3), '123');
     });
 
-    it('isArray - should check if array', () => {
-      assert.equal(genericHelpers.isArray([]), true);
-      assert.equal(genericHelpers.isArray([1, 2, 3]), true);
-      assert.equal(genericHelpers.isArray({}), false);
-      assert.equal(genericHelpers.isArray('string'), false);
-      assert.equal(genericHelpers.isArray(null), false);
+    it('is_array - should check if array', () => {
+      assert.equal(genericHelpers.is_array([]), true);
+      assert.equal(genericHelpers.is_array([1, 2, 3]), true);
+      assert.equal(genericHelpers.is_array({}), false);
+      assert.equal(genericHelpers.is_array('string'), false);
+      assert.equal(genericHelpers.is_array(null), false);
     });
 
-    it('isObject - should check if object', () => {
-      assert.equal(genericHelpers.isObject({}), true);
-      assert.equal(genericHelpers.isObject({ a: 1 }), true);
-      assert.equal(genericHelpers.isObject([]), false);
-      assert.equal(genericHelpers.isObject(null), false);
-      assert.equal(genericHelpers.isObject('string'), false);
+    it('is_object - should check if object', () => {
+      assert.equal(genericHelpers.is_object({}), true);
+      assert.equal(genericHelpers.is_object({ a: 1 }), true);
+      assert.equal(genericHelpers.is_object([]), false);
+      assert.equal(genericHelpers.is_object(null), false);
+      assert.equal(genericHelpers.is_object('string'), false);
     });
 
-    it('isString - should check if string', () => {
-      assert.equal(genericHelpers.isString('hello'), true);
-      assert.equal(genericHelpers.isString(''), true);
-      assert.equal(genericHelpers.isString(123), false);
-      assert.equal(genericHelpers.isString(null), false);
+    it('is_string - should check if string', () => {
+      assert.equal(genericHelpers.is_string('hello'), true);
+      assert.equal(genericHelpers.is_string(''), true);
+      assert.equal(genericHelpers.is_string(123), false);
+      assert.equal(genericHelpers.is_string(null), false);
     });
 
-    it('isNumber - should check if number', () => {
-      assert.equal(genericHelpers.isNumber(123), true);
-      assert.equal(genericHelpers.isNumber(0), true);
-      assert.equal(genericHelpers.isNumber(-5.5), true);
-      assert.equal(genericHelpers.isNumber('123'), false);
-      assert.equal(genericHelpers.isNumber(NaN), false);
+    it('is_number - should check if number', () => {
+      assert.equal(genericHelpers.is_number(123), true);
+      assert.equal(genericHelpers.is_number(0), true);
+      assert.equal(genericHelpers.is_number(-5.5), true);
+      assert.equal(genericHelpers.is_number('123'), false);
+      assert.equal(genericHelpers.is_number(NaN), false);
     });
 
-    it('isBoolean - should check if boolean', () => {
-      assert.equal(genericHelpers.isBoolean(true), true);
-      assert.equal(genericHelpers.isBoolean(false), true);
-      assert.equal(genericHelpers.isBoolean(1), false);
-      assert.equal(genericHelpers.isBoolean('true'), false);
+    it('is_boolean - should check if boolean', () => {
+      assert.equal(genericHelpers.is_boolean(true), true);
+      assert.equal(genericHelpers.is_boolean(false), true);
+      assert.equal(genericHelpers.is_boolean(1), false);
+      assert.equal(genericHelpers.is_boolean('true'), false);
     });
 
-    it('isNil - should check if null/undefined', () => {
-      assert.equal(genericHelpers.isNil(null), true);
-      assert.equal(genericHelpers.isNil(undefined), true);
-      assert.equal(genericHelpers.isNil(0), false);
-      assert.equal(genericHelpers.isNil(''), false);
-      assert.equal(genericHelpers.isNil(false), false);
+    it('is_nil - should check if null/undefined', () => {
+      assert.equal(genericHelpers.is_nil(null), true);
+      assert.equal(genericHelpers.is_nil(undefined), true);
+      assert.equal(genericHelpers.is_nil(0), false);
+      assert.equal(genericHelpers.is_nil(''), false);
+      assert.equal(genericHelpers.is_nil(false), false);
     });
 
-    it('typeOf - should return type', () => {
-      assert.equal(genericHelpers.typeOf([]), 'array');
-      assert.equal(genericHelpers.typeOf({}), 'object');
-      assert.equal(genericHelpers.typeOf(''), 'string');
-      assert.equal(genericHelpers.typeOf(123), 'number');
-      assert.equal(genericHelpers.typeOf(null), 'null');
-      assert.equal(genericHelpers.typeOf(undefined), 'undefined');
-      assert.equal(genericHelpers.typeOf(true), 'boolean');
+    it('type_of - should return type', () => {
+      assert.equal(genericHelpers.type_of([]), 'array');
+      assert.equal(genericHelpers.type_of({}), 'object');
+      assert.equal(genericHelpers.type_of(''), 'string');
+      assert.equal(genericHelpers.type_of(123), 'number');
+      assert.equal(genericHelpers.type_of(null), 'null');
+      assert.equal(genericHelpers.type_of(undefined), 'undefined');
+      assert.equal(genericHelpers.type_of(true), 'boolean');
     });
   });
 });

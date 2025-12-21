@@ -135,7 +135,7 @@ curated_links/
 {% endfor %}
 ```
 
-**Note**: Struktur's `filterInherits` helper is registered but not accessible in Nunjucks template context, so manual filtering is required.
+**Tip**: Use `filter_inherits` to keep templates concise (no manual loops needed).
 
 ## Interactive Features (HTML)
 
@@ -188,10 +188,6 @@ curated_links/
 2. **Template extensions** - Must specify `.njk` explicitly in build configs
   - Build config: `{"template": "index.html.njk", "output": "/index.html"}`
    - Auto-extension fallback is unreliable
-
-3. **Helper registration** - Some helpers registered but not accessible in templates
-   - `filterInherits` registered but returns "undefined or falsey" in templates
-   - Use manual filtering with loops instead
 
 ## Extending This Example
 

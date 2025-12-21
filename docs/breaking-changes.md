@@ -65,6 +65,36 @@ This document tracks breaking changes in Struktur's alpha releases.
 
 ---
 
+### Template Helpers Normalized to snake_case
+
+**Breaking** (Commit: pending): All template helper names are now snake_case only.
+
+**Struktur helpers (before → after):**
+- `schemaRequired` → `schema_required`
+- `schemaHas` → `schema_has`
+- `schemaProps` → `schema_props`
+- `schemaPropSource` → `schema_prop_source`
+- `schemaRequiredBySource` → `schema_required_by_source`
+- `classLineage` → `class_lineage`
+- `filterInherits` → `filter_inherits`
+
+**Generic helper examples (before → after):**
+- `whereIncludes` → `where_includes`
+- `sortBy` → `sort_by`
+- `groupBy` → `group_by`
+- `titleCase` → `title_case`
+- `defaultTo` → `default_value`
+- `isArray` → `is_array`
+- `typeOf` → `type_of`
+
+**Migration**:
+- Update all templates to use snake_case helper names.
+- See `docs/conventions/naming.md` for full naming rules.
+
+**Rationale**: One naming convention across all helpers reduces confusion and matches template conventions.
+
+---
+
 ### `$render` Format Strictly Enforced
 
 **Breaking** (Commit: 953be59): `$render` tasks must be objects with `template` and `output` fields. Invalid formats now cause build failures.
@@ -207,7 +237,7 @@ struktur build mystack --exact
 **Before**:
 ```json
 {
-  "class": "server",
+  "$class": "server",
   "aspect_types": ["infrastructure"],
   "aspect_defaults": {
     "infrastructure": { "tier": "production" }

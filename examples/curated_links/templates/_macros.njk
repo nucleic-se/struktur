@@ -26,8 +26,8 @@
       "$id": "{{ link.$id }}",
       "title": "{{ link.title }}",
       "url": "{{ link.url }}",
-      "description": "{{ link.description | default('') }}",
-      "category": "{{ link.category | default('') }}",
+      "description": "{{ link.description | default_value('') }}",
+      "category": "{{ link.category | default_value('') }}",
       "tags": [{% if link.tags %}{% for tag in link.tags %}"{{ tag }}"{% if not loop.last %}, {% endif %}{% endfor %}{% endif %}]
     }{% if not isLast %},{% endif %}
 {%- endmacro %}
@@ -37,7 +37,7 @@
     <item>
       <title>{{ link.title }}</title>
       <link>{{ link.url }}</link>
-      <description>{{ link.description | default('') }}</description>
+      <description>{{ link.description | default_value('') }}</description>
       <guid>{{ link.url }}</guid>
       {% if link.category %}<category>{{ link.category }}</category>{% endif %}
     </item>

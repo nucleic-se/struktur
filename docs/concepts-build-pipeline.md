@@ -538,7 +538,7 @@ Fix: Add "port" field to instance
 Line 15: Cannot read property 'name' of undefined
 Context: {{post.author.name}}
 
-Fix: Check that author exists or use {{default post.author.name "Anonymous"}}
+Fix: Check that author exists or use {{default_value post.author.name "Anonymous"}}
 ```
 
 ---

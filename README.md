@@ -408,17 +408,17 @@ Templates are **read-only** by design. They receive validated data and generate 
 
 1. **Generic Helpers** — Pure functions, no context needed
    - Logic: `eq`, `or`, `and`, `not`
-   - Collections: `where`, `whereIncludes`, `sortBy`, `groupBy`, `pluck`
+   - Collections: `where`, `where_includes`, `sort_by`, `group_by`, `pluck`
    - Strings: `concat`, `replace`, `slugify`, `lowercase`, `uppercase`
-   - Utility: `length`, `defaultTo`
+   - Utility: `length`, `default_value`
 
 2. **Struktur Helpers** — Need class/schema context
    - `inherits(className, targetClass)` — Check inheritance
-   - `filterInherits(instances, targetClass)` — Filter by class
-   - `classLineage(className)` — Get full lineage array
-   - `schemaRequired(className, field)` — Check if field required
-   - `schemaHas(className, field)` — Check if field exists in schema
-   - `schemaProps(className)` — Get all schema properties
+   - `filter_inherits(instances, targetClass)` — Filter by class
+   - `class_lineage(className)` — Get full lineage array
+   - `schema_required(className, field)` — Check if field required
+   - `schema_has(className, field)` — Check if field exists in schema
+   - `schema_props(className)` — Get all schema properties
 
 3. **Engine Helpers** — Need build context
    - `render_file(template, outputPath)` — Generate separate output files
@@ -636,16 +636,16 @@ Named content buffers for layouts and multi-file output:
 - `eq`, `or` — Logic comparisons
 - `concat` — Join strings
 - `replace` — String replacement
-- `sortBy` — Sort arrays by field
-- `where`, `whereIncludes` — Filter arrays
-- `groupBy` — Group by field
+- `sort_by` — Sort arrays by field
+- `where`, `where_includes` — Filter arrays
+- `group_by` — Group by field
 - `length` — Array/object length
 - `render_file` — Generate separate output files
 
 ### Example Usage
 
 ```handlebars
-{{#each (sortBy instances "name")}}
+{{#each (sort_by instances "name")}}
 {{#if (eq $class "container")}}
   {{render_file "layouts/container" (concat "containers/" $id ".yml")}}
 {{/if}}

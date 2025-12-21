@@ -506,9 +506,9 @@ Template references undefined variable.
    }
    ```
 
-2. **Use default helper:**
+2. **Use default_value helper:**
    ```handlebars
-   <p>Author: {{default author "Anonymous"}}</p>
+   <p>Author: {{default_value author "Anonymous"}}</p>
    ```
 
 3. **Check for property existence:**

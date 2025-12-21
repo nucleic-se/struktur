@@ -46,21 +46,21 @@ export class TemplateRenderer {
     
     // Bind helpers with canonical context
     const strukturContext = { $classes_by_id: canonical.$classes_by_id };
-    this.adapter.registerHelper('schemaRequired', (className, fieldName) => 
+    this.adapter.registerHelper('schema_required', (className, fieldName) =>
       strukturSchema.schemaRequired(strukturContext, className, fieldName));
-    this.adapter.registerHelper('schemaHas', (className, fieldName) => 
+    this.adapter.registerHelper('schema_has', (className, fieldName) =>
       strukturSchema.schemaHas(strukturContext, className, fieldName));
-    this.adapter.registerHelper('schemaProps', (className) => 
+    this.adapter.registerHelper('schema_props', (className) =>
       strukturSchema.schemaProps(strukturContext, className));
-    this.adapter.registerHelper('schemaPropSource', (className, fieldName) => 
+    this.adapter.registerHelper('schema_prop_source', (className, fieldName) =>
       strukturSchema.schemaPropSource(strukturContext, className, fieldName));
-    this.adapter.registerHelper('schemaRequiredBySource', (className) => 
+    this.adapter.registerHelper('schema_required_by_source', (className) =>
       strukturSchema.schemaRequiredBySource(strukturContext, className));
     this.adapter.registerHelper('inherits', (className, targetClasses) => 
       strukturInheritance.inherits(strukturContext, className, targetClasses));
-    this.adapter.registerHelper('filterInherits', (entries, targetClasses) => 
+    this.adapter.registerHelper('filter_inherits', (entries, targetClasses) =>
       strukturInheritance.filterInherits(strukturContext, entries, targetClasses));
-    this.adapter.registerHelper('classLineage', (className) => 
+    this.adapter.registerHelper('class_lineage', (className) =>
       strukturInheritance.classLineage(strukturContext, className));
     
     // Register buffer helpers (for extends/yields support)
