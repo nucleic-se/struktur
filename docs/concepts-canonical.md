@@ -60,7 +60,7 @@ struktur generate -c classes/ -i instances/ -o canonical.json
 - Validated against schemas
 
 **`$instances_by_id`** (Object)
-- Same instances, keyed by `id`
+- Same instances, keyed by `$id`
 - Fast lookup by ID
 - Used in templates: `{{lookup $instances_by_id "web-01"}}`
 
@@ -105,14 +105,14 @@ struktur generate -c classes/ -i instances/ -o canonical.json
 
 **Input:**
 
-**`classes/service.schema.json`:**
+**`classes/service.class.json`:**
 ```json
 {
-  "class": "service",
-  "parent": null,
+  "$class": "service",
+  "$parent": null,
   "replicas": 1,
   "auto_restart": true,
-  "schema": {
+  "$schema": {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
@@ -127,8 +127,8 @@ struktur generate -c classes/ -i instances/ -o canonical.json
 **`instances/web.json`:**
 ```json
 {
-  "id": "web-app",
-  "class": "service",
+  "$id": "web-app",
+  "$class": "service",
   "port": 8080
 }
 ```
@@ -138,8 +138,8 @@ struktur generate -c classes/ -i instances/ -o canonical.json
 {
   "$instances": [
     {
-      "id": "web-app",
-      "class": "service",
+      "$id": "web-app",
+      "$class": "service",
       "port": 8080,
       "replicas": 1,
       "auto_restart": true
@@ -147,8 +147,8 @@ struktur generate -c classes/ -i instances/ -o canonical.json
   ],
   "$instances_by_id": {
     "web-app": {
-      "id": "web-app",
-      "class": "service",
+      "$id": "web-app",
+      "$class": "service",
       "port": 8080,
       "replicas": 1,
       "auto_restart": true
@@ -156,20 +156,24 @@ struktur generate -c classes/ -i instances/ -o canonical.json
   },
   "$classes": [
     {
-      "class": "service",
-      "parent": null,
-      "replicas": 1,
-      "auto_restart": true
+      "$class": "service",
+      "$parent": null,
+      "$fields": {
+        "replicas": 1,
+        "auto_restart": true
+      }
     }
   ],
   "$classes_by_id": {
     "service": {
-      "class": "service",
-      "parent": null,
-      "replicas": 1,
-      "auto_restart": true,
-      "_lineage": [],
-      "_schema": "service.schema.json"
+      "$class": "service",
+      "$parent": null,
+      "$fields": {
+        "replicas": 1,
+        "auto_restart": true
+      },
+      "$lineage": [],
+      "$schemas": [{ ... }]
     }
   },
   "$class_names": ["service"],
@@ -197,15 +201,15 @@ Each instance in the array contains:
 
 ```json
 {
-  "id": "web-01",              // Instance ID
-  "class": "server",           // Class name
+  "$id": "web-01",              // Instance ID
+  "$class": "server",           // Class name
   "hostname": "web-01",        // Instance-specific field
   "replicas": 1,               // From class default
   "auto_restart": true,        // From parent class default
   "domain": "@production",     // Tag reference
   "labels": ["web", "nginx"],  // Array field (merged)
   "$aspects": {                // Aspect data
-    "monitoring": {
+    "aspect_monitoring": {
       "port": 9090
     }
   }
@@ -235,25 +239,26 @@ Each instance in the array contains:
 
 ```json
 {
-  "class": "web_server",
-  "parent": "server",
-  "port": 80,
-  "ssl": false,
-  "_lineage": ["entity_base", "server", "web_server"],
-  "_schema": "web_server.schema.json"
+  "$class": "web_server",
+  "$parent": "server",
+  "$fields": {
+    "port": 80,
+    "ssl": false
+  },
+  "$lineage": ["entity_base", "server", "web_server"],
+  "$schemas": [{ ... }]
 }
 ```
 
 ### Internal Fields
 
-**`_lineage`** (Array)
+**`$lineage`** (Array)
 - Full inheritance chain (root → leaf)
 - Used by `inherits` helper
 - Used by `class_lineage` helper
 
-**`_schema`** (String)
-- Schema filename
-- Relative to class directory
+**`$schemas`** (Array)
+- Schema objects for each class in the lineage (base → child)
 
 ---
 
@@ -263,9 +268,9 @@ Each instance in the array contains:
 
 ```json
 {
-  "aspect": "monitoring",
+  "$aspect": "aspect_monitoring",
   "description": "Monitoring configuration",
-  "schema": {
+  "$schema": {
     "type": "object",
     "properties": {
       "port": { "type": "integer" }
@@ -277,7 +282,7 @@ Each instance in the array contains:
 
 **Used for:**
 - Aspect validation
-- Template checks (`{{#if $aspects.monitoring}}`)
+- Template checks (`{{#if $aspects.aspect_monitoring}}`)
 - Documentation generation
 
 ---
@@ -322,16 +327,16 @@ cat debug.json | jq .
 
 ```bash
 # List all instance IDs
-jq '."$instances"[] | .id' canonical.json
+jq '."$instances"[] | ."$id"' canonical.json
 
 # Find instances by class
-jq '."$instances"[] | select(.class == "server")' canonical.json
+jq '."$instances"[] | select(."$class" == "server")' canonical.json
 
 # Get class lineage
-jq '."$classes_by_id".web_server._lineage' canonical.json
+jq '."$classes_by_id".web_server.$lineage' canonical.json
 
 # Count by class
-jq '[."$instances"[] | .class] | group_by(.) | map({class: .[0], count: length})' canonical.json
+jq '[."$instances"[] | ."$class"] | group_by(.) | map({$class: .[0], count: length})' canonical.json
 ```
 
 ### Use in External Tools
@@ -351,7 +356,7 @@ with open('canonical.json') as f:
 
 for instance in data['$instances']:
     if instance['class'] == 'server':
-        print(f"{instance['id']}: {instance['hostname']}")
+        print(f"{instance['$id']}: {instance['hostname']}")
 ```
 
 ---
@@ -425,7 +430,7 @@ Templates receive canonical as context:
 {{/with}}
 
 {{!-- Check class inheritance --}}
-{{#if (inherits class "entity_base" $classes_by_id)}}
+{{#if (inherits $class "entity_base" $classes_by_id)}}
   <span class="entity">{{name}}</span>
 {{/if}}
 ```
@@ -525,7 +530,7 @@ struktur build --canonical data.json -t markdown-templates/
 struktur generate . -o canonical.json
 
 # Transform with jq
-jq '[."$instances"[] | select(.class == "server")]' canonical.json > servers.json
+jq '[."$instances"[] | select(."$class" == "server")]' canonical.json > servers.json
 
 # Use transformed data elsewhere
 ```
@@ -579,7 +584,7 @@ jq '."$classes_by_id".myclass' canonical.json
 **Check merge order:**
 ```bash
 # See all instances with same ID
-grep -r '"id": "myinstance"' instances/
+grep -r '"$id": "myinstance"' instances/
 ```
 
 Later files override earlier files.

@@ -36,7 +36,7 @@ export class ClassResolver {
     // Collect schemas (one per lineage entry, no merging)
     const schemas = lineage.map(name => {
       const def = this.classLoader.getClass(name);
-      return def.schema;
+      return def.$schema;
     });
 
     // Merge fields (simple field defaults, not schemas)
@@ -53,17 +53,17 @@ export class ClassResolver {
     }
 
     const resolved = {
-      class: className,
-      lineage,
-      schemas,
-      fields,
+      $class: className,
+      $lineage: lineage,
+      $schemas: schemas,
+      $fields: fields,
       $aspects: aspects,
       // Include metadata from class definition for viewer
       $uses_aspects: this._mergeAspectTypes(lineage),
       $aspect_defaults: this._mergeAspectDefaults(lineage),
-      pretty_name: classDef.pretty_name || className,
-      domains: classDef.domains || [],
-      parent: lineage.slice(0, -1)  // All parents in lineage order
+      $pretty_name: classDef.$pretty_name || className,
+      $domains: classDef.$domains || [],
+      $parent: lineage.slice(0, -1)  // All parents in lineage order
     };
 
     // Cache result
@@ -100,7 +100,7 @@ export class ClassResolver {
       }
 
       // Handle both single parent (string) and multi-parent (array)
-      const parents = classDef.parent;
+      const parents = classDef.$parent;
       if (parents) {
         const parentArray = Array.isArray(parents) ? parents : [parents];
         for (const parent of parentArray) {
@@ -132,8 +132,8 @@ export class ClassResolver {
 
     for (const className of lineage) {
       const classDef = this.classLoader.getClass(className);
-      if (classDef.fields) {
-        merged = classMerge(merged, classDef.fields);
+      if (classDef.$fields) {
+        merged = classMerge(merged, classDef.$fields);
       }
     }
 

@@ -1,6 +1,6 @@
 {
-  "id": "test_015",
-  "class": "tool_link",
+  "$id": "test_015",
+  "$class": "tool_link",
   "title": "Nock",
   "url": "https://github.com/nock/nock",
   "description": "HTTP server mocking and expectations library for Node.js",

@@ -134,7 +134,7 @@ A **fully functional collaborative todo list** application demonstrating:
 
 ### Struktur Capabilities Demonstrated
 
-- **Extending Universal**: Domain-specific docker_container classes build on universal base
+- **Extending Universal**: Domain-specific aspect_docker_container classes build on universal base
 - **Aspect defaults**: Common configuration (networks, restart_policy, healthcheck defaults) defined once in class, inherited by all instances
 - **Multi-output templates**: One canonical model generates docker-compose.yml, nginx.conf, API code, and frontend
 - **Smart template escaping**: Triple-stash `{{{...}}}` prevents HTML entity encoding in configs
@@ -363,12 +363,12 @@ mkdir -p my-services/containers
 ```bash
 cat > my-services/containers/myapp.json << 'EOF'
 {
-  "id": "myapp",
-  "class": "docked_container",
+  "$id": "myapp",
+  "$class": "docked_container",
   "description": "My custom application",
   "domains": ["application"],
   "$aspects": {
-    "docker_container": {
+    "aspect_docker_container": {
       "image": "myorg/myapp:latest",
       "ports": ["8000:8000"],
       "environment": {
@@ -417,11 +417,11 @@ cd build && docker compose up -d myapp
 **Database container:**
 ```json
 {
-  "id": "mongodb",
-  "class": "docked_container",
+  "$id": "mongodb",
+  "$class": "docked_container",
   "domains": ["database"],
   "$aspects": {
-    "docker_container": {
+    "aspect_docker_container": {
       "image": "mongo:7",
       "ports": ["27017:27017"],
       "volumes": ["mongo-data:/data/db"],
@@ -437,11 +437,11 @@ cd build && docker compose up -d myapp
 **Worker/background job:**
 ```json
 {
-  "id": "worker",
-  "class": "docked_container",
+  "$id": "worker",
+  "$class": "docked_container",
   "domains": ["application"],
   "$aspects": {
-    "docker_container": {
+    "aspect_docker_container": {
       "image": "myorg/worker:latest",
       "command": "npm run worker",
       "depends_on": ["redis", "postgres"],
@@ -458,11 +458,11 @@ cd build && docker compose up -d myapp
 **Volume for persistence:**
 ```json
 {
-  "id": "mongo-data",
-  "class": "docked_volume",
+  "$id": "mongo-data",
+  "$class": "docked_volume",
   "description": "MongoDB data storage",
   "$aspects": {
-    "docker_volume": {
+    "aspect_docker_volume": {
       "driver": "local"
     }
   }
@@ -515,11 +515,11 @@ For deeper customization, edit the JSON instances directly:
 ```json
 // instances/containers/myapp.json
 {
-  "id": "myapp",
-  "class": "docked_container",
+  "$id": "myapp",
+  "$class": "docked_container",
   "label": "My Application",
   "domains": ["domain_application"],
-  "aspects": ["aspect_docker_container"],
+  "$aspects": ["aspect_docker_container"],
   "aspect_docker_container": {
     "image": "myorg/myapp:latest",
     "ports": [{"host": 3000, "container": 3000}],

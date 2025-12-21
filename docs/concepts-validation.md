@@ -22,13 +22,13 @@ Struktur performs validation in five independent passes:
 ### Pass 0: Base Schema Validation (Universal Contract)
 
 Validates that **all instances** meet the universal contract:
-- Required fields: `id`, `class`
-- Optional fields: `render` (instance-specific render tasks)
+- Required fields: `$id`, `$class`
+- Optional fields: `$render` (instance-specific render tasks)
 - Schema: `schemas/instance_base.schema.json`
 
 **Level:** Error (validation fails)
 
-**Why first?** Catches fundamental structural errors (missing id/class) before any class-specific validation runs.
+**Why first?** Catches fundamental structural errors (missing $id/$class) before any class-specific validation runs.
 
 See [Base Schema Validation](#base-schema-validation-pass-0) for details.
 
@@ -51,8 +51,8 @@ Checks basic structure and types:
 
 // Instance missing "name" → Schema validation fails
 {
-  "id": "app",
-  "class": "service"
+  "$id": "app",
+  "$class": "service"
 }
 ```
 
@@ -74,7 +74,7 @@ Validates aspect-specific requirements:
 
 // Instance missing aspect field → Aspect validation fails
 {
-  "id": "vm-01",
+  "$id": "vm-01",
   "$aspects": {
     "terraform": {}
   }
@@ -95,7 +95,7 @@ Checks data formats and quality (warnings only):
 ```json
 // Instance with format issue → Semantic warning
 {
-  "id": "srv-01",
+  "$id": "srv-01",
   "name": "TODO: Add proper name",  // Warning: placeholder_value
   "email": "not-an-email",           // Warning: invalid_format
   "hostname": "UPPERCASE.COM"        // Warning: invalid_format (should be lowercase)
@@ -116,7 +116,7 @@ Checks data quality and conventions (warnings only):
 ```json
 // Instance with lint issues → Lint warnings
 {
-  "id": "MyService_01",    // Warning: malformed_id (should be kebab-case)
+  "$id": "MyService_01",    // Warning: malformed_id (should be kebab-case)
   "name": "",              // Warning: suspicious_value (empty name)
   "port": 0,               // Warning: suspicious_value (port 0)
   "tags": []               // Warning: empty_array
@@ -129,7 +129,7 @@ Checks data quality and conventions (warnings only):
 ## Errors vs Warnings
 
 **Errors** (validation fails):
-- Base schema violations (Pass 0) - missing id/class, malformed render array
+- Base schema violations (Pass 0) - missing $id/$class, malformed render array
 - Schema violations (Pass 1)
 - Aspect requirement violations (Pass 2)
 - Result: `valid: false`, build stops
@@ -156,34 +156,34 @@ const validator = new MultiPassValidator({
 Before any class-specific validation, **all instances** are validated against the universal base schema (`schemas/instance_base.schema.json`).
 
 **Required fields:**
-- `id` (string, minLength: 1) - Unique instance identifier
-- `class` (string, minLength: 1) - Class name
+- `$id` (string, minLength: 1) - Unique instance identifier
+- `$class` (string, minLength: 1) - Class name
 
 **Optional fields:**
-- `render` (array) - Instance-specific render tasks (see [Render Arrays](./concepts-instances.md#render-arrays))
+- `$render` (array) - Instance-specific render tasks (see [Render Arrays](./concepts-instances.md#render-arrays))
 
 **Example base schema errors:**
 
 ```json
-// Missing id
+// Missing $id
 {
-  "class": "server",
+  "$class": "server",
   "name": "My Server"
 }
-// Error: Base schema validation failed for instance 'undefined' - missing required property 'id'
+// Error: Base schema validation failed for instance 'undefined' - missing required property '$id'
 
-// Empty id
+// Empty $id
 {
-  "id": "",
-  "class": "server"
+  "$id": "",
+  "$class": "server"
 }
-// Error: Base schema validation failed for instance '' - 'id' must be at least 1 character
+// Error: Base schema validation failed for instance '' - '$id' must be at least 1 character
 
 // Invalid render array
 {
-  "id": "web-01",
-  "class": "server",
-  "render": [{"template": "config.hbs"}]  // missing 'output'
+  "$id": "web-01",
+  "$class": "server",
+  "$render": [{"template": "config.hbs"}]  // missing 'output'
 }
 // Error: Base schema validation failed for instance 'web-01' - render[0] missing required property 'output'
 ```
@@ -197,11 +197,11 @@ Before any class-specific validation, **all instances** are validated against th
 Each class in the inheritance chain validates independently:
 
 ```
-entity_base.schema.json
+entity_base.class.json
   ↓ validates base fields
-server.schema.json
+server.class.json
   ↓ validates server fields
-web_server.schema.json
+web_server.class.json
   ↓ validates web-specific fields
 ```
 
@@ -213,7 +213,7 @@ web_server.schema.json
 ```json
 // entity_base.json + schema
 {
-  "required": ["id", "name"]
+  "required": ["$id", "name"]
 }
 
 // server.json + schema  
@@ -230,8 +230,8 @@ web_server.schema.json
 **Instance validation:**
 ```json
 {
-  "id": "web-01",
-  "class": "web_server",
+  "$id": "web-01",
+  "$class": "web_server",
   "name": "Web Server 01"
 }
 ```
@@ -241,11 +241,11 @@ web_server.schema.json
 ✗ Validation failed
 
 Error (instance: web-01)
-  Schema: server.schema.json
+  Schema: server.class.json
   Missing required: hostname, ip_address
 
 Error (instance: web-01)
-  Schema: web_server.schema.json
+  Schema: web_server.class.json
   Missing required: port
 ```
 
@@ -291,7 +291,7 @@ Error (instance: web-01)
 ```
 [VALIDATE] Validation Error (instance: web-01)
   Property "port" is required but not provided
-  Schema: server.schema.json
+  Schema: server.class.json
   Class: web_server (inherits: entity_base → server → web_server)
 ```
 
@@ -299,7 +299,7 @@ Error (instance: web-01)
 - **Phase:** `[VALIDATE]` - Where error occurred
 - **Instance:** `web-01` - Which instance failed
 - **Property:** `port` - Which field caused error
-- **Schema:** `server.schema.json` - Which schema failed
+- **Schema:** `server.class.json` - Which schema failed
 - **Context:** Class lineage for debugging
 
 ### Constraint Conflict Example
@@ -475,17 +475,17 @@ Supported formats (semantic validation):
 ```json
 // Parent schema
 {
-  "class": "entity_base",
-  "required": ["id", "name"]
+  "$class": "entity_base",
+  "required": ["$id", "name"]
 }
 
 // Child schema (adds more required)
 {
-  "class": "server",
+  "$class": "server",
   "required": ["hostname"]
 }
 
-// Instance must have: id, name, hostname
+// Instance must have: $id, name, hostname
 ```
 
 ### Optional vs Required
@@ -535,7 +535,7 @@ Supported formats (semantic validation):
 
 ```
 Error (instance: web-01)
-  Schema: server.schema.json  ← This schema
+  Schema: server.class.json  ← This schema
   Missing required: hostname
 ```
 
@@ -556,7 +556,7 @@ web_server
 
 ```bash
 struktur generate -c classes/ -i instances/ -o debug.json
-cat debug.json | jq '."$instances"[] | select(.id == "web-01")'
+cat debug.json | jq '."$instances"[] | select(."$id" == "web-01")'
 ```
 
 See what fields actually got merged.
@@ -565,8 +565,8 @@ See what fields actually got merged.
 
 ```json
 {
-  "id": "web-01",
-  "class": "web_server",
+  "$id": "web-01",
+  "$class": "web_server",
   "hostname": "web-01.example.com"  // Add missing field
 }
 ```

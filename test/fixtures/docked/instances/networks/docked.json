@@ -1,9 +1,11 @@
 {
-  "id": "docked",
-  "class": "docked_network",
-  "domains": ["infrastructure"],
+  "$id": "docked",
+  "$class": "docked_network",
+  "domains": [
+    "infrastructure"
+  ],
   "$aspects": {
-    "docker_network": {
+    "aspect_docker_network": {
       "driver": "bridge"
     }
   }

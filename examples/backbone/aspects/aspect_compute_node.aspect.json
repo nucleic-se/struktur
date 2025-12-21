@@ -1,6 +1,6 @@
 {
-  "aspect": "aspect_compute_node",
-  "schema": {
+  "$aspect": "aspect_compute_node",
+  "$schema": {
     "type": "object",
     "properties": {
       "cores": {

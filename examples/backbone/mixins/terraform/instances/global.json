@@ -1,9 +1,18 @@
 {
-  "id": "global",
-  "class": "global",
-  "build": [
-    { "terraform/dot.env.terraform.example": "/terraform/.env.terraform.example" },
-    { "terraform/main.tf.j2": "/terraform/main.tf" },
-    { "terraform/variables.tf.j2": "/terraform/variables.tf" }
+  "$id": "global",
+  "$class": "global",
+  "$render": [
+    {
+      "template": "terraform/dot.env.terraform.example",
+      "output": "/terraform/.env.terraform.example"
+    },
+    {
+      "template": "terraform/main.tf.j2",
+      "output": "/terraform/main.tf"
+    },
+    {
+      "template": "terraform/variables.tf.j2",
+      "output": "/terraform/variables.tf"
+    }
   ]
 }

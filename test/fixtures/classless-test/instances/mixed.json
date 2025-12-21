@@ -1,15 +1,15 @@
 [
   {
-    "id": "valid-1",
-    "class": "entity",
+    "$id": "valid-1",
+    "$class": "entity",
     "name": "Valid Instance"
   },
   {
-    "id": "classless-1",
+    "$id": "classless-1",
     "name": "No class field"
   },
   {
-    "id": "classless-2",
+    "$id": "classless-2",
     "name": "Also no class"
   }
 ]

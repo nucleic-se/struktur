@@ -4,19 +4,19 @@
   "title": "Instance Base Schema",
   "description": "Base schema that all Struktur instances must validate against, regardless of class",
   "type": "object",
-  "required": ["id", "class"],
+  "required": ["$id", "$class"],
   "properties": {
-    "id": {
+    "$id": {
       "type": "string",
       "minLength": 1,
       "description": "Unique identifier for this instance"
     },
-    "class": {
+    "$class": {
       "type": "string",
       "minLength": 1,
       "description": "Class name this instance belongs to"
     },
-    "render": {
+    "$render": {
       "type": "array",
       "description": "Optional array of render tasks for this instance",
       "items": {
@@ -37,7 +37,7 @@
         "additionalProperties": false
       }
     },
-    "_source_file": {
+    "$source_file": {
       "type": "string",
       "description": "Internal: source file path (added by loader)"
     }

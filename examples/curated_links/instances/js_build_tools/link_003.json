@@ -1,6 +1,6 @@
 {
-  "id": "link_003",
-  "class": "tool_link",
+  "$id": "link_003",
+  "$class": "tool_link",
   "url": "https://rollupjs.org",
   "title": "Rollup",
   "description": "Module bundler for JavaScript which compiles small pieces of code into something larger",
@@ -15,7 +15,7 @@
   "license": "MIT",
   "github_url": "https://github.com/rollup/rollup",
   "$aspects": {
-    "quality": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 4,

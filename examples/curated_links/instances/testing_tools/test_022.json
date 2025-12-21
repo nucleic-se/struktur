@@ -1,6 +1,6 @@
 {
-  "id": "test_022",
-  "class": "tool_link",
+  "$id": "test_022",
+  "$class": "tool_link",
   "url": "https://nightwatchjs.org",
   "title": "Nightwatch.js",
   "description": "Integrated testing framework powered by Node.js and Selenium",

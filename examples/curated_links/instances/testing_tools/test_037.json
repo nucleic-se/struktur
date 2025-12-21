@@ -1,6 +1,6 @@
 {
-  "id": "test_037",
-  "class": "tool_link",
+  "$id": "test_037",
+  "$class": "tool_link",
   "url": "https://www.artillery.io",
   "title": "Artillery",
   "description": "Modern load testing and smoke testing solution",

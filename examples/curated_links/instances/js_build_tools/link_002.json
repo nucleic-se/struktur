@@ -1,6 +1,6 @@
 {
-  "id": "link_002",
-  "class": "tool_link",
+  "$id": "link_002",
+  "$class": "tool_link",
   "url": "https://vitejs.dev",
   "title": "Vite",
   "description": "Next generation frontend tooling with instant dev server and lightning fast HMR",
@@ -15,7 +15,7 @@
   "license": "MIT",
   "github_url": "https://github.com/vitejs/vite",
   "$aspects": {
-    "quality": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 5,

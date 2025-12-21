@@ -1,0 +1,20 @@
+{
+  "$class": "optional_service2",
+  "$parent": "entity_base",
+  "$schema": {
+    "type": "object",
+    "required": [
+      "$id"
+    ],
+    "properties": {
+      "$id": {
+        "type": "string"
+      }
+    }
+  },
+  "$aspects": {
+    "aspect_network_interface": {
+      "required": false
+    }
+  }
+}

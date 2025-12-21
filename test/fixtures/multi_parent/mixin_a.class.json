@@ -1,0 +1,18 @@
+{
+  "$class": "mixin_a",
+  "$schema": {
+    "type": "object",
+    "properties": {
+      "prop_a": {
+        "type": "string",
+        "description": "Property from mixin A"
+      }
+    },
+    "required": [
+      "prop_a"
+    ]
+  },
+  "$fields": {
+    "prop_a": "default_a"
+  }
+}

@@ -40,7 +40,7 @@ Struktur is designed for people who:
 - **Templates** (output generators)  
 → **Deterministic artifacts** (YAML, JSON, HTML, configs)
 
-**Example:** A Docker stack has container classes, `docker_container` aspects, postgres/redis/nginx instances, and docker-compose.yml templates.
+**Example:** A Docker stack has container classes, `aspect_docker_container` aspects, postgres/redis/nginx instances, and docker-compose.yml templates.
 
 ## How It Works
 
@@ -48,21 +48,23 @@ Struktur's pipeline has three stages:
 
 ### 1. Define Shapes (Classes + Schemas)
 
-Classes describe the **structure** of your data. Each class file (`.schema.json`) contains the class definition with inheritance, field defaults, and JSON Schema validation rules.
+Classes describe the **structure** of your data. Each class file (`.class.json`) contains the class definition with inheritance, field defaults, and JSON Schema validation rules.
 
 ```json
-// classes/service.schema.json
+// classes/service.class.json
 {
-  "class": "service",
-  "parent": "base",
-  "replicas": 1,
-  "port": null,
-  "schema": {
+  "$class": "service",
+  "$parent": "base",
+  "$fields": {
+    "replicas": 1,
+    "port": null
+  },
+  "$schema": {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
-    "required": ["id", "port"],
+    "required": ["$id", "port"],
     "properties": {
-      "id": { "type": "string" },
+      "$id": { "type": "string" },
       "port": { "type": "integer", "minimum": 1, "maximum": 65535 },
       "replicas": { "type": "integer", "minimum": 1 }
     }
@@ -79,8 +81,8 @@ Instances are the **real objects**—your actual services, networks, teams, what
 ```json
 // instances/web-prod.json
 {
-  "id": "web-prod",
-  "class": "service",
+  "$id": "web-prod",
+  "$class": "service",
   "port": 8080,
   "replicas": 3
 }
@@ -95,7 +97,7 @@ Templates turn the merged data into files. Struktur uses Handlebars by default, 
 ```handlebars
 {{!-- templates/docker-compose.yml --}}
 services:
-  {{id}}:
+  {{$id}}:
     image: nginx:latest
     ports:
       - "{{port}}:80"
@@ -302,7 +304,7 @@ struktur init --example docked my-stack
 
 Struktur validates instances through multiple layers:
 
-1. **Base schema validation (Pass 0)**: Universal contract - all instances must have `id` and `class` fields
+1. **Base schema validation (Pass 0)**: Universal contract - all instances must have `$id` and `$class` fields
 2. **JSON Schema validation (Pass 1)**: Structural correctness (required fields, types, additionalProperties)
 3. **Aspect validation (Pass 2)**: Aspect-specific requirements
 4. **Semantic validation (Pass 3)**: Data quality checks (minLength, maxLength, enum, bounds, format validation)
@@ -393,7 +395,7 @@ Templates are **read-only** by design. They receive validated data and generate 
 **Template Context** (available in all templates):
 ```javascript
 {
-  global,              // Global instance (id: "global")
+  global,              // Global instance ($id: "global")
   $instances,          // Array of all instances
   $instances_by_id,    // Map for lookups by ID
   canonical,           // Full canonical structure
@@ -462,7 +464,7 @@ registry.register('myHelper', (value) => {
 
 // Struktur helper (needs context)
 registry.register('hasPort', (context, className) => {
-  return context.$classes_by_id[className]?.fields?.port !== undefined;
+  return context.$classes_by_id[className]?.$fields?.port !== undefined;
 }, { 
   category: 'struktur',
   requiresContext: true 
@@ -511,12 +513,12 @@ Instances merge through three mechanisms:
 1. **Multi-file Merging** (same ID across files)
    ```json
    // base/app.json
-   { "id": "app", "class": "service", "port": 8080 }
+   { "$id": "app", "$class": "service", "port": 8080 }
    
    // prod/app.json
-   { "id": "app", "replicas": 5 }
+   { "$id": "app", "replicas": 5 }
    
-   // Result: { id: "app", class: "service", port: 8080, replicas: 5 }
+   // Result: { $id: "app", $class: "service", port: 8080, replicas: 5 }
    ```
 
 2. **Class Inheritance** (parent → child defaults)
@@ -567,8 +569,8 @@ Classes inherit from multiple parents with deterministic merge order:
 
 ```json
 {
-  "class": "production_db",
-  "parent": ["database", "production_config", "monitored_service"]
+  "$class": "production_db",
+  "$parent": ["database", "production_config", "monitored_service"]
 }
 ```
 
@@ -578,12 +580,12 @@ Multiple JSON files defining the same instance ID are merged:
 
 ```json
 // base/config.json
-{ "id": "app", "class": "service", "port": 8080 }
+{ "$id": "app", "$class": "service", "port": 8080 }
 
 // prod/config.json  
-{ "id": "app", "replicas": 5, "region": "us-east" }
+{ "$id": "app", "replicas": 5, "region": "us-east" }
 
-// Result: { id: "app", class: "service", port: 8080, replicas: 5, region: "us-east" }
+// Result: { $id: "app", $class: "service", port: 8080, replicas: 5, region: "us-east" }
 ```
 
 ### Mixins
@@ -622,7 +624,7 @@ Named content buffers for layouts and multi-file output:
 
 {# Multi-file output #}
 {% buffer name="config" destination="docker-compose.yml" mode="append" %}
-  {{id}}: ...
+  {{$id}}: ...
 {% endbuffer %}
 ```
 
@@ -645,8 +647,8 @@ Named content buffers for layouts and multi-file output:
 
 ```handlebars
 {{#each (sortBy instances "name")}}
-{{#if (eq class "container")}}
-  {{render_file "layouts/container" (concat "containers/" id ".yml")}}
+{{#if (eq $class "container")}}
+  {{render_file "layouts/container" (concat "containers/" $id ".yml")}}
 {{/if}}
 {{/each}}
 ```

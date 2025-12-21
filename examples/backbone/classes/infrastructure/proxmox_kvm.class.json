@@ -1,0 +1,18 @@
+{
+  "$class": "proxmox_kvm",
+  "$parent": [
+    "proxmox_guest",
+    "domain_virtual"
+  ],
+  "$pretty_name": "Proxmox KVM",
+  "$domains": [
+    "virtual"
+  ],
+  "$uses_aspects": [],
+  "$schema": {
+    "type": "object",
+    "description": "Proxmox KVM virtual machine",
+    "properties": {},
+    "additionalProperties": true
+  }
+}

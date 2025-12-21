@@ -1,6 +1,6 @@
 {
-  "aspect": "aspect_service",
-  "schema": {
+  "$aspect": "aspect_service",
+  "$schema": {
     "type": "object",
     "properties": {
       "type": {

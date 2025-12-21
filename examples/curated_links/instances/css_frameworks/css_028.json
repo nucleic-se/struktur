@@ -1,6 +1,6 @@
 {
-  "id": "css_028",
-  "class": "tool_link",
+  "$id": "css_028",
+  "$class": "tool_link",
   "url": "https://watercss.kognise.dev",
   "title": "Water.css",
   "description": "Just-add-water CSS framework with no classes needed",

@@ -1,0 +1,42 @@
+{
+  "$class": "global",
+  "$schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "$id": {
+        "type": "string",
+        "const": "global"
+      },
+      "$class": {
+        "type": "string",
+        "const": "global"
+      },
+      "$render": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["template", "output"],
+          "properties": {
+            "template": {
+              "type": "string",
+              "minLength": 1
+            },
+            "output": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": [
+      "$id",
+      "$class"
+    ]
+  },
+  "$fields": {
+    "$render": []
+  }
+}

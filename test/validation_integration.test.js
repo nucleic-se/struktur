@@ -16,11 +16,11 @@ describe('Semantic and Lint Validation Integration', () => {
 
     // Manually add class to loader (testing convenience)
     loader.classes.set('test_class', {
-      class: 'test_class',
-      schema: {
+      $class: 'test_class',
+      $schema: {
         type: 'object',
         properties: {
-          id: { type: 'string' },
+          $id: { type: 'string' },
           name: { type: 'string' }
         }
       }
@@ -31,8 +31,8 @@ describe('Semantic and Lint Validation Integration', () => {
 
     // Instance with empty name (semantic warning)
     const instance = {
-      id: 'test-1',
-      class: 'test_class',
+      $id: 'test-1',
+      $class: 'test_class',
       name: ''
     };
 
@@ -51,11 +51,11 @@ describe('Semantic and Lint Validation Integration', () => {
     const validator = new MultiPassValidator();
 
     loader.classes.set('test_class', {
-      class: 'test_class',
-      schema: {
+      $class: 'test_class',
+      $schema: {
         type: 'object',
         properties: {
-          id: { type: 'string' },
+          $id: { type: 'string' },
           description: { type: 'string' }
         }
       }
@@ -66,8 +66,8 @@ describe('Semantic and Lint Validation Integration', () => {
 
     // Instance with malformed ID and missing description
     const instance = {
-      id: 'BadID_Format',
-      class: 'test_class'
+      $id: 'BadID_Format',
+      $class: 'test_class'
     };
 
     const result = validator.validate(instance, resolved);
@@ -89,12 +89,12 @@ describe('Semantic and Lint Validation Integration', () => {
     const validator = new MultiPassValidator();
 
     loader.classes.set('test_class', {
-      class: 'test_class',
-      schema: {
+      $class: 'test_class',
+      $schema: {
         type: 'object',
         required: ['name'],
         properties: {
-          id: { type: 'string' },
+          $id: { type: 'string' },
           name: { type: 'string' }
         }
       }
@@ -105,8 +105,8 @@ describe('Semantic and Lint Validation Integration', () => {
 
     // Instance with schema error (missing name) AND warnings (bad ID)
     const instance = {
-      id: 'Bad_ID',
-      class: 'test_class'
+      $id: 'Bad_ID',
+      $class: 'test_class'
       // name missing (error)
     };
 
@@ -132,11 +132,11 @@ describe('Semantic and Lint Validation Integration', () => {
     const validator = new MultiPassValidator({ enableSemantic: false });
 
     loader.classes.set('test_class', {
-      class: 'test_class',
-      schema: {
+      $class: 'test_class',
+      $schema: {
         type: 'object',
         properties: {
-          id: { type: 'string' },
+          $id: { type: 'string' },
           name: { type: 'string' }
         }
       }
@@ -147,8 +147,8 @@ describe('Semantic and Lint Validation Integration', () => {
 
     // Instance with empty name (would trigger semantic warning if enabled)
     const instance = {
-      id: 'test-1',
-      class: 'test_class',
+      $id: 'test-1',
+      $class: 'test_class',
       name: ''
     };
 
@@ -170,11 +170,11 @@ describe('Semantic and Lint Validation Integration', () => {
     const validator = new MultiPassValidator({ enableLint: false });
 
     loader.classes.set('test_class', {
-      class: 'test_class',
-      schema: {
+      $class: 'test_class',
+      $schema: {
         type: 'object',
         properties: {
-          id: { type: 'string' }
+          $id: { type: 'string' }
         }
       }
     });
@@ -184,8 +184,8 @@ describe('Semantic and Lint Validation Integration', () => {
 
     // Instance with bad ID (would trigger lint warning if enabled)
     const instance = {
-      id: 'BadID',
-      class: 'test_class'
+      $id: 'BadID',
+      $class: 'test_class'
     };
 
     const result = validator.validate(instance, resolved);
@@ -201,11 +201,11 @@ describe('Semantic and Lint Validation Integration', () => {
     const validator = new MultiPassValidator();
 
     loader.classes.set('test_class', {
-      class: 'test_class',
-      schema: {
+      $class: 'test_class',
+      $schema: {
         type: 'object',
         properties: {
-          id: { type: 'string' },
+          $id: { type: 'string' },
           description: { type: 'string' }
         }
       }
@@ -215,8 +215,8 @@ describe('Semantic and Lint Validation Integration', () => {
     validator.registerClass(resolved);
 
     const instance = {
-      id: 'test-1',
-      class: 'test_class',
+      $id: 'test-1',
+      $class: 'test_class',
       description: 'TODO: write this'
     };
 
@@ -234,11 +234,11 @@ describe('Semantic and Lint Validation Integration', () => {
     const validator = new MultiPassValidator();
 
     loader.classes.set('test_class', {
-      class: 'test_class',
-      schema: {
+      $class: 'test_class',
+      $schema: {
         type: 'object',
         properties: {
-          id: { type: 'string' },
+          $id: { type: 'string' },
           tags: { type: 'array' }
         }
       }
@@ -248,8 +248,8 @@ describe('Semantic and Lint Validation Integration', () => {
     validator.registerClass(resolved);
 
     const instance = {
-      id: 'test-1',
-      class: 'test_class',
+      $id: 'test-1',
+      $class: 'test_class',
       tags: []
     };
 

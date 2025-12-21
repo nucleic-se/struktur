@@ -10,7 +10,7 @@
     <language>en-us</language>
     <item:count>{{ m.toolCount($instances) }}</item:count>
     
-    {% for link in $instances %}{% if link.class == 'tool_link' %}
+    {% for link in $instances %}{% if link.$class == 'tool_link' %}
 {{ m.rssItem(link) }}
     {% endif %}{% endfor %}
   </channel>

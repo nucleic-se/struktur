@@ -1,6 +1,6 @@
 {
-  "id": "link_017",
-  "class": "tool_link",
+  "$id": "link_017",
+  "$class": "tool_link",
   "url": "https://pnpm.io",
   "title": "pnpm",
   "description": "Fast, disk space efficient package manager that uses hard links and symlinks",
@@ -14,7 +14,7 @@
   "license": "MIT",
   "github_url": "https://github.com/pnpm/pnpm",
   "$aspects": {
-    "quality": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 4,

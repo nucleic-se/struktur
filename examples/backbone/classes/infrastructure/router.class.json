@@ -1,0 +1,21 @@
+{
+  "$class": "router",
+  "$parent": [
+    "network_device",
+    "domain_physical",
+    "domain_network"
+  ],
+  "$pretty_name": "Router",
+  "$domains": [
+    "physical",
+    "network"
+  ],
+  "$uses_aspects": [
+    "aspect_network_interface"
+  ],
+  "$schema": {
+    "type": "object",
+    "description": "Network router or gateway device",
+    "additionalProperties": true
+  }
+}

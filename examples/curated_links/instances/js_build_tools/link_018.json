@@ -1,6 +1,6 @@
 {
-  "id": "link_018",
-  "class": "tool_link",
+  "$id": "link_018",
+  "$class": "tool_link",
   "url": "https://bun.sh",
   "title": "Bun",
   "description": "All-in-one JavaScript runtime and toolkit with bundler, package manager, and test runner",
@@ -14,7 +14,7 @@
   "license": "MIT",
   "github_url": "https://github.com/oven-sh/bun",
   "$aspects": {
-    "quality": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 5,

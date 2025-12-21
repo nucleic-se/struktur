@@ -1,6 +1,6 @@
 {
-  "id": "css_013",
-  "class": "tool_link",
+  "$id": "css_013",
+  "$class": "tool_link",
   "url": "https://unocss.dev",
   "title": "UnoCSS",
   "description": "Instant on-demand atomic CSS engine with flexible presets",

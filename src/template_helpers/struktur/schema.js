@@ -40,12 +40,12 @@ export function schemaRequired(context, className, fieldName) {
   if (!classDef) return false;
   
   // Check class and all parents
-  const lineage = classDef.lineage || [className];
+  const lineage = classDef.$lineage || [className];
   
-  for (const ancestorName of lineage) {
-    const ancestor = $classes_by_id[ancestorName];
-    if (ancestor?.schema) {
-      const required = getSchemaRequired(ancestor.schema);
+  for (const [index, ancestorName] of lineage.entries()) {
+    const schema = classDef.$schemas?.[index];
+    if (schema) {
+      const required = getSchemaRequired(schema);
       if (required.includes(fieldName)) {
         return true;
       }
@@ -70,12 +70,12 @@ export function schemaHas(context, className, fieldName) {
   if (!classDef) return false;
   
   // Check class and all parents
-  const lineage = classDef.lineage || [className];
+  const lineage = classDef.$lineage || [className];
   
-  for (const ancestorName of lineage) {
-    const ancestor = $classes_by_id[ancestorName];
-    if (ancestor?.schema) {
-      const props = getSchemaProperties(ancestor.schema);
+  for (const [index, ancestorName] of lineage.entries()) {
+    const schema = classDef.$schemas?.[index];
+    if (schema) {
+      const props = getSchemaProperties(schema);
       if (props.includes(fieldName)) {
         return true;
       }
@@ -98,13 +98,13 @@ export function schemaProps(context, className) {
   const classDef = $classes_by_id[className];
   if (!classDef) return [];
   
-  const lineage = classDef.lineage || [className];
+  const lineage = classDef.$lineage || [className];
   const props = new Set();
   
-  for (const ancestorName of lineage) {
-    const ancestor = $classes_by_id[ancestorName];
-    if (ancestor?.schema) {
-      const ancestorProps = getSchemaProperties(ancestor.schema);
+  for (const [index, ancestorName] of lineage.entries()) {
+    const schema = classDef.$schemas?.[index];
+    if (schema) {
+      const ancestorProps = getSchemaProperties(schema);
       ancestorProps.forEach(prop => props.add(prop));
     }
   }
@@ -126,12 +126,12 @@ export function schemaPropSource(context, className, fieldName) {
   const classDef = $classes_by_id[className];
   if (!classDef) return '';
   
-  const lineage = classDef.lineage || [className];
+  const lineage = classDef.$lineage || [className];
   
-  for (const ancestorName of lineage) {
-    const ancestor = $classes_by_id[ancestorName];
-    if (ancestor?.schema) {
-      const props = getSchemaProperties(ancestor.schema);
+  for (const [index, ancestorName] of lineage.entries()) {
+    const schema = classDef.$schemas?.[index];
+    if (schema) {
+      const props = getSchemaProperties(schema);
       if (props.includes(fieldName)) {
         return ancestorName;
       }
@@ -154,13 +154,13 @@ export function schemaRequiredBySource(context, className) {
   const classDef = $classes_by_id[className];
   if (!classDef) return [];
   
-  const lineage = classDef.lineage || [className];
+  const lineage = classDef.$lineage || [className];
   const result = [];
   
-  for (const ancestorName of lineage) {
-    const ancestor = $classes_by_id[ancestorName];
-    if (ancestor?.schema) {
-      const required = getSchemaRequired(ancestor.schema);
+  for (const [index, ancestorName] of lineage.entries()) {
+    const schema = classDef.$schemas?.[index];
+    if (schema) {
+      const required = getSchemaRequired(schema);
       if (required.length > 0) {
         result.push({
           class: ancestorName,

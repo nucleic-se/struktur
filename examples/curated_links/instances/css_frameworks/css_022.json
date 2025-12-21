@@ -1,6 +1,6 @@
 {
-  "id": "css_022",
-  "class": "tool_link",
+  "$id": "css_022",
+  "$class": "tool_link",
   "url": "https://www.radix-ui.com",
   "title": "Radix UI",
   "description": "Unstyled, accessible components for building high-quality design systems",

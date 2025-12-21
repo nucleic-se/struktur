@@ -19,7 +19,7 @@ const { version: PACKAGE_VERSION } = require('../package.json');
  * @returns {Object} - Merged instance
  */
 function mergeInstanceWithFields(instance, resolvedClass = {}, aspectLoader = null) {
-  const fields = resolvedClass.fields || {};
+  const fields = resolvedClass.$fields || {};
   
   // Deep merge: start with empty object, merge defaults, then instance (instance wins)
   const merged = classMerge(classMerge({}, fields), instance);
@@ -48,11 +48,9 @@ function mergeInstanceWithFields(instance, resolvedClass = {}, aspectLoader = nu
       
       // Layer 1: Aspect definition defaults (from aspect file)
       if (aspectLoader && aspectLoader.aspects) {
-        // Aspect definitions are stored with "aspect_" prefix, but instances use them without
-        const aspectKey = aspectName.startsWith('aspect_') ? aspectName : `aspect_${aspectName}`;
-        const aspectDef = aspectLoader.aspects.get(aspectKey);
+        const aspectDef = aspectLoader.aspects.get(aspectName);
         if (aspectDef) {
-          const { aspect, schema, ...defaults } = aspectDef;
+          const defaults = aspectDef.$defaults || {};
           aspectData = classMerge(aspectData, defaults);
         }
       }
@@ -92,8 +90,8 @@ function buildClassIndex(instances, resolver, logger) {
 
   // Collect unique class names from instances
   for (const obj of instances) {
-    if (obj.class) {
-      uniqueClasses.add(obj.class);
+    if (obj.$class) {
+      uniqueClasses.add(obj.$class);
     }
   }
 
@@ -131,18 +129,18 @@ export function generateCanonical(instances, resolver, options = {}) {
 
   // Merge instances with class defaults
   const mergedInstances = instances.map(instance => {
-    if (!instance.class) {
-      // No class field - return as-is (should not happen if filtered correctly)
+    if (!instance.$class) {
+      // No $class field - return as-is (should not happen if filtered correctly)
       return instance;
     }
     
     try {
-      const resolved = resolver.resolve(instance.class);
+      const resolved = resolver.resolve(instance.$class);
       return mergeInstanceWithFields(instance, resolved, aspectLoader);
     } catch (error) {
       // If class resolution fails, return instance as-is
       if (logger) {
-        logger.warn(`Warning: Could not resolve class ${instance.class}: ${error.message}`);
+        logger.warn(`Warning: Could not resolve class ${instance.$class}: ${error.message}`);
       }
       return instance;
     }
@@ -156,8 +154,8 @@ export function generateCanonical(instances, resolver, options = {}) {
   // Add $instances_by_id for fast lookup
   const instancesById = {};
   for (const obj of mergedInstances) {
-    if (obj.id) {
-      instancesById[obj.id] = obj;
+    if (obj.$id) {
+      instancesById[obj.$id] = obj;
     }
   }
   canonical.$instances_by_id = instancesById;
@@ -174,15 +172,18 @@ export function generateCanonical(instances, resolver, options = {}) {
   if (aspectLoader && aspectLoader.aspects) {
     const aspectsById = {};
     for (const [aspectName, aspectDef] of aspectLoader.aspects.entries()) {
-      // Extract defaults: all top-level fields except 'aspect' and 'schema'
-      const { aspect, schema, ...defaults } = aspectDef;
-      
+      // Extract defaults from $defaults and metadata from $schema
+      const schema = aspectDef.$schema || {};
+      const defaults = aspectDef.$defaults || null;
+      const prettyName = aspectDef.$pretty_name || aspectName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+      const description = aspectDef.$description || schema.description || null;
+
       aspectsById[aspectName] = {
-        aspect: aspectName,
-        description: schema?.description || null,
-        pretty_name: aspectName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-        schema: schema || {},
-        defaults: Object.keys(defaults).length > 0 ? defaults : null
+        $aspect: aspectName,
+        $description: description,
+        $pretty_name: prettyName,
+        $schema: schema,
+        $defaults: defaults && Object.keys(defaults).length > 0 ? defaults : null
       };
     }
     canonical.$aspects_by_id = aspectsById;
@@ -230,7 +231,7 @@ export function generateCanonical(instances, resolver, options = {}) {
  */
 export function generateCanonicalWithValidation(instances, struktur, options = {}) {
   // All instances must have class field for validation
-  const validatableInstances = instances.filter(inst => inst.class);
+  const validatableInstances = instances.filter(inst => inst.$class);
   
   // Validate all instances
   const validationResults = validatableInstances.length > 0 

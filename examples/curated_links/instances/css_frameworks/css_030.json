@@ -1,6 +1,6 @@
 {
-  "id": "css_030",
-  "class": "tool_link",
+  "$id": "css_030",
+  "$class": "tool_link",
   "url": "https://linaria.dev",
   "title": "Linaria",
   "description": "Zero-runtime CSS in JS library with ahead-of-time compilation",

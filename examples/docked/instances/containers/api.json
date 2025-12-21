@@ -1,15 +1,20 @@
 {
-  "id": "api",
-  "class": "docked_container",
+  "$id": "api",
+  "$class": "docked_container",
   "description": "Backend API service handling business logic and data access",
-  "domains": ["application", "api"],
+  "domains": [
+    "application",
+    "api"
+  ],
   "$aspects": {
-    "docker_container": {
+    "aspect_docker_container": {
       "image": "node:20-alpine",
       "description": "Backend API connecting database, cache, and frontend",
       "command": "sh -c 'npm install && node server.js'",
       "working_dir": "/app",
-      "ports": ["3001:3001"],
+      "ports": [
+        "3001:3001"
+      ],
       "volumes": [
         "./api:/app"
       ],
@@ -22,9 +27,19 @@
         "API_SECRET": "${API_SECRET}",
         "LOG_LEVEL": "${LOG_LEVEL:-info}"
       },
-      "depends_on": ["postgres", "redis"],
+      "depends_on": [
+        "postgres",
+        "redis"
+      ],
       "healthcheck": {
-        "test": ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/health"],
+        "test": [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:3001/health"
+        ],
         "interval": "15s",
         "retries": "3",
         "start_period": "30s"
@@ -44,7 +59,10 @@
     }
   },
   "relations": {
-    "uses/used_by": ["postgres", "redis"],
+    "uses/used_by": [
+      "postgres",
+      "redis"
+    ],
     "serves/served_by": []
   }
 }

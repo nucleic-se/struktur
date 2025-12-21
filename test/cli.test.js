@@ -56,8 +56,8 @@ describe('CLI: validate command', () => {
 
     assert.equal(result.exitCode, 0, 'Should exit with code 0');
     assert.match(result.stdout, /✓ about \(page\)/, 'Should show valid instance');
-    assert.match(result.stdout, /Total:\s+20/, 'Should show total count');
-    assert.match(result.stdout, /Valid:\s+20/, 'Should show all valid');
+    assert.match(result.stdout, /Total:\s+21/, 'Should show total count');
+    assert.match(result.stdout, /Valid:\s+21/, 'Should show all valid');
     assert.match(result.stdout, /Invalid:\s+0/, 'Should show no invalid');
   });
 
@@ -74,8 +74,8 @@ describe('CLI: validate command', () => {
     const json = JSON.parse(result.stdout);
     assert.ok(json.results, 'Should have results array');
     assert.ok(json.summary, 'Should have summary object');
-    assert.equal(json.summary.total, 20, 'Summary should show 20 total');
-    assert.equal(json.summary.valid, 20, 'Summary should show 20 valid');
+    assert.equal(json.summary.total, 21, 'Summary should show 21 total');
+    assert.equal(json.summary.valid, 21, 'Summary should show 21 valid');
     assert.equal(json.summary.invalid, 0, 'Summary should show 0 invalid');
     assert.equal(json.summary.errorCount, 0, 'Summary should show 0 errors');
 
@@ -122,14 +122,14 @@ describe('CLI: validate command', () => {
 
     // Create a simple class
     await fs.writeFile(
-      join(classesDir, 'test_class.schema.json'),
+      join(classesDir, 'test_class.class.json'),
       JSON.stringify({
-        class: 'test_class',
-        schema: {
+        $class: 'test_class',
+        $schema: {
           type: 'object',
-          required: ['id', 'required_field'],
+          required: ['$id', 'required_field'],
           properties: {
-            id: { type: 'string' },
+            $id: { type: 'string' },
             required_field: { type: 'string' }
           }
         }
@@ -140,8 +140,8 @@ describe('CLI: validate command', () => {
     await fs.writeFile(
       join(instancesDir, 'invalid.json'),
       JSON.stringify({
-        id: 'invalid_instance',
-        class: 'test_class'
+        $id: 'invalid_instance',
+        $class: 'test_class'
       })
     );
 
@@ -190,8 +190,8 @@ describe('CLI: validate command', () => {
     ]);
 
     assert.equal(result.exitCode, 0, 'Should exit with code 0');
-    assert.match(result.stdout, /Total:\s+20/, 'Should validate Skribe instances');
-    assert.match(result.stdout, /Valid:\s+20/, 'Should show all valid');
+    assert.match(result.stdout, /Total:\s+21/, 'Should validate Skribe instances');
+    assert.match(result.stdout, /Valid:\s+21/, 'Should show all valid');
   });
 
   it('should support multiple aspects directories', async () => {
@@ -231,7 +231,7 @@ describe('CLI: info command', () => {
     assert.match(result.stdout, /blog_post/, 'Should list blog_post class');
     assert.match(result.stdout, /content_base/, 'Should list content_base class');
     assert.match(result.stdout, /page/, 'Should list page class');
-    assert.match(result.stdout, /Total: 3 classes/, 'Should show count');
+    assert.match(result.stdout, /Total: 4 classes/, 'Should show count');
   });
 
   it('should display classes and aspects from Universal stack', async () => {
@@ -297,7 +297,7 @@ describe('CLI: info command', () => {
     // Should show classes from both Skribe (3) and Universal (3)
     assert.match(result.stdout, /blog_post/, 'Should show Skribe classes');
     assert.match(result.stdout, /entity_base/, 'Should show Universal classes');
-    assert.match(result.stdout, /Total: 6 classes/, 'Should count all classes from both directories');
+    assert.match(result.stdout, /Total: 7 classes/, 'Should count all classes from both directories');
   });
 
   it('should support multiple aspects directories', async () => {

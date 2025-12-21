@@ -17,12 +17,12 @@ instances/
 ### Minimal Container
 ```json
 {
-  "id": "myapp",
-  "class": "docked_container",
+  "$id": "myapp",
+  "$class": "docked_container",
   "description": "My application",
   "domains": ["application"],
   "$aspects": {
-    "docker_container": {
+    "aspect_docker_container": {
       "image": "myorg/myapp:latest",
       "ports": ["8000:8000"]
     }
@@ -35,10 +35,10 @@ instances/
 ### With Environment Variables
 ```json
 {
-  "id": "api",
-  "class": "docked_container",
+  "$id": "api",
+  "$class": "docked_container",
   "$aspects": {
-    "docker_container": {
+    "aspect_docker_container": {
       "image": "node:20-alpine",
       "environment": {
         "NODE_ENV": "${NODE_ENV:-development}",
@@ -52,10 +52,10 @@ instances/
 ### With Dependencies
 ```json
 {
-  "id": "webapp",
-  "class": "docked_container",
+  "$id": "webapp",
+  "$class": "docked_container",
   "$aspects": {
-    "docker_container": {
+    "aspect_docker_container": {
       "image": "nginx:alpine",
       "depends_on": ["api"],
       "healthcheck": {
@@ -99,6 +99,6 @@ See existing files for examples of:
 ## Workflow
 
 1. Copy an existing container as template
-2. Modify `id`, `image`, and other fields
+2. Modify `$id`, `image`, and other fields
 3. Run `struktur build --exact`
 4. Test with `cd build && docker compose up -d`

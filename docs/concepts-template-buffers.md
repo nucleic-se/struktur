@@ -194,7 +194,7 @@ Add content to the beginning:
 {% buffer name="title" %}My Page{% endbuffer %}
 
 {% buffer name="header" %}
-  <h1>Welcome to {{id}}</h1>
+  <h1>Welcome to {{$id}}</h1>
 {% endbuffer %}
 
 {% buffer name="content" %}
@@ -272,18 +272,18 @@ Add content to the beginning:
 {# Write to docker-compose.yml #}
 {% buffer name="service" destination="docker-compose.yml" mode="append" %}
 services:
-  {{id}}:
-    image: {{$aspects.docker_container.image}}
+  {{$id}}:
+    image: {{$aspects.aspect_docker_container.image}}
     ports:
-      - "{{$aspects.docker_container.port}}:80"
+      - "{{$aspects.aspect_docker_container.port}}:80"
 {% endbuffer %}
 
 {# Write to README.md #}
 {% buffer name="docs" destination="README.md" mode="append" %}
-## Service: {{id}}
+## Service: {{$id}}
 
-**Image:** {{$aspects.docker_container.image}}
-**Port:** {{$aspects.docker_container.port}}
+**Image:** {{$aspects.aspect_docker_container.image}}
+**Port:** {{$aspects.aspect_docker_container.port}}
 {% endbuffer %}
 ```
 
@@ -543,20 +543,20 @@ templates/
 ```nunjucks
 {# Write service to docker-compose.yml #}
 {% buffer name="docker_service" destination="docker-compose.yml" mode="append" %}
-  {{id}}:
-    image: {{$aspects.docker_container.image}}
+  {{$id}}:
+    image: {{$aspects.aspect_docker_container.image}}
     ports:
-      - "{{$aspects.docker_container.port}}:{{$aspects.docker_container.internal_port}}"
+      - "{{$aspects.aspect_docker_container.port}}:{{$aspects.aspect_docker_container.internal_port}}"
     environment:
       NODE_ENV: production
 {% endbuffer %}
 
 {# Write docs to README.md #}
 {% buffer name="service_docs" destination="README.md" mode="append" %}
-### {{id}}
+### {{$id}}
 
-- **Image:** {{$aspects.docker_container.image}}
-- **Port:** {{$aspects.docker_container.port}}
+- **Image:** {{$aspects.aspect_docker_container.image}}
+- **Port:** {{$aspects.aspect_docker_container.port}}
 - **Status:** {{status}}
 {% endbuffer %}
 ```
@@ -564,8 +564,8 @@ templates/
 **Instances:**
 ```json
 [
-  {"id": "web", "class": "service", "$aspects": {"docker_container": {"image": "nginx", "port": 80, "internal_port": 80}}},
-  {"id": "api", "class": "service", "$aspects": {"docker_container": {"image": "node:18", "port": 3000, "internal_port": 3000}}}
+  {"$id": "web", "$class": "service", "$aspects": {"aspect_docker_container": {"image": "nginx", "port": 80, "internal_port": 80}}},
+  {"$id": "api", "$class": "service", "$aspects": {"aspect_docker_container": {"image": "node:18", "port": 3000, "internal_port": 3000}}}
 ]
 ```
 

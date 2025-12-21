@@ -2,7 +2,7 @@
 
 {# Count tool links in instances #}
 {% macro toolCount($instances) %}
-{{ $instances | selectattr('class', 'equalto', 'tool_link') | list | length }}
+{{ $instances | selectattr('$class', 'equalto', 'tool_link') | list | length }}
 {%- endmacro %}
 
 {# Macro to render a link with metadata #}
@@ -23,7 +23,7 @@
 {# Macro to render link as JSON object #}
 {% macro linkJSON(link, isLast) %}
     {
-      "id": "{{ link.id }}",
+      "$id": "{{ link.$id }}",
       "title": "{{ link.title }}",
       "url": "{{ link.url }}",
       "description": "{{ link.description | default('') }}",

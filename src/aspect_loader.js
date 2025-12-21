@@ -24,35 +24,35 @@ export class AspectLoader {
     const aspect = JSON.parse(content);
 
     // Validate required fields (check aspect field first)
-    if (!aspect.aspect) {
-      throw new Error(`Aspect definition missing 'aspect' field: ${filePath}`);
+    if (!aspect.$aspect) {
+      throw new Error(`Aspect definition missing '$aspect' field: ${filePath}`);
     }
 
-    if (!aspect.schema) {
-      throw new Error(`Aspect definition missing 'schema' field: ${filePath}`);
+    if (!aspect.$schema) {
+      throw new Error(`Aspect definition missing '$schema' field: ${filePath}`);
     }
 
     // Meta-validate schema against JSON Schema draft-07 (security: fail fast)
     try {
       const ajv = new Ajv({ strict: true, strictRequired: false, strictTypes: false, validateSchema: true, validateFormats: false });
-      ajv.compile(aspect.schema);
+      ajv.compile(aspect.$schema);
     } catch (error) {
       throw new Error(
-        `Invalid JSON Schema in aspect '${aspect.aspect}' (${filePath}): ${error.message}`
+        `Invalid JSON Schema in aspect '${aspect.$aspect}' (${filePath}): ${error.message}`
       );
     }
 
     // Check for duplicate aspect names
-    if (this.aspects.has(aspect.aspect)) {
+    if (this.aspects.has(aspect.$aspect)) {
 
       throw new Error(
-        `Duplicate aspect name '${aspect.aspect}' found in ${filePath}. ` +
+        `Duplicate aspect name '${aspect.$aspect}' found in ${filePath}. ` +
         'Already loaded from previous location.'
       );
     }
 
     // Store in registry
-    this.aspects.set(aspect.aspect, aspect);
+    this.aspects.set(aspect.$aspect, aspect);
 
     return aspect;
   }

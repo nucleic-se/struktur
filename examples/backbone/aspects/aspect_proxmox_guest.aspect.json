@@ -1,6 +1,6 @@
 {
-  "aspect": "aspect_proxmox_guest",
-  "schema": {
+  "$aspect": "aspect_proxmox_guest",
+  "$schema": {
     "type": "object",
     "properties": {
       "vmid": {

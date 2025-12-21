@@ -84,7 +84,7 @@ describe('SemanticValidator', () => {
   describe('quality checks', () => {
     test('should detect empty name field', () => {
       const validator = new SemanticValidator();
-      const instance = { id: 'test-1', name: '' };
+      const instance = { $id: 'test-1', name: '' };
       const warnings = validator.checkQuality(instance);
       
       const emptyWarning = warnings.find(w => w.code === 'empty_field');
@@ -95,7 +95,7 @@ describe('SemanticValidator', () => {
 
     test('should detect TODO placeholder', () => {
       const validator = new SemanticValidator();
-      const instance = { id: 'test-1', description: 'TODO: fill this in' };
+      const instance = { $id: 'test-1', description: 'TODO: fill this in' };
       const warnings = validator.checkQuality(instance);
       
       const todoWarning = warnings.find(w => w.code === 'placeholder_value');
@@ -106,7 +106,7 @@ describe('SemanticValidator', () => {
 
     test('should detect FIXME placeholder', () => {
       const validator = new SemanticValidator();
-      const instance = { id: 'test-1', notes: 'FIXME: broken' };
+      const instance = { $id: 'test-1', notes: 'FIXME: broken' };
       const warnings = validator.checkQuality(instance);
       
       const fixmeWarning = warnings.find(w => w.code === 'placeholder_value');
@@ -116,7 +116,7 @@ describe('SemanticValidator', () => {
 
     test('should detect XXX placeholder', () => {
       const validator = new SemanticValidator();
-      const instance = { id: 'test-1', comment: 'XXX: review this' };
+      const instance = { $id: 'test-1', comment: 'XXX: review this' };
       const warnings = validator.checkQuality(instance);
       
       const xxxWarning = warnings.find(w => w.code === 'placeholder_value');
@@ -125,7 +125,7 @@ describe('SemanticValidator', () => {
 
     test('should detect TBD placeholder', () => {
       const validator = new SemanticValidator();
-      const instance = { id: 'test-1', value: 'TBD' };
+      const instance = { $id: 'test-1', value: 'TBD' };
       const warnings = validator.checkQuality(instance);
       
       const tbdWarning = warnings.find(w => w.code === 'placeholder_value');
@@ -135,7 +135,7 @@ describe('SemanticValidator', () => {
     test('should not warn on valid data', () => {
       const validator = new SemanticValidator();
       const instance = { 
-        id: 'test-1', 
+        $id: 'test-1', 
         name: 'Valid Name',
         description: 'A proper description'
       };
@@ -147,7 +147,7 @@ describe('SemanticValidator', () => {
     test('should check nested fields for placeholders', () => {
       const validator = new SemanticValidator();
       const instance = { 
-        id: 'test-1',
+        $id: 'test-1',
         config: {
           database: 'TODO: configure'
         }
@@ -161,7 +161,7 @@ describe('SemanticValidator', () => {
 
     test('should detect empty description field', () => {
       const validator = new SemanticValidator();
-      const instance = { id: 'test-1', description: '' };
+      const instance = { $id: 'test-1', description: '' };
       const warnings = validator.checkQuality(instance);
       
       const emptyWarning = warnings.find(w => w.code === 'empty_field');
@@ -174,7 +174,7 @@ describe('SemanticValidator', () => {
     test('should return warnings with instance context', () => {
       const validator = new SemanticValidator();
       const instance = { 
-        id: 'test-instance',
+        $id: 'test-instance',
         name: '',
         description: 'TODO: write'
       };
@@ -188,7 +188,7 @@ describe('SemanticValidator', () => {
     test('should handle instances without issues', () => {
       const validator = new SemanticValidator();
       const instance = { 
-        id: 'test-instance',
+        $id: 'test-instance',
         name: 'Good Name',
         description: 'Good description'
       };
@@ -200,7 +200,7 @@ describe('SemanticValidator', () => {
     test('should detect multiple issues in one instance', () => {
       const validator = new SemanticValidator();
       const instance = { 
-        id: 'test-instance',
+        $id: 'test-instance',
         name: '',
         description: 'TODO: write',
         notes: 'FIXME: review'

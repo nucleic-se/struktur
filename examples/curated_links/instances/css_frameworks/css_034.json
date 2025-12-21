@@ -1,6 +1,6 @@
 {
-  "id": "css_034",
-  "class": "tool_link",
+  "$id": "css_034",
+  "$class": "tool_link",
   "url": "https://ianlunn.github.io/Hover",
   "title": "Hover.css",
   "description": "Collection of CSS3 powered hover effects",

@@ -14,26 +14,26 @@ This document tracks breaking changes in Struktur's alpha releases.
 
 **What Changed**:
 - Pass 0 validation: Universal contract (`schemas/instance_base.schema.json`)
-- Required fields: `id`, `class` (already enforced by earlier changes)
-- Optional field: `render` (array of {template, output} objects for instance-specific rendering)
+- Required fields: `$id`, `$class` (already enforced by earlier changes)
+- Optional field: `$render` (array of {template, output} objects for instance-specific rendering)
 - Runs before class/aspect validation (fail-fast on fundamental errors)
 
 **Fully Backward Compatible**:
 ```json
-// Existing instances already have id/class - no changes needed
+// Existing instances must rename `id`/`class` to `$id`/`$class`
 {
-  "id": "web-01",
-  "class": "server",
+  "$id": "web-01",
+  "$class": "server",
   "hostname": "web.example.com"
 }
 
 // New: Instances can now specify own render tasks
 {
-  "id": "web-01",
-  "class": "server",
+  "$id": "web-01",
+  "$class": "server",
   "hostname": "web.example.com",
-  "render": [
-    {"template": "nginx.conf.hbs", "output": "nginx/{{ id }}.conf"}
+  "$render": [
+    {"template": "nginx.conf.hbs", "output": "nginx/{{$id}}.conf"}
   ]
 }
 ```
@@ -41,7 +41,7 @@ This document tracks breaking changes in Struktur's alpha releases.
 **Migration**: None required. Existing instances already meet base schema requirements.
 
 **Benefits**:
-- Catch fundamental errors (missing id/class) with clear messages before any class validation
+- Catch fundamental errors (missing $id/$class) with clear messages before any class validation
 - Instance-specific render tasks: per-instance configs, service docs, environment-specific outputs
 - Explicit validation of render array structure (no silent failures)
 
@@ -60,13 +60,13 @@ See [Concepts: Instances - Render Arrays](concepts-instances.md#render-arrays) f
 ```json
 // Old style (explicit cumulative lists) - still works
 {
-  "class": "proxmox_lxc",
+  "$class": "proxmox_lxc",
   "$uses_aspects": ["infrastructure", "compute_node", "proxmox_guest"]
 }
 
 // New style (minimal declarations) - now works too
 {
-  "class": "proxmox_lxc",
+  "$class": "proxmox_lxc",
   "$uses_aspects": ["proxmox_guest"]  // Others inherited automatically
 }
 ```
@@ -95,7 +95,7 @@ See [Concepts: Aspects - Aspect Defaults](concepts-aspects.md#aspect-defaults) f
   "instances_by_id": {...},
   "classes": [...],
   "classes_by_id": {...},
-  "aspects": [...],
+  "$aspects": [...],
   "aspects_by_id": {...},
   "metadata": {...},
   "validation": {...}
@@ -120,19 +120,170 @@ See [Concepts: Aspects - Aspect Defaults](concepts-aspects.md#aspect-defaults) f
 
 ---
 
+### System Field Prefixes (`$`) for Data Model
+
+**Breaking**: All system/meta fields in instances, classes, aspects, and canonical now use `$` prefixes. Schema **properties** describe user data and are **unprefixed**.
+
+**Instances:**
+- `id` → `$id`
+- `class` → `$class`
+- `render` → `$render`
+- `aspects` → `$aspects`
+
+**Classes:**
+- `class` → `$class`
+- `parent` → `$parent`
+- `schema` → `$schema`
+- `fields` → `$fields`
+- `aspect_defaults` → `$aspect_defaults`
+- `aspect_types` → `$uses_aspects`
+
+**Aspects:**
+- `aspect` → `$aspect`
+- `schema` → `$schema`
+- defaults now live under `$defaults`
+
+**Templates/Context:**
+- `{{id}}` → `{{$id}}`
+- `{{class}}` → `{{$class}}`
+- `$aspects.page` → `$aspects.aspect_page`
+
+**Rule**: If a schema property validates **user data**, it is **unprefixed**.
+
+**Before (schema property mismatch):**
+```json
+{
+  "$schema": {
+    "properties": {
+      "$parent": { "type": "string" }
+    }
+  }
+}
+```
+
+**After:**
+```json
+{
+  "$schema": {
+    "properties": {
+      "parent": { "type": "string" }
+    }
+  }
+}
+```
+
+**Migration**:
+1. Update instance fields (`$id`, `$class`, `$render`, `$aspects`).
+2. Update class fields (`$class`, `$parent`, `$schema`, `$fields`, `$aspect_defaults`, `$uses_aspects`).
+3. Update aspect files (`$aspect`, `$schema`, `$defaults`).
+4. Update templates and any consumers of canonical output.
+
+---
+
+### Aspect Defaults Require Explicit `$defaults`
+
+**Breaking**: Aspect defaults must be placed under a `$defaults` object. No implicit top-level defaults.
+
+**Before:**
+```json
+{
+  "$aspect": "aspect_network_interface",
+  "$schema": { "type": "object" },
+  "$bridge": "vmbr0",
+  "$gateway": "192.168.68.1"
+}
+```
+
+**After:**
+```json
+{
+  "$aspect": "aspect_network_interface",
+  "$schema": { "type": "object" },
+  "$defaults": {
+    "bridge": "vmbr0",
+    "gateway": "192.168.68.1"
+  }
+}
+```
+
+**Migration**: Move any top-level default values into `$defaults` and drop `$` prefixes from those user fields.
+
+---
+
+### File Extension: `.schema.json` → `.class.json`
+
+**Breaking**: Class definition files now use the `.class.json` extension.
+
+**Before:** `server.schema.json`  
+**After:** `server.class.json`
+
+**Migration**: Rename class files and update any references.
+
+---
+
+### Aspect Namespace Prefix
+
+**Breaking**: Aspect names are now prefixed with `aspect_`.
+
+**Before:**
+```json
+{
+  "$aspects": { "page": { "menu": "header" } }
+}
+```
+
+**After:**
+```json
+{
+  "$aspects": { "aspect_page": { "menu": "header" } }
+}
+```
+
+**Migration**: Rename aspect files, update `$uses_aspects`, `$aspect_defaults`, and template access.
+
+---
+
+### `$render` Format Standardization
+
+**Breaking**: `$render` tasks must be objects with `template` and `output` fields.
+
+**Before:**
+```json
+{
+  "$render": [
+    { "index.html": "/index.html" }
+  ]
+}
+```
+
+**After:**
+```json
+{
+  "$render": [
+    { "template": "index.html", "output": "/index.html" }
+  ]
+}
+```
+
+**Migration**: Convert render tasks to the explicit object format.
+
+---
+
 ## v0.2.0-alpha (December 2025)
 
-### Schema `class` Field Required
+### Schema `$class` Field Required
 
-**Breaking**: All schema files must now include a `class` field matching the filename.
+**Breaking**: All schema files must now include a `$class` field matching the filename.
 
 **Before** (worked):
 ```json
-// server.schema.json
+// server.class.json
 {
-  "parent": "entity_base",
-  "hostname": null,
-  "schema": {
+  "$parent": "entity_base",
+  "$fields": {
+    "hostname": null
+  },
+  "$schema": {
     "type": "object",
     "properties": { "hostname": { "type": "string" } }
   }
@@ -141,19 +292,21 @@ See [Concepts: Aspects - Aspect Defaults](concepts-aspects.md#aspect-defaults) f
 
 **After** (required):
 ```json
-// server.schema.json
+// server.class.json
 {
-  "class": "server",
-  "parent": "entity_base",
-  "hostname": null,
-  "schema": {
+  "$class": "server",
+  "$parent": "entity_base",
+  "$fields": {
+    "hostname": null
+  },
+  "$schema": {
     "type": "object",
     "properties": { "hostname": { "type": "string" } }
   }
 }
 ```
 
-**Migration**: Add `"class": "<filename>"` to all schema files. A migration script ran automatically for 70+ schemas.
+**Migration**: Add `"$class": "<filename>"` to all schema files. A migration script ran automatically for 70+ schemas.
 
 **Rationale**: Explicit class names improve refactoring safety and eliminate filename-based inference.
 
@@ -169,21 +322,21 @@ See [Concepts: Aspects - Aspect Defaults](concepts-aspects.md#aspect-defaults) f
 
 **Migration**: Update any code parsing canonical.json to use new field names.
 
-### Instance `class` Field Required
+### Instance `$class` Field Required
 
-**Breaking**: All instances must have a `class` field. Classless instances are now rejected with an error.
+**Breaking**: All instances must have a `$class` field. Classless instances are now rejected with an error.
 
 **Before** (silently skipped):
 ```json
-{ "id": "config", "setting": "value" }
+{ "$id": "config", "setting": "value" }
 ```
 
 **After** (required):
 ```json
-{ "id": "config", "class": "config_base", "setting": "value" }
+{ "$id": "config", "$class": "config_base", "setting": "value" }
 ```
 
-**Migration**: Add `class` field to all instance files, or use `global` class for global config.
+**Migration**: Add `$class` field to all instance files, or use `global` class for global config.
 
 ### Strict Validation Default
 
@@ -195,8 +348,8 @@ See [Concepts: Aspects - Aspect Defaults](concepts-aspects.md#aspect-defaults) f
 
 ## v0.1.x → v0.2.x Migration Checklist
 
-- [ ] Add `class` field to all schema files
-- [ ] Add `class` field to all instance files
+- [ ] Add `$class` field to all schema files
+- [ ] Add `$class` field to all instance files
 - [ ] Update canonical.json consumers (`objects` → `instances`)
 - [ ] Fix any schema validation warnings
 - [ ] Test build with strict validation (default)

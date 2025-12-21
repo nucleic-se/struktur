@@ -1,0 +1,27 @@
+{
+  "$class": "proxmox_lxc",
+  "$parent": [
+    "proxmox_guest",
+    "domain_virtual"
+  ],
+  "$pretty_name": "Proxmox LXC",
+  "$domains": [
+    "virtual"
+  ],
+  "$uses_aspects": [],
+  "$aspect_defaults": {
+    "aspect_proxmox_guest": {
+      "host_node": "polaris",
+      "ostemplate": "local:vztmpl/debian-13-standard_13.1-2_amd64.tar.zst",
+      "rootfs_storage": "local-lvm",
+      "start": true,
+      "unprivileged": true,
+      "cmode": "shell"
+    }
+  },
+  "$schema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": true
+  }
+}

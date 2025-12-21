@@ -1,6 +1,6 @@
 {
-  "id": "test_007",
-  "class": "tool_link",
+  "$id": "test_007",
+  "$class": "tool_link",
   "title": "Selenium",
   "url": "https://www.selenium.dev",
   "description": "Browser automation framework for web application testing",

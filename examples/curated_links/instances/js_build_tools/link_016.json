@@ -1,6 +1,6 @@
 {
-  "id": "link_016",
-  "class": "tool_link",
+  "$id": "link_016",
+  "$class": "tool_link",
   "url": "https://yarnpkg.com",
   "title": "Yarn",
   "description": "Fast, reliable, and secure dependency management for JavaScript",
@@ -14,7 +14,7 @@
   "license": "BSD-2-Clause",
   "github_url": "https://github.com/yarnpkg/berry",
   "$aspects": {
-    "quality": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 4,

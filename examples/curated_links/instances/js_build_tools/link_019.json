@@ -1,6 +1,6 @@
 {
-  "id": "link_019",
-  "class": "tool_link",
+  "$id": "link_019",
+  "$class": "tool_link",
   "url": "https://nodejs.org",
   "title": "Node.js",
   "description": "JavaScript runtime built on Chrome's V8 engine for server-side development",
@@ -14,7 +14,7 @@
   "license": "MIT",
   "github_url": "https://github.com/nodejs/node",
   "$aspects": {
-    "quality": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 5,

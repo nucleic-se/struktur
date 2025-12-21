@@ -1,6 +1,6 @@
 {
-  "id": "css_016",
-  "class": "tool_link",
+  "$id": "css_016",
+  "$class": "tool_link",
   "url": "http://getskeleton.com",
   "title": "Skeleton",
   "description": "Dead simple, responsive boilerplate with only 400 lines of code",

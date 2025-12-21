@@ -94,9 +94,9 @@ export async function buildStack(options) {
   
   log.log(`  ✓ Loaded ${allInstances.length} instances`);
   
-  // Enforce class field requirement - throw error for classless instances
+  // Enforce $class field requirement - throw error for classless instances
   if (allClasslessRejects.length > 0) {
-    const errorMessage = [`\nError: Found ${allClasslessRejects.length} instances missing required 'class' field:\n`];
+    const errorMessage = [`\nError: Found ${allClasslessRejects.length} instances missing required '$class' field:\n`];
     // Show first 5 examples
     const examples = allClasslessRejects.slice(0, 5);
     for (const reject of examples) {
@@ -105,7 +105,7 @@ export async function buildStack(options) {
     if (allClasslessRejects.length > 5) {
       errorMessage.push(`  ... and ${allClasslessRejects.length - 5} more`);
     }
-    errorMessage.push('\nAll instances must have a "class" field that references a valid class definition.');
+    errorMessage.push('\nAll instances must have a "$class" field that references a valid class definition.');
     throw new Error(errorMessage.join('\n'));
   }
 
@@ -184,8 +184,8 @@ export async function buildStack(options) {
 
   // Step 6.5: Extract render tasks from instances and merge with config render tasks
   const instanceRenderTasks = canonical.$instances
-    .filter(inst => inst.render && Array.isArray(inst.render) && inst.render.length > 0)
-    .flatMap(inst => inst.render);
+    .filter(inst => inst.$render && Array.isArray(inst.$render) && inst.$render.length > 0)
+    .flatMap(inst => inst.$render);
   
   // Merge: config tasks first, then instance tasks
   const allRenderTasks = [...renderTasks, ...instanceRenderTasks];
@@ -224,7 +224,7 @@ export async function buildStack(options) {
 
     // Use merged render tasks
     if (allRenderTasks.length === 0) {
-      log.log(`  ℹ No render tasks found (no "render" array in config or instances)`);
+    log.log(`  ℹ No render tasks found (no "$render" array in config or instances)`);
       log.log(`     Templates will not be rendered. This is OK if you only need canonical output.`);
     } else {
       log.log(`  Found ${allRenderTasks.length} render tasks`);

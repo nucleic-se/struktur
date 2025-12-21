@@ -37,12 +37,12 @@ describe('Security Tests', () => {
     it('should reject path traversal in build array output paths', async () => {
       // Create test files
       await fs.writeFile(
-        path.join(testDir, 'classes', 'test.schema.json'),
+        path.join(testDir, 'classes', 'test.class.json'),
         JSON.stringify({
-          class: 'test',
-          schema: {
+          $class: 'test',
+          $schema: {
             type: 'object',
-            properties: { id: { type: 'string' } }
+            properties: { $id: { type: 'string' } }
           }
         })
       );
@@ -51,8 +51,8 @@ describe('Security Tests', () => {
       await fs.writeFile(
         path.join(testDir, 'instances', 'global.json'),
         JSON.stringify({
-          id: 'global',
-          class: 'test',
+          $id: 'global',
+          $class: 'test',
           build: [
             { 'test.html': '../../../etc/passwd' }
           ]
@@ -98,16 +98,16 @@ describe('Security Tests', () => {
     it('should reject path traversal in canonical.json path', async () => {
       // Create test files
       await fs.writeFile(
-        path.join(testDir, 'classes', 'test.schema.json'),
+        path.join(testDir, 'classes', 'test.class.json'),
         JSON.stringify({
-          class: 'test',
-          schema: { type: 'object', properties: { id: { type: 'string' } } }
+          $class: 'test',
+          $schema: { type: 'object', properties: { $id: { type: 'string' } } }
         })
       );
 
       await fs.writeFile(
         path.join(testDir, 'instances', 'test1.json'),
-        JSON.stringify({ id: 'test1', class: 'test' })
+        JSON.stringify({ $id: 'test1', $class: 'test' })
       );
 
       // Build should complete without escaping buildDir
@@ -133,16 +133,16 @@ describe('Security Tests', () => {
     it('should reject path traversal in meta/ directory writes', async () => {
       // Create test class with path traversal in class name (stored safely but name is malicious)
       await fs.writeFile(
-        path.join(testDir, 'classes', 'malicious.schema.json'),
+        path.join(testDir, 'classes', 'malicious.class.json'),
         JSON.stringify({
-          class: '../../../tmp/malicious',  // Malicious class name
-          schema: { type: 'object', properties: { id: { type: 'string' } } }
+          $class: '../../../tmp/malicious',  // Malicious class name
+          $schema: { type: 'object', properties: { $id: { type: 'string' } } }
         })
       );
 
       await fs.writeFile(
         path.join(testDir, 'instances', 'test1.json'),
-        JSON.stringify({ id: 'test1', class: '../../../tmp/malicious' })
+        JSON.stringify({ $id: 'test1', $class: '../../../tmp/malicious' })
       );
 
       // Build should sanitize the path or skip it
@@ -177,16 +177,16 @@ describe('Security Tests', () => {
       
       // Create invalid schema (type must be string or array, not number)
       const invalidSchema = {
-        class: 'invalid',
-        schema: {
+        $class: 'invalid',
+        $schema: {
           type: 123,  // Invalid: type must be string or array
           properties: {
-            id: { type: 'string' }
+            $id: { type: 'string' }
           }
         }
       };
 
-      const schemaPath = path.join(testDir, 'classes', 'invalid.schema.json');
+      const schemaPath = path.join(testDir, 'classes', 'invalid.class.json');
       await fs.writeFile(schemaPath, JSON.stringify(invalidSchema));
 
       // Should throw error on load due to meta-validation
@@ -212,9 +212,9 @@ describe('Security Tests', () => {
       
       // Create invalid aspect schema
       const invalidAspect = {
-        aspect: 'invalid',
+        $aspect: 'invalid',
         description: 'Invalid aspect',
-        schema: {
+        $schema: {
           // Invalid: properties without type: object
           properties: {
             config: { type: 'notarealtype' }
@@ -249,18 +249,18 @@ describe('Security Tests', () => {
       
       // Create valid schema
       const validSchema = {
-        class: 'valid',
-        schema: {
+        $class: 'valid',
+        $schema: {
           type: 'object',
           properties: {
-            id: { type: 'string' },
+            $id: { type: 'string' },
             name: { type: 'string' }
           },
-          required: ['id']
+          required: ['$id']
         }
       };
 
-      const schemaPath = path.join(testDir, 'classes', 'valid.schema.json');
+      const schemaPath = path.join(testDir, 'classes', 'valid.class.json');
       await fs.writeFile(schemaPath, JSON.stringify(validSchema));
 
       // Should load successfully
@@ -279,16 +279,16 @@ describe('Security Tests', () => {
       
       // Create test schema
       await fs.writeFile(
-        path.join(testDir, 'classes', 'validated.schema.json'),
+        path.join(testDir, 'classes', 'validated.class.json'),
         JSON.stringify({
-          class: 'validated',
-          schema: {
+          $class: 'validated',
+          $schema: {
             type: 'object',
             properties: {
-              id: { type: 'string' },
+              $id: { type: 'string' },
               required_field: { type: 'string' }
             },
-            required: ['id', 'required_field']
+            required: ['$id', 'required_field']
           }
         })
       );
@@ -296,7 +296,7 @@ describe('Security Tests', () => {
       // Create invalid instance (missing required field)
       await fs.writeFile(
         path.join(testDir, 'instances', 'invalid.json'),
-        JSON.stringify({ id: 'invalid', class: 'validated' })
+        JSON.stringify({ $id: 'invalid', $class: 'validated' })
       );
 
       // Build should fail validation
@@ -323,10 +323,10 @@ describe('Security Tests', () => {
       
       // Create valid test class first
       await fs.writeFile(
-        path.join(testDir, 'classes', 'test.schema.json'),
+        path.join(testDir, 'classes', 'test.class.json'),
         JSON.stringify({
-          class: 'test',
-          schema: { type: 'object', properties: { id: { type: 'string' } } }
+          $class: 'test',
+          $schema: { type: 'object', properties: { $id: { type: 'string' } } }
         })
       );
       
@@ -339,7 +339,7 @@ describe('Security Tests', () => {
       // Create valid instance to allow build to succeed
       await fs.writeFile(
         path.join(testDir, 'instances', 'valid.json'),
-        JSON.stringify({ id: 'valid1', class: 'test' })
+        JSON.stringify({ $id: 'valid1', $class: 'test' })
       );
 
       // Build should succeed and skip instance without id
@@ -355,7 +355,7 @@ describe('Security Tests', () => {
       assert.ok(!noIdInstance, 'Instance without id should not be loaded');
       
       // Verify valid instance was included
-      const validInstance = result.canonical.$instances.find(obj => obj.id === 'valid1');
+      const validInstance = result.canonical.$instances.find(obj => obj.$id === 'valid1');
       assert.ok(validInstance, 'Instance with id should be loaded');
     });
   });

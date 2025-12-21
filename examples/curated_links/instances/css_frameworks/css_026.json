@@ -1,6 +1,6 @@
 {
-  "id": "css_026",
-  "class": "tool_link",
+  "$id": "css_026",
+  "$class": "tool_link",
   "url": "https://headlessui.com",
   "title": "Headless UI",
   "description": "Completely unstyled, fully accessible UI components from Tailwind Labs",

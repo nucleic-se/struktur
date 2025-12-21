@@ -1,6 +1,6 @@
 {
-  "id": "link_014",
-  "class": "tool_link",
+  "$id": "link_014",
+  "$class": "tool_link",
   "url": "https://prettier.io",
   "title": "Prettier",
   "description": "Opinionated code formatter that supports many languages",
@@ -15,7 +15,7 @@
   "license": "MIT",
   "github_url": "https://github.com/prettier/prettier",
   "$aspects": {
-    "quality": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 5,

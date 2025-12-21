@@ -1,0 +1,28 @@
+{
+  "$class": "entity_base",
+  "$schema": {
+    "type": "object",
+    "required": [
+      "$id",
+      "$class"
+    ],
+    "properties": {
+      "$id": {
+        "type": "string",
+        "minLength": 1
+      },
+      "$class": {
+        "type": "string"
+      },
+      "domains": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "$fields": {
+    "domains": []
+  }
+}

@@ -1,6 +1,6 @@
 {
-  "id": "test_017",
-  "class": "tool_link",
+  "$id": "test_017",
+  "$class": "tool_link",
   "title": "Percy",
   "url": "https://percy.io",
   "description": "All-in-one visual testing and review platform",

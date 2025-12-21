@@ -44,20 +44,20 @@ describe('Required Aspect Enforcement', () => {
     it('should preserve required flag from object format', () => {
       const resolved = resolver.resolve('service');
       
-      // service.schema.json has: "$aspects": {"network_interface": {"required": true}}
+      // service.class.json has: "$aspects": {"network_interface": {"required": true}}
       assert.strictEqual(typeof resolved.$aspects, 'object');
       assert.strictEqual(Array.isArray(resolved.$aspects), false);
-      assert.ok(resolved.$aspects.network_interface);
-      assert.strictEqual(resolved.$aspects.network_interface.required, true);
+      assert.ok(resolved.$aspects.aspect_network_interface);
+      assert.strictEqual(resolved.$aspects.aspect_network_interface.required, true);
     });
 
     it('should treat array format as optional', () => {
-      // test_array_$aspects.schema.json has array format: ["network_interface"]
+      // test_array_$aspects.aspect_class.json has array format: ["network_interface"]
       const resolved = resolver.resolve('test_array_aspects');
       
       assert.strictEqual(typeof resolved.$aspects, 'object');
-      assert.ok(resolved.$aspects.network_interface);
-      assert.strictEqual(resolved.$aspects.network_interface.required, false);
+      assert.ok(resolved.$aspects.aspect_network_interface);
+      assert.strictEqual(resolved.$aspects.aspect_network_interface.required, false);
     });
 
     it('should merge aspects from parent and child', () => {
@@ -65,8 +65,8 @@ describe('Required Aspect Enforcement', () => {
       // child_with_aspect has no $aspects defined, should inherit from parent
       const resolved = resolver.resolve('child_with_aspect');
       
-      assert.ok(resolved.$aspects.network_interface);
-      assert.strictEqual(resolved.$aspects.network_interface.required, true);
+      assert.ok(resolved.$aspects.aspect_network_interface);
+      assert.strictEqual(resolved.$aspects.aspect_network_interface.required, true);
     });
 
     it('should let parent required=true override child required=false', () => {
@@ -75,7 +75,7 @@ describe('Required Aspect Enforcement', () => {
       const resolved = resolver.resolve('child_optionalizes');
       
       // Parent wins - aspect should be required
-      assert.strictEqual(resolved.$aspects.network_interface.required, true);
+      assert.strictEqual(resolved.$aspects.aspect_network_interface.required, true);
     });
   });
 
@@ -86,8 +86,8 @@ describe('Required Aspect Enforcement', () => {
 
       // Instance missing required network_interface aspect
       const instance = {
-        id: 'test-service',
-        class: 'service',
+        $id: 'test-service',
+        $class: 'service',
         port: 8080
       };
 
@@ -96,7 +96,7 @@ describe('Required Aspect Enforcement', () => {
       assert.strictEqual(result.valid, false);
       const aspectError = result.errors.find(e => e.code === 'missing_required_aspect');
       assert.ok(aspectError, 'Should have missing_required_aspect error');
-      assert.strictEqual(aspectError.aspect, 'network_interface');
+      assert.strictEqual(aspectError.aspect, 'aspect_network_interface');
     });
 
     it('should pass when required aspect is provided', () => {
@@ -105,11 +105,11 @@ describe('Required Aspect Enforcement', () => {
 
       // Instance with required network_interface aspect
       const instance = {
-        id: 'test-service',
-        class: 'service',
+        $id: 'test-service',
+        $class: 'service',
         port: 8080,
         $aspects: {
-          network_interface: {
+          aspect_network_interface: {
             ip: '192.168.1.100'
           }
         }
@@ -130,8 +130,8 @@ describe('Required Aspect Enforcement', () => {
 
       // Instance without optional aspect - should be valid
       const instance = {
-        id: 'test-optional',
-        class: 'optional_service'
+        $id: 'test-optional',
+        $class: 'optional_service'
       };
 
       const result = validator.validate(instance, resolved);
@@ -145,10 +145,10 @@ describe('Required Aspect Enforcement', () => {
 
       // Instance with invalid aspect data (missing required 'ip')
       const instance = {
-        id: 'test-optional',
-        class: 'optional_service2',
+        $id: 'test-optional',
+        $class: 'optional_service2',
         $aspects: {
-          network_interface: {
+          aspect_network_interface: {
             hostname: 'test.local'
             // missing required 'ip' field
           }
@@ -159,7 +159,7 @@ describe('Required Aspect Enforcement', () => {
       
       // Should fail because aspect data is invalid
       assert.strictEqual(result.valid, false);
-      const aspectError = result.errors.find(e => e.layer === 'aspect:network_interface');
+      const aspectError = result.errors.find(e => e.layer === 'aspect:aspect_network_interface');
       assert.ok(aspectError, 'Should have aspect validation error');
     });
   });

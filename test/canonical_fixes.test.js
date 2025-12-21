@@ -19,9 +19,9 @@ describe('Canonical Deep Merge', () => {
     
     // Parent with nested defaults
     const baseDef = {
-      class: 'base',
-      schema: { type: 'object' },
-      fields: {
+      $class: 'base',
+      $schema: { type: 'object' },
+      $fields: {
         config: {
           logging: {
             level: 'info',
@@ -35,10 +35,10 @@ describe('Canonical Deep Merge', () => {
     
     // Child overrides one nested field
     const appDef = {
-      class: 'app',
-      parent: ['base'],
-      schema: { type: 'object' },
-      fields: {}
+      $class: 'app',
+      $parent: ['base'],
+      $schema: { type: 'object' },
+      $fields: {}
     };
     classLoader.classes.set('app', appDef);
     
@@ -46,8 +46,8 @@ describe('Canonical Deep Merge', () => {
     
     // Instance only provides partial config.logging
     const instances = [{
-      id: 'myapp',
-      class: 'app',
+      $id: 'myapp',
+      $class: 'app',
       config: {
         logging: {
           level: 'debug'  // Override level, should preserve format
@@ -68,9 +68,9 @@ describe('Canonical Deep Merge', () => {
     const classLoader = new ClassLoader();
     
     const serviceDef = {
-      class: 'service',
-      schema: { type: 'object' },
-      fields: {
+      $class: 'service',
+      $schema: { type: 'object' },
+      $fields: {
         deployment: {
           kubernetes: {
             replicas: 3,
@@ -87,8 +87,8 @@ describe('Canonical Deep Merge', () => {
     const resolver = new ClassResolver(classLoader);
     
     const instances = [{
-      id: 'api',
-      class: 'service',
+      $id: 'api',
+      $class: 'service',
       deployment: {
         kubernetes: {
           resources: {
@@ -113,23 +113,23 @@ describe('Canonical $classes_by_id Format', () => {
     const classLoader = new ClassLoader();
     
     classLoader.classes.set('entity_base', {
-      class: 'entity_base',
-      schema: { type: 'object' }
+      $class: 'entity_base',
+      $schema: { type: 'object' }
     });
     
     classLoader.classes.set('container', {
-      class: 'container',
-      parent: ['entity_base'],
-      kinds: ['docker_container'],
-      pretty_name: 'Container',
-      schema: { type: 'object' }
+      $class: 'container',
+      $parent: ['entity_base'],
+      $kinds: ['docker_container'],
+      $pretty_name: 'Container',
+      $schema: { type: 'object' }
     });
     
     const resolver = new ClassResolver(classLoader);
     
     const instances = [
-      { id: 'nginx', class: 'container' },
-      { id: 'redis', class: 'container' }
+      { $id: 'nginx', $class: 'container' },
+      { $id: 'redis', $class: 'container' }
     ];
     
     const canonical = generateCanonical(instances, resolver, { includeClassIndex: true });
@@ -137,9 +137,9 @@ describe('Canonical $classes_by_id Format', () => {
     // Should be an object with class metadata, not array of IDs
     assert.ok(canonical.$classes_by_id.container, 'Should have container class entry');
     assert.strictEqual(typeof canonical.$classes_by_id.container, 'object', 'Should be object, not array');
-    assert.strictEqual(canonical.$classes_by_id.container.class, 'container', 'Should have class name');
-    assert.ok(Array.isArray(canonical.$classes_by_id.container.lineage), 'Should have lineage array');
-    assert.strictEqual(canonical.$classes_by_id.container.pretty_name, 'Container', 'Should have pretty_name');
+    assert.strictEqual(canonical.$classes_by_id.container.$class, 'container', 'Should have class name');
+    assert.ok(Array.isArray(canonical.$classes_by_id.container.$lineage), 'Should have lineage array');
+    assert.strictEqual(canonical.$classes_by_id.container.$pretty_name, 'Container', 'Should have pretty_name');
     assert.ok(Array.isArray(canonical.$classes_by_id.container.$uses_aspects), 'Should have uses_aspects array');
   });
 
@@ -147,37 +147,37 @@ describe('Canonical $classes_by_id Format', () => {
     const classLoader = new ClassLoader();
     
     classLoader.classes.set('base', {
-      class: 'base',
-      schema: { type: 'object' }
+      $class: 'base',
+      $schema: { type: 'object' }
     });
     
     classLoader.classes.set('app', {
-      class: 'app',
-      parent: ['base'],
-      $uses_aspects: ['web_app'],
-      pretty_name: 'Application',
-      domains: ['frontend'],
-      schema: { type: 'object' },
-      fields: { port: 8080 }
+      $class: 'app',
+      $parent: ['base'],
+      $uses_aspects: ['aspect_web_app'],
+      $pretty_name: 'Application',
+      $domains: ['frontend'],
+      $schema: { type: 'object' },
+      $fields: { port: 8080 }
     });
     
     const resolver = new ClassResolver(classLoader);
-    const instances = [{ id: 'myapp', class: 'app' }];
+    const instances = [{ $id: 'myapp', $class: 'app' }];
     
     const canonical = generateCanonical(instances, resolver, { includeClassIndex: true });
     const appClass = canonical.$classes_by_id.app;
     
-    assert.strictEqual(appClass.class, 'app');
-    assert.ok(Array.isArray(appClass.lineage), 'Should have lineage array');
-    assert.ok(appClass.lineage.includes('base'), 'Lineage should include base');
-    assert.ok(appClass.lineage.includes('app'), 'Lineage should include app');
+    assert.strictEqual(appClass.$class, 'app');
+    assert.ok(Array.isArray(appClass.$lineage), 'Should have lineage array');
+    assert.ok(appClass.$lineage.includes('base'), 'Lineage should include base');
+    assert.ok(appClass.$lineage.includes('app'), 'Lineage should include app');
     assert.ok(Array.isArray(appClass.$uses_aspects), 'Should have uses_aspects array');
-    assert.ok(appClass.$uses_aspects.includes('web_app'), 'Should include web_app aspect');
-    assert.strictEqual(appClass.pretty_name, 'Application');
-    assert.ok(Array.isArray(appClass.domains), 'Should have domains array');
-    assert.ok(appClass.domains.includes('frontend'), 'Should include frontend domain');
-    assert.ok(appClass.fields, 'Should include merged fields');
-    assert.strictEqual(appClass.fields.port, 8080);
+    assert.ok(appClass.$uses_aspects.includes('aspect_web_app'), 'Should include web_app aspect');
+    assert.strictEqual(appClass.$pretty_name, 'Application');
+    assert.ok(Array.isArray(appClass.$domains), 'Should have domains array');
+    assert.ok(appClass.$domains.includes('frontend'), 'Should include frontend domain');
+    assert.ok(appClass.$fields, 'Should include merged fields');
+    assert.strictEqual(appClass.$fields.port, 8080);
   });
 });
 
@@ -189,13 +189,13 @@ describe('Classless Instance Handling', () => {
     const validator = new MultiPassValidator();
     
     classLoader.classes.set('container', {
-      class: 'container',
-      schema: { 
+      $class: 'container',
+      $schema: { 
         type: 'object',
-        required: ['id', 'class'],
+        required: ['$id', '$class'],
         properties: {
-          id: { type: 'string' },
-          class: { type: 'string' }
+          $id: { type: 'string' },
+          $class: { type: 'string' }
         }
       }
     });
@@ -209,10 +209,10 @@ describe('Classless Instance Handling', () => {
       validate(instances) {
         const resolved = new Map();
         for (const instance of instances) {
-          if (!resolved.has(instance.class)) {
-            const resolvedClass = resolver.resolve(instance.class);
+          if (!resolved.has(instance.$class)) {
+            const resolvedClass = resolver.resolve(instance.$class);
             validator.registerClass(resolvedClass);
-            resolved.set(instance.class, resolvedClass);
+            resolved.set(instance.$class, resolvedClass);
           }
         }
         return validator.validateBatch(instances, (className) => {
@@ -222,21 +222,21 @@ describe('Classless Instance Handling', () => {
     };
     
     const instances = [
-      { id: 'nginx', class: 'container' },           // Valid
-      { id: 'global', config: 'data' },              // No class (global config)
-      { id: 'metadata', random: 'stuff' },           // No class (junk)
-      { id: 'redis', class: 'container' }            // Valid
+      { $id: 'nginx', $class: 'container' },           // Valid
+      { $id: 'global', config: 'data' },              // No class (global config)
+      { $id: 'metadata', random: 'stuff' },           // No class (junk)
+      { $id: 'redis', $class: 'container' }            // Valid
     ];
     
     const canonical = generateCanonicalWithValidation(instances, struktur, { preserveGlobal: false });
     
     // Should only have instances with class field
     assert.strictEqual(canonical.$instances.length, 2, 'Should only include instances with class field');
-    assert.ok(canonical.$instances.every(obj => obj.class), 'All objects should have class field');
-    assert.ok(canonical.$instances.find(obj => obj.id === 'nginx'), 'Should include nginx');
-    assert.ok(canonical.$instances.find(obj => obj.id === 'redis'), 'Should include redis');
-    assert.ok(!canonical.$instances.find(obj => obj.id === 'global'), 'Should exclude global');
-    assert.ok(!canonical.$instances.find(obj => obj.id === 'metadata'), 'Should exclude metadata');
+    assert.ok(canonical.$instances.every(obj => obj.$class), 'All objects should have class field');
+    assert.ok(canonical.$instances.find(obj => obj.$id === 'nginx'), 'Should include nginx');
+    assert.ok(canonical.$instances.find(obj => obj.$id === 'redis'), 'Should include redis');
+    assert.ok(!canonical.$instances.find(obj => obj.$id === 'global'), 'Should exclude global');
+    assert.ok(!canonical.$instances.find(obj => obj.$id === 'metadata'), 'Should exclude metadata');
   });
 
   it('should require all instances including global to have a class', async () => {
@@ -246,8 +246,8 @@ describe('Classless Instance Handling', () => {
     const validator = new MultiPassValidator();
     
     classLoader.classes.set('container', {
-      class: 'container',
-      schema: { type: 'object' }
+      $class: 'container',
+      $schema: { type: 'object' }
     });
     
     // Create struktur object with proper validate method
@@ -259,10 +259,10 @@ describe('Classless Instance Handling', () => {
       validate(instances) {
         const resolved = new Map();
         for (const instance of instances) {
-          if (!resolved.has(instance.class)) {
-            const resolvedClass = resolver.resolve(instance.class);
+          if (!resolved.has(instance.$class)) {
+            const resolvedClass = resolver.resolve(instance.$class);
             validator.registerClass(resolvedClass);
-            resolved.set(instance.class, resolvedClass);
+            resolved.set(instance.$class, resolvedClass);
           }
         }
         return validator.validateBatch(instances, (className) => {
@@ -272,8 +272,8 @@ describe('Classless Instance Handling', () => {
     };
     
     classLoader.classes.set('global', {
-      class: 'global',
-      schema: { 
+      $class: 'global',
+      $schema: { 
         type: 'object',
         properties: {
           build: { type: 'array' }
@@ -282,15 +282,15 @@ describe('Classless Instance Handling', () => {
     });
     
     const instances = [
-      { id: 'global', class: 'global', build: [{ 'index.html.hbs': 'index.html' }] },
-      { id: 'app', class: 'container' }
+      { $id: 'global', $class: 'global', build: [{ 'index.html.hbs': 'index.html' }] },
+      { $id: 'app', $class: 'container' }
     ];
     
     const canonical = generateCanonicalWithValidation(instances, struktur);
     
     // All instances including global must have class
     assert.strictEqual(canonical.$instances.length, 2, 'Should have 2 objects');
-    assert.ok(canonical.$instances.find(obj => obj.id === 'global' && obj.class === 'global'), 'Global must have class');
-    assert.ok(canonical.$instances.find(obj => obj.id === 'app'), 'Should include regular instances');
+    assert.ok(canonical.$instances.find(obj => obj.$id === 'global' && obj.$class === 'global'), 'Global must have class');
+    assert.ok(canonical.$instances.find(obj => obj.$id === 'app'), 'Should include regular instances');
   });
 });

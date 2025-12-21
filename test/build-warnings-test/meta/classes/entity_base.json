@@ -1,21 +1,21 @@
 {
-  "class": "entity_base",
-  "lineage": [
+  "$class": "entity_base",
+  "$lineage": [
     "entity_base"
   ],
-  "schemas": [
+  "$schemas": [
     {
       "type": "object",
       "required": [
-        "id",
-        "class"
+        "$id",
+        "$class"
       ],
       "properties": {
-        "id": {
+        "$id": {
           "type": "string",
           "minLength": 1
         },
-        "class": {
+        "$class": {
           "type": "string"
         },
         "domains": {
@@ -27,13 +27,13 @@
       }
     }
   ],
-  "fields": {
+  "$fields": {
     "domains": []
   },
   "$aspects": {},
   "$uses_aspects": [],
   "$aspect_defaults": {},
-  "pretty_name": "entity_base",
-  "domains": [],
-  "parent": []
+  "$pretty_name": "entity_base",
+  "$domains": [],
+  "$parent": []
 }

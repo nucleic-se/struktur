@@ -21,7 +21,7 @@ Learn how to build on Universal's foundation using **aspects** (the correct patt
 
 **Universal** provides foundational classes for most infrastructure stacks:
 
-- **universal_base** - Root with id, class, name, description
+- **universal_base** - Root with $id, $class, name, description
 - **entity_base** - Extends universal_base with domains, aspects, relations
 - **aspect_base** - For defining aspect schemas
 - **domain_root** - For hierarchical organization
@@ -84,11 +84,11 @@ Aspects are the **correct way** to add custom fields to universal entities.
 **\`aspects/server.json\`:**
 ```json
 {
-  "id": "server",
-  "class": "aspect_base",
+  "$id": "server",
+  "$class": "aspect_base",
   "name": "Server Configuration",
   "description": "Server hardware and OS configuration",
-  "schema": {
+  "$schema": {
     "\$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
@@ -135,8 +135,8 @@ Domains provide hierarchical organization.
 **\`instances/production-domain.json\`:**
 ```json
 {
-  "id": "production",
-  "class": "domain_root",
+  "$id": "production",
+  "$class": "domain_root",
   "name": "Production Environment",
   "description": "Production infrastructure"
 }
@@ -145,8 +145,8 @@ Domains provide hierarchical organization.
 **\`instances/web-tier-domain.json\`:**
 ```json
 {
-  "id": "web-tier",
-  "class": "domain_root",
+  "$id": "web-tier",
+  "$class": "domain_root",
   "name": "Web Tier",
   "description": "Load balancers and web servers",
   "domains": ["production"]
@@ -164,13 +164,13 @@ Use **entity_base** class with the **server aspect**.
 **\`instances/web-01.json\`:**
 ```json
 {
-  "id": "web-01",
-  "class": "entity_base",
+  "$id": "web-01",
+  "$class": "entity_base",
   "name": "Web Server 01",
   "description": "Primary web server",
   "domains": ["web-tier"],
   "$aspects": {
-    "server": {
+    "aspect_server": {
       "hostname": "web-01",
       "ip_address": "10.0.1.10",
       "os": "linux",
@@ -184,13 +184,13 @@ Use **entity_base** class with the **server aspect**.
 **\`instances/web-02.json\`:**
 ```json
 {
-  "id": "web-02",
-  "class": "entity_base",
+  "$id": "web-02",
+  "$class": "entity_base",
   "name": "Web Server 02",
   "description": "Secondary web server",
   "domains": ["web-tier"],
   "$aspects": {
-    "server": {
+    "aspect_server": {
       "hostname": "web-02",
       "ip_address": "10.0.1.11",
       "os": "linux",
@@ -202,7 +202,7 @@ Use **entity_base** class with the **server aspect**.
 ```
 
 **What you get:**
-- From **entity_base**: id, name, description, domains, aspects
+- From **entity_base**: $id, name, description, domains, aspects
 - From **server aspect**: hostname, ip_address, os, cpu_cores, memory_gb
 - Validated against both universal and aspect schemas
 
@@ -246,12 +246,13 @@ Universal includes a global instance with viewer.html template. Override it for 
 **\`instances/global.json\`:**
 ```json
 {
-  "id": "global",
-  "class": "global",
+  "$id": "global",
+  "$class": "global",
   "description": "Infrastructure configuration",
-  "build": [
+  "$render": [
     {
-      "inventory.txt": "/inventory.txt"
+      "template": "inventory.txt",
+      "output": "/inventory.txt"
     }
   ]
 }
@@ -268,19 +269,19 @@ Universal includes a global instance with viewer.html template. Override it for 
 # Infrastructure Inventory
 
 ## Domains
-{{#each (where $instances "class" "domain_root")}}
+{{#each (where $instances "$class" "domain_root")}}
 - {{name}}: {{description}}
   {{#if (gt (length domains) 0)}}Parent Domains: {{#each domains}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{/if}}
 {{/each}}
 
 ## Servers
 {{#each $instances}}
-{{#if $aspects.server}}
+{{#if $aspects.aspect_server}}
 ### {{name}}
-- Hostname: {{$aspects.server.hostname}}
-- IP: {{$aspects.server.ip_address}}
-- OS: {{$aspects.server.os}}
-- Resources: {{$aspects.server.cpu_cores}} cores, {{$aspects.server.memory_gb}}GB RAM
+- Hostname: {{$aspects.aspect_server.hostname}}
+- IP: {{$aspects.aspect_server.ip_address}}
+- OS: {{$aspects.aspect_server.os}}
+- Resources: {{$aspects.aspect_server.cpu_cores}} cores, {{$aspects.aspect_server.memory_gb}}GB RAM
 - Domains: {{#each domains}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
 
 {{/if}}
@@ -288,8 +289,8 @@ Universal includes a global instance with viewer.html template. Override it for 
 ```
 
 **Aspect access:**
-- Check presence: \`{{#if $aspects.server}}\`
-- Access data: \`{{$aspects.server.hostname}}\`
+- Check presence: \`{{#if $aspects.aspect_server}}\`
+- Access data: \`{{$aspects.aspect_server.hostname}}\`
 - Filter: iterate all instances, check for aspect
 
 ---
@@ -397,21 +398,21 @@ If you **really need** custom top-level fields (not recommended):
 
 ```json
 {
-  "class": "server",
-  "parent": "entity_base",
-  "schema": {
+  "$class": "server",
+  "$parent": "entity_base",
+  "$schema": {
     "\$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
-      "id": {"type": "string"},
-      "class": {"type": "string"},
+      "$id": {"type": "string"},
+      "$class": {"type": "string"},
       "name": {"type": "string"},
       "description": {"type": "string"},
       "domains": {"type": "array", "items": {"type": "string"}},
       "hostname": {"type": "string"},
       "ip_address": {"type": "string"}
     },
-    "required": ["id", "class", "hostname"],
+    "required": ["$id", "$class", "hostname"],
     "additionalProperties": true
   }
 }
@@ -433,10 +434,8 @@ If you **really need** custom top-level fields (not recommended):
 
 ```json
 {
-  "id": "monitoring",
-  "class": "aspect_base",
-  "name": "Monitoring Configuration",
-  "schema": {
+  "$aspect": "aspect_monitoring",
+  "$schema": {
     "type": "object",
     "properties": {
       "metrics_port": {"type": "integer"},
@@ -449,11 +448,11 @@ If you **really need** custom top-level fields (not recommended):
 Apply to instances:
 ```json
 {
-  "id": "web-01",
-  "class": "entity_base",
+  "$id": "web-01",
+  "$class": "entity_base",
   "$aspects": {
-    "server": {...},
-    "monitoring": {
+    "aspect_server": {...},
+    "aspect_monitoring": {
       "metrics_port": 9090,
       "health_endpoint": "/health"
     }
@@ -467,11 +466,12 @@ Universal includes an interactive hierarchical viewer:
 
 ```json
 {
-  "id": "global",
-  "class": "global",
-  "build": [
+  "$id": "global",
+  "$class": "global",
+  "$render": [
     {
-      "viewer.html": "/index.html"
+      "template": "viewer.html",
+      "output": "/index.html"
     }
   ]
 }
@@ -492,8 +492,8 @@ Open \`build/index.html\` to see your domain hierarchy visualized.
 ### Conditional Aspects
 
 ```handlebars
-{{#if $aspects.monitoring}}
-Monitoring: {{$aspects.monitoring.metrics_port}}
+{{#if $aspects.aspect_monitoring}}
+Monitoring: {{$aspects.aspect_monitoring.metrics_port}}
 {{/if}}
 ```
 
@@ -501,7 +501,7 @@ Monitoring: {{$aspects.monitoring.metrics_port}}
 
 ```handlebars
 {{#each $instances}}
-  {{#if $aspects.server}}
+  {{#if $aspects.aspect_server}}
     {{!-- Has server aspect --}}
   {{/if}}
 {{/each}}
@@ -512,9 +512,9 @@ Monitoring: {{$aspects.monitoring.metrics_port}}
 ```json
 {
   "$aspects": {
-    "server": {...},
-    "monitoring": {...},
-    "backup": {...}
+    "aspect_server": {...},
+    "aspect_monitoring": {...},
+    "aspect_backup": {...}
   }
 }
 ```
@@ -537,7 +537,7 @@ Aspects: {{#each $uses_aspects}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
 **Solution:** Use aspects instead:
 ```json
 {
-  "class": "entity_base",
+  "$class": "entity_base",
   "$aspects": {
     "your_aspect": {
       "custom_field": "value"
@@ -558,7 +558,7 @@ Aspects: {{#each $uses_aspects}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
 
 **Solution:** Use \`$aspects.aspect_name.field\`:
 ```handlebars
-{{$aspects.server.hostname}}
+{{$aspects.aspect_server.hostname}}
 ```
 
 ---

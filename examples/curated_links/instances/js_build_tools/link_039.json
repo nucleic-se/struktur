@@ -1,6 +1,6 @@
 {
-  "id": "link_039",
-  "class": "tool_link",
+  "$id": "link_039",
+  "$class": "tool_link",
   "url": "https://github.com/google/wireit",
   "title": "Wireit",
   "description": "Upgrades npm scripts to make them smarter and more efficient",
@@ -14,7 +14,7 @@
   "license": "Apache-2.0",
   "github_url": "https://github.com/google/wireit",
   "$aspects": {
-    "quality": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 3,

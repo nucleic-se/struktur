@@ -34,8 +34,9 @@ describe('Example Stack Builds', () => {
         instanceDirs: (config.instances || config.instanceDirs || []).map(resolvePath),
         aspectDirs: (config.aspects || config.aspectDirs || []).map(resolvePath),
         templateDirs: (config.templates || config.templateDirs || []).map(resolvePath),
-        buildDir: resolvePath(config.buildDir || 'build'),
-        engine: config.engine || 'handlebars',
+        buildDir: resolvePath(config.build_dir || config.buildDir || 'build'),
+        engine: config.template_engine || config.engine || 'handlebars',
+        renderTasks: config.render || [],
         logger: {
           log: () => {}, // Silent during tests
           warn: () => {},

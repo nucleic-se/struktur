@@ -1,16 +1,16 @@
 {
-  "aspect": "aspect_docker_volume",
-  "schema": {
+  "$aspect": "aspect_docker_volume",
+  "$schema": {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "description": "Docker volume configuration",
     "additionalProperties": true,
     "properties": {
-      "id": {
+      "$id": {
         "type": "string",
         "description": "Identifier for the object"
       },
-      "class": {
+      "$class": {
         "type": "string",
         "description": "Class name for this object"
       },
@@ -43,7 +43,7 @@
         "type": "string",
         "description": "Human-friendly overview"
       },
-      "parent": {
+      "$parent": {
         "anyOf": [
           {
             "type": "string"
@@ -88,16 +88,16 @@
           "additionalProperties": {}
         }
       },
-      "classEntries": {
+      "$class_entries": {
         "type": "array",
         "description": "Loaded class entries",
         "items": {
           "type": "object",
           "properties": {
-            "class": {
+            "$class": {
               "type": "string"
             },
-            "parent": {
+            "$parent": {
               "type": [
                 "string",
                 "array",
@@ -119,7 +119,7 @@
       }
     }
   },
-  "fields": {
+  "$fields": {
     "$aspects": {
       "aspect": {
         "kind": "docker_volume",

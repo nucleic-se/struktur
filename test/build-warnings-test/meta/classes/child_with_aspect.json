@@ -1,23 +1,23 @@
 {
-  "class": "child_with_aspect",
-  "lineage": [
+  "$class": "child_with_aspect",
+  "$lineage": [
     "entity_base",
     "parent_with_aspect",
     "child_with_aspect"
   ],
-  "schemas": [
+  "$schemas": [
     {
       "type": "object",
       "required": [
-        "id",
-        "class"
+        "$id",
+        "$class"
       ],
       "properties": {
-        "id": {
+        "$id": {
           "type": "string",
           "minLength": 1
         },
-        "class": {
+        "$class": {
           "type": "string"
         },
         "domains": {
@@ -41,19 +41,19 @@
       }
     }
   ],
-  "fields": {
+  "$fields": {
     "domains": []
   },
   "$aspects": {
-    "network_interface": {
+    "aspect_network_interface": {
       "required": true
     }
   },
   "$uses_aspects": [],
   "$aspect_defaults": {},
-  "pretty_name": "child_with_aspect",
-  "domains": [],
-  "parent": [
+  "$pretty_name": "child_with_aspect",
+  "$domains": [],
+  "$parent": [
     "entity_base",
     "parent_with_aspect"
   ]

@@ -1,6 +1,6 @@
 {
-  "aspect": "aspect_network_interface",
-  "schema": {
+  "$aspect": "aspect_network_interface",
+  "$schema": {
     "type": "object",
     "properties": {
       "hostname": {
@@ -35,7 +35,9 @@
     ],
     "additionalProperties": false
   },
-  "bridge": "vmbr0",
-  "gateway": "192.168.68.1",
-  "nameserver": "192.168.68.10"
+  "$defaults": {
+    "bridge": "vmbr0",
+    "gateway": "192.168.68.1",
+    "nameserver": "192.168.68.10"
+  }
 }

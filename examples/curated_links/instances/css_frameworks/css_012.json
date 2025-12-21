@@ -1,6 +1,6 @@
 {
-  "id": "css_012",
-  "class": "tool_link",
+  "$id": "css_012",
+  "$class": "tool_link",
   "url": "https://semantic-ui.com",
   "title": "Semantic UI",
   "description": "User interface framework based on natural language principles",

@@ -85,7 +85,7 @@ program
 
       // Warn about classless instances
       if (allClasslessRejects.length > 0 && !options.quiet) {
-        console.warn(`⚠ Rejected ${allClasslessRejects.length} classless instances (missing 'class' field):`);
+        console.warn(`⚠ Rejected ${allClasslessRejects.length} classless instances (missing '$class' field):`);
         const examples = allClasslessRejects.slice(0, 5);
         for (const reject of examples) {
           console.warn(`   - '${reject.id}' in ${reject.file}`);
@@ -157,12 +157,12 @@ program
       console.log('\n=== Classes ===');
       const classes = struktur.classLoader.getAllClasses();
       for (const cls of classes) {
-        const inherits = cls.parent
-          ? Array.isArray(cls.parent)
-            ? cls.parent.join(', ')
-            : cls.parent
+        const inherits = cls.$parent
+          ? Array.isArray(cls.$parent)
+            ? cls.$parent.join(', ')
+            : cls.$parent
           : 'none';
-        console.log(`  ${cls.class} (inherits: ${inherits})`);
+        console.log(`  ${cls.$class} (inherits: ${inherits})`);
       }
       console.log(`\nTotal: ${classes.length} classes`);
 
@@ -170,7 +170,7 @@ program
         console.log('\n=== Aspects ===');
         const aspects = struktur.aspectLoader.getAllAspects();
         for (const aspect of aspects) {
-          console.log(`  ${aspect.aspect}`);
+          console.log(`  ${aspect.$aspect}`);
         }
         console.log(`\nTotal: ${aspects.length} aspects`);
       }
@@ -205,7 +205,7 @@ function createTemplateAdapter(engineName) {
  * @returns {string} File extension without dot
  */
 function getOutputExtension(className, classDef) {
-  const schema = classDef?.schemas?.[classDef.schemas.length - 1] || classDef?.schema;
+  const schema = classDef?.$schemas?.[classDef.$schemas.length - 1] || classDef?.$schema;
   const extension = schema?.outputExtension || schema?.['x-struktur']?.extension;
   if (typeof extension === 'string' && extension.trim().length > 0) {
     return extension.replace(/^\./, '');
@@ -357,20 +357,20 @@ program
         await fs.mkdir(outputDir, { recursive: true });
 
         for (const obj of canonical.$instances) {
-          const templateName = `${obj.class}.hbs`;
+          const templateName = `${obj.$class}.hbs`;
           try {
             const rendered = await adapter.render(templateName, obj);
-            const classDef = canonical.$classes_by_id?.[obj.class];
-            const relativeOutput = `${obj.id}.${getOutputExtension(obj.class, classDef)}`;
+            const classDef = canonical.$classes_by_id?.[obj.$class];
+            const relativeOutput = `${obj.$id}.${getOutputExtension(obj.$class, classDef)}`;
             const safeOutput = resolveOutputPath(templateName, relativeOutput, outputDir, console);
             if (!safeOutput) {
-              console.warn(`Warning: Skipping render for ${obj.id} due to unsafe output path '${relativeOutput}'`);
+              console.warn(`Warning: Skipping render for ${obj.$id} due to unsafe output path '${relativeOutput}'`);
               continue;
             }
             await fs.writeFile(safeOutput, rendered, 'utf-8');
             console.log(`Rendered: ${safeOutput}`);
           } catch (error) {
-            console.warn(`Warning: Could not render ${obj.id}: ${error.message}`);
+            console.warn(`Warning: Could not render ${obj.$id}: ${error.message}`);
           }
         }
 
@@ -616,7 +616,7 @@ program
         
         // Add render tasks if present
         if (configFromFile.render) {
-          config.render = configFromFile.render;
+          config.$render = configFromFile.render;
         }
         
         // Write config file

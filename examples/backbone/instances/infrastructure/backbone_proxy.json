@@ -1,26 +1,28 @@
 {
-  "id": "backbone_proxy",
+  "$id": "backbone_proxy",
   "name": "Reverse Proxy",
-  "class": "proxmox_lxc",
-  "domains": ["virtual"],
+  "$class": "proxmox_lxc",
+  "domains": [
+    "virtual"
+  ],
   "$aspects": {
-    "infrastructure": {
+    "aspect_infrastructure": {
       "notes": "Terraform-managed reverse proxy"
     },
-    "compute_node": {
+    "aspect_compute_node": {
       "cores": 2,
       "memory": 2048,
       "storage": "20G"
     },
-    "proxmox_guest": {
+    "aspect_proxmox_guest": {
       "vmid": 400101
     },
-    "network_interface": {
+    "aspect_network_interface": {
       "hostname": "proxy",
       "ip": "192.168.68.20",
       "mac": "BC:24:11:E3:59:DF"
     },
-    "terraform": {
+    "aspect_terraform": {
       "enabled": true
     }
   }

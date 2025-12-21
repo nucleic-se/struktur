@@ -67,9 +67,9 @@ describe('Integration: Docked Stack (with Universal base)', () => {
 
     const resolved = struktur.classResolver.resolve('docked_container');
 
-    assert.ok(resolved.lineage.includes('entity_base'));
-    assert.ok(resolved.lineage.includes('docked_container'));
-    assert.ok(resolved.schemas.length >= 2);
+    assert.ok(resolved.$lineage.includes('entity_base'));
+    assert.ok(resolved.$lineage.includes('docked_container'));
+    assert.ok(resolved.$schemas.length >= 2);
   });
 
   it('should load domain classes from subdirectory', async () => {
@@ -188,9 +188,9 @@ describe('Integration: Docked Stack (with Universal base)', () => {
 
     // Create invalid container (missing required aspect data)
     const invalidContainer = {
-      id: 'invalid-container',
-      class: 'docked_container',
-      domains: ['infrastructure'],
+      $id: 'invalid-container',
+      $class: 'docked_container',
+      $domains: ['infrastructure'],
       $aspects: {}
       // Missing: aspect_docker_container data (required)
     };
@@ -221,6 +221,6 @@ describe('Integration: Docked Stack (with Universal base)', () => {
     assert.strictEqual(results[0].valid, true);
 
     // Grafana has complex aspect data (ports, volumes, environment)
-    assert.ok(grafana.$aspects?.docker_container || grafana.$aspects?.aspect_docker_container);
+    assert.ok(grafana.$aspects?.aspect_docker_container);
   });
 });

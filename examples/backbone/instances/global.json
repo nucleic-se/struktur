@@ -1,11 +1,12 @@
 {
-  "id": "global",
-  "class": "global",
+  "$id": "global",
+  "$class": "global",
   "stack_name": "Backbone Infrastructure (Demo)",
   "description": "Demo infrastructure stack showcasing Universal data modeling with Terraform provisioning and Ansible configuration. Demonstrates LXC containers with automated deployment and service configuration.",
-  "build": [
+  "$render": [
     {
-      "viewer.html": "/index.html"
+      "template": "viewer.html",
+      "output": "/index.html"
     }
   ]
 }

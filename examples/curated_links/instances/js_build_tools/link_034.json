@@ -1,6 +1,6 @@
 {
-  "id": "link_034",
-  "class": "tool_link",
+  "$id": "link_034",
+  "$class": "tool_link",
   "url": "https://storybook.js.org",
   "title": "Storybook",
   "description": "Frontend workshop for building UI components and pages in isolation",
@@ -14,7 +14,7 @@
   "license": "MIT",
   "github_url": "https://github.com/storybookjs/storybook",
   "$aspects": {
-    "quality": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 5,

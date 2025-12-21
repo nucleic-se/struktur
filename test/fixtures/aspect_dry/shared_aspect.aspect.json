@@ -1,6 +1,5 @@
 {
-  "aspect": "shared_aspect",
-  "schema": {
+  "$schema": {
     "type": "object",
     "properties": {
       "shared_prop": {
@@ -12,6 +11,9 @@
         "description": "Shared numeric property"
       }
     },
-    "required": ["shared_prop"]
-  }
+    "required": [
+      "shared_prop"
+    ]
+  },
+  "$aspect": "aspect_shared_aspect"
 }

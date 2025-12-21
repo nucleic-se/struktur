@@ -9,17 +9,17 @@ This stack contains {{ $instances | length }} service(s).
 ## Services
 
 {% for instance in $instances %}
-{% if instance.class == "web_service" %}
+{% if instance.$class == "web_service" %}
 ### {{ instance.name }}
 
-- **ID**: `{{ instance.id }}`
+- **ID**: `{{ instance.$id }}`
 - **Description**: {{ instance.description }}
-- **URL**: {{ instance.$aspects.web_service.protocol }}://{{ instance.$aspects.web_service.hostname }}:{{ instance.$aspects.web_service.port }}
-- **Workers**: {{ instance.$aspects.web_service.workers }}
-{% if instance.$aspects.web_service.ssl_enabled %}
+- **URL**: {{ instance.$aspects.aspect_web_service.protocol }}://{{ instance.$aspects.aspect_web_service.hostname }}:{{ instance.$aspects.aspect_web_service.port }}
+- **Workers**: {{ instance.$aspects.aspect_web_service.workers }}
+{% if instance.$aspects.aspect_web_service.ssl_enabled %}
 - **SSL**: Enabled
-  - Certificate: `{{ instance.$aspects.web_service.ssl_cert }}`
-  - Key: `{{ instance.$aspects.web_service.ssl_key }}`
+  - Certificate: `{{ instance.$aspects.aspect_web_service.ssl_cert }}`
+  - Key: `{{ instance.$aspects.aspect_web_service.ssl_key }}`
 {% else %}
 - **SSL**: Disabled
 {% endif %}

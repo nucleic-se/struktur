@@ -1,6 +1,6 @@
 {
-  "aspect": "aspect_terraform",
-  "schema": {
+  "$aspect": "aspect_terraform",
+  "$schema": {
     "type": "object",
     "properties": {
       "enabled": {

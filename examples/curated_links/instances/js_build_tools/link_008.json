@@ -1,6 +1,6 @@
 {
-  "id": "link_008",
-  "class": "tool_link",
+  "$id": "link_008",
+  "$class": "tool_link",
   "url": "https://www.typescriptlang.org",
   "title": "TypeScript",
   "description": "Typed superset of JavaScript that compiles to plain JavaScript",
@@ -15,7 +15,7 @@
   "license": "Apache-2.0",
   "github_url": "https://github.com/microsoft/TypeScript",
   "$aspects": {
-    "quality": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 5,

@@ -1,6 +1,6 @@
 {
-  "id": "metadata",
-  "class": "collection_metadata",
+  "$id": "metadata",
+  "$class": "collection_metadata",
   "title": "Testing Tools Ecosystem",
   "description": "Curated list of testing frameworks, assertion libraries, and quality assurance tools",
   "url": "https://github.com/nucleic-se/struktur/tree/main/examples/curated_links"

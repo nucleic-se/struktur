@@ -1,6 +1,6 @@
 {
-  "id": "test_013",
-  "class": "tool_link",
+  "$id": "test_013",
+  "$class": "tool_link",
   "title": "Sinon",
   "url": "https://sinonjs.org",
   "description": "Standalone test spies, stubs and mocks for JavaScript",

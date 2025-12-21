@@ -1,11 +1,13 @@
 {
-  "id": "welcome",
-  "class": "blog_post",
+  "$id": "welcome",
+  "$class": "blog_post",
   "title": "Welcome to Skribe",
   "slug": "welcome-to-scribe",
   "date": "2025-12-01",
   "author": "Struktur Team",
-  "tags": ["tutorial"],
+  "tags": [
+    "tutorial"
+  ],
   "description": "Learn how to build static sites with Struktur",
-  "content": "Welcome to Skribe, a minimal static site generator built on Struktur. If you're exploring this example, you're about to see something different from typical static site generators.\n\nSkribe demonstrates how structured data, class inheritance, and templates combine to create a deterministic build pipeline for content. Unlike generators that rely on magic conventions or complex configurations, Skribe makes everything explicit. Classes define shapes, instances provide data, templates render outputs. That's it.\n\nWhat makes this approach powerful? Everything is validated before rendering. Your content has a schema. Your templates have type-safe data. Your builds are reproducible byte-for-byte. If it builds once, it builds every time—no surprises, no race conditions, no 'works on my machine' problems.\n\nThis site you're reading right now? It's generated from JSON files, a handful of templates, and three class definitions. Sixteen blog posts, four pages, four tag indexes, RSS feed, and custom theming—all from the same source data. Explore the examples, check out the source, and see how far you can push a deterministic build engine."
+  "content": "Welcome to Skribe, a minimal static site generator built on Struktur. If you're exploring this example, you're about to see something different from typical static site generators.\n\nSkribe demonstrates how structured data, class inheritance, and templates combine to create a deterministic build pipeline for content. Unlike generators that rely on magic conventions or complex configurations, Skribe makes everything explicit. Classes define shapes, instances provide data, templates render outputs. That's it.\n\nWhat makes this approach powerful? Everything is validated before rendering. Your content has a schema. Your templates have type-safe data. Your builds are reproducible byte-for-byte. If it builds once, it builds every time\u2014no surprises, no race conditions, no 'works on my machine' problems.\n\nThis site you're reading right now? It's generated from JSON files, a handful of templates, and three class definitions. Sixteen blog posts, four pages, four tag indexes, RSS feed, and custom theming\u2014all from the same source data. Explore the examples, check out the source, and see how far you can push a deterministic build engine."
 }

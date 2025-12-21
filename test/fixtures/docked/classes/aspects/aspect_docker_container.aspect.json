@@ -1,6 +1,6 @@
 {
-  "aspect": "aspect_docker_container",
-  "schema": {
+  "$aspect": "aspect_docker_container",
+  "$schema": {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "description": "Docker container configuration",
@@ -309,7 +309,7 @@
       }
     ]
   },
-  "fields": {
+  "$fields": {
     "$aspects": {
       "aspect": {
         "kind": "docker_container",

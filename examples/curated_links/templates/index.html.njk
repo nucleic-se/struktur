@@ -179,7 +179,7 @@
       <h1>{{ $instances_by_id['metadata'].title }}</h1>
       <p class="subtitle">{{ $instances_by_id['metadata'].description }}</p>
       <div class="stats">
-        <span>📦 {% set count = 0 %}{% for i in $instances %}{% if i.class == 'tool_link' %}{% set count = count + 1 %}{% endif %}{% endfor %}{{ count }} tools</span>
+        <span>📦 {% set count = 0 %}{% for i in $instances %}{% if i.$class == 'tool_link' %}{% set count = count + 1 %}{% endif %}{% endfor %}{{ count }} tools</span>
       </div>
     </header>
 
@@ -217,8 +217,8 @@
 
   <script>
     const links = [
-      {% for link in $instances %}{% if link.class == 'tool_link' %}{
-        id: "{{ link.id }}",
+      {% for link in $instances %}{% if link.$class == 'tool_link' %}{
+        id: "{{ link.$id }}",
         title: "{{ link.title }}",
         url: "{{ link.url }}",
         description: "{{ link.description }}",

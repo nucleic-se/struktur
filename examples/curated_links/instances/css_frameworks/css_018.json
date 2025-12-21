@@ -1,6 +1,6 @@
 {
-  "id": "css_018",
-  "class": "tool_link",
+  "$id": "css_018",
+  "$class": "tool_link",
   "url": "https://lesscss.org",
   "title": "Less",
   "description": "Backwards-compatible language extension for CSS with variables and mixins",

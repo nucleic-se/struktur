@@ -1,6 +1,6 @@
 {
-  "id": "css_008",
-  "class": "tool_link",
+  "$id": "css_008",
+  "$class": "tool_link",
   "url": "https://milligram.io",
   "title": "Milligram",
   "description": "Minimalist CSS framework with only 2KB gzipped for clean and minimal designs",

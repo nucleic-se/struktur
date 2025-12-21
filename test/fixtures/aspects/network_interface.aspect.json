@@ -1,10 +1,12 @@
 {
-  "aspect": "network_interface",
-  "kind": "infrastructure",
-  "description": "Network connectivity for entities",
-  "schema": {
+  "$aspect": "aspect_network_interface",
+  "$kind": "infrastructure",
+  "$description": "Network connectivity for entities",
+  "$schema": {
     "type": "object",
-    "required": ["ip"],
+    "required": [
+      "ip"
+    ],
     "properties": {
       "ip": {
         "type": "string",
@@ -23,7 +25,7 @@
       }
     }
   },
-  "defaults": {
+  "$defaults": {
     "ip": null,
     "mac": null,
     "hostname": null

@@ -1,6 +1,6 @@
 {
-  "id": "test_009",
-  "class": "tool_link",
+  "$id": "test_009",
+  "$class": "tool_link",
   "title": "WebdriverIO",
   "url": "https://webdriver.io",
   "description": "Next-gen browser and mobile automation test framework for Node.js",

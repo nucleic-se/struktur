@@ -1,6 +1,6 @@
 {
-  "id": "link_020",
-  "class": "tool_link",
+  "$id": "link_020",
+  "$class": "tool_link",
   "url": "https://deno.com",
   "title": "Deno",
   "description": "Secure runtime for JavaScript and TypeScript with built-in tooling",
@@ -14,7 +14,7 @@
   "license": "MIT",
   "github_url": "https://github.com/denoland/deno",
   "$aspects": {
-    "quality": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 4,

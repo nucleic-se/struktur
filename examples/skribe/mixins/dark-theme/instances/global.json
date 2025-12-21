@@ -1,12 +1,13 @@
 {
-  "id": "global",
-  "class": "global",
+  "$id": "global",
+  "$class": "global",
   "stylesheets": [
     "css/dark-theme.css"
   ],
-  "build": [
+  "$render": [
     {
-      "css/dark-theme.css": "/css/dark-theme.css"
+      "template": "css/dark-theme.css",
+      "output": "/css/dark-theme.css"
     }
   ]
 }

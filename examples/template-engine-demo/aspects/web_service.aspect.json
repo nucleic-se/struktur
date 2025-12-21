@@ -1,0 +1,53 @@
+{
+  "$aspect": "aspect_web_service",
+  "$pretty_name": "Web Service Configuration",
+  "$description": "HTTP server configuration",
+  "$defaults": {
+    "port": 8080,
+    "protocol": "http",
+    "hostname": "localhost"
+  },
+  "$schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "port": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 65535,
+        "description": "HTTP listen port"
+      },
+      "protocol": {
+        "type": "string",
+        "enum": [
+          "http",
+          "https"
+        ],
+        "description": "HTTP protocol"
+      },
+      "hostname": {
+        "type": "string",
+        "description": "Server hostname"
+      },
+      "ssl_enabled": {
+        "type": "boolean",
+        "description": "Enable SSL/TLS",
+        "default": false
+      },
+      "ssl_cert": {
+        "type": "string",
+        "description": "SSL certificate path"
+      },
+      "ssl_key": {
+        "type": "string",
+        "description": "SSL private key path"
+      },
+      "workers": {
+        "type": "integer",
+        "minimum": 1,
+        "description": "Number of worker processes",
+        "default": 4
+      }
+    }
+  }
+}

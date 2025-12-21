@@ -112,7 +112,7 @@
   <script>
     // Load canonical data (single source of truth)
     const canonical = {{{json canonical}}};
-    const allInstances = canonical.$instances.filter(obj => obj.id !== 'global');
+    const allInstances = canonical.$instances.filter(obj => obj.$id !== 'global');
     const allClasses = Object.values(canonical.$classes_by_id);
     
     // Build relation indexes (drift-safe unidirectional)
@@ -124,7 +124,7 @@
       
       instances.forEach(inst => {
         if (inst.relations && typeof inst.relations === 'object') {
-          outbound.set(inst.id, inst.relations);
+          outbound.set(inst.$id, inst.relations);
           
           // Build inverse index (derived relations)
           for (const [relationType, targets] of Object.entries(inst.relations)) {
@@ -136,7 +136,7 @@
               if (!inbound.get(targetId)[relationType]) {
                 inbound.get(targetId)[relationType] = [];
               }
-              inbound.get(targetId)[relationType].push(inst.id);
+              inbound.get(targetId)[relationType].push(inst.$id);
             });
           }
         }
@@ -162,8 +162,8 @@
     
     // Group instances by class
     allInstances.forEach(inst => {
-      if (!instancesByClass.has(inst.class)) instancesByClass.set(inst.class, []);
-      instancesByClass.get(inst.class).push(inst);
+      if (!instancesByClass.has(inst.$class)) instancesByClass.set(inst.$class, []);
+      instancesByClass.get(inst.$class).push(inst);
     });
     
     // Build class hierarchy per aspect tree
@@ -177,11 +177,11 @@
         }
         
         const tree = aspectTrees.get(kind);
-        tree.classes.set(cls.class, {
-          class: cls.class,
+        tree.classes.set(cls.$class, {
+          class: cls.$class,
           data: cls,
           children: [],
-          instances: instancesByClass.get(cls.class) || [],
+          instances: instancesByClass.get(cls.$class) || [],
           parent: null
         });
       });
@@ -191,7 +191,9 @@
     aspectTrees.forEach((tree, kind) => {
       tree.classes.forEach((node, className) => {
         // Find the closest parent that's in the same tree
-        const parentChain = node.data.parent || [];
+        const parentChain = Array.isArray(node.data.$parent)
+          ? node.data.$parent
+          : (node.data.$parent ? [node.data.$parent] : []);
         for (let i = parentChain.length - 1; i >= 0; i--) {
           const potentialParent = parentChain[i];
           if (tree.classes.has(potentialParent) && potentialParent !== className) {
@@ -271,7 +273,7 @@
             instNode.className = 'tree-instance';
             const displayName = getInstanceName(inst);
             instNode.innerHTML = `
-              <div class="tree-node tree-level-2 py-1 rounded d-flex align-items-center instance-item ${selectedInstance === inst.id ? 'selected' : ''}" data-kind="${kind}" data-class="${singleClass}" data-instance="${inst.id}">
+              <div class="tree-node tree-level-2 py-1 rounded d-flex align-items-center instance-item ${selectedInstance === inst.$id ? 'selected' : ''}" data-kind="${kind}" data-class="${singleClass}" data-instance="${inst.$id}">
                 <span class="tree-toggle"></span>
                 <i class="bi bi-file-earmark tree-icon text-muted"></i>
                 <span>${escapeHtml(displayName)}</span>
@@ -378,7 +380,7 @@
           instNode.className = 'tree-instance';
           const displayName = getInstanceName(inst);
           instNode.innerHTML = `
-            <div class="tree-node tree-level-${level + 1} py-1 rounded d-flex align-items-center instance-item ${selectedInstance === inst.id ? 'selected' : ''}" data-kind="${kind}" data-class="${className}" data-instance="${inst.id}">
+            <div class="tree-node tree-level-${level + 1} py-1 rounded d-flex align-items-center instance-item ${selectedInstance === inst.$id ? 'selected' : ''}" data-kind="${kind}" data-class="${className}" data-instance="${inst.$id}">
               <span class="tree-toggle"></span>
               <i class="bi bi-file-earmark tree-icon text-muted"></i>
               <span>${escapeHtml(displayName)}</span>
@@ -520,7 +522,7 @@
     function updateTitle() {
       const title = document.getElementById('viewTitle');
       if (selectedInstance) {
-        const inst = allInstances.find(i => i.id === selectedInstance);
+        const inst = allInstances.find(i => i.$id === selectedInstance);
         title.textContent = inst ? getInstanceName(inst) : selectedInstance;
       } else if (selectedClass) {
         title.textContent = formatClassName(selectedClass);
@@ -583,7 +585,7 @@
       
       // Add instance
       if (selectedInstance) {
-        const inst = allInstances.find(i => i.id === selectedInstance);
+        const inst = allInstances.find(i => i.$id === selectedInstance);
         ol.innerHTML += `<li class="breadcrumb-item active">${escapeHtml(inst ? getInstanceName(inst) : selectedInstance)}</li>`;
       }
     }
@@ -617,14 +619,14 @@
       
       // Filter by selection
       if (selectedInstance) {
-        filtered = filtered.filter(obj => obj.id === selectedInstance);
+        filtered = filtered.filter(obj => obj.$id === selectedInstance);
       } else if (selectedClass) {
         // Include instances of this class and all descendant classes
         const tree = aspectTrees.get(selectedKind);
         if (tree) {
           const validClasses = getDescendantClasses(tree, selectedClass);
           validClasses.add(selectedClass);
-          filtered = filtered.filter(obj => validClasses.has(obj.class));
+          filtered = filtered.filter(obj => validClasses.has(obj.$class));
         }
       } else if (selectedKind) {
         filtered = filtered.filter(obj => 
@@ -680,7 +682,7 @@
         <div class="card h-100" ${primaryAspect ? `data-aspect="${escapeHtml(primaryAspect)}"` : ''}>
           <div class="card-header">
             <h5 class="card-title mb-0">${escapeHtml(displayName)}</h5>
-            <small class="text-muted">${escapeHtml(obj.id)}</small>
+            <small class="text-muted">${escapeHtml(obj.$id)}</small>
           </div>
           <div class="card-body">
       `;
@@ -704,9 +706,9 @@
       const parents = Array.isArray(obj.parent) ? obj.parent : (obj.parent ? [obj.parent] : []);
       // Find children: any instance whose parent includes this object's id
       const children = allInstances.filter(inst => {
-        if (inst.id === obj.id) return false;
+        if (inst.$id === obj.$id) return false;
         const p = Array.isArray(inst.parent) ? inst.parent : (inst.parent ? [inst.parent] : []);
-        return p.includes(obj.id);
+        return p.includes(obj.$id);
       });
 
       if (parents.length > 0 || children.length > 0) {
@@ -715,7 +717,7 @@
           html += `<div class="mb-1"><strong class="text-uppercase small text-muted">Parents</strong><ul class="mb-0">`;
           parents.forEach(pid => {
             // Try to find the parent instance for display name
-            const parentObj = allInstances.find(i => i.id === pid);
+            const parentObj = allInstances.find(i => i.$id === pid);
             html += `<li>${parentObj ? escapeHtml(getInstanceName(parentObj)) + ' <span class=\"text-muted\">(' + escapeHtml(pid) + ')</span>' : escapeHtml(pid)}</li>`;
           });
           html += `</ul></div>`;
@@ -723,15 +725,15 @@
         if (children.length > 0) {
           html += `<div class="mb-1"><strong class="text-uppercase small text-muted">Children</strong><ul class="mb-0">`;
           children.forEach(child => {
-            html += `<li>${escapeHtml(getInstanceName(child))} <span class=\"text-muted\">(${escapeHtml(child.id)})</span></li>`;
+            html += `<li>${escapeHtml(getInstanceName(child))} <span class=\"text-muted\">(${escapeHtml(child.$id)})</span></li>`;
           });
           html += `</ul></div>`;
         }
       }
       
       // --- Relations Section (Drift-Safe Topology) ---
-      const outboundRels = relationIndexes.outbound.get(obj.id);
-      const inboundRels = relationIndexes.inbound.get(obj.id);
+      const outboundRels = relationIndexes.outbound.get(obj.$id);
+      const inboundRels = relationIndexes.inbound.get(obj.$id);
       
       if (outboundRels || inboundRels) {
         html += `<hr class="my-2"><div class="mb-2"><span class="badge bg-warning">Relations</span></div>`;
@@ -745,7 +747,7 @@
             const showArrow = !relType.includes('/'); // Only show arrow for legacy format
             html += `<div class="mb-2"><strong class="text-uppercase small text-muted">${escapeHtml(formatLabel(outboundLabel))}</strong>${showArrow ? ' <i class="bi bi-arrow-right text-muted"></i>' : ''}<ul class="mb-0">`;
             targets.forEach(targetId => {
-              const targetObj = allInstances.find(i => i.id === targetId);
+              const targetObj = allInstances.find(i => i.$id === targetId);
               const displayName = targetObj ? getInstanceName(targetObj) : targetId;
               html += `<li><a href="#" onclick="selectInstanceById('${escapeHtml(targetId)}'); return false;">${escapeHtml(displayName)}</a> <span class="text-muted small">(${escapeHtml(targetId)})</span></li>`;
             });
@@ -762,7 +764,7 @@
             const showArrow = !relType.includes('/'); // Only show arrow for legacy format
             html += `<div class="mb-2">${showArrow ? '<i class="bi bi-arrow-left text-muted"></i> ' : ''}<strong class="text-uppercase small text-muted">${escapeHtml(formatLabel(inboundLabel))}</strong><ul class="mb-0">`;
             sources.forEach(sourceId => {
-              const sourceObj = allInstances.find(i => i.id === sourceId);
+              const sourceObj = allInstances.find(i => i.$id === sourceId);
               const displayName = sourceObj ? getInstanceName(sourceObj) : sourceId;
               html += `<li><a href="#" onclick="selectInstanceById('${escapeHtml(sourceId)}'); return false;">${escapeHtml(displayName)}</a> <span class="text-muted small">(${escapeHtml(sourceId)})</span></li>`;
             });
@@ -790,7 +792,7 @@
       html += `
           </div>
           <div class="card-footer">
-            <small class="text-muted">Class: <code>${escapeHtml(obj.class)}</code></small>
+            <small class="text-muted">Class: <code>${escapeHtml(obj.$class)}</code></small>
           </div>
         </div>
       `;
@@ -810,7 +812,7 @@
       }
       
       // 3. Final fallback to ID
-      return obj.id;
+      return obj.$id;
     }
     
     function formatLabel(key) {
@@ -821,7 +823,7 @@
       if (!cls) return 'Unknown';
       
       // Check if class has pretty_name in canonical data
-      const classData = allClasses.find(c => c.class === cls);
+      const classData = allClasses.find(c => c.$class === cls);
       if (classData && classData.pretty_name) {
         return classData.pretty_name;
       }
@@ -871,17 +873,17 @@
     
     // Helper to select instance by ID (used in relation links)
     function selectInstanceById(instanceId) {
-      const inst = allInstances.find(i => i.id === instanceId);
+      const inst = allInstances.find(i => i.$id === instanceId);
       if (!inst) return;
       
       // Find which tree this instance belongs to
       if (inst.$uses_aspects && inst.$uses_aspects.length > 0) {
         const kind = inst.$uses_aspects[0];
-        selectInstance(kind, inst.class, instanceId);
+        selectInstance(kind, inst.$class, instanceId);
       } else {
         // Fallback: just filter by ID
         selectedInstance = instanceId;
-        selectedClass = inst.class;
+        selectedClass = inst.$class;
         selectedKind = null;
         updateUI();
       }

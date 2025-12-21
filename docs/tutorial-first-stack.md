@@ -39,16 +39,18 @@ blog-stack/
 
 Create the foundation class with defaults and validation.
 
-**`classes/content.schema.json`:**
+**`classes/content.class.json`:**
 ```json
 {
-  "class": "content",
-  "parent": null,
-  "title": "",
-  "author": null,
-  "created_at": "2025-01-01",
-  "status": "draft",
-  "schema": {
+  "$class": "content",
+  "$parent": null,
+  "$fields": {
+    "title": "",
+    "author": null,
+    "created_at": "2025-01-01",
+    "status": "draft"
+  },
+  "$schema": {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
@@ -75,10 +77,10 @@ Create the foundation class with defaults and validation.
 ```
 
 **What this means:**
-- `class`: Unique identifier matching filename (`content`)
-- `parent: null`: Top-level class (no inheritance)
-- Top-level fields: Default values for all content
-- `schema`: Validation rules (types, constraints, required fields)
+- `$class`: Unique identifier matching filename (`content`)
+- `$parent: null`: Top-level class (no inheritance)
+- `$fields`: Default values for all content
+- `$schema`: Validation rules (types, constraints, required fields)
 - `required`: Fields that must be present (title, author)
 - `enum`: Allowed values for status
 - `minLength/maxLength`: String constraints
@@ -107,15 +109,17 @@ Total: 1 classes
 
 Add classes that inherit from content.
 
-**`classes/post.schema.json`:**
+**`classes/post.class.json`:**
 ```json
 {
-  "class": "post",
-  "parent": "content",
-  "category": "general",
-  "excerpt": "",
-  "content": "",
-  "schema": {
+  "$class": "post",
+  "$parent": "content",
+  "$fields": {
+    "category": "general",
+    "excerpt": "",
+    "content": ""
+  },
+  "$schema": {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
@@ -135,14 +139,16 @@ Add classes that inherit from content.
 }
 ```
 
-**`classes/page.schema.json`:**
+**`classes/page.class.json`:**
 ```json
 {
-  "class": "page",
-  "parent": "content",
-  "slug": "",
-  "content": "",
-  "schema": {
+  "$class": "page",
+  "$parent": "content",
+  "$fields": {
+    "slug": "",
+    "content": ""
+  },
+  "$schema": {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
@@ -188,8 +194,8 @@ Add actual blog content.
 **`instances/welcome-post.json`:**
 ```json
 {
-  "id": "welcome",
-  "class": "post",
+  "$id": "welcome",
+  "$class": "post",
   "title": "Welcome to My Blog",
   "description": "First post introducing the blog",
   "author": "Alice",
@@ -204,8 +210,8 @@ Add actual blog content.
 **`instances/first-tech-post.json`:**
 ```json
 {
-  "id": "struktur-intro",
-  "class": "post",
+  "$id": "struktur-intro",
+  "$class": "post",
   "title": "Introduction to Struktur",
   "description": "Tutorial post about Struktur basics",
   "author": "Bob",
@@ -220,8 +226,8 @@ Add actual blog content.
 **`instances/about-page.json`:**
 ```json
 {
-  "id": "about",
-  "class": "page",
+  "$id": "about",
+  "$class": "page",
   "title": "About This Blog",
   "description": "Information about the blog and its author",
   "author": "Alice",
@@ -266,8 +272,8 @@ Try creating an invalid instance to see validation in action.
 **`instances/invalid.json`:**
 ```json
 {
-  "id": "invalid-post",
-  "class": "post",
+  "$id": "invalid-post",
+  "$class": "post",
   "title": "Missing Required Fields"
 }
 ```
@@ -311,18 +317,18 @@ struktur validate -c classes/ -i instances/
 
 Before creating templates, we need a global configuration that specifies build tasks.
 
-**`classes/global.schema.json`:**
+**`classes/global.class.json`:**
 ```json
 {
-  "class": "global",
-  "schema": {
+  "$class": "global",
+  "$schema": {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
-      "id": {"type": "string"},
-      "class": {"type": "string"},
+      "$id": {"type": "string"},
+      "$class": {"type": "string"},
       "description": {"type": "string"},
-      "build": {"type": "array"}
+      "$render": {"type": "array"}
     }
   }
 }
@@ -331,18 +337,19 @@ Before creating templates, we need a global configuration that specifies build t
 **`instances/global.json`:**
 ```json
 {
-  "id": "global",
-  "class": "global",
+  "$id": "global",
+  "$class": "global",
   "description": "Blog configuration",
-  "build": [
+  "$render": [
     {
-      "index.html": "/index.html"
+      "template": "index.html",
+      "output": "/index.html"
     }
   ]
 }
 ```
 
-✅ **Learning:** The `build` array tells Struktur which templates to render and where to put them.
+✅ **Learning:** The `$render` array tells Struktur which templates to render and where to put them.
 
 ---
 
@@ -368,7 +375,7 @@ Before creating templates, we need a global configuration that specifies build t
     <h1>My Blog</h1>
     <nav>
       <a href="index.html">Home</a>
-      {{#each (where $instances "class" "page")}}
+      {{#each (where $instances "$class" "page")}}
         <a href="{{slug}}.html">{{title}}</a>
       {{/each}}
     </nav>
@@ -377,7 +384,7 @@ Before creating templates, we need a global configuration that specifies build t
   <main>
     <h2>Recent Posts</h2>
     
-    {{#each (where $instances "class" "post")}}
+    {{#each (where $instances "$class" "post")}}
       {{#if (eq status "published")}}
         <article>
           <h3>{{title}}</h3>
@@ -386,14 +393,14 @@ Before creating templates, we need a global configuration that specifies build t
             <span class="category">{{category}}</span>
           </p>
           <p>{{excerpt}}</p>
-          <a href="posts/{{id}}.html">Read more →</a>
+          <a href="posts/{{$id}}.html">Read more →</a>
         </article>
       {{/if}}
     {{/each}}
   </main>
 
   <footer>
-    <p>Total posts: {{length (where $instances "class" "post")}}</p>
+    <p>Total posts: {{length (where $instances "$class" "post")}}</p>
     <p>Built with Struktur at {{$metadata.timestamp}}</p>
   </footer>
 </body>
@@ -476,12 +483,12 @@ Update index template to generate individual pages using `render_file`.
 **`templates/index.html`** (add before closing `</body>`):
 ```handlebars
   {{!-- Generate individual post pages --}}
-  {{#each (where $instances "class" "post")}}
-    {{render_file "post.html" (concat "posts/" id ".html") this}}
+  {{#each (where $instances "$class" "post")}}
+    {{render_file "post.html" (concat "posts/" $id ".html") this}}
   {{/each}}
   
   {{!-- Generate individual page files --}}
-  {{#each (where $instances "class" "page")}}
+  {{#each (where $instances "$class" "page")}}
     {{render_file "page.html" (concat slug ".html") this}}
   {{/each}}
 
@@ -597,8 +604,8 @@ open build/index.html
 **1. Draft posts (already supported):**
 ```json
 {
-  "id": "draft-post",
-  "class": "post",
+  "$id": "draft-post",
+  "$class": "post",
   "title": "Coming Soon",
   "status": "draft",
   ...
@@ -608,14 +615,14 @@ Won't appear (filtered by `{{#if (eq status "published")}}`)
 
 **2. Sort posts by date:**
 ```handlebars
-{{#each (reverse (sort_by (where $instances "class" "post") "created_at"))}}
+{{#each (reverse (sort_by (where $instances "$class" "post") "created_at"))}}
   <article>{{title}}</article>
 {{/each}}
 ```
 
 **3. Group by category:**
 ```handlebars
-{{#each (group_by (where $instances "class" "post") "category")}}
+{{#each (group_by (where $instances "$class" "post") "category")}}
   <h2>{{@key}}</h2>
   {{#each this}}
     <li>{{title}}</li>
@@ -623,21 +630,23 @@ Won't appear (filtered by `{{#if (eq status "published")}}`)
 {{/each}}
 ```
 
-**4. Add author class:**
+**4. Add author $class:**
 ```json
-// classes/author.json
+// classes/author.class.json
 {
-  "class": "author",
-  "parent": null,
-  "name": "",
-  "bio": "",
-  "email": ""
+  "$class": "author",
+  "$parent": null,
+  "$fields": {
+    "name": "",
+    "bio": "",
+    "email": ""
+  }
 }
 
 // instances/alice.json
 {
-  "id": "alice",
-  "class": "author",
+  "$id": "alice",
+  "$class": "author",
   "name": "Alice Smith",
   "bio": "Tech writer and developer",
   "email": "alice@example.com"
@@ -645,8 +654,8 @@ Won't appear (filtered by `{{#if (eq status "published")}}`)
 
 // Reference in post:
 {
-  "id": "my-post",
-  "class": "post",
+  "$id": "my-post",
+  "$class": "post",
   "author": "@alice",  // Tag reference
   ...
 }

@@ -27,7 +27,7 @@ Discover and load data files from directories.
 
 1. **Scan directories** for files
 2. **Load class definitions** (`.json` files)
-3. **Load schemas** (`.schema.json` files)
+3. **Load schemas** (`.class.json` files)
 4. **Load aspects** (aspect definitions)
 5. **Load instances** (instance data files)
 6. **Load templates** (`.hbs`, `.njk` files)
@@ -142,16 +142,20 @@ Each layer deep merges with previous, instance always wins
 ```json
 // entity_base.json
 {
-  "class": "entity_base",
-  "name": "",
-  "labels": []
+  "$class": "entity_base",
+  "$fields": {
+    "name": "",
+    "labels": []
+  }
 }
 
 // server.json
 {
-  "class": "server",
-  "parent": "entity_base",
-  "replicas": 1
+  "$class": "server",
+  "$parent": "entity_base",
+  "$fields": {
+    "replicas": 1
+  }
 }
 ```
 
@@ -159,15 +163,15 @@ Each layer deep merges with previous, instance always wins
 ```json
 // base/web-01.json
 {
-  "id": "web-01",
-  "class": "server",
+  "$id": "web-01",
+  "$class": "server",
   "name": "Web Server 01",
   "hostname": "web-01.local"
 }
 
 // prod/web-01.json
 {
-  "id": "web-01",
+  "$id": "web-01",
   "replicas": 3,
   "labels": ["production"]
 }
@@ -176,8 +180,8 @@ Each layer deep merges with previous, instance always wins
 **Merged Result:**
 ```json
 {
-  "id": "web-01",
-  "class": "server",
+  "$id": "web-01",
+  "$class": "server",
   "name": "Web Server 01",        // From base/web-01.json
   "hostname": "web-01.local",     // From base/web-01.json
   "replicas": 3,                  // From prod/web-01.json (overrides class default)
@@ -250,12 +254,12 @@ Ensure merged data satisfies schemas and constraints.
 Each class in inheritance chain validates independently:
 
 ```
-Instance: { "id": "web-01", "class": "web_server", ... }
+Instance: { "$id": "web-01", "$class": "web_server", ... }
 
 Validates against:
-1. entity_base.schema.json
-2. server.schema.json
-3. web_server.schema.json
+1. entity_base.class.json
+2. server.class.json
+3. web_server.class.json
 ```
 
 **All must pass.**
@@ -286,7 +290,7 @@ Build Phase: Validation
 ```
 [VALIDATE] Validation Error (instance: web-01)
   Property "hostname" is required but not provided
-  Schema: server.schema.json
+  Schema: server.class.json
   Class: web_server (inherits: entity_base → server → web_server)
 ```
 
@@ -295,14 +299,14 @@ Build Phase: Validation
 [VALIDATE] Validation Error (instance: app)
   Property "port" expected type "integer" but got "string"
   Value: "8080"
-  Schema: service.schema.json
+  Schema: service.class.json
 ```
 
 **Constraint violation:**
 ```
 [VALIDATE] Validation Error (instance: db)
   Property "replicas" value -1 violates minimum constraint (1)
-  Schema: database.schema.json
+  Schema: database.class.json
 ```
 
 **Extra field warning (promoted to error):**
@@ -522,7 +526,7 @@ Fix: Remove circular parent reference
 ```
 [VALIDATE] Validation Error (instance: web-01)
   Property "port" is required but not provided
-  Schema: server.schema.json
+  Schema: server.class.json
   File: instances/web-01.json
 
 Fix: Add "port" field to instance
@@ -719,7 +723,7 @@ grep -r '"parent"' classes/
 ```bash
 struktur validate . --json | jq .
 struktur generate . -o debug.json
-jq '."$instances"[] | select(.id == "problematic-id")' debug.json
+jq '."$instances"[] | select(."$id" == "problematic-id")' debug.json
 ```
 
 ### Build Fails in RENDER

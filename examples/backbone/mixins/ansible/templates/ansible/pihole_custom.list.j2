@@ -1,5 +1,5 @@
 {{#each $instances}}
-{{#if (eq this.class "proxmox_lxc")}}
+{{#if (eq this.$class "proxmox_lxc")}}
 {{this.$aspects.network_interface.ip}} {{this.$aspects.network_interface.hostname}}.home
 {{/if}}
 {{/each}}

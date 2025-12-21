@@ -8,7 +8,7 @@ The original use case, but worth highlighting the breadth:
 
 ### Docker Orchestration
 **Problem:** Managing multi-container applications across environments  
-**Solution:** Container instances + docker_container aspects → docker-compose.yml  
+**Solution:** Container instances + aspect_docker_container aspects → docker-compose.yml  
 **Example:** See `examples/docked/` - 5 containers with health checks, dependencies, networks
 
 ### Kubernetes Manifests
@@ -37,8 +37,8 @@ The original use case, but worth highlighting the breadth:
 ```json
 // instances/strict-typescript.json
 {
-  "id": "strict-typescript",
-  "class": "eslint_config",
+  "$id": "strict-typescript",
+  "$class": "eslint_config",
   "extends": ["base-typescript"],
   "$aspects": {
     "typescript": {
@@ -91,8 +91,8 @@ The original use case, but worth highlighting the breadth:
 ```json
 // instances/button.json
 {
-  "id": "button",
-  "class": "component",
+  "$id": "button",
+  "$class": "component",
   "category": "forms",
   "$aspects": {
     "design": {
@@ -126,8 +126,8 @@ The original use case, but worth highlighting the breadth:
 ```json
 // instances/laptop-001.json
 {
-  "id": "laptop-001",
-  "class": "equipment",
+  "$id": "laptop-001",
+  "$class": "equipment",
   "serial": "ABC123",
   "assigned_to": "jane.doe",
   "$aspects": {

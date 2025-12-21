@@ -1,6 +1,6 @@
 {
-  "id": "link_026",
-  "class": "tool_link",
+  "$id": "link_026",
+  "$class": "tool_link",
   "url": "https://lerna.js.org",
   "title": "Lerna",
   "description": "Tool for managing JavaScript projects with multiple packages",
@@ -14,7 +14,7 @@
   "license": "MIT",
   "github_url": "https://github.com/lerna/lerna",
   "$aspects": {
-    "quality": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 3,

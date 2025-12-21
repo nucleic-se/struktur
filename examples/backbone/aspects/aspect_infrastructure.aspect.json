@@ -1,6 +1,6 @@
 {
-  "aspect": "aspect_infrastructure",
-  "schema": {
+  "$aspect": "aspect_infrastructure",
+  "$schema": {
     "type": "object",
     "properties": {
       "environment": {
@@ -21,6 +21,8 @@
     ],
     "additionalProperties": false
   },
-  "environment": "production",
-  "location": "homelab"
+  "$defaults": {
+    "environment": "production",
+    "location": "homelab"
+  }
 }

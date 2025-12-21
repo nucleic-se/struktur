@@ -26,9 +26,9 @@ describe('Build Warnings and Messaging', () => {
     // Verify it's a lookup map
     const instances = canonical.canonical.$instances;
     for (const inst of instances) {
-      if (inst.id) {
-        assert.ok(canonical.canonical.$instances_by_id[inst.id], `$instances_by_id should contain ${inst.id}`);
-        assert.strictEqual(canonical.canonical.$instances_by_id[inst.id], inst);
+      if (inst.$id) {
+        assert.ok(canonical.canonical.$instances_by_id[inst.$id], `$instances_by_id should contain ${inst.$id}`);
+        assert.strictEqual(canonical.canonical.$instances_by_id[inst.$id], inst);
       }
     }
   });
@@ -40,7 +40,7 @@ describe('Build Warnings and Messaging', () => {
     // Create a classless instance
     await fs.writeFile(
       path.join(testDir, 'bad.json'),
-      JSON.stringify({ id: 'bad-instance', field: 'value' })
+      JSON.stringify({ $id: 'bad-instance', field: 'value' })
     );
 
     // Should throw error for classless instances
@@ -54,7 +54,7 @@ describe('Build Warnings and Messaging', () => {
         });
       },
       (error) => {
-        return error.message.includes("missing required 'class' field") &&
+        return error.message.includes("missing required '$class' field") &&
                error.message.includes('bad-instance');
       },
       'Should throw error with classless instance details'
@@ -104,17 +104,17 @@ describe('Build Warnings and Messaging', () => {
     
     // Create a simple class
     await fs.writeFile(
-      path.join(classesDir, 'page.schema.json'),
+      path.join(classesDir, 'page.class.json'),
       JSON.stringify({
-        class: 'page',
-        schema: { type: 'object', properties: { id: { type: 'string' } } }
+        $class: 'page',
+        $schema: { type: 'object', properties: { $id: { type: 'string' } } }
       })
     );
     
     // Create instance without build array
     await fs.writeFile(
       path.join(instancesDir, 'test.json'),
-      JSON.stringify({ id: 'test', class: 'page' })
+      JSON.stringify({ $id: 'test', $class: 'page' })
     );
     
     // Create a template

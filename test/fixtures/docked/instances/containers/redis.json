@@ -1,12 +1,16 @@
 {
-  "id": "redis",
-  "class": "docked_container",
-  "domains": ["application"],
+  "$id": "redis",
+  "$class": "docked_container",
+  "domains": [
+    "application"
+  ],
   "$aspects": {
-    "docker_container": {
+    "aspect_docker_container": {
       "image": "redis:alpine",
       "description": "Redis in-memory data store",
-      "networks": ["docked"],
+      "networks": [
+        "docked"
+      ],
       "restart_policy": "unless-stopped"
     }
   }

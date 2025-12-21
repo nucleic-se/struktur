@@ -1,6 +1,6 @@
 {
-  "id": "css_039",
-  "class": "tool_link",
+  "$id": "css_039",
+  "$class": "tool_link",
   "url": "https://open-props.style",
   "title": "Open Props",
   "description": "CSS custom properties to help accelerate design and development",

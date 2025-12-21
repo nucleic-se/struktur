@@ -1,1 +1,0 @@
-{"class":"child","parent":"base","schema":{"type":"object","properties":{"name":{"type":"string"}}},"fields":{"config":{"timeout":60,"logging":{"level":"debug"}}}}

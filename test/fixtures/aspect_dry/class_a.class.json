@@ -1,0 +1,17 @@
+{
+  "$class": "class_a",
+  "$schema": {
+    "type": "object",
+    "properties": {
+      "prop_a": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "prop_a"
+    ]
+  },
+  "$aspects": [
+    "aspect_shared_aspect"
+  ]
+}

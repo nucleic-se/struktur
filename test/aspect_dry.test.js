@@ -27,9 +27,9 @@ describe('Aspect DRY (Define Once, Use Many)', () => {
     await aspectLoader.loadAspect(path.join(fixturesDir, 'shared_aspect.aspect.json'));
 
     // Load multiple classes that use the same aspect
-    await classLoader.loadClass(path.join(fixturesDir, 'class_a.schema.json'));
-    await classLoader.loadClass(path.join(fixturesDir, 'class_b.schema.json'));
-    await classLoader.loadClass(path.join(fixturesDir, 'class_c.schema.json'));
+    await classLoader.loadClass(path.join(fixturesDir, 'class_a.class.json'));
+    await classLoader.loadClass(path.join(fixturesDir, 'class_b.class.json'));
+    await classLoader.loadClass(path.join(fixturesDir, 'class_c.class.json'));
   });
 
   it('should define aspect schema once and reference from multiple classes', () => {
@@ -37,30 +37,30 @@ describe('Aspect DRY (Define Once, Use Many)', () => {
     const classB = classLoader.getClass('class_b');
 
     // Both classes reference the same aspect
-    assert.ok(classA.$aspects.includes('shared_aspect'));
-    assert.ok(classB.$aspects.includes('shared_aspect'));
+    assert.ok(classA.$aspects.includes('aspect_shared_aspect'));
+    assert.ok(classB.$aspects.includes('aspect_shared_aspect'));
 
     // Aspect is defined only once in aspect registry
-    const sharedAspect = aspectLoader.getAspect('shared_aspect');
+    const sharedAspect = aspectLoader.getAspect('aspect_shared_aspect');
     assert.ok(sharedAspect);
-    assert.strictEqual(sharedAspect.aspect, 'shared_aspect');
+    assert.strictEqual(sharedAspect.$aspect, 'aspect_shared_aspect');
 
     // Verify aspect has schema
-    assert.ok(sharedAspect.schema);
-    assert.ok(sharedAspect.schema.properties.shared_prop);
+    assert.ok(sharedAspect.$schema);
+    assert.ok(sharedAspect.$schema.properties.shared_prop);
   });
 
   it('should inherit aspects from parent classes', () => {
     const classC = classLoader.getClass('class_c');
 
     // class_c doesn't directly declare shared_aspect
-    const hasAspect = classC.$aspects?.includes('shared_aspect');
+    const hasAspect = classC.$aspects?.includes('aspect_shared_aspect');
     assert.strictEqual(hasAspect, undefined, 'class_c should not directly declare aspect');
 
     // But it inherits from class_a which has shared_aspect
     const resolved = resolver.resolve('class_c');
     assert.strictEqual(typeof resolved.$aspects, 'object', 'Resolved aspects should be an object');
-    assert.ok(resolved.$aspects.shared_aspect, 'Should inherit aspect from parent');
+    assert.ok(resolved.$aspects.aspect_shared_aspect, 'Should inherit aspect from parent');
   });
 
   it('should validate all classes using the same aspect schema', () => {
@@ -70,16 +70,16 @@ describe('Aspect DRY (Define Once, Use Many)', () => {
     validator.registerClass(resolvedA);
     validator.registerClass(resolvedB);
 
-    const aspectDef = aspectLoader.getAspect('shared_aspect');
+    const aspectDef = aspectLoader.getAspect('aspect_shared_aspect');
     validator.registerAspect(aspectDef);
 
     // Valid instance for class_a with aspect data
     const instanceA = {
-      id: 'inst_a',
-      class: 'class_a',
+      $id: 'inst_a',
+      $class: 'class_a',
       prop_a: 'value_a',
       $aspects: {
-        shared_aspect: {
+        aspect_shared_aspect: {
           shared_prop: 'shared_value',
           shared_number: 123
         }
@@ -91,11 +91,11 @@ describe('Aspect DRY (Define Once, Use Many)', () => {
 
     // Valid instance for class_b with same aspect schema
     const instanceB = {
-      id: 'inst_b',
-      class: 'class_b',
+      $id: 'inst_b',
+      $class: 'class_b',
       prop_b: true,
       $aspects: {
-        shared_aspect: {
+        aspect_shared_aspect: {
           shared_prop: 'another_value',
           shared_number: 456
         }
@@ -113,16 +113,16 @@ describe('Aspect DRY (Define Once, Use Many)', () => {
     validator.registerClass(resolvedA);
     validator.registerClass(resolvedB);
 
-    const aspectDef = aspectLoader.getAspect('shared_aspect');
+    const aspectDef = aspectLoader.getAspect('aspect_shared_aspect');
     validator.registerAspect(aspectDef);
 
     // Invalid instance for class_a (missing required shared_prop)
     const invalidA = {
-      id: 'invalid_a',
-      class: 'class_a',
+      $id: 'invalid_a',
+      $class: 'class_a',
       prop_a: 'value_a',
       $aspects: {
-        shared_aspect: {
+        aspect_shared_aspect: {
           shared_number: 123
           // missing shared_prop
         }
@@ -133,17 +133,17 @@ describe('Aspect DRY (Define Once, Use Many)', () => {
     assert.strictEqual(resultA.valid, false, 'Should fail validation when missing required aspect property');
 
     const aspectErrorA = resultA.errors.find(e =>
-      e.layer === 'aspect:shared_aspect' && e.message.includes('shared_prop')
+      e.layer === 'aspect:aspect_shared_aspect' && e.message.includes('shared_prop')
     );
     assert.ok(aspectErrorA, 'Should have error from shared_aspect for missing shared_prop');
 
     // Invalid instance for class_b (same validation error)
     const invalidB = {
-      id: 'invalid_b',
-      class: 'class_b',
+      $id: 'invalid_b',
+      $class: 'class_b',
       prop_b: true,
       $aspects: {
-        shared_aspect: {
+        aspect_shared_aspect: {
           shared_number: 456
           // missing shared_prop
         }
@@ -153,7 +153,7 @@ describe('Aspect DRY (Define Once, Use Many)', () => {
     const resultB = validator.validate(invalidB, resolvedB);
     assert.strictEqual(resultB.valid, false, 'Should fail validation when missing required aspect property');
     const aspectErrorB = resultB.errors.find(e =>
-      e.layer === 'aspect:shared_aspect' && e.message.includes('shared_prop')
+      e.layer === 'aspect:aspect_shared_aspect' && e.message.includes('shared_prop')
     );
     assert.ok(aspectErrorB, 'Should have error from shared_aspect for missing shared_prop');
   });
@@ -163,17 +163,17 @@ describe('Aspect DRY (Define Once, Use Many)', () => {
 
     validator.registerClass(resolvedC);
 
-    const aspectDef = aspectLoader.getAspect('shared_aspect');
+    const aspectDef = aspectLoader.getAspect('aspect_shared_aspect');
     validator.registerAspect(aspectDef);
 
     // class_c inherits shared_aspect from class_a
     const instanceC = {
-      id: 'inst_c',
-      class: 'class_c',
+      $id: 'inst_c',
+      $class: 'class_c',
       prop_a: 'value_a',  // from parent
       prop_c: 789,        // from self
       $aspects: {
-        shared_aspect: {
+        aspect_shared_aspect: {
           shared_prop: 'inherited_aspect_value',
           shared_number: 999
         }
@@ -193,7 +193,7 @@ describe('Aspect DRY (Define Once, Use Many)', () => {
     validator.registerClass(resolvedB);
     validator.registerClass(resolvedC);
 
-    const aspectDef = aspectLoader.getAspect('shared_aspect');
+    const aspectDef = aspectLoader.getAspect('aspect_shared_aspect');
     validator.registerAspect(aspectDef);
 
     // The aspect validator is compiled once and cached
@@ -201,23 +201,23 @@ describe('Aspect DRY (Define Once, Use Many)', () => {
 
     const instances = [
       {
-        id: 'a1',
-        class: 'class_a',
+        $id: 'a1',
+        $class: 'class_a',
         prop_a: 'val',
-        $aspects: { shared_aspect: { shared_prop: 'test' } }
+        $aspects: { aspect_shared_aspect: { shared_prop: 'test' } }
       },
       {
-        id: 'b1',
-        class: 'class_b',
+        $id: 'b1',
+        $class: 'class_b',
         prop_b: false,
-        $aspects: { shared_aspect: { shared_prop: 'test' } }
+        $aspects: { aspect_shared_aspect: { shared_prop: 'test' } }
       },
       {
-        id: 'c1',
-        class: 'class_c',
+        $id: 'c1',
+        $class: 'class_c',
         prop_a: 'val',
         prop_c: 123,
-        $aspects: { shared_aspect: { shared_prop: 'test' } }
+        $aspects: { aspect_shared_aspect: { shared_prop: 'test' } }
       }
     ];
 

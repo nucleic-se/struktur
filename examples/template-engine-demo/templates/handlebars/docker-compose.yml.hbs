@@ -4,20 +4,20 @@
 version: '3.8'
 
 services:
-{{#each (where $instances "class" "web_service")}}
-  {{id}}:
+{{#each (where $instances "$class" "web_service")}}
+  {{$id}}:
     image: nginx:alpine
-    container_name: {{id}}
+    container_name: {{$id}}
     ports:
-      - "{{$aspects.web_service.port}}:{{$aspects.web_service.port}}"
+      - "{{$aspects.aspect_web_service.port}}:{{$aspects.aspect_web_service.port}}"
     environment:
       - SERVICE_NAME={{{name}}}
-      - WORKERS={{{$aspects.web_service.workers}}}
-{{#if $aspects.web_service.ssl_enabled}}
+      - WORKERS={{{$aspects.aspect_web_service.workers}}}
+{{#if $aspects.aspect_web_service.ssl_enabled}}
       - SSL_ENABLED=true
     volumes:
-      - {{$aspects.web_service.ssl_cert}}:{{$aspects.web_service.ssl_cert}}:ro
-      - {{$aspects.web_service.ssl_key}}:{{$aspects.web_service.ssl_key}}:ro
+      - {{$aspects.aspect_web_service.ssl_cert}}:{{$aspects.aspect_web_service.ssl_cert}}:ro
+      - {{$aspects.aspect_web_service.ssl_key}}:{{$aspects.aspect_web_service.ssl_key}}:ro
 {{else}}
       - SSL_ENABLED=false
 {{/if}}
@@ -27,7 +27,7 @@ services:
 
 {{/each}}
 networks:
-{{#each (where $instances "class" "web_service")}}
+{{#each (where $instances "$class" "web_service")}}
   {{lowercase (replace name " " "-")}}-network:
     driver: bridge
 {{/each}}

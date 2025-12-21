@@ -1,6 +1,6 @@
 {
-  "aspect": "aspect_service_entity",
-  "schema": {
+  "$aspect": "aspect_service_entity",
+  "$schema": {
     "type": "object",
     "properties": {
       "parent": {

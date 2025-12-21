@@ -8,7 +8,7 @@
     "total_links": {{ m.toolCount($instances) }}
   },
   "links": [
-    {% set links = $instances | selectattr('class', 'equalto', 'tool_link') | list %}
+    {% set links = $instances | selectattr('$class', 'equalto', 'tool_link') | list %}
     {% for link in links %}
 {{ m.linkJSON(link, loop.last) }}
     {% endfor %}

@@ -13,10 +13,10 @@ describe('Canonical Structure Validation', () => {
     it('should validate minimal valid structure', async () => {
       const canonical = {
         $instances: [
-          { id: 'test1', class: 'TestClass' }
+          { $id: 'test1', $class: 'TestClass' }
         ],
         $instances_by_id: {
-          test1: { id: 'test1', class: 'TestClass' }
+          test1: { $id: 'test1', $class: 'TestClass' }
         }
       };
       
@@ -28,16 +28,16 @@ describe('Canonical Structure Validation', () => {
     it('should validate structure with classes', async () => {
       const canonical = {
         $instances: [
-          { id: 'test1', class: 'TestClass' }
+          { $id: 'test1', $class: 'TestClass' }
         ],
         $instances_by_id: {
-          test1: { id: 'test1', class: 'TestClass' }
+          test1: { $id: 'test1', $class: 'TestClass' }
         },
         $classes: [
-          { class: 'TestClass', lineage: ['TestClass'], schema: {} }
+          { $class: 'TestClass', $lineage: ['TestClass'], $schemas: [{}] }
         ],
         $classes_by_id: {
-          TestClass: { class: 'TestClass', lineage: ['TestClass'], schema: {} }
+          TestClass: { $class: 'TestClass', $lineage: ['TestClass'], $schemas: [{}] }
         }
       };
       
@@ -50,10 +50,10 @@ describe('Canonical Structure Validation', () => {
         $instances: [],
         $instances_by_id: {},
         $aspects: [
-          { aspect: 'test_aspect', schema: {} }
+          { $aspect: 'test_aspect', $schema: {} }
         ],
         $aspects_by_id: {
-          test_aspect: { aspect: 'test_aspect', schema: {} }
+          aspect_test_aspect: { $aspect: 'test_aspect', $schema: {} }
         }
       };
       
@@ -140,7 +140,7 @@ describe('Canonical Structure Validation', () => {
         $instances: [],
         $instances_by_id: {},
         $classes: [
-          { class: 'TestClass' } // missing lineage and schema
+          { $class: 'TestClass' } // missing $lineage and $schemas
         ]
       };
       
@@ -153,7 +153,7 @@ describe('Canonical Structure Validation', () => {
         $instances: [],
         $instances_by_id: {},
         $aspects: [
-          { aspect: 'test' } // missing schema
+          { $aspect: 'test' } // missing schema
         ]
       };
       

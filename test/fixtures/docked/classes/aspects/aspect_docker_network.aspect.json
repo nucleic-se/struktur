@@ -1,6 +1,6 @@
 {
-  "aspect": "aspect_docker_network",
-  "schema": {
+  "$aspect": "aspect_docker_network",
+  "$schema": {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "description": "Docker network configuration",
@@ -12,7 +12,7 @@
       }
     }
   },
-  "fields": {
+  "$fields": {
     "$aspects": {
       "aspect": {
         "kind": "docker_network",

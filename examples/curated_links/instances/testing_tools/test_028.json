@@ -1,6 +1,6 @@
 {
-  "id": "test_028",
-  "class": "tool_link",
+  "$id": "test_028",
+  "$class": "tool_link",
   "url": "https://github.com/typicode/json-server",
   "title": "json-server",
   "description": "Get a full fake REST API with zero coding",

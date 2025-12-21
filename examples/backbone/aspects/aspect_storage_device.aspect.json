@@ -1,6 +1,6 @@
 {
-  "aspect": "aspect_storage_device",
-  "schema": {
+  "$aspect": "aspect_storage_device",
+  "$schema": {
     "type": "object",
     "properties": {
       "storage": {

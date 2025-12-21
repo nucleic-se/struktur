@@ -9,7 +9,7 @@ This directory contains Handlebars templates that generate the complete Docker s
 #### `docker-compose.yml`
 **Generates**: Complete Docker Compose configuration for multi-container orchestration
 
-**Input**: Instances with `$aspects.docker_container`, `$aspects.docker_network`, or `$aspects.docker_volume`
+**Input**: Instances with `$aspects.aspect_docker_container`, `$aspects.aspect_docker_network`, or `$aspects.aspect_docker_volume`
 
 **Key Features**:
 - Service definitions with image, ports, volumes, environment variables
@@ -29,12 +29,12 @@ environment:
 **Template Logic**:
 ```handlebars
 {{#each $instances}}
-  {{#if $aspects.docker_container}}
-    {{id}}:
-      image: {{{$aspects.docker_container.image}}}
-      {{#if $aspects.docker_container.depends_on}}
+  {{#if $aspects.aspect_docker_container}}
+    {{$id}}:
+      image: {{{$aspects.aspect_docker_container.image}}}
+      {{#if $aspects.aspect_docker_container.depends_on}}
       depends_on:
-        {{#each $aspects.docker_container.depends_on}}
+        {{#each $aspects.aspect_docker_container.depends_on}}
         - {{this}}
         {{/each}}
       {{/if}}
@@ -202,8 +202,8 @@ Templates receive the full canonical data model:
 ```javascript
 {
   instances: [
-    { id: "postgres", class: "docked_container", aspects: {...}, ... },
-    { id: "redis", class: "docked_container", aspects: {...}, ... },
+    { $id: "postgres", $class: "docked_container", $aspects: {...}, ... },
+    { $id: "redis", $class: "docked_container", $aspects: {...}, ... },
     // ...
   ],
   relations: {
@@ -230,7 +230,7 @@ Templates receive the full canonical data model:
 **Custom filtering**:
 ```handlebars
 {{#each $instances}}
-  {{#if $aspects.docker_container}}
+  {{#if $aspects.aspect_docker_container}}
     # Only processes container instances
   {{/if}}
 {{/each}}
@@ -248,12 +248,12 @@ Templates receive the full canonical data model:
 
 ```handlebars
 ✅ CORRECT
-command: {{{$aspects.docker_container.command}}}
+command: {{{$aspects.aspect_docker_container.command}}}
 environment:
   {{@key}}: "{{{this}}}"
 
 ❌ WRONG - Gets HTML escaped
-command: {{$aspects.docker_container.command}}
+command: {{$aspects.aspect_docker_container.command}}
 # Result: sh -c &#x27;npm install&#x27; (BROKEN!)
 ```
 
@@ -268,10 +268,10 @@ command: {{$aspects.docker_container.command}}
 
 **2. Check before iterating:**
 ```handlebars
-{{#if $aspects.docker_container.volumes}}
-{{#if (gt $aspects.docker_container.volumes.length 0)}}
+{{#if $aspects.aspect_docker_container.volumes}}
+{{#if (gt $aspects.aspect_docker_container.volumes.length 0)}}
 volumes:
-{{#each $aspects.docker_container.volumes}}
+{{#each $aspects.aspect_docker_container.volumes}}
   - {{this}}
 {{/each}}
 {{/if}}
@@ -287,9 +287,9 @@ volumes:
 
 **4. Use conditionals for optional sections:**
 ```handlebars
-{{#if $aspects.docker_container.healthcheck}}
+{{#if $aspects.aspect_docker_container.healthcheck}}
 healthcheck:
-  test: {{$aspects.docker_container.healthcheck.test}}
+  test: {{$aspects.aspect_docker_container.healthcheck.test}}
 {{/if}}
 ```
 
@@ -298,17 +298,17 @@ healthcheck:
 ### Adding New Templates
 
 1. **Create template file**: `templates/my-artifact.ext`
-2. **Update global.json**: Add to `render` array
+2. **Update global.json**: Add to `$render` array
 3. **Build and verify**: Check `build/` directory
 
 Example:
 ```json
 // instances/global.json
 {
-  "render": [
-    "docker-compose.yml",
-    "frontend.html",
-    "my-artifact.ext"  // New template
+  "$render": [
+    { "template": "docker-compose.yml", "output": "/docker-compose.yml" },
+    { "template": "frontend.html", "output": "/frontend.html" },
+    { "template": "my-artifact.ext", "output": "/my-artifact.ext" }  // New template
   ]
 }
 ```
@@ -326,9 +326,9 @@ Templates can be layered (Docked extends Universal):
 ```handlebars
 #!/bin/bash
 {{#each $instances}}
-{{#if $aspects.docker_container.healthcheck}}
-echo "Checking {{id}}..."
-docker exec {{id}} {{$aspects.docker_container.healthcheck.test}}
+{{#if $aspects.aspect_docker_container.healthcheck}}
+echo "Checking {{$id}}..."
+docker exec {{$id}} {{$aspects.aspect_docker_container.healthcheck.test}}
 {{/if}}
 {{/each}}
 ```
@@ -337,10 +337,10 @@ docker exec {{id}} {{$aspects.docker_container.healthcheck.test}}
 ```handlebars
 scrape_configs:
   {{#each $instances}}
-  {{#if $aspects.docker_container.ports}}
-  - job_name: '{{id}}'
+  {{#if $aspects.aspect_docker_container.ports}}
+  - job_name: '{{$id}}'
     static_configs:
-      - targets: ['{{id}}:{{$aspects.docker_container.ports.[0]}}']
+      - targets: ['{{$id}}:{{$aspects.aspect_docker_container.ports.[0]}}']
   {{/if}}
   {{/each}}
 ```
@@ -356,7 +356,7 @@ scrape_configs:
 **Solution**: Wrap in `{{#if}}` conditionals
 
 **Problem**: Template not generating  
-**Solution**: Check `render` array in `instances/global.json`
+**Solution**: Check `$render` array in `instances/global.json`
 
 ### Debugging Tips
 

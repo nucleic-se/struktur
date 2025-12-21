@@ -20,7 +20,7 @@ export function inherits(context, className, targetClasses) {
   if (!classDef) return false;
   
   const targets = Array.isArray(targetClasses) ? targetClasses : [targetClasses];
-  const lineage = classDef.lineage || [className];
+  const lineage = classDef.$lineage || [className];
   
   return targets.every(target => lineage.includes(target));
 }
@@ -37,8 +37,8 @@ export function filterInherits(context, entries, targetClasses) {
   const targets = Array.isArray(targetClasses) ? targetClasses : [targetClasses];
   
   return array.filter(entry => {
-    if (!entry.class) return false;
-    return inherits(context, entry.class, targets);
+    if (!entry.$class) return false;
+    return inherits(context, entry.$class, targets);
   });
 }
 
@@ -55,5 +55,5 @@ export function classLineage(context, className) {
   const classDef = $classes_by_id[className];
   if (!classDef) return [];
   
-  return classDef.lineage || [className];
+  return classDef.$lineage || [className];
 }

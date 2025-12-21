@@ -1,8 +1,8 @@
 <footer>
   <div class="footer-links">
     {{#each @root.$instances}}
-    {{#if (eq class "page")}}
-    {{#if (or (eq $aspects.page.menu "footer") (eq $aspects.page.menu "both"))}}
+    {{#if (eq $class "page")}}
+    {{#if (or (eq $aspects.aspect_page.menu "footer") (eq $aspects.aspect_page.menu "both"))}}
     <a href="{{#if ../pathPrefix}}{{../pathPrefix}}{{/if}}{{slug}}.html">{{title}}</a>
     {{/if}}
     {{/if}}

@@ -98,16 +98,16 @@ describe('Class Field Deep Merging', async () => {
 
     // Base class with nested defaults
     await fs.writeFile(
-      path.join(testDir, 'base.schema.json'),
+      path.join(testDir, 'base.class.json'),
       JSON.stringify({
-        class: 'base',
-        schema: {
+        $class: 'base',
+        $schema: {
           type: 'object',
           properties: {
-            id: { type: 'string' }
+            $id: { type: 'string' }
           }
         },
-        fields: {
+        $fields: {
           config: {
             timeout: 30,
             retries: 3,
@@ -122,17 +122,17 @@ describe('Class Field Deep Merging', async () => {
 
     // Child class overrides some nested fields
     await fs.writeFile(
-      path.join(testDir, 'child.schema.json'),
+      path.join(testDir, 'child.class.json'),
       JSON.stringify({
-        class: 'child',
-        parent: 'base',
-        schema: {
+        $class: 'child',
+        $parent: 'base',
+        $schema: {
           type: 'object',
           properties: {
             name: { type: 'string' }
           }
         },
-        fields: {
+        $fields: {
           config: {
             timeout: 60,
             logging: {
@@ -145,14 +145,14 @@ describe('Class Field Deep Merging', async () => {
 
     // Grandchild class adds more nested config
     await fs.writeFile(
-      path.join(testDir, 'grandchild.schema.json'),
+      path.join(testDir, 'grandchild.class.json'),
       JSON.stringify({
-        class: 'grandchild',
-        parent: 'child',
-        schema: {
+        $class: 'grandchild',
+        $parent: 'child',
+        $schema: {
           type: 'object'
         },
-        fields: {
+        $fields: {
           config: {
             logging: {
               destination: '/var/log/app.log'
@@ -171,7 +171,7 @@ describe('Class Field Deep Merging', async () => {
     const resolved = resolver.resolve('grandchild');
 
     // Expected: deep merge of all three levels
-    assert.deepStrictEqual(resolved.fields, {
+    assert.deepStrictEqual(resolved.$fields, {
       config: {
         timeout: 60,        // From child (overrides base)
         retries: 3,         // From base (preserved)
@@ -187,12 +187,12 @@ describe('Class Field Deep Merging', async () => {
   it('should handle child without nested config', async () => {
     // Create a class that doesn't define nested config
     await fs.writeFile(
-      path.join(testDir, 'simple.schema.json'),
+      path.join(testDir, 'simple.class.json'),
       JSON.stringify({
-        class: 'simple',
-        parent: 'base',
-        schema: { type: 'object' },
-        fields: {
+        $class: 'simple',
+        $parent: 'base',
+        $schema: { type: 'object' },
+        $fields: {
           simple_field: 'value'
         }
       })
@@ -205,7 +205,7 @@ describe('Class Field Deep Merging', async () => {
     const resolved = resolver.resolve('simple');
 
     // Should preserve base's nested config
-    assert.deepStrictEqual(resolved.fields.config, {
+    assert.deepStrictEqual(resolved.$fields.config, {
       timeout: 30,
       retries: 3,
       logging: {
@@ -214,6 +214,6 @@ describe('Class Field Deep Merging', async () => {
       }
     });
     
-    assert.strictEqual(resolved.fields.simple_field, 'value');
+    assert.strictEqual(resolved.$fields.simple_field, 'value');
   });
 });

@@ -1,8 +1,8 @@
 {
-  "aspect": "page",
-  "content": "",
-  "menu": "header",
-  "schema": {
+  "$aspect": "aspect_page",
+  "$content": "",
+  "$menu": "header",
+  "$schema": {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
@@ -11,7 +11,12 @@
       },
       "menu": {
         "type": "string",
-        "enum": ["header", "footer", "both", "none"],
+        "enum": [
+          "header",
+          "footer",
+          "both",
+          "none"
+        ],
         "description": "Where to show this page link: header nav, footer, both, or none"
       }
     }

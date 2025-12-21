@@ -1,6 +1,6 @@
 {
-  "id": "test_020",
-  "class": "tool_link",
+  "$id": "test_020",
+  "$class": "tool_link",
   "title": "Lighthouse",
   "url": "https://github.com/GoogleChrome/lighthouse",
   "description": "Automated auditing, performance metrics, and best practices for web apps",

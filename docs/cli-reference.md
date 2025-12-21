@@ -194,11 +194,11 @@ struktur generate -c classes/ -i instances/ -o canonical.json
 ```json
 {
   "$instances": [...],           // Array of all instances
-  "$instances_by_id": {...},     // Map of id -> instance
+  "$instances_by_id": {...},     // Map of $id -> instance
   "$classes": [...],             // Array of class definitions
   "$classes_by_id": {...},       // Map of class name -> resolved class
   "$class_names": [...],         // List of class names
-  "$aspects": [...],             // Array of aspect definitions
+  "$aspects": [...],            // Array of aspect definitions
   "$aspects_by_id": {...},       // Map of aspect name -> definition
   "$aspect_names": [...],        // List of aspect names
   "$metadata": {
@@ -238,7 +238,7 @@ struktur info -c classes/
 struktur info -c classes/ -a aspects/
 
 # JSON format for scripting
-struktur info -c classes/ --json | jq '.classes[] | .class'
+struktur info -c classes/ --json | jq '."$classes"[] | ."$class"'
 ```
 
 **Behavior:**
@@ -314,6 +314,9 @@ Optional configuration file for build settings. Automatically discovered when bu
   "templates": ["./templates"],
   "build_dir": "./build",
   "template_engine": "handlebars",
+  "render": [
+    { "template": "index.html.hbs", "output": "/index.html" }
+  ],
   "exact": true,
   "allow_template_collisions": false,
   "warn_extra_fields": true,
@@ -329,6 +332,7 @@ Optional configuration file for build settings. Automatically discovered when bu
 - `templates` (string | string[]) - Template directories (relative to config file)
 - `build_dir` (string) - Build output directory (relative to config file)
 - `template_engine` (string) - Template engine: `handlebars` or `nunjucks` (default: `handlebars`)
+- `render` (array) - Config render tasks (config only, runs before instance `$render`)
 - `exact` (boolean) - Use exact build directory without hash suffix (default: false)
 - `allow_template_collisions` (boolean) - Allow template name conflicts (default: false)
 - `warn_extra_fields` (boolean) - Warn about fields not in schema (default: true)
@@ -433,7 +437,7 @@ struktur build mystack --exact --save-config mystack/struktur.build.json
 **`-i, --instances <dirs...>`**
 - Specifies instance file directories
 - Multiple directories supported
-- Instances with same `id` are merged (later overrides earlier)
+- Instances with same `$id` are merged (later overrides earlier)
 
 **`-t, --templates <dirs...>`**
 - Specifies template directories

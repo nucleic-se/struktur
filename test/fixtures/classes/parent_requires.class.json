@@ -1,0 +1,13 @@
+{
+  "$class": "parent_requires",
+  "$parent": "entity_base",
+  "$schema": {
+    "type": "object",
+    "properties": {}
+  },
+  "$aspects": {
+    "aspect_network_interface": {
+      "required": true
+    }
+  }
+}

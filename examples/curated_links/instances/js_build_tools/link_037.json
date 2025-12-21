@@ -1,6 +1,6 @@
 {
-  "id": "link_037",
-  "class": "tool_link",
+  "$id": "link_037",
+  "$class": "tool_link",
   "url": "https://biomejs.dev",
   "title": "Rome (now Biome)",
   "description": "Unified toolchain for JavaScript, TypeScript, JSON, HTML, Markdown, and CSS",
@@ -14,7 +14,7 @@
   "license": "MIT",
   "github_url": "https://github.com/rome/tools",
   "$aspects": {
-    "quality": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 4,

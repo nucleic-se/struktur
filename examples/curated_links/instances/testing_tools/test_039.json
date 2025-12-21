@@ -1,6 +1,6 @@
 {
-  "id": "test_039",
-  "class": "tool_link",
+  "$id": "test_039",
+  "$class": "tool_link",
   "url": "https://www.webpagetest.org",
   "title": "WebPageTest",
   "description": "Website performance and optimization test",

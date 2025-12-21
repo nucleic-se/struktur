@@ -1,6 +1,6 @@
 {
-  "id": "css_023",
-  "class": "tool_link",
+  "$id": "css_023",
+  "$class": "tool_link",
   "url": "https://daisyui.com",
   "title": "DaisyUI",
   "description": "Tailwind CSS component library with clean HTML and customizable themes",

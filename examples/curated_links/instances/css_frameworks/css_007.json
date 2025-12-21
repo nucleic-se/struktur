@@ -1,6 +1,6 @@
 {
-  "id": "css_007",
-  "class": "tool_link",
+  "$id": "css_007",
+  "$class": "tool_link",
   "url": "https://sass-lang.com",
   "title": "Sass",
   "description": "Most mature, stable CSS extension language with variables, nesting, and mixins",

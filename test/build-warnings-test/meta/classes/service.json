@@ -1,22 +1,22 @@
 {
-  "class": "service",
-  "lineage": [
+  "$class": "service",
+  "$lineage": [
     "entity_base",
     "service"
   ],
-  "schemas": [
+  "$schemas": [
     {
       "type": "object",
       "required": [
-        "id",
-        "class"
+        "$id",
+        "$class"
       ],
       "properties": {
-        "id": {
+        "$id": {
           "type": "string",
           "minLength": 1
         },
-        "class": {
+        "$class": {
           "type": "string"
         },
         "domains": {
@@ -45,20 +45,20 @@
       }
     }
   ],
-  "fields": {
+  "$fields": {
     "domains": [],
     "replicas": 1
   },
   "$aspects": {
-    "network_interface": {
+    "aspect_network_interface": {
       "required": true
     }
   },
   "$uses_aspects": [],
   "$aspect_defaults": {},
-  "pretty_name": "service",
-  "domains": [],
-  "parent": [
+  "$pretty_name": "service",
+  "$domains": [],
+  "$parent": [
     "entity_base"
   ]
 }

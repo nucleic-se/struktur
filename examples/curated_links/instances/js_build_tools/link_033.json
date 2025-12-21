@@ -1,6 +1,6 @@
 {
-  "id": "link_033",
-  "class": "tool_link",
+  "$id": "link_033",
+  "$class": "tool_link",
   "url": "https://typedoc.org",
   "title": "TypeDoc",
   "description": "Documentation generator for TypeScript projects",
@@ -15,7 +15,7 @@
   "license": "Apache-2.0",
   "github_url": "https://github.com/TypeStrong/typedoc",
   "$aspects": {
-    "quality": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 4,

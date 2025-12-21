@@ -20,7 +20,7 @@ provider "proxmox" {
 #
 {{#each $instances}}
 {{#if (and (eq class "proxmox_lxc") $aspects.terraform.enabled)}}
-resource "proxmox_lxc" "{{id}}" {
+resource "proxmox_lxc" "{{$id}}" {
     # From data model
     vmid = {{$aspects.proxmox_guest.vmid}}
     target_node = "{{$aspects.proxmox_guest.host_node}}"

@@ -1,6 +1,6 @@
 {
-  "id": "css_003",
-  "class": "tool_link",
+  "$id": "css_003",
+  "$class": "tool_link",
   "url": "https://get.foundation",
   "title": "Foundation",
   "description": "Advanced responsive front-end framework for professional websites and applications",

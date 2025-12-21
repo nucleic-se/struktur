@@ -1,6 +1,6 @@
 {
-  "aspect": "aspect_network_device",
-  "schema": {
+  "$aspect": "aspect_network_device",
+  "$schema": {
     "type": "object",
     "properties": {
       "vendor": {

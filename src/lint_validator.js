@@ -39,9 +39,9 @@ class LintValidator {
       warnings.push({
         level: 'warning',
         code: 'missing_description',
-        message: `Instance '${instance.id}' has no description`,
+        message: `Instance '${instance.$id}' has no description`,
         path: '/description',
-        instance: instance.id
+        instance: instance.$id
       });
     }
     
@@ -57,15 +57,15 @@ class LintValidator {
     if (!this.options.checkId) return [];
     
     const warnings = [];
-    const id = instance.id;
+    const id = instance.$id;
     
     if (id && !this.idPattern.test(id)) {
       warnings.push({
         level: 'warning',
         code: 'malformed_id',
         message: `ID '${id}' not in kebab-case format (lowercase, hyphen-separated)`,
-        path: '/id',
-        instance: instance.id
+        path: '/$id',
+        instance: instance.$id
       });
     }
     
@@ -89,7 +89,7 @@ class LintValidator {
           code: 'empty_array',
           message: `Field '${field}' is empty array (consider removing)`,
           path: `/${field}`,
-          instance: instance.id
+          instance: instance.$id
         });
       }
     }
@@ -114,7 +114,7 @@ class LintValidator {
         code: 'suspicious_value',
         message: `Port is 0 (likely unset or invalid)`,
         path: '/port',
-        instance: instance.id
+        instance: instance.$id
       });
     }
     
@@ -125,7 +125,7 @@ class LintValidator {
         code: 'suspicious_value',
         message: `Field 'name' is empty string`,
         path: '/name',
-        instance: instance.id
+        instance: instance.$id
       });
     }
     

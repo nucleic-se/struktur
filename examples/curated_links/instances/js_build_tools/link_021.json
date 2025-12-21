@@ -1,6 +1,6 @@
 {
-  "id": "link_021",
-  "class": "tool_link",
+  "$id": "link_021",
+  "$class": "tool_link",
   "url": "https://vitest.dev",
   "title": "Vitest",
   "description": "Blazing fast unit test framework powered by Vite",
@@ -15,7 +15,7 @@
   "license": "MIT",
   "github_url": "https://github.com/vitest-dev/vitest",
   "$aspects": {
-    "quality": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 4,

@@ -1,0 +1,51 @@
+{
+  "$class": "domain_media",
+  "$parent": "domain_root",
+  "$domains": [
+    "media"
+  ],
+  "$aspects": {
+    "aspect_domain": {
+      "name": "Media Services",
+      "description": "Media streaming and entertainment platforms"
+    }
+  },
+  "$schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "domains": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "$aspects": {
+        "type": "object",
+        "properties": {
+          "aspect_domain": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "description"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "required": [
+      "domains"
+    ],
+    "additionalProperties": true
+  }
+}

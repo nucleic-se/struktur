@@ -1,0 +1,18 @@
+{
+  "$class": "domain_services",
+  "$parent": "domain_root",
+  "$domains": [
+    "services"
+  ],
+  "$aspects": {
+    "aspect_domain": {
+      "name": "Service Infrastructure",
+      "description": "Applications and services running on the infrastructure"
+    }
+  },
+  "$schema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": true
+  }
+}

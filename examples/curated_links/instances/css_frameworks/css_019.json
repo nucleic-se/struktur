@@ -1,6 +1,6 @@
 {
-  "id": "css_019",
-  "class": "tool_link",
+  "$id": "css_019",
+  "$class": "tool_link",
   "url": "https://stylus-lang.com",
   "title": "Stylus",
   "description": "Expressive, dynamic, robust CSS preprocessor with Python-like syntax",

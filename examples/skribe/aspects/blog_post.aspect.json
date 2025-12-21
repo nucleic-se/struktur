@@ -1,13 +1,15 @@
 {
-  "aspect": "blog_post",
-  "date": "",
-  "content": "",
-  "author": "",
-  "tags": [],
-  "schema": {
+  "$aspect": "aspect_blog_post",
+  "$date": "",
+  "$content": "",
+  "$author": "",
+  "$tags": [],
+  "$schema": {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
-    "required": ["date"],
+    "required": [
+      "date"
+    ],
     "properties": {
       "date": {
         "type": "string",

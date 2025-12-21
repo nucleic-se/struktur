@@ -1,24 +1,26 @@
 {
-  "id": "hypervisor01",
+  "$id": "hypervisor01",
   "name": "Proxmox Hypervisor",
-  "class": "proxmox_node",
-  "domains": ["physical"],
+  "$class": "proxmox_node",
+  "domains": [
+    "physical"
+  ],
   "$aspects": {
-    "infrastructure": {
+    "aspect_infrastructure": {
       "notes": "Primary Proxmox VE host - Change host_node references in guests to match your Proxmox node name"
     },
-    "network_interface": {
+    "aspect_network_interface": {
       "hostname": "proxmox",
       "ip": "192.168.68.10",
       "mac": "AA:BB:CC:DD:EE:01",
       "nameserver": "192.168.68.1"
     },
-    "compute_node": {
+    "aspect_compute_node": {
       "cores": 8,
       "memory": 32768,
       "storage": "1TB"
     },
-    "terraform": {
+    "aspect_terraform": {
       "enabled": false
     }
   }

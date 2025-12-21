@@ -1,6 +1,6 @@
 {
-  "id": "link_025",
-  "class": "tool_link",
+  "$id": "link_025",
+  "$class": "tool_link",
   "url": "https://nx.dev",
   "title": "Nx",
   "description": "Smart, fast and extensible build system with first class monorepo support",
@@ -14,7 +14,7 @@
   "license": "MIT",
   "github_url": "https://github.com/nrwl/nx",
   "$aspects": {
-    "quality": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 4,

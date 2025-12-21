@@ -23,11 +23,11 @@ Aspects define:
 
 **Example:**
 ```json
-// aspects/monitoring.json
+// aspects/aspect_monitoring.aspect.json
 {
-  "aspect": "monitoring",
+  "$aspect": "aspect_monitoring",
   "description": "Monitoring configuration",
-  "schema": {
+  "$schema": {
     "type": "object",
     "properties": {
       "metrics_port": { "type": "integer" },
@@ -44,13 +44,13 @@ Aspects define:
 
 ### Required Fields
 
-- `aspect` — Unique aspect identifier
-- `schema` — JSON Schema for aspect data
+- `$aspect` — Unique aspect identifier
+- `$schema` — JSON Schema for aspect data
 
 ### Optional Fields
 
 - `description` — What the aspect provides
-- `defaults` — Default values for aspect fields (see [Aspect Defaults](#aspect-defaults))
+- `$defaults` — Default values for aspect fields (see [Aspect Defaults](#aspect-defaults))
 - Required/optional is declared on classes via `$aspects` (not inside aspect definitions)
 
 ---
@@ -76,8 +76,8 @@ Define defaults in the aspect file itself:
 ```json
 // aspects/aspect_proxmox_guest.aspect.json
 {
-  "aspect": "aspect_proxmox_guest",
-  "schema": {
+  "$aspect": "aspect_proxmox_guest",
+  "$schema": {
     "type": "object",
     "properties": {
       "host_node": { "type": "string" },
@@ -85,7 +85,7 @@ Define defaults in the aspect file itself:
       "unprivileged": { "type": "boolean" }
     }
   },
-  "defaults": {
+  "$defaults": {
     "host_node": "default-host",
     "start": true,
     "unprivileged": true
@@ -97,21 +97,21 @@ Define defaults in the aspect file itself:
 
 ### Layer 2: Class $aspect_defaults
 
-Override defaults for a specific class:
+Override defaults for a specific $class:
 
 ```json
-// classes/proxmox_lxc.schema.json
+// classes/proxmox_lxc.class.json
 {
-  "class": "proxmox_lxc",
-  "parent": "proxmox_guest",
-  "$uses_aspects": ["proxmox_guest"],
+  "$class": "proxmox_lxc",
+  "$parent": "proxmox_guest",
+  "$uses_aspects": ["aspect_proxmox_guest"],
   "$aspect_defaults": {
-    "proxmox_guest": {
+    "aspect_proxmox_guest": {
       "host_node": "polaris",
       "ostemplate": "local:vztmpl/debian-13-standard_13.1-2_amd64.tar.zst"
     }
   },
-  "schema": { ... }
+  "$schema": { ... }
 }
 ```
 
@@ -126,10 +126,10 @@ Override for specific instance:
 ```json
 // instances/backbone_web01.json
 {
-  "id": "backbone_web01",
-  "class": "proxmox_lxc",
+  "$id": "backbone_web01",
+  "$class": "proxmox_lxc",
   "$aspects": {
-    "proxmox_guest": {
+    "aspect_proxmox_guest": {
       "vmid": 400102  // Instance-specific value
       // host_node, ostemplate, start, unprivileged all inherited
     }
@@ -155,7 +155,7 @@ Override for specific instance:
 // ❌ Before: Repeat in every instance
 {
   "$aspects": {
-    "proxmox_guest": {
+    "aspect_proxmox_guest": {
       "host_node": "polaris",
       "ostemplate": "local:vztmpl/debian-13-standard_13.1-2_amd64.tar.zst",
       "start": true,
@@ -168,7 +168,7 @@ Override for specific instance:
 // ✅ After: Only declare what's unique
 {
   "$aspects": {
-    "proxmox_guest": {
+    "aspect_proxmox_guest": {
       "vmid": 400102  // Everything else inherited
     }
   }
@@ -194,30 +194,30 @@ Override for specific instance:
 **$uses_aspects** lists which aspects a class uses. Since v0.2.9, these accumulate automatically through inheritance:
 
 ```json
-// infrastructure_entity.schema.json
+// infrastructure_entity.class.json
 {
-  "class": "infrastructure_entity",
-  "$uses_aspects": ["infrastructure"]
+  "$class": "infrastructure_entity",
+  "$uses_aspects": ["aspect_infrastructure"]
 }
 
-// compute_node.schema.json (child)
+// compute_node.class.json (child)
 {
-  "class": "compute_node",
-  "parent": "infrastructure_entity",
-  "$uses_aspects": ["compute_node"]  // Only declares its own
+  "$class": "compute_node",
+  "$parent": "infrastructure_entity",
+  "$uses_aspects": ["aspect_compute_node"]  // Only declares its own
 }
 
-// proxmox_guest.schema.json (grandchild)
+// proxmox_guest.class.json (grandchild)
 {
-  "class": "proxmox_guest",
-  "parent": "compute_node",
-  "$uses_aspects": ["proxmox_guest", "network_interface"]
+  "$class": "proxmox_guest",
+  "$parent": "compute_node",
+  "$uses_aspects": ["aspect_proxmox_guest", "aspect_network_interface"]
 }
 ```
 
 **Accumulated result** for `proxmox_guest`:
 ```json
-["infrastructure", "compute_node", "proxmox_guest", "network_interface"]
+["aspect_infrastructure", "aspect_compute_node", "aspect_proxmox_guest", "aspect_network_interface"]
 ```
 
 **Benefits:**
@@ -236,19 +236,19 @@ Requirement is declared on the **class**, not the aspect definition:
 
 ```json
 {
-  "class": "server",
+  "$class": "server",
   "$aspects": {
-    "monitoring": { "required": false },
-    "security": { "required": true }
+    "aspect_monitoring": { "required": false },
+    "aspect_security": { "required": true }
   },
-  "schema": { ... }
+  "$schema": { ... }
 }
 ```
 
 **Notes:**
 - `required: true` enforces presence on instances of that class
 - `required: false` allows omission
-- Array shorthand (`"$aspects": ["monitoring"]`) is treated as optional
+- Array shorthand (`"$aspects": ["aspect_monitoring"]`) is treated as optional
 
 ---
 
@@ -260,15 +260,15 @@ Aspects live in the `$aspects` object:
 
 ```json
 {
-  "id": "web-01",
-  "class": "server",
+  "$id": "web-01",
+  "$class": "server",
   "hostname": "web-01.example.com",
   "$aspects": {
-    "monitoring": {
+    "aspect_monitoring": {
       "metrics_port": 9090,
       "health_endpoint": "/health"
     },
-    "backup": {
+    "aspect_backup": {
       "schedule": "0 2 * * *",
       "retention_days": 30
     }
@@ -280,15 +280,15 @@ Aspects live in the `$aspects` object:
 
 ### Multiple Aspects
 
-Instances can have any number of aspects:
+Instances can have any number of $aspects:
 
 ```json
 {
-  "id": "db-prod",
-  "class": "database",
+  "$id": "db-prod",
+  "$class": "database",
   "$aspects": {
-    "monitoring": { ... },
-    "backup": { ... },
+    "aspect_monitoring": { ... },
+    "aspect_backup": { ... },
     "encryption": { ... },
     "replication": { ... }
   }
@@ -320,7 +320,7 @@ Each aspect validates independently:
 
 **Validation error:**
 ```
-Error: Instance "web-01" aspect "monitoring"
+Error: Instance "web-01" aspect "aspect_monitoring"
   Missing required property: metrics_port
 ```
 
@@ -331,7 +331,7 @@ Supports all JSON Schema features:
 **Required fields:**
 ```json
 {
-  "schema": {
+  "$schema": {
     "type": "object",
     "required": ["port", "endpoint"]
   }
@@ -341,7 +341,7 @@ Supports all JSON Schema features:
 **Nested objects:**
 ```json
 {
-  "schema": {
+  "$schema": {
     "type": "object",
     "properties": {
       "database": {
@@ -359,7 +359,7 @@ Supports all JSON Schema features:
 **Arrays:**
 ```json
 {
-  "schema": {
+  "$schema": {
     "type": "object",
     "properties": {
       "alerts": {
@@ -378,10 +378,10 @@ Supports all JSON Schema features:
 ### Check Aspect Presence
 
 ```handlebars
-{{#if $aspects.monitoring}}
-  <div class="monitoring">
-    Port: {{$aspects.monitoring.metrics_port}}
-    Health: {{$aspects.monitoring.health_endpoint}}
+{{#if $aspects.aspect_monitoring}}
+  <div class="aspect_monitoring">
+    Port: {{$aspects.aspect_monitoring.metrics_port}}
+    Health: {{$aspects.aspect_monitoring.health_endpoint}}
   </div>
 {{/if}}
 ```
@@ -392,8 +392,8 @@ Supports all JSON Schema features:
 {{!-- Show all $instances with monitoring --}}
 <h2>Monitored Services</h2>
 {{#each $instances}}
-  {{#if $aspects.monitoring}}
-    <li>{{name}} - :{{$aspects.monitoring.metrics_port}}</li>
+  {{#if $aspects.aspect_monitoring}}
+    <li>{{name}} - :{{$aspects.aspect_monitoring.metrics_port}}</li>
   {{/if}}
 {{/each}}
 ```
@@ -457,7 +457,7 @@ Good: server + monitoring aspect + backup aspect
 }
 
 // Good
-"class": "database"
+"$class": "database"
 ```
 
 **2. Single-Use Fields**
@@ -478,7 +478,7 @@ Good: server + monitoring aspect + backup aspect
 // Bad - use domain field
 "$aspects": {
   "hierarchy": {
-    "parent": "production"
+    "$parent": "production"
   }
 }
 
@@ -495,8 +495,8 @@ Good: server + monitoring aspect + backup aspect
 **Port Mapping Aspect:**
 ```json
 {
-  "aspect": "ports",
-  "schema": {
+  "$aspect": "aspect_ports",
+  "$schema": {
     "type": "object",
     "properties": {
       "mappings": {
@@ -517,10 +517,10 @@ Good: server + monitoring aspect + backup aspect
 **Usage:**
 ```json
 {
-  "id": "nginx",
-  "class": "container",
+  "$id": "nginx",
+  "$class": "container",
   "$aspects": {
-    "ports": {
+    "aspect_ports": {
       "mappings": [
         { "container": 80, "host": 8080 },
         { "container": 443, "host": 8443 }
@@ -533,7 +533,7 @@ Good: server + monitoring aspect + backup aspect
 **Template:**
 ```handlebars
 services:
-  {{id}}:
+  {{$id}}:
     image: {{image}}
     {{#if $aspects.ports}}
     ports:
@@ -548,8 +548,8 @@ services:
 **Monitoring Aspect:**
 ```json
 {
-  "aspect": "monitoring",
-  "schema": {
+  "$aspect": "aspect_monitoring",
+  "$schema": {
     "type": "object",
     "properties": {
       "prometheus": {
@@ -573,10 +573,10 @@ services:
 ```json
 // web-01.json
 {
-  "id": "web-01",
-  "class": "server",
+  "$id": "web-01",
+  "$class": "server",
   "$aspects": {
-    "monitoring": {
+    "aspect_monitoring": {
       "prometheus": {
         "enabled": true,
         "port": 9090,
@@ -589,10 +589,10 @@ services:
 
 // db-01.json (different monitoring config)
 {
-  "id": "db-01",
-  "class": "database",
+  "$id": "db-01",
+  "$class": "database",
   "$aspects": {
-    "monitoring": {
+    "aspect_monitoring": {
       "prometheus": {
         "enabled": true,
         "port": 9187,
@@ -610,16 +610,16 @@ services:
 
 ### Pattern 1: Feature Bundles
 
-Group related aspects:
+Group related $aspects:
 
 ```json
 // Production instance
 {
-  "id": "api-prod",
-  "class": "service",
+  "$id": "api-prod",
+  "$class": "service",
   "$aspects": {
-    "monitoring": { ... },
-    "backup": { ... },
+    "aspect_monitoring": { ... },
+    "aspect_backup": { ... },
     "security": { ... },
     "compliance": { ... }
   }
@@ -627,10 +627,10 @@ Group related aspects:
 
 // Development instance (fewer aspects)
 {
-  "id": "api-dev",
-  "class": "service",
+  "$id": "api-dev",
+  "$class": "service",
   "$aspects": {
-    "monitoring": { ... }
+    "aspect_monitoring": { ... }
   }
 }
 ```
@@ -656,11 +656,11 @@ Group related aspects:
 {{!-- Generate monitoring config for all monitored $instances --}}
 scrape_configs:
 {{#each $instances}}
-  {{#if $aspects.monitoring}}
-  - job_name: {{id}}
+  {{#if $aspects.aspect_monitoring}}
+  - job_name: {{$id}}
     static_configs:
-      - targets: ['{{hostname}}:{{$aspects.monitoring.metrics_port}}']
-    metrics_path: {{default $aspects.monitoring.path "/metrics"}}
+      - targets: ['{{hostname}}:{{$aspects.aspect_monitoring.metrics_port}}']
+    metrics_path: {{default $aspects.aspect_monitoring.path "/metrics"}}
   {{/if}}
 {{/each}}
 ```
@@ -682,8 +682,8 @@ scrape_configs:
 **3. Sensible Defaults**
 ```json
 {
-  "aspect": "logging",
-  "defaults": {
+  "$aspect": "aspect_logging",
+  "$defaults": {
     "level": "info",
     "format": "json"
   }
@@ -695,7 +695,7 @@ scrape_configs:
 **1. Required vs Optional Fields**
 ```json
 {
-  "schema": {
+  "$schema": {
     "required": ["port"],  // Must have
     "properties": {
       "port": { "type": "integer" },
@@ -708,7 +708,7 @@ scrape_configs:
 **2. Validation Constraints**
 ```json
 {
-  "schema": {
+  "$schema": {
     "properties": {
       "port": {
         "type": "integer",
@@ -729,13 +729,13 @@ scrape_configs:
 **1. Document Aspects**
 ```json
 {
-  "id": "web-01",
-  "class": "server",
+  "$id": "web-01",
+  "$class": "server",
   "name": "Web Server 01",
   "description": "Production web server with monitoring and backup",
   "$aspects": {
-    "monitoring": { ... },
-    "backup": { ... }
+    "aspect_monitoring": { ... },
+    "aspect_backup": { ... }
   }
 }
 ```
@@ -780,12 +780,12 @@ Use both for maximum flexibility:
 
 ```json
 {
-  "id": "web-prod-01",
-  "class": "web_server",      // Inheritance
-  "parent": "server",          // IS-A server
+  "$id": "web-prod-01",
+  "$class": "web_server",      // Inheritance
+  "$parent": "server",          // IS-A server
   "$aspects": {                 // Composition
-    "monitoring": { ... },     // HAS monitoring
-    "backup": { ... },         // HAS backup
+    "aspect_monitoring": { ... },     // HAS monitoring
+    "aspect_backup": { ... },         // HAS backup
     "ssl": { ... }             // HAS SSL
   }
 }
@@ -799,7 +799,7 @@ Use both for maximum flexibility:
 
 ```
 Error: Instance "server-01" missing required aspect "security"
-Applies to class: server
+Applies to $class: server
 ```
 
 **Fix:** Add the aspect:
@@ -816,7 +816,7 @@ Applies to class: server
 ### Aspect Validation Failure
 
 ```
-Error: Instance "web-01" aspect "monitoring"
+Error: Instance "web-01" aspect "aspect_monitoring"
   Property "metrics_port" is required
 ```
 
@@ -824,7 +824,7 @@ Error: Instance "web-01" aspect "monitoring"
 ```json
 {
   "$aspects": {
-    "monitoring": {
+    "aspect_monitoring": {
       "metrics_port": 9090
     }
   }

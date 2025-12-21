@@ -1,6 +1,6 @@
 {
-  "id": "link_023",
-  "class": "tool_link",
+  "$id": "link_023",
+  "$class": "tool_link",
   "url": "https://playwright.dev",
   "title": "Playwright",
   "description": "Cross-browser automation library for end-to-end testing",
@@ -15,7 +15,7 @@
   "license": "Apache-2.0",
   "github_url": "https://github.com/microsoft/playwright",
   "$aspects": {
-    "quality": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 5,

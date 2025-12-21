@@ -1,6 +1,6 @@
 {
-  "id": "css_011",
-  "class": "tool_link",
+  "$id": "css_011",
+  "$class": "tool_link",
   "url": "https://chakra-ui.com",
   "title": "Chakra UI",
   "description": "Simple, modular and accessible component library for React",

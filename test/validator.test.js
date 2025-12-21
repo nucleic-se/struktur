@@ -12,13 +12,13 @@ describe('MultiPassValidator', () => {
   describe('registerClass', () => {
     it('should register a class with valid schema', () => {
       const resolvedClass = {
-        class: 'test_class',
-        lineage: ['base', 'test_class'],
-        schemas: [
-          { type: 'object', properties: { id: { type: 'string' } } },
+        $class: 'test_class',
+        $lineage: ['base', 'test_class'],
+        $schemas: [
+          { type: 'object', properties: { $id: { type: 'string' } } },
           { type: 'object', properties: { name: { type: 'string' } } }
         ],
-        fields: {},
+        $fields: {},
         $aspects: {}
       };
 
@@ -32,10 +32,10 @@ describe('MultiPassValidator', () => {
 
     it('should not recompile validators for already registered classes', () => {
       const resolvedClass = {
-        class: 'test_class',
-        lineage: ['test_class'],
-        schemas: [{ type: 'object', properties: { id: { type: 'string' } } }],
-        fields: {},
+        $class: 'test_class',
+        $lineage: ['test_class'],
+        $schemas: [{ type: 'object', properties: { $id: { type: 'string' } } }],
+        $fields: {},
         $aspects: {}
       };
 
@@ -52,18 +52,18 @@ describe('MultiPassValidator', () => {
 
     it('should handle schemas with complex validation rules', () => {
       const resolvedClass = {
-        class: 'complex_class',
-        lineage: ['complex_class'],
-        schemas: [{
+        $class: 'complex_class',
+        $lineage: ['complex_class'],
+        $schemas: [{
           type: 'object',
           properties: {
-            id: { type: 'string', pattern: '^[a-z0-9_-]+$' },
+            $id: { type: 'string', pattern: '^[a-z0-9_-]+$' },
             count: { type: 'number', minimum: 0, maximum: 100 },
             tags: { type: 'array', items: { type: 'string' }, minItems: 1 }
           },
-          required: ['id', 'count']
+          required: ['$id', 'count']
         }],
-        fields: {},
+        $fields: {},
         $aspects: {}
       };
 
@@ -76,8 +76,8 @@ describe('MultiPassValidator', () => {
   describe('registerAspect', () => {
     it('should register an aspect with valid schema', () => {
       const aspectDef = {
-        aspect: 'test_aspect',
-        schema: {
+        $aspect: 'aspect_test',
+        $schema: {
           type: 'object',
           properties: {
             value: { type: 'string' }
@@ -88,32 +88,32 @@ describe('MultiPassValidator', () => {
 
       validator.registerAspect(aspectDef);
 
-      assert.ok(validator.aspectValidators.has('test_aspect'));
+      assert.ok(validator.aspectValidators.has('aspect_test'));
       assert.strictEqual(validator.aspectValidators.size, 1);
     });
 
     it('should not recompile validators for already registered aspects', () => {
       const aspectDef = {
-        aspect: 'test_aspect',
-        schema: {
+        $aspect: 'aspect_test',
+        $schema: {
           type: 'object',
           properties: { value: { type: 'string' } }
         }
       };
 
       validator.registerAspect(aspectDef);
-      const firstValidator = validator.aspectValidators.get('test_aspect');
+      const firstValidator = validator.aspectValidators.get('aspect_test');
 
       validator.registerAspect(aspectDef);
-      const secondValidator = validator.aspectValidators.get('test_aspect');
+      const secondValidator = validator.aspectValidators.get('aspect_test');
 
       assert.strictEqual(firstValidator, secondValidator);
     });
 
     it('should handle aspects with nested schemas', () => {
       const aspectDef = {
-        aspect: 'nested_aspect',
-        schema: {
+        $aspect: 'aspect_nested',
+        $schema: {
           type: 'object',
           properties: {
             config: {
@@ -131,32 +131,32 @@ describe('MultiPassValidator', () => {
 
       validator.registerAspect(aspectDef);
 
-      assert.ok(validator.aspectValidators.has('nested_aspect'));
+      assert.ok(validator.aspectValidators.has('aspect_nested'));
     });
   });
 
   describe('validate', () => {
     it('should validate a valid instance against simple schema', () => {
       const resolvedClass = {
-        class: 'simple',
-        lineage: ['simple'],
-        schemas: [{
+        $class: 'simple',
+        $lineage: ['simple'],
+        $schemas: [{
           type: 'object',
           properties: {
-            id: { type: 'string' },
+            $id: { type: 'string' },
             name: { type: 'string' }
           },
-          required: ['id']
+          required: ['$id']
         }],
-        fields: {},
+        $fields: {},
         $aspects: {}
       };
 
       validator.registerClass(resolvedClass);
 
       const instance = {
-        id: 'test-1',
-        class: 'simple',
+        $id: 'test-1',
+        $class: 'simple',
         name: 'Test Instance'
       };
 
@@ -168,25 +168,25 @@ describe('MultiPassValidator', () => {
 
     it('should detect missing required properties', () => {
       const resolvedClass = {
-        class: 'simple',
-        lineage: ['simple'],
-        schemas: [{
+        $class: 'simple',
+        $lineage: ['simple'],
+        $schemas: [{
           type: 'object',
           properties: {
-            id: { type: 'string' },
+            $id: { type: 'string' },
             name: { type: 'string' }
           },
-          required: ['id', 'name']
+          required: ['$id', 'name']
         }],
-        fields: {},
+        $fields: {},
         $aspects: {}
       };
 
       validator.registerClass(resolvedClass);
 
       const instance = {
-        id: 'test-1',
-        class: 'simple'
+        $id: 'test-1',
+        $class: 'simple'
         // missing name
       };
 
@@ -203,24 +203,24 @@ describe('MultiPassValidator', () => {
 
     it('should detect wrong property types', () => {
       const resolvedClass = {
-        class: 'typed',
-        lineage: ['typed'],
-        schemas: [{
+        $class: 'typed',
+        $lineage: ['typed'],
+        $schemas: [{
           type: 'object',
           properties: {
-            id: { type: 'string' },
+            $id: { type: 'string' },
             count: { type: 'number' }
           }
         }],
-        fields: {},
+        $fields: {},
         $aspects: {}
       };
 
       validator.registerClass(resolvedClass);
 
       const instance = {
-        id: 'test-1',
-        class: 'typed',
+        $id: 'test-1',
+        $class: 'typed',
         count: 'not-a-number'
       };
 
@@ -232,13 +232,13 @@ describe('MultiPassValidator', () => {
 
     it('should validate through entire lineage chain', () => {
       const resolvedClass = {
-        class: 'child',
-        lineage: ['parent', 'child'],
-        schemas: [
+        $class: 'child',
+        $lineage: ['parent', 'child'],
+        $schemas: [
           {
             type: 'object',
-            properties: { id: { type: 'string' } },
-            required: ['id']
+            properties: { $id: { type: 'string' } },
+            required: ['$id']
           },
           {
             type: 'object',
@@ -246,7 +246,7 @@ describe('MultiPassValidator', () => {
             required: ['name']
           }
         ],
-        fields: {},
+        $fields: {},
         $aspects: {}
       };
 
@@ -254,8 +254,8 @@ describe('MultiPassValidator', () => {
 
       // Valid against both schemas
       const validInstance = {
-        id: 'test-1',
-        class: 'child',
+        $id: 'test-1',
+        $class: 'child',
         name: 'Test'
       };
 
@@ -264,7 +264,7 @@ describe('MultiPassValidator', () => {
 
       // Invalid - missing property required by parent
       const invalidInstance = {
-        class: 'child',
+        $class: 'child',
         name: 'Test'
         // missing id required by parent
       };
@@ -276,19 +276,19 @@ describe('MultiPassValidator', () => {
 
     it('should validate aspect data when present', () => {
       const resolvedClass = {
-        class: 'with_aspect',
-        lineage: ['with_aspect'],
-        schemas: [{
+        $class: 'with_aspect',
+        $lineage: ['with_aspect'],
+        $schemas: [{
           type: 'object',
-          properties: { id: { type: 'string' } }
+          properties: { $id: { type: 'string' } }
         }],
-        fields: {},
-        $aspects: { test_aspect: { required: false } }
+        $fields: {},
+        $aspects: { aspect_test: { required: false } }
       };
 
       const aspectDef = {
-        aspect: 'test_aspect',
-        schema: {
+        $aspect: 'aspect_test',
+        $schema: {
           type: 'object',
           properties: {
             value: { type: 'string' }
@@ -301,10 +301,10 @@ describe('MultiPassValidator', () => {
       validator.registerAspect(aspectDef);
 
       const instance = {
-        id: 'test-1',
-        class: 'with_aspect',
+        $id: 'test-1',
+        $class: 'with_aspect',
         $aspects: {
-          test_aspect: {
+          aspect_test: {
             value: 'test-value'
           }
         }
@@ -316,19 +316,19 @@ describe('MultiPassValidator', () => {
 
     it('should detect invalid aspect data', () => {
       const resolvedClass = {
-        class: 'with_aspect',
-        lineage: ['with_aspect'],
-        schemas: [{
+        $class: 'with_aspect',
+        $lineage: ['with_aspect'],
+        $schemas: [{
           type: 'object',
-          properties: { id: { type: 'string' } }
+          properties: { $id: { type: 'string' } }
         }],
-        fields: {},
-        $aspects: { test_aspect: { required: false } }
+        $fields: {},
+        $aspects: { aspect_test: { required: false } }
       };
 
       const aspectDef = {
-        aspect: 'test_aspect',
-        schema: {
+        $aspect: 'aspect_test',
+        $schema: {
           type: 'object',
           properties: {
             value: { type: 'string' }
@@ -341,10 +341,10 @@ describe('MultiPassValidator', () => {
       validator.registerAspect(aspectDef);
 
       const instance = {
-        id: 'test-1',
-        class: 'with_aspect',
+        $id: 'test-1',
+        $class: 'with_aspect',
         $aspects: {
-          test_aspect: {
+          aspect_test: {
             // missing required value
           }
         }
@@ -352,24 +352,24 @@ describe('MultiPassValidator', () => {
 
       const result = validator.validate(instance, resolvedClass);
       assert.strictEqual(result.valid, false);
-      assert.ok(result.errors.some(e => e.layer === 'aspect:test_aspect'));
+      assert.ok(result.errors.some(e => e.layer === 'aspect:aspect_test'));
     });
 
     it('should skip validation for optional aspects not provided', () => {
       const resolvedClass = {
-        class: 'with_optional_aspect',
-        lineage: ['with_optional_aspect'],
-        schemas: [{
+        $class: 'with_aspect_optional',
+        $lineage: ['with_aspect_optional'],
+        $schemas: [{
           type: 'object',
-          properties: { id: { type: 'string' } }
+          properties: { $id: { type: 'string' } }
         }],
-        fields: {},
-        $aspects: { optional_aspect: { required: false } }
+        $fields: {},
+        $aspects: { aspect_optional: { required: false } }
       };
 
       const aspectDef = {
-        aspect: 'optional_aspect',
-        schema: {
+        $aspect: 'aspect_optional',
+        $schema: {
           type: 'object',
           properties: { value: { type: 'string' } },
           required: ['value']
@@ -380,8 +380,8 @@ describe('MultiPassValidator', () => {
       validator.registerAspect(aspectDef);
 
       const instance = {
-        id: 'test-1',
-        class: 'with_optional_aspect'
+        $id: 'test-1',
+        $class: 'with_aspect_optional'
         // no aspects provided
       };
 
@@ -391,15 +391,15 @@ describe('MultiPassValidator', () => {
 
     it('should handle missing validator gracefully', () => {
       const resolvedClass = {
-        class: 'unregistered',
-        lineage: ['unregistered'],
-        schemas: [{ type: 'object' }],
-        fields: {},
+        $class: 'unregistered',
+        $lineage: ['unregistered'],
+        $schemas: [{ type: 'object' }],
+        $fields: {},
         $aspects: {}
       };
 
       // Don't register the class
-      const instance = { id: 'test', class: 'test' };
+      const instance = { $id: 'test', $class: 'test' };
 
       const result = validator.validate(instance, resolvedClass);
 
@@ -411,21 +411,21 @@ describe('MultiPassValidator', () => {
 
     it('should handle missing aspect validator gracefully', () => {
       const resolvedClass = {
-        class: 'test',
-        lineage: ['test'],
-        schemas: [{ type: 'object', properties: { id: { type: 'string' } } }],
-        fields: {},
-        $aspects: { unregistered_aspect: { required: false } }
+        $class: 'test',
+        $lineage: ['test'],
+        $schemas: [{ type: 'object', properties: { $id: { type: 'string' } } }],
+        $fields: {},
+        $aspects: { aspect_unregistered: { required: false } }
       };
 
       validator.registerClass(resolvedClass);
       // Don't register the aspect
 
       const instance = {
-        id: 'test',
-        class: 'test',
+        $id: 'test',
+        $class: 'test',
         $aspects: {
-          unregistered_aspect: { value: 'something' }
+          aspect_unregistered: { value: 'something' }
         }
       };
 
@@ -433,7 +433,7 @@ describe('MultiPassValidator', () => {
 
       assert.strictEqual(result.valid, false);
       assert.ok(result.errors.some(e =>
-        e.code === 'no_validator' && e.layer === 'aspect:unregistered_aspect'
+        e.code === 'no_validator' && e.layer === 'aspect:aspect_unregistered'
       ));
     });
   });
@@ -441,26 +441,26 @@ describe('MultiPassValidator', () => {
   describe('validateBatch', () => {
     it('should validate multiple instances', () => {
       const resolvedClass = {
-        class: 'test',
-        lineage: ['test'],
-        schemas: [{
+        $class: 'test',
+        $lineage: ['test'],
+        $schemas: [{
           type: 'object',
           properties: {
-            id: { type: 'string' },
+            $id: { type: 'string' },
             name: { type: 'string' }
           },
-          required: ['id']
+          required: ['$id']
         }],
-        fields: {},
+        $fields: {},
         $aspects: {}
       };
 
       validator.registerClass(resolvedClass);
 
       const instances = [
-        { id: 'test-1', class: 'test', name: 'First' },
-        { id: 'test-2', class: 'test', name: 'Second' },
-        { id: 'test-3', class: 'test', name: 'Third' }
+        { $id: 'test-1', $class: 'test', name: 'First' },
+        { $id: 'test-2', $class: 'test', name: 'Second' },
+        { $id: 'test-3', $class: 'test', name: 'Third' }
       ];
 
       const getResolvedClass = (_className) => resolvedClass;
@@ -474,26 +474,26 @@ describe('MultiPassValidator', () => {
 
     it('should detect errors in batch validation', () => {
       const resolvedClass = {
-        class: 'test',
-        lineage: ['test'],
-        schemas: [{
+        $class: 'test',
+        $lineage: ['test'],
+        $schemas: [{
           type: 'object',
           properties: {
-            id: { type: 'string' },
+            $id: { type: 'string' },
             count: { type: 'number' }
           },
-          required: ['id', 'count']
+          required: ['$id', 'count']
         }],
-        fields: {},
+        $fields: {},
         $aspects: {}
       };
 
       validator.registerClass(resolvedClass);
 
       const instances = [
-        { id: 'test-1', class: 'test', count: 10 },       // valid
-        { id: 'test-2', class: 'test' },                   // missing count
-        { id: 'test-3', class: 'test', count: 'invalid' }  // wrong type
+        { $id: 'test-1', $class: 'test', count: 10 },       // valid
+        { $id: 'test-2', $class: 'test' },                   // missing count
+        { $id: 'test-3', $class: 'test', count: 'invalid' }  // wrong type
       ];
 
       const getResolvedClass = (_className) => resolvedClass;
@@ -507,23 +507,23 @@ describe('MultiPassValidator', () => {
 
     it('should continue validation after errors', () => {
       const resolvedClass = {
-        class: 'test',
-        lineage: ['test'],
-        schemas: [{
+        $class: 'test',
+        $lineage: ['test'],
+        $schemas: [{
           type: 'object',
-          properties: { id: { type: 'string' } },
-          required: ['id']
+          properties: { $id: { type: 'string' } },
+          required: ['$id']
         }],
-        fields: {},
+        $fields: {},
         $aspects: {}
       };
 
       validator.registerClass(resolvedClass);
 
       const instances = [
-        { class: 'test' },              // missing id
-        { id: 'test-2', class: 'test' }, // valid
-        { class: 'test' }                // missing id
+        { $class: 'test' },              // missing id
+        { $id: 'test-2', $class: 'test' }, // valid
+        { $class: 'test' }                // missing id
       ];
 
       const getResolvedClass = (_className) => resolvedClass;
@@ -539,9 +539,9 @@ describe('MultiPassValidator', () => {
   describe('error formatting', () => {
     it('should format schema errors with layer and path', () => {
       const resolvedClass = {
-        class: 'test',
-        lineage: ['test'],
-        schemas: [{
+        $class: 'test',
+        $lineage: ['test'],
+        $schemas: [{
           type: 'object',
           properties: {
             nested: {
@@ -554,15 +554,15 @@ describe('MultiPassValidator', () => {
           },
           required: ['nested']
         }],
-        fields: {},
+        $fields: {},
         $aspects: {}
       };
 
       validator.registerClass(resolvedClass);
 
       const instance = {
-        id: 'test',
-        class: 'test',
+        $id: 'test',
+        $class: 'test',
         nested: {
           // missing value
         }
@@ -582,16 +582,16 @@ describe('MultiPassValidator', () => {
 
     it('should format aspect errors with aspect context', () => {
       const resolvedClass = {
-        class: 'test',
-        lineage: ['test'],
-        schemas: [{ type: 'object', properties: { id: { type: 'string' } } }],
-        fields: {},
-        $aspects: { test_aspect: { required: false } }
+        $class: 'test',
+        $lineage: ['test'],
+        $schemas: [{ type: 'object', properties: { $id: { type: 'string' } } }],
+        $fields: {},
+        $aspects: { aspect_test: { required: false } }
       };
 
       const aspectDef = {
-        aspect: 'test_aspect',
-        schema: {
+        $aspect: 'aspect_test',
+        $schema: {
           type: 'object',
           properties: {
             config: {
@@ -610,10 +610,10 @@ describe('MultiPassValidator', () => {
       validator.registerAspect(aspectDef);
 
       const instance = {
-        id: 'test',
-        class: 'test',
+        $id: 'test',
+        $class: 'test',
         $aspects: {
-          test_aspect: {
+          aspect_test: {
             config: {
               // missing host
             }
@@ -627,30 +627,30 @@ describe('MultiPassValidator', () => {
       const error = result.errors[0];
       assert.strictEqual(error.level, 'error');
       assert.strictEqual(error.code, 'aspect_validation');
-      assert.strictEqual(error.layer, 'aspect:test_aspect');
-      assert.strictEqual(error.aspect, 'test_aspect');
+      assert.strictEqual(error.layer, 'aspect:aspect_test');
+      assert.strictEqual(error.aspect, 'aspect_test');
       assert.ok(error.path);
-      assert.ok(error.message.includes('test_aspect'));
+      assert.ok(error.message.includes('aspect_test'));
     });
 
     it('should include instance id in error messages', () => {
       const resolvedClass = {
-        class: 'test',
-        lineage: ['test'],
-        schemas: [{
+        $class: 'test',
+        $lineage: ['test'],
+        $schemas: [{
           type: 'object',
           properties: { value: { type: 'number' } },
           required: ['value']
         }],
-        fields: {},
+        $fields: {},
         $aspects: {}
       };
 
       validator.registerClass(resolvedClass);
 
       const instance = {
-        id: 'my-instance-123',
-        class: 'test'
+        $id: 'my-instance-123',
+        $class: 'test'
         // missing value
       };
 
@@ -665,14 +665,14 @@ describe('MultiPassValidator', () => {
   describe('edge cases', () => {
     it('should handle empty lineage', () => {
       const resolvedClass = {
-        class: 'test',
-        lineage: [],
-        schemas: [],
-        fields: {},
+        $class: 'test',
+        $lineage: [],
+        $schemas: [],
+        $fields: {},
         $aspects: {}
       };
 
-      const instance = { id: 'test', class: 'test' };
+      const instance = { $id: 'test', $class: 'test' };
       const result = validator.validate(instance, resolvedClass);
 
       assert.strictEqual(result.valid, true);
@@ -681,16 +681,16 @@ describe('MultiPassValidator', () => {
 
     it('should handle empty aspects array', () => {
       const resolvedClass = {
-        class: 'test',
-        lineage: ['test'],
-        schemas: [{ type: 'object' }],
-        fields: {},
+        $class: 'test',
+        $lineage: ['test'],
+        $schemas: [{ type: 'object' }],
+        $fields: {},
         $aspects: {}
       };
 
       validator.registerClass(resolvedClass);
 
-      const instance = { id: 'test', class: 'test' };
+      const instance = { $id: 'test', $class: 'test' };
       const result = validator.validate(instance, resolvedClass);
 
       assert.strictEqual(result.valid, true);
@@ -698,19 +698,19 @@ describe('MultiPassValidator', () => {
 
     it('should handle object format aspects', () => {
       const resolvedClass = {
-        class: 'test',
-        lineage: ['test'],
-        schemas: [{ type: 'object', properties: { id: { type: 'string' } } }],
-        fields: {},
+        $class: 'test',
+        $lineage: ['test'],
+        $schemas: [{ type: 'object', properties: { $id: { type: 'string' } } }],
+        $fields: {},
         $aspects: {
-          required_aspect: { required: true },
-          optional_aspect: { required: false }
+          aspect_required: { required: true },
+          aspect_optional: { required: false }
         }
       };
 
       const aspectDef = {
-        aspect: 'required_aspect',
-        schema: {
+        $aspect: 'aspect_required',
+        $schema: {
           type: 'object',
           properties: { value: { type: 'string' } },
           required: ['value']
@@ -722,8 +722,8 @@ describe('MultiPassValidator', () => {
 
       // Missing required aspect
       const instance = {
-        id: 'test',
-        class: 'test'
+        $id: 'test',
+        $class: 'test'
         // no aspects
       };
 
@@ -731,26 +731,26 @@ describe('MultiPassValidator', () => {
 
       assert.strictEqual(result.valid, false);
       assert.ok(result.errors.some(e =>
-        e.code === 'missing_required_aspect' && e.aspect === 'required_aspect'
+        e.code === 'missing_required_aspect' && e.aspect === 'aspect_required'
       ));
     });
 
     it('should require id field via base schema', () => {
       const resolvedClass = {
-        class: 'test',
-        lineage: ['test'],
-        schemas: [{
+        $class: 'test',
+        $lineage: ['test'],
+        $schemas: [{
           type: 'object',
           properties: { value: { type: 'string' } }
         }],
-        fields: {},
+        $fields: {},
         $aspects: {}
       };
 
       validator.registerClass(resolvedClass);
 
       const instance = {
-        class: 'test',
+        $class: 'test',
         value: 'test'
         // no id field - should fail base schema validation
       };

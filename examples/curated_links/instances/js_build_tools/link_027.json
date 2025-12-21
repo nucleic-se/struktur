@@ -1,6 +1,6 @@
 {
-  "id": "link_027",
-  "class": "tool_link",
+  "$id": "link_027",
+  "$class": "tool_link",
   "url": "https://terser.org",
   "title": "Terser",
   "description": "JavaScript mangler and compressor toolkit for ES6+",
@@ -15,7 +15,7 @@
   "license": "BSD-2-Clause",
   "github_url": "https://github.com/terser/terser",
   "$aspects": {
-    "quality": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 4,

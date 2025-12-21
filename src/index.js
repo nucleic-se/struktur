@@ -57,10 +57,10 @@ export function createStruktur() {
       const resolved = new Map();
 
       for (const instance of instances) {
-        if (!resolved.has(instance.class)) {
-          const resolvedClass = classResolver.resolve(instance.class);
+        if (!resolved.has(instance.$class)) {
+          const resolvedClass = classResolver.resolve(instance.$class);
           validator.registerClass(resolvedClass);
-          resolved.set(instance.class, resolvedClass);
+          resolved.set(instance.$class, resolvedClass);
         }
       }
 

@@ -26,16 +26,16 @@ describe('Canonical Output', () => {
     const resolver = new ClassResolver(loader);
 
     const instances = [
-      { id: 'test1', class: 'page', title: 'Test Page' },
-      { id: 'test2', class: 'blog_post', title: 'Test Post' }
+      { $id: 'test1', $class: 'page', title: 'Test Page' },
+      { $id: 'test2', $class: 'blog_post', title: 'Test Post' }
     ];
 
     const canonical = generateCanonical(instances, resolver);
 
     assert.ok(canonical.$instances, 'Should have $instances array');
     assert.equal(canonical.$instances.length, 2, 'Should have 2 instances');
-    assert.equal(canonical.$instances[0].id, 'test1', 'First instance should be test1');
-    assert.equal(canonical.$instances[1].id, 'test2', 'Second instance should be test2');
+    assert.equal(canonical.$instances[0].$id, 'test1', 'First instance should be test1');
+    assert.equal(canonical.$instances[1].$id, 'test2', 'Second instance should be test2');
   });
 
   it('should merge instances with class field defaults', async () => {
@@ -44,16 +44,16 @@ describe('Canonical Output', () => {
     const resolver = new ClassResolver(loader);
 
     const instances = [
-      { id: 'test1', class: 'page', title: 'Test Page' }
+      { $id: 'test1', $class: 'page', title: 'Test Page' }
     ];
 
     const canonical = generateCanonical(instances, resolver);
     const obj = canonical.$instances[0];
 
     // Should have both instance fields and class defaults
-    assert.equal(obj.id, 'test1', 'Should preserve instance id');
+    assert.equal(obj.$id, 'test1', 'Should preserve instance id');
     assert.equal(obj.title, 'Test Page', 'Should preserve instance title');
-    assert.equal(obj.class, 'page', 'Should preserve class');
+    assert.equal(obj.$class, 'page', 'Should preserve class');
   });
 
   it('should generate class index', async () => {
@@ -62,9 +62,9 @@ describe('Canonical Output', () => {
     const resolver = new ClassResolver(loader);
 
     const instances = [
-      { id: 'page1', class: 'page', title: 'Page 1' },
-      { id: 'page2', class: 'page', title: 'Page 2' },
-      { id: 'post1', class: 'blog_post', title: 'Post 1' }
+      { $id: 'page1', $class: 'page', title: 'Page 1' },
+      { $id: 'page2', $class: 'page', title: 'Page 2' },
+      { $id: 'post1', $class: 'blog_post', title: 'Post 1' }
     ];
 
     const canonical = generateCanonical(instances, resolver);
@@ -72,10 +72,10 @@ describe('Canonical Output', () => {
     assert.ok(canonical.$classes_by_id, 'Should have $classes_by_id');
     assert.ok(typeof canonical.$classes_by_id.page === 'object', 'Should have page class object');
     assert.ok(typeof canonical.$classes_by_id.blog_post === 'object', 'Should have blog_post class object');
-    assert.strictEqual(canonical.$classes_by_id.page.class, 'page', 'Page class should have class field');
-    assert.strictEqual(canonical.$classes_by_id.blog_post.class, 'blog_post', 'Blog post class should have class field');
-    assert.ok(Array.isArray(canonical.$classes_by_id.page.lineage), 'Page should have lineage');
-    assert.ok(Array.isArray(canonical.$classes_by_id.blog_post.lineage), 'Blog post should have lineage');
+    assert.strictEqual(canonical.$classes_by_id.page.$class, 'page', 'Page class should have class field');
+    assert.strictEqual(canonical.$classes_by_id.blog_post.$class, 'blog_post', 'Blog post class should have class field');
+    assert.ok(Array.isArray(canonical.$classes_by_id.page.$lineage), 'Page should have lineage');
+    assert.ok(Array.isArray(canonical.$classes_by_id.blog_post.$lineage), 'Blog post should have lineage');
   });
 
   it('should include metadata by default', async () => {
@@ -84,7 +84,7 @@ describe('Canonical Output', () => {
     const resolver = new ClassResolver(loader);
 
     const instances = [
-      { id: 'test1', class: 'page', title: 'Test' }
+      { $id: 'test1', $class: 'page', title: 'Test' }
     ];
 
     const canonical = generateCanonical(instances, resolver);
@@ -102,7 +102,7 @@ describe('Canonical Output', () => {
     await loader.loadClassesFromDirectory(join(FIXTURES_DIR, 'skribe', 'classes'));
     const resolver = new ClassResolver(loader);
 
-    const instances = [{ id: 'test1', class: 'page', title: 'Test' }];
+    const instances = [{ $id: 'test1', $class: 'page', title: 'Test' }];
     const canonical = generateCanonical(instances, resolver, { includeMetadata: false });
 
     assert.equal(canonical.$metadata, undefined, 'Should not have metadata');
@@ -113,7 +113,7 @@ describe('Canonical Output', () => {
     await loader.loadClassesFromDirectory(join(FIXTURES_DIR, 'skribe', 'classes'));
     const resolver = new ClassResolver(loader);
 
-    const instances = [{ id: 'test1', class: 'page', title: 'Test' }];
+    const instances = [{ $id: 'test1', $class: 'page', title: 'Test' }];
     const canonical = generateCanonical(instances, resolver, { includeClassIndex: false });
 
     assert.equal(canonical.$classes_by_id, undefined, 'Should not have class index');
@@ -126,10 +126,10 @@ describe('Canonical Output', () => {
 
     const instances = [
       {
-        id: 'test1',
-        class: 'entity_base',
+        $id: 'test1',
+        $class: 'entity_base',
         $aspects: {
-          test_aspect: {
+          aspect_test_aspect: {
             value: 'test'
           }
         }
@@ -139,7 +139,7 @@ describe('Canonical Output', () => {
     const canonical = generateCanonical(instances, resolver);
 
     assert.ok(canonical.$instances[0].$aspects, 'Should preserve aspects');
-    assert.equal(canonical.$instances[0].$aspects.test_aspect.value, 'test', 'Should preserve aspect data');
+    assert.equal(canonical.$instances[0].$aspects.aspect_test_aspect.value, 'test', 'Should preserve aspect data');
   });
 
   it('should handle unknown classes gracefully', async () => {
@@ -148,14 +148,14 @@ describe('Canonical Output', () => {
     const resolver = new ClassResolver(loader);
 
     const instances = [
-      { id: 'test1', class: 'unknown_class', title: 'Test' }
+      { $id: 'test1', $class: 'unknown_class', title: 'Test' }
     ];
 
     const canonical = generateCanonical(instances, resolver);
 
     assert.ok(canonical.$instances, 'Should still generate output');
     assert.equal(canonical.$instances.length, 1, 'Should include instance');
-    assert.equal(canonical.$instances[0].id, 'test1', 'Should preserve instance');
+    assert.equal(canonical.$instances[0].$id, 'test1', 'Should preserve instance');
   });
 
   it('should generate canonical with validation metadata', async () => {
@@ -165,7 +165,7 @@ describe('Canonical Output', () => {
     });
 
     const instances = [
-      { id: 'valid', class: 'page', title: 'Valid Page' }
+      { $id: 'valid', $class: 'page', title: 'Valid Page' }
     ];
 
     const canonical = generateCanonicalWithValidation(instances, struktur);
@@ -183,7 +183,7 @@ describe('Canonical Output', () => {
 
     // Assume page class has default status: 'draft'
     const instances = [
-      { id: 'test1', class: 'page', title: 'Test', status: 'published' }
+      { $id: 'test1', $class: 'page', title: 'Test', status: 'published' }
     ];
 
     const canonical = generateCanonical(instances, resolver);
@@ -211,7 +211,7 @@ describe('Canonical Output', () => {
     const resolver = new ClassResolver(loader);
 
     const customTime = '2025-01-01T00:00:00.000Z';
-    const instances = [{ id: 'test1', class: 'page', title: 'Test' }];
+    const instances = [{ $id: 'test1', $class: 'page', title: 'Test' }];
     const canonical = generateCanonical(instances, resolver, { timestamp: customTime });
 
     assert.equal(canonical.$metadata.timestamp, customTime, 'Should use custom timestamp');

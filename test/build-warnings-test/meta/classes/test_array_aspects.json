@@ -1,22 +1,22 @@
 {
-  "class": "test_array_aspects",
-  "lineage": [
+  "$class": "test_array_aspects",
+  "$lineage": [
     "entity_base",
     "test_array_aspects"
   ],
-  "schemas": [
+  "$schemas": [
     {
       "type": "object",
       "required": [
-        "id",
-        "class"
+        "$id",
+        "$class"
       ],
       "properties": {
-        "id": {
+        "$id": {
           "type": "string",
           "minLength": 1
         },
-        "class": {
+        "$class": {
           "type": "string"
         },
         "domains": {
@@ -36,19 +36,19 @@
       }
     }
   ],
-  "fields": {
+  "$fields": {
     "domains": []
   },
   "$aspects": {
-    "network_interface": {
+    "aspect_network_interface": {
       "required": false
     }
   },
   "$uses_aspects": [],
   "$aspect_defaults": {},
-  "pretty_name": "test_array_aspects",
-  "domains": [],
-  "parent": [
+  "$pretty_name": "test_array_aspects",
+  "$domains": [],
+  "$parent": [
     "entity_base"
   ]
 }

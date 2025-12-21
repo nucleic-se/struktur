@@ -66,18 +66,18 @@ Outputs are identical except for generator comment.
 
 **Iteration:**
 ```handlebars
-{{#each (where $instances "class" "web_service")}}
+{{#each (where $instances "$class" "web_service")}}
   server {
-    listen {{$aspects.web_service.port}};
-    server_name {{$aspects.web_service.hostname}};
+    listen {{$aspects.aspect_web_service.port}};
+    server_name {{$aspects.aspect_web_service.hostname}};
   }
 {{/each}}
 ```
 
 **Conditionals:**
 ```handlebars
-{{#if $aspects.web_service.ssl_enabled}}
-  ssl_certificate {{$aspects.web_service.ssl_cert}};
+{{#if $aspects.aspect_web_service.ssl_enabled}}
+  ssl_certificate {{$aspects.aspect_web_service.ssl_cert}};
 {{/if}}
 ```
 
@@ -91,10 +91,10 @@ Outputs are identical except for generator comment.
 **Iteration:**
 ```nunjucks
 {% for instance in $instances %}
-{% if instance.class == "web_service" %}
+{% if instance.$class == "web_service" %}
   server {
-    listen {{ instance.$aspects.web_service.port }};
-    server_name {{ instance.$aspects.web_service.hostname }};
+    listen {{ instance.$aspects.aspect_web_service.port }};
+    server_name {{ instance.$aspects.aspect_web_service.hostname }};
   }
 {% endif %}
 {% endfor %}
@@ -102,8 +102,8 @@ Outputs are identical except for generator comment.
 
 **Conditionals:**
 ```nunjucks
-{% if instance.$aspects.web_service.ssl_enabled %}
-  ssl_certificate {{ instance.$aspects.web_service.ssl_cert }};
+{% if instance.$aspects.aspect_web_service.ssl_enabled %}
+  ssl_certificate {{ instance.$aspects.aspect_web_service.ssl_cert }};
 {% endif %}
 ```
 
@@ -148,9 +148,9 @@ template-engine-demo/
 ├── struktur.build.json                # Handlebars config
 ├── struktur.nunjucks.build.json       # Nunjucks config
 ├── classes/
-│   └── web_service.schema.json        # Class definition
+│   └── web_service.class.json        # Class definition
 ├── aspects/
-│   └── web_service.schema.json        # Aspect schema
+│   └── web_service.aspect.json       # Aspect schema
 ├── instances/                         # Shared instance data
 │   ├── api_server.json                # Data only, no build arrays
 │   └── web_app.json                   # Data only, no build arrays

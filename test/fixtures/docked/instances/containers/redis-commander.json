@@ -1,18 +1,26 @@
 {
-  "id": "redis-commander",
-  "class": "docked_container",
-  "domains": ["monitoring"],
+  "$id": "redis-commander",
+  "$class": "docked_container",
+  "domains": [
+    "monitoring"
+  ],
   "$aspects": {
-    "docker_container": {
+    "aspect_docker_container": {
       "image": "rediscommander/redis-commander:latest",
       "description": "Redis web UI for managing and viewing data",
       "web_ui": "http://localhost:8081",
-      "ports": ["8081:8081"],
-      "networks": ["docked"],
+      "ports": [
+        "8081:8081"
+      ],
+      "networks": [
+        "docked"
+      ],
       "restart_policy": "unless-stopped"
     }
   },
   "relations": {
-    "manages/managed_by": ["redis"]
+    "manages/managed_by": [
+      "redis"
+    ]
   }
 }
