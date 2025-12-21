@@ -1,4 +1,5 @@
 {
+  "$class": "aspect_docker_network",
   "$aspect": "aspect_docker_network",
   "$schema": {
     "$schema": "http://json-schema.org/draft-07/schema#",
@@ -9,6 +10,14 @@
       "driver": {
         "type": "string",
         "description": "Docker network driver (bridge, overlay, etc.)"
+      }
+    }
+  },
+  "$fields": {
+    "$aspects": {
+      "aspect": {
+        "kind": "docker_network",
+        "description": "Docker networks for container communication"
       }
     }
   }

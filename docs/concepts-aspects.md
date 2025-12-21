@@ -23,7 +23,7 @@ Aspects define:
 
 **Example:**
 ```json
-// aspects/aspect_monitoring.aspect.json
+// aspects/aspect_monitoring.class.json
 {
   "$aspect": "aspect_monitoring",
   "description": "Monitoring configuration",
@@ -74,7 +74,7 @@ Aspect data merges from three sources with clear priority:
 Define defaults in the aspect file itself:
 
 ```json
-// aspects/aspect_proxmox_guest.aspect.json
+// aspects/aspect_proxmox_guest.class.json
 {
   "$aspect": "aspect_proxmox_guest",
   "$schema": {

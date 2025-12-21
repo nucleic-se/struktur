@@ -212,6 +212,7 @@ describe('Security Tests', () => {
       
       // Create invalid aspect schema
       const invalidAspect = {
+        $class: 'invalid',
         $aspect: 'invalid',
         description: 'Invalid aspect',
         $schema: {
@@ -223,7 +224,7 @@ describe('Security Tests', () => {
       };
 
       await fs.writeFile(
-        path.join(aspectDir, 'invalid.aspect.json'),
+        path.join(aspectDir, 'invalid.class.json'),
         JSON.stringify(invalidAspect)
       );
 

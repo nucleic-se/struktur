@@ -275,7 +275,7 @@ Canonical output shows **exactly** what got merged:
   "_meta": {
     "merged_from": [
       "classes/service.class.json (replicas: 1)",
-      "aspects/web_service.aspect.json (port, upstream)",
+      "aspects/aspect_web_service.class.json (port, upstream)",
       "instances/api-prod.json (replicas: 3, port: 8080)"
     ]
   }

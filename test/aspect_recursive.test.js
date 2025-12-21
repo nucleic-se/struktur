@@ -19,21 +19,22 @@ describe('Recursive Aspect Loading', async () => {
   await (async () => {
     // Create directory structure:
     // aspects/
-    //   top.aspect.json
+    //   aspect_top.class.json
     //   category1/
-    //     cat1.aspect.json
+    //     aspect_cat1.class.json
     //   category2/
-    //     cat2.aspect.json
+    //     aspect_cat2.class.json
     //     nested/
-    //       deep.aspect.json
+    //       aspect_deep.class.json
 
     await fs.mkdir(path.join(testDir, 'category1'), { recursive: true });
     await fs.mkdir(path.join(testDir, 'category2', 'nested'), { recursive: true });
 
     // Top-level aspect
     await fs.writeFile(
-      path.join(testDir, 'top.aspect.json'),
+      path.join(testDir, 'aspect_top.class.json'),
       JSON.stringify({
+        $class: 'aspect_top',
         $aspect: 'aspect_top',
         description: 'Top-level aspect',
         $schema: { type: 'object', properties: { top_field: { type: 'string' } } }
@@ -42,8 +43,9 @@ describe('Recursive Aspect Loading', async () => {
 
     // Category 1 aspect
     await fs.writeFile(
-      path.join(testDir, 'category1', 'cat1.aspect.json'),
+      path.join(testDir, 'category1', 'aspect_cat1.class.json'),
       JSON.stringify({
+        $class: 'aspect_cat1',
         $aspect: 'aspect_cat1',
         description: 'Category 1 aspect',
         $schema: { type: 'object', properties: { cat1_field: { type: 'string' } } }
@@ -52,8 +54,9 @@ describe('Recursive Aspect Loading', async () => {
 
     // Category 2 aspect
     await fs.writeFile(
-      path.join(testDir, 'category2', 'cat2.aspect.json'),
+      path.join(testDir, 'category2', 'aspect_cat2.class.json'),
       JSON.stringify({
+        $class: 'aspect_cat2',
         $aspect: 'aspect_cat2',
         description: 'Category 2 aspect',
         $schema: { type: 'object', properties: { cat2_field: { type: 'string' } } }
@@ -62,8 +65,9 @@ describe('Recursive Aspect Loading', async () => {
 
     // Deeply nested aspect
     await fs.writeFile(
-      path.join(testDir, 'category2', 'nested', 'deep.aspect.json'),
+      path.join(testDir, 'category2', 'nested', 'aspect_deep.class.json'),
       JSON.stringify({
+        $class: 'aspect_deep',
         $aspect: 'aspect_deep',
         description: 'Deeply nested aspect',
         $schema: { type: 'object', properties: { deep_field: { type: 'string' } } }

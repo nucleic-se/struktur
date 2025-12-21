@@ -1,4 +1,5 @@
 {
+  "$class": "aspect_docker_host",
   "$aspect": "aspect_docker_host",
   "$schema": {
     "$schema": "http://json-schema.org/draft-07/schema#",

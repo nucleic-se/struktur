@@ -294,10 +294,10 @@ describe('CLI: info command', () => {
     ]);
 
     assert.equal(result.exitCode, 0, 'Should exit with code 0');
-    // Should show classes from both Skribe (3) and Universal (3)
+    // Should show classes from both Skribe and Universal
     assert.match(result.stdout, /blog_post/, 'Should show Skribe classes');
     assert.match(result.stdout, /entity_base/, 'Should show Universal classes');
-    assert.match(result.stdout, /Total: 7 classes/, 'Should count all classes from both directories');
+    assert.match(result.stdout, /Total: 8 classes/, 'Should count all classes from both directories');
   });
 
   it('should support multiple aspects directories', async () => {

@@ -28,6 +28,17 @@ export class AspectLoader {
       throw new Error(`Aspect definition missing '$aspect' field: ${filePath}`);
     }
 
+    if (!aspect.$class) {
+      throw new Error(`Aspect definition missing '$class' field: ${filePath}`);
+    }
+
+    if (aspect.$class !== aspect.$aspect) {
+      throw new Error(
+        `Aspect definition '$class' must match '$aspect' (${filePath}): ` +
+        `'$class'=${aspect.$class}, '$aspect'=${aspect.$aspect}`
+      );
+    }
+
     if (!aspect.$schema) {
       throw new Error(`Aspect definition missing '$schema' field: ${filePath}`);
     }
@@ -82,7 +93,7 @@ export class AspectLoader {
           if (entry.isDirectory() && recursive) {
             // Recurse into subdirectories
             await loadFromDir(fullPath);
-          } else if (entry.isFile() && entry.name.endsWith('.aspect.json')) {
+          } else if (entry.isFile() && entry.name.endsWith('.class.json')) {
             try {
               const aspect = await self.loadAspect(fullPath);
               aspects.push(aspect);

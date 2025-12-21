@@ -1,4 +1,5 @@
 {
+  "$class": "aspect_network_device",
   "$aspect": "aspect_network_device",
   "$schema": {
     "type": "object",

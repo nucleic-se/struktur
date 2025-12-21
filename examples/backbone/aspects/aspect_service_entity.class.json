@@ -1,4 +1,5 @@
 {
+  "$class": "aspect_service_entity",
   "$aspect": "aspect_service_entity",
   "$schema": {
     "type": "object",

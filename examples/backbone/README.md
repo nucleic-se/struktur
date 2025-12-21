@@ -53,14 +53,14 @@ Open `build/build-{hash}/index.html` in your browser to explore the infrastructu
 
 This stack demonstrates the three-layer aspect data merge:
 
-1. **Aspect Definition Defaults** - Defined in `aspects/*.aspect.json`
+1. **Aspect Definition Defaults** - Defined in `aspects/*.class.json`
 2. **Class Defaults** - Defined in `classes/*/*.class.json` via `$aspect_defaults`
 3. **Instance Values** - Defined in `instances/*/*.json`
 
 Example: Network configuration inherits from aspect defaults:
 
 ```json
-// aspects/aspect_network_interface.aspect.json
+// aspects/aspect_network_interface.class.json
 {
   "bridge": "vmbr0",
   "gateway": "192.168.68.1",
@@ -98,7 +98,7 @@ infrastructure_entity
 
 ### Network Configuration
 
-Edit aspect defaults in `aspects/aspect_network_interface.aspect.json`:
+Edit aspect defaults in `aspects/aspect_network_interface.class.json`:
 
 ```json
 {
@@ -157,7 +157,7 @@ Bridge and gateway are inherited from aspect defaults - no duplication needed!
 backbone/
 ├── struktur.build.json       # Build configuration
 ├── aspects/                  # Aspect definitions with defaults
-│   └── aspect_network_interface.aspect.json
+│   └── aspect_network_interface.class.json
 ├── classes/                  # Class schemas
 │   ├── domains/              # Domain classifications
 │   ├── infrastructure/       # Infrastructure classes

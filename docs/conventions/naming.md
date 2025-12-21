@@ -42,7 +42,7 @@ Examples:
 - `blog_post.class.json` → `"$class": "blog_post"`
 - `aspect_network_interface.class.json` → `"$class": "aspect_network_interface"`
 
-**Legacy:** `.aspect.json` is still supported but deprecated. Use `.class.json` for new aspects.
+**Note:** Aspect definitions now use `.class.json`. The `.aspect.json` format is no longer supported.
 
 ## Instance Files
 

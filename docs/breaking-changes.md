@@ -67,7 +67,7 @@ This document tracks breaking changes in Struktur's alpha releases.
 
 ### Template Helpers Normalized to snake_case
 
-**Breaking** (Commit: pending): All template helper names are now snake_case only.
+**Breaking** (Commit: 7485318): All template helper names are now snake_case only. No camelCase aliases.
 
 **Struktur helpers (before → after):**
 - `schemaRequired` → `schema_required`
@@ -88,10 +88,51 @@ This document tracks breaking changes in Struktur's alpha releases.
 - `typeOf` → `type_of`
 
 **Migration**:
-- Update all templates to use snake_case helper names.
-- See `docs/conventions/naming.md` for full naming rules.
+- Update all templates to use snake_case helper names
+- Find-replace camelCase → snake_case (mechanical, safe)
+- See `docs/conventions/naming.md` for complete list and edge cases
 
-**Rationale**: One naming convention across all helpers reduces confusion and matches template conventions.
+**Rationale**: One naming convention across all helpers reduces confusion and matches template conventions. Clean break in alpha (no backward compatibility).
+
+---
+
+### Aspect Files Now Use `.class.json` (Not Yet Implemented)
+
+**Breaking** (Planned for v0.3.0): Aspect definitions will use `.class.json` files. The `.aspect.json` format will be removed.
+
+**Changes:**
+- File extension: `*.aspect.json` → `*.class.json`
+- Aspect definitions require `$class` field (must match `$aspect`)
+- Aspect loader will only scan `.class.json` files
+- No fallback support for `.aspect.json`
+
+**Before:**
+```json
+// aspect_web_service.aspect.json
+{
+  "$aspect": "aspect_web_service",
+  "$schema": { "type": "object", "properties": { "port": { "type": "number" } } },
+  "$defaults": { "port": 8080 }
+}
+```
+
+**After:**
+```json
+// aspect_web_service.class.json
+{
+  "$class": "aspect_web_service",
+  "$aspect": "aspect_web_service",
+  "$schema": { "type": "object", "properties": { "port": { "type": "number" } } },
+  "$defaults": { "port": 8080 }
+}
+```
+
+**Migration**:
+1. Rename files: `aspect_foo.aspect.json` → `aspect_foo.class.json`
+2. Add `"$class": "aspect_foo"` to match `"$aspect": "aspect_foo"`
+3. Structure unchanged (keep `$aspect`, `$schema`, `$defaults`)
+
+**Rationale**: One file extension (`.class.json`) for all definitions. Simplifies loader, removes legacy code path. Clean architecture for v1.0
 
 ---
 

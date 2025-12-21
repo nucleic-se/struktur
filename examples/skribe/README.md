@@ -70,8 +70,8 @@ Open `build/build-*/index.html` in your browser.
 ```
 skribe/
   aspects/              # Aspect type definitions
-    blog_post.aspect.json     # Blog post fields: date, content, author, tags
-    page.aspect.json          # Page fields: content, menu placement
+    aspect_blog_post.class.json     # Blog post fields: date, content, author, tags
+    aspect_page.class.json          # Page fields: content, menu placement
   classes/              # Content type definitions
     content_base.class.json  # Shared: title, slug, description
     blog_post.class.json     # Extends content_base, uses blog_post aspect
@@ -303,7 +303,7 @@ Edit `templates/css/custom.css`:
 
 **Best Practice**: Define aspect first (data structure), then class (ties aspect to content_base hierarchy).
 
-1. Create `aspects/tutorial.aspect.json` (defines tutorial-specific fields):
+1. Create `aspects/aspect_tutorial.class.json` (defines tutorial-specific fields):
 ```json
 {
   "aspect": "tutorial",

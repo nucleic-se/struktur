@@ -1,4 +1,5 @@
 {
+  "$class": "aspect_network_interface",
   "$aspect": "aspect_network_interface",
   "$kind": "infrastructure",
   "$description": "Network connectivity for entities",

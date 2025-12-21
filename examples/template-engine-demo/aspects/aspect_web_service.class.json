@@ -1,4 +1,5 @@
 {
+  "$class": "aspect_web_service",
   "$aspect": "aspect_web_service",
   "$pretty_name": "Web Service Configuration",
   "$description": "HTTP server configuration",

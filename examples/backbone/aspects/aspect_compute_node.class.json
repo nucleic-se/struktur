@@ -1,4 +1,5 @@
 {
+  "$class": "aspect_compute_node",
   "$aspect": "aspect_compute_node",
   "$schema": {
     "type": "object",

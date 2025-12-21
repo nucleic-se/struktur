@@ -24,7 +24,7 @@ describe('Aspect DRY (Define Once, Use Many)', () => {
     validator = new MultiPassValidator();
 
     // Load shared aspect (defined once)
-    await aspectLoader.loadAspect(path.join(fixturesDir, 'shared_aspect.aspect.json'));
+    await aspectLoader.loadAspect(path.join(fixturesDir, 'aspect_shared_aspect.class.json'));
 
     // Load multiple classes that use the same aspect
     await classLoader.loadClass(path.join(fixturesDir, 'class_a.class.json'));

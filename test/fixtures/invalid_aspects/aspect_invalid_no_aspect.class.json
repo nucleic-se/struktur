@@ -1,4 +1,5 @@
 {
+  "$class": "aspect_invalid_no_aspect",
   "$schema": {
     "type": "object"
   }

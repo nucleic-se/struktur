@@ -1,4 +1,5 @@
 {
+  "$class": "aspect_proxmox_guest",
   "$aspect": "aspect_proxmox_guest",
   "$schema": {
     "type": "object",

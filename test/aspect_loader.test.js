@@ -21,7 +21,7 @@ describe('AspectLoader', () => {
 
   describe('loadAspect', () => {
     it('should load a valid aspect definition', async () => {
-      const aspect = await loader.loadAspect(path.join(fixturesDir, 'network_interface.aspect.json'));
+      const aspect = await loader.loadAspect(path.join(fixturesDir, 'aspect_network_interface.class.json'));
 
       assert.strictEqual(aspect.$aspect, 'aspect_network_interface');
       assert.ok(aspect.$schema);
@@ -31,7 +31,7 @@ describe('AspectLoader', () => {
     it('should throw error for missing aspect field', async () => {
       const invalidDir = path.join(__dirname, 'fixtures', 'invalid_aspects');
       await assert.rejects(
-        async () => loader.loadAspect(path.join(invalidDir, 'invalid_no_aspect.aspect.json')),
+        async () => loader.loadAspect(path.join(invalidDir, 'aspect_invalid_no_aspect.class.json')),
         /missing '\$aspect' field/
       );
     });
@@ -39,20 +39,20 @@ describe('AspectLoader', () => {
     it('should throw error for missing schema field', async () => {
       const invalidDir = path.join(__dirname, 'fixtures', 'invalid_aspects');
       await assert.rejects(
-        async () => loader.loadAspect(path.join(invalidDir, 'invalid_no_schema.aspect.json')),
+        async () => loader.loadAspect(path.join(invalidDir, 'invalid_no_schema.class.json')),
         /missing '\$schema' field/
       );
     });
 
     it('should store aspect in registry', async () => {
-      await loader.loadAspect(path.join(fixturesDir, 'network_interface.aspect.json'));
+      await loader.loadAspect(path.join(fixturesDir, 'aspect_network_interface.class.json'));
 
       assert.ok(loader.hasAspect('aspect_network_interface'));
       assert.strictEqual(loader.getAspect('aspect_network_interface').$aspect, 'aspect_network_interface');
     });
 
     it('should detect duplicate aspect names', async () => {
-      const filePath = path.join(fixturesDir, 'network_interface.aspect.json');
+      const filePath = path.join(fixturesDir, 'aspect_network_interface.class.json');
       await loader.loadAspect(filePath);
 
       // Try to load the same aspect again
@@ -85,7 +85,7 @@ describe('AspectLoader', () => {
     });
 
     it('should return aspect definition for known aspect', async () => {
-      await loader.loadAspect(path.join(fixturesDir, 'network_interface.aspect.json'));
+      await loader.loadAspect(path.join(fixturesDir, 'aspect_network_interface.class.json'));
       const aspect = loader.getAspect('aspect_network_interface');
 
       assert.ok(aspect);
@@ -99,7 +99,7 @@ describe('AspectLoader', () => {
     });
 
     it('should return all loaded aspects', async () => {
-      await loader.loadAspect(path.join(fixturesDir, 'network_interface.aspect.json'));
+      await loader.loadAspect(path.join(fixturesDir, 'aspect_network_interface.class.json'));
 
       const aspects = loader.getAllAspects();
       assert.ok(aspects.length >= 1);
@@ -108,7 +108,7 @@ describe('AspectLoader', () => {
 
   describe('clear', () => {
     it('should clear all loaded aspects', async () => {
-      await loader.loadAspect(path.join(fixturesDir, 'network_interface.aspect.json'));
+      await loader.loadAspect(path.join(fixturesDir, 'aspect_network_interface.class.json'));
       assert.ok(loader.hasAspect('aspect_network_interface'));
 
       loader.clear();

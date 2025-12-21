@@ -1,4 +1,5 @@
 {
+  "$class": "aspect_shared_aspect",
   "$schema": {
     "type": "object",
     "properties": {

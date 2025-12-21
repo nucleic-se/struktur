@@ -2,7 +2,7 @@
  * Tests for three-layer aspect defaults merge system
  * 
  * Tests the merge hierarchy:
- * 1. Aspect definition defaults (from .aspect.json files)
+ * 1. Aspect definition defaults (from .class.json files)
  * 2. Class $aspect_defaults (from class hierarchy)
  * 3. Instance values (highest priority)
  */
@@ -56,7 +56,8 @@ describe('Aspect Defaults Three-Layer Merge', () => {
   describe('Layer 1: Aspect Definition Defaults', () => {
     it('should apply defaults from aspect definition', async () => {
       await createTestFiles({
-        'aspects/aspect_network.aspect.json': {
+        'aspects/aspect_network.class.json': {
+          $class: 'aspect_network',
           $aspect: 'aspect_network',
           $schema: {
             type: 'object',
@@ -113,7 +114,8 @@ describe('Aspect Defaults Three-Layer Merge', () => {
 
     it('should handle aspect definitions without defaults', async () => {
       await createTestFiles({
-        'aspects/aspect_storage.aspect.json': {
+        'aspects/aspect_storage.class.json': {
+          $class: 'aspect_storage',
           $aspect: 'aspect_storage',
           $schema: {
             type: 'object',
@@ -166,7 +168,8 @@ describe('Aspect Defaults Three-Layer Merge', () => {
   describe('Layer 2: Class Hierarchy $aspect_defaults', () => {
     it('should apply defaults from class $aspect_defaults', async () => {
       await createTestFiles({
-        'aspects/aspect_proxmox.aspect.json': {
+        'aspects/aspect_proxmox.class.json': {
+          $class: 'aspect_proxmox',
           $aspect: 'aspect_proxmox',
           $schema: {
             type: 'object',
@@ -228,7 +231,8 @@ describe('Aspect Defaults Three-Layer Merge', () => {
 
     it('should accumulate $aspect_defaults through inheritance', async () => {
       await createTestFiles({
-        'aspects/aspect_compute.aspect.json': {
+        'aspects/aspect_compute.class.json': {
+          $class: 'aspect_compute',
           $aspect: 'aspect_compute',
           $schema: {
             type: 'object',
@@ -301,7 +305,8 @@ describe('Aspect Defaults Three-Layer Merge', () => {
   describe('Layer 3: Instance Values (Highest Priority)', () => {
     it('should prioritize instance values over all defaults', async () => {
       await createTestFiles({
-        'aspects/aspect_network.aspect.json': {
+        'aspects/aspect_network.class.json': {
+          $class: 'aspect_network',
           $aspect: 'aspect_network',
           $schema: {
             type: 'object',
@@ -369,7 +374,8 @@ describe('Aspect Defaults Three-Layer Merge', () => {
   describe('Complete Three-Layer Merge', () => {
     it('should merge all three layers correctly', async () => {
       await createTestFiles({
-        'aspects/aspect_network.aspect.json': {
+        'aspects/aspect_network.class.json': {
+          $class: 'aspect_network',
           $aspect: 'aspect_network',
           $schema: {
             type: 'object',
@@ -444,7 +450,8 @@ describe('Aspect Defaults Three-Layer Merge', () => {
 
     it('should populate aspects even when not in instance data', async () => {
       await createTestFiles({
-        'aspects/aspect_terraform.aspect.json': {
+        'aspects/aspect_terraform.class.json': {
+          $class: 'aspect_terraform',
           $aspect: 'aspect_terraform',
           $schema: {
             type: 'object',
@@ -530,7 +537,8 @@ describe('Aspect Defaults Three-Layer Merge', () => {
 
     it('should handle aspect name with aspect_ prefix', async () => {
       await createTestFiles({
-        'aspects/aspect_test.aspect.json': {
+        'aspects/aspect_test.class.json': {
+          $class: 'aspect_test',
           $aspect: 'aspect_test',
           $schema: {
             type: 'object',

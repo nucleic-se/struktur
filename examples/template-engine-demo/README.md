@@ -150,7 +150,7 @@ template-engine-demo/
 ├── classes/
 │   └── web_service.class.json        # Class definition
 ├── aspects/
-│   └── web_service.aspect.json       # Aspect schema
+│   └── aspect_web_service.class.json       # Aspect schema
 ├── instances/                         # Shared instance data
 │   ├── api_server.json                # Data only, no build arrays
 │   └── web_app.json                   # Data only, no build arrays

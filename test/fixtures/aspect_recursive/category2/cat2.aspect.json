@@ -1,1 +1,0 @@
-{"$aspect":"aspect_cat2","description":"Category 2 aspect","$schema":{"type":"object","properties":{"cat2_field":{"type":"string"}}}}

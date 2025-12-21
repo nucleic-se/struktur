@@ -1,4 +1,5 @@
 {
+  "$class": "aspect_terraform",
   "$aspect": "aspect_terraform",
   "$schema": {
     "type": "object",
