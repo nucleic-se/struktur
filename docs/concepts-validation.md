@@ -17,7 +17,20 @@ Load → Merge → Validate → Render
 
 ## Validation Layers
 
-Struktur performs validation in four independent passes:
+Struktur performs validation in five independent passes:
+
+### Pass 0: Base Schema Validation (Universal Contract)
+
+Validates that **all instances** meet the universal contract:
+- Required fields: `id`, `class`
+- Optional fields: `render` (instance-specific render tasks)
+- Schema: `schemas/instance_base.schema.json`
+
+**Level:** Error (validation fails)
+
+**Why first?** Catches fundamental structural errors (missing id/class) before any class-specific validation runs.
+
+See [Base Schema Validation](#base-schema-validation-pass-0) for details.
 
 ### Pass 1: Schema Validation (JSON Schema)
 
@@ -114,6 +127,7 @@ Checks data quality and conventions (warnings only):
 ## Errors vs Warnings
 
 **Errors** (validation fails):
+- Base schema violations (Pass 0) - missing id/class, malformed render array
 - Schema violations (Pass 1)
 - Aspect requirement violations (Pass 2)
 - Result: `valid: false`, build stops
@@ -130,6 +144,49 @@ const validator = new MultiPassValidator({
   enableLint: true       // Enable Pass 4 (default: true)
 });
 ```
+
+**Note:** Pass 0 (base schema) and Pass 1-2 (class/aspect schemas) cannot be disabled - they are fundamental to structural integrity.
+
+---
+
+## Base Schema Validation (Pass 0)
+
+Before any class-specific validation, **all instances** are validated against the universal base schema (`schemas/instance_base.schema.json`).
+
+**Required fields:**
+- `id` (string, minLength: 1) - Unique instance identifier
+- `class` (string, minLength: 1) - Class name
+
+**Optional fields:**
+- `render` (array) - Instance-specific render tasks (see [Render Arrays](./concepts-instances.md#render-arrays))
+
+**Example base schema errors:**
+
+```json
+// Missing id
+{
+  "class": "server",
+  "name": "My Server"
+}
+// Error: Base schema validation failed for instance 'undefined' - missing required property 'id'
+
+// Empty id
+{
+  "id": "",
+  "class": "server"
+}
+// Error: Base schema validation failed for instance '' - 'id' must be at least 1 character
+
+// Invalid render array
+{
+  "id": "web-01",
+  "class": "server",
+  "render": [{"template": "config.hbs"}]  // missing 'output'
+}
+// Error: Base schema validation failed for instance 'web-01' - render[0] missing required property 'output'
+```
+
+**Why Pass 0?** Ensures all instances meet the universal contract before any class-specific validation runs. This catches fundamental structural errors early with clear, specific messages.
 
 ---
 

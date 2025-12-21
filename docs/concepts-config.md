@@ -76,6 +76,8 @@ Each entry requires:
 - **`template`** - Template file name (with extension)
 - **`output`** - Output path (relative to `build_dir`)
 
+**Instance render arrays:** Instances can also have `render` arrays. Config render tasks execute first, then instance render tasks (alphabetically). See [Render Arrays in concepts-instances.md](concepts-instances.md#render-arrays) for details.
+
 ### Validation Options
 
 - **`exact`** - Deterministic mode: exact reproducible builds, sorted output (default: `false`)

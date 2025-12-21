@@ -8,6 +8,45 @@ This document tracks breaking changes in Struktur's alpha releases.
 
 ## v0.2.9-alpha (December 2025)
 
+### Universal Instance Base Schema (Non-Breaking Enhancement)
+
+**New Feature**: All instances now validate against a universal base schema before class-specific validation.
+
+**What Changed**:
+- Pass 0 validation: Universal contract (`schemas/instance_base.schema.json`)
+- Required fields: `id`, `class` (already enforced by earlier changes)
+- Optional field: `render` (array of {template, output} objects for instance-specific rendering)
+- Runs before class/aspect validation (fail-fast on fundamental errors)
+
+**Fully Backward Compatible**:
+```json
+// Existing instances already have id/class - no changes needed
+{
+  "id": "web-01",
+  "class": "server",
+  "hostname": "web.example.com"
+}
+
+// New: Instances can now specify own render tasks
+{
+  "id": "web-01",
+  "class": "server",
+  "hostname": "web.example.com",
+  "render": [
+    {"template": "nginx.conf.hbs", "output": "nginx/{{ id }}.conf"}
+  ]
+}
+```
+
+**Migration**: None required. Existing instances already meet base schema requirements.
+
+**Benefits**:
+- Catch fundamental errors (missing id/class) with clear messages before any class validation
+- Instance-specific render tasks: per-instance configs, service docs, environment-specific outputs
+- Explicit validation of render array structure (no silent failures)
+
+See [Concepts: Instances - Render Arrays](concepts-instances.md#render-arrays) for details.
+
 ### Three-Layer Aspect Merge (Non-Breaking Enhancement)
 
 **New Feature**: Aspect data now merges from three sources automatically.

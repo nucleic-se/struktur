@@ -32,8 +32,26 @@ Result     → Merged, validated data
 ### Required Fields
 
 Every instance must have:
-- `id` — Unique identifier (string)
-- `class` — Class name this instance belongs to
+- **`id`** — Unique identifier (string, minLength: 1)
+- **`class`** — Class name this instance belongs to (string, minLength: 1)
+
+These are enforced by the universal **instance base schema** (`instance_base.schema.json`) which validates ALL instances before class-specific validation.
+
+### Optional Fields
+
+**`render`** — Array of render tasks for this instance:
+```json
+{
+  "id": "my-service",
+  "class": "service",
+  "render": [
+    { "template": "config.yml.hbs", "output": "/config/my-service.yml" },
+    { "template": "docs.md.hbs", "output": "/docs/my-service.md" }
+  ]
+}
+```
+
+Instance render tasks are merged with config render tasks (see [Render Arrays](#render-arrays) below).
 
 All other fields depend on the class and schema definitions.
 
@@ -228,6 +246,128 @@ Objects merge recursively:
 
 // Result
 { "tags": ["production", "critical"] }
+```
+
+---
+
+## Render Arrays
+
+Instances can specify their own render tasks using the `render` field. This is useful when different instances need different template outputs.
+
+### Basic Usage
+
+```json
+{
+  "id": "nginx-proxy",
+  "class": "server",
+  "hostname": "proxy.example.com",
+  "render": [
+    { "template": "nginx/proxy.conf.hbs", "output": "/nginx/proxy.conf" },
+    { "template": "nginx/upstream.conf.hbs", "output": "/nginx/upstream.conf" }
+  ]
+}
+```
+
+### Merging with Config
+
+Instance render arrays are merged with config render arrays:
+
+**Config (`struktur.build.json`):**
+```json
+{
+  "render": [
+    { "template": "index.html.hbs", "output": "/index.html" },
+    { "template": "about.html.hbs", "output": "/about.html" }
+  ]
+}
+```
+
+**Instance (`instances/nginx.json`):**
+```json
+{
+  "id": "nginx",
+  "class": "server",
+  "render": [
+    { "template": "nginx.conf.hbs", "output": "/nginx.conf" }
+  ]
+}
+```
+
+**Merged render tasks (execution order):**
+```json
+[
+  { "template": "index.html.hbs", "output": "/index.html" },      // Config first
+  { "template": "about.html.hbs", "output": "/about.html" },      // Config
+  { "template": "nginx.conf.hbs", "output": "/nginx.conf" }       // Instance
+]
+```
+
+### Precedence Rules
+
+1. **Config render tasks execute first** (in order)
+2. **Instance render tasks execute second** (alphabetically by filename)
+3. **Duplicate outputs:** Last task wins (later overwrites earlier)
+
+### Use Cases
+
+**Per-Instance Configs:**
+```json
+{
+  "id": "db-primary",
+  "class": "database",
+  "render": [
+    { "template": "postgres/primary.conf.hbs", "output": "/postgres/primary.conf" }
+  ]
+}
+```
+
+**Service-Specific Docs:**
+```json
+{
+  "id": "api-service",
+  "class": "service",
+  "render": [
+    { "template": "api-docs.md.hbs", "output": "/docs/api.md" }
+  ]
+}
+```
+
+**Environment-Specific:**
+```json
+{
+  "id": "prod-settings",
+  "class": "environment",
+  "render": [
+    { "template": "env/production.yml.hbs", "output": "/config/production.yml" }
+  ]
+}
+```
+
+### Validation
+
+The `render` field is validated by `instance_base.schema.json`:
+
+- Must be an array (if present)
+- Each item must have `template` and `output` properties
+- Both must be non-empty strings
+- Invalid entries fail build immediately
+
+**Valid:**
+```json
+{
+  "render": [
+    { "template": "config.yml.hbs", "output": "/config.yml" }
+  ]
+}
+```
+
+**Invalid:**
+```json
+{
+  "render": [
+    { "template": "config.yml.hbs" }  // Missing "output"
+  ]
+}
 ```
 
 ---

@@ -302,10 +302,11 @@ struktur init --example docked my-stack
 
 Struktur validates instances through multiple layers:
 
-1. **JSON Schema validation**: Structural correctness (required fields, types, additionalProperties)
-2. **Semantic validation**: Data quality checks (minLength, maxLength, enum, bounds, format validation)
-3. **Lint checks**: Best practices and common issues (empty fields, suspicious formats)
-4. **Canonical shape validation**: Output structure integrity
+1. **Base schema validation (Pass 0)**: Universal contract - all instances must have `id` and `class` fields
+2. **JSON Schema validation (Pass 1)**: Structural correctness (required fields, types, additionalProperties)
+3. **Aspect validation (Pass 2)**: Aspect-specific requirements
+4. **Semantic validation (Pass 3)**: Data quality checks (minLength, maxLength, enum, bounds, format validation)
+5. **Lint checks (Pass 4)**: Best practices and common issues (empty fields, suspicious formats)
 
 The validation system checks:
 
