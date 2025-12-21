@@ -149,7 +149,7 @@ export class TemplateRenderer {
     
     // Find global instance (handle both full canonical and simple context)
     const instances = canonical.$instances || [];
-    const globalInstance = instances.find?.(obj => obj.id === 'global') || null;
+    const globalInstance = instances.find?.(obj => obj.$id === 'global') || null;
     
     // Build template context with render context for buffers
     const templateContext = this.buildContext(canonical, globalInstance, renderContext);
