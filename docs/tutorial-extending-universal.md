@@ -519,11 +519,10 @@ Monitoring: {{$aspects.aspect_monitoring.metrics_port}}
 }
 ```
 
-### Aspect Types (Auto-Computed)
+### Aspect Names (From $aspects)
 
 ```handlebars
-{{!-- $uses_aspects is automatically populated --}}
-Aspects: {{#each $uses_aspects}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+Aspects: {{#each (keys $aspects)}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
 ```
 
 ---

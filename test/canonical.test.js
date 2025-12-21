@@ -56,6 +56,26 @@ describe('Canonical Output', () => {
     assert.equal(obj.$class, 'page', 'Should preserve class');
   });
 
+  it('should not auto-populate $uses_aspects on instances', async () => {
+    const loader = new ClassLoader();
+    loader.classes.set('service', {
+      $class: 'service',
+      $uses_aspects: ['aspect_network'],
+      $schema: { type: 'object' }
+    });
+    const resolver = new ClassResolver(loader);
+
+    const instances = [
+      { $id: 'svc-1', $class: 'service' }
+    ];
+
+    const canonical = generateCanonical(instances, resolver);
+    const obj = canonical.$instances[0];
+
+    assert.equal(obj.$uses_aspects, undefined, 'Should not add $uses_aspects to instances');
+    assert.ok(obj.$aspects, 'Should still merge aspect data');
+  });
+
   it('should generate class index', async () => {
     const loader = new ClassLoader();
     await loader.loadClassesFromDirectory(join(FIXTURES_DIR, 'skribe', 'classes'));

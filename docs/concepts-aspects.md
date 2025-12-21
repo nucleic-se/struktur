@@ -226,6 +226,8 @@ Override for specific instance:
 - Changes to parent aspects propagate automatically
 - Fully backward compatible (explicit cumulative lists still work)
 
+**Note:** `$uses_aspects` is class metadata only. Instances should use `$aspects` and templates should read `keys $aspects`. Instances do not auto-populate `$uses_aspects`.
+
 ---
 
 ## Aspect Requirements

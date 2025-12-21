@@ -35,7 +35,7 @@
           "$uses_aspects": {
             "type": "array",
             "items": { "type": "string" },
-            "description": "List of aspect names (from class $uses_aspects + derived from instance $aspects keys)"
+            "description": "Explicit list of aspect names if provided (not auto-populated)"
           },
           "$source_file": {
             "type": "string",

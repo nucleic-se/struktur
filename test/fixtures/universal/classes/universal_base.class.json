@@ -41,7 +41,7 @@
         "items": {
           "type": "string"
         },
-        "description": "Kind classifications for this instance"
+        "description": "Explicit list of aspect names if provided"
       },
       "domains": {
         "type": "array",

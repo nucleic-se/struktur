@@ -68,10 +68,7 @@ function mergeInstanceWithFields(instance, resolvedClass = {}, aspectLoader = nu
       merged.$aspects[aspectName] = aspectData;
     }
     
-    // Auto-populate $uses_aspects from all merged aspects for convenient filtering
-    if (!merged.$uses_aspects) {
-      merged.$uses_aspects = Array.from(allAspectNames);
-    }
+    // Note: $uses_aspects is not auto-populated on instances
   }
 
   return merged;

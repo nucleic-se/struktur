@@ -774,10 +774,13 @@
       }
 
       // Kinds and domains badges
-      if ((obj.$uses_aspects && obj.$uses_aspects.length) || (obj.domains && obj.domains.length)) {
+      const aspectNamesFromData = Object.keys(obj.$aspects || {});
+      const declaredAspects = Array.isArray(obj.$uses_aspects) ? obj.$uses_aspects : [];
+      const displayAspects = aspectNamesFromData.length > 0 ? aspectNamesFromData : declaredAspects;
+      if (displayAspects.length > 0 || (obj.domains && obj.domains.length)) {
         html += `<div class="mt-3 pt-3 border-top">`;
-        if (obj.$uses_aspects) {
-          obj.$uses_aspects.forEach(k => {
+        if (displayAspects.length > 0) {
+          displayAspects.forEach(k => {
             html += `<span class="badge bg-primary me-1">${escapeHtml(k)}</span>`;
           });
         }
@@ -877,8 +880,11 @@
       if (!inst) return;
       
       // Find which tree this instance belongs to
-      if (inst.$uses_aspects && inst.$uses_aspects.length > 0) {
-        const kind = inst.$uses_aspects[0];
+      const aspectNamesFromData = Object.keys(inst.$aspects || {});
+      const declaredAspects = Array.isArray(inst.$uses_aspects) ? inst.$uses_aspects : [];
+      const displayAspects = aspectNamesFromData.length > 0 ? aspectNamesFromData : declaredAspects;
+      if (displayAspects.length > 0) {
+        const kind = displayAspects[0];
         selectInstance(kind, inst.$class, instanceId);
       } else {
         // Fallback: just filter by ID

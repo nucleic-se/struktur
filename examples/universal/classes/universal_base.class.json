@@ -40,7 +40,7 @@
         "items": {
           "type": "string"
         },
-        "description": "Aspect types present on this instance (auto-derived from aspects object keys)"
+        "description": "Explicit list of aspect names if provided"
       },
       "domains": {
         "type": "array",

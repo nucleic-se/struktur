@@ -180,6 +180,25 @@ See [Concepts: Aspects - Aspect Defaults](concepts-aspects.md#aspect-defaults) f
 
 ---
 
+### Instances No Longer Auto-Populate `$uses_aspects`
+
+**Breaking**: Canonical instances no longer auto-add `$uses_aspects` from merged aspect data.
+
+**Before:** Instances could rely on `$uses_aspects` being present after merge.
+
+**After:** Use `$aspects` keys directly in templates and consumers.
+
+**Migration**:
+```handlebars
+{{!-- Before --}}
+{{#each $uses_aspects}}{{this}}{{/each}}
+
+{{!-- After --}}
+{{#each (keys $aspects)}}{{this}}{{/each}}
+```
+
+---
+
 ### Aspect Defaults Require Explicit `$defaults`
 
 **Breaking**: Aspect defaults must be placed under a `$defaults` object. No implicit top-level defaults.

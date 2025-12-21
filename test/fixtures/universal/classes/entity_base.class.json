@@ -18,7 +18,7 @@
         "items": {
           "type": "string"
         },
-        "description": "Aspect types this entity belongs to"
+        "description": "Explicit list of aspect names if provided"
       },
       "domains": {
         "type": "array",
