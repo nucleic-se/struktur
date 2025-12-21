@@ -227,7 +227,7 @@ Every template receives the same context object:
   // Build metadata
   $metadata: {
     timestamp: "2025-12-16T10:30:00Z",
-    version: "0.2.3-alpha",
+    version: "0.4.0-alpha",
     generator: "struktur"
   },
   

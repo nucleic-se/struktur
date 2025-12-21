@@ -250,7 +250,7 @@ Requirement is declared on the **class**, not the aspect definition:
 **Notes:**
 - `required: true` enforces presence on instances of that class
 - `required: false` allows omission
-- Array shorthand (`"$aspects": ["aspect_monitoring"]`) is treated as optional
+- `$aspects` must be an object mapping aspect names to requirement settings
 
 ---
 

@@ -72,7 +72,7 @@ Build Phase: Stack Loading & Validation
 ✓ Template directories: 2
 ```
 
-### Output Collision Detection (v0.5.0+)
+### Output Collision Detection (v0.4.0+)
 
 Struktur detects when multiple render tasks target the same output file:
 
@@ -396,7 +396,7 @@ Every template receives:
   $aspect_names: [...],
   $metadata: {
     timestamp: "2025-12-16T10:30:00Z",
-    version: "0.2.3-alpha",
+    version: "0.4.0-alpha",
     generator: "struktur"
   },
   canonical: { ... }

@@ -98,7 +98,7 @@ This document tracks breaking changes in Struktur's alpha releases.
 
 ### Aspect Files Now Use `.class.json` (Not Yet Implemented)
 
-**Breaking** (Planned for v0.3.0): Aspect definitions will use `.class.json` files. The `.aspect.json` format will be removed.
+**Breaking** (v0.4.0): Aspect definitions use `.class.json` files. The `.aspect.json` format has been removed.
 
 **Changes:**
 - File extension: `*.aspect.json` → `*.class.json`
@@ -258,46 +258,74 @@ struktur build mystack --exact
 
 ---
 
-## v0.4.0-alpha (Planned - Reliability + Strictness)
+## v0.4.0-alpha (December 2025)
 
-**Status**: Planned  
-**Scope**: Fail fast on security and integrity issues
+**Status**: Released  
+**Tag**: v0.4.0-alpha  
+**Package version**: `0.4.0-alpha`  
+**Focus**: Strictness & Safety
 
-**Changes:**
-- Unsafe output paths now throw (path traversal is a hard error)
-- Unresolved classes now throw during canonical generation
-- Instance files without `$id` now throw (required field)
-- Invalid JSON in instance files now throws (no skip)
-- Explicitly configured directories must exist (missing dirs throw)
-- Template helpers now throw if `buildDir` is missing
+### Breaking Changes
 
-**Migration:**
-- Fix invalid JSON and add `$id` to all instances
-- Correct class names referenced by instances
-- Ensure CLI/config directories exist if explicitly set
-- Remove any template outputs that escape the build directory
+**Fail-Fast Security & Integrity (6 fixes):**
+- **Unsafe output paths** throw (path traversal blocked)
+- **Unresolved classes** throw during canonical generation
+- **Missing `$id`** throws on instance load (required field)
+- **Invalid JSON** throws with context (no silent skip)
+- **Explicitly configured directories** must exist (catch typos)
+- **Missing `buildDir`** throws in template helpers
 
-**Rationale**: These conditions indicate bugs or security issues. Failing fast prevents corrupt output and makes debugging obvious.
+**Strict Validation Enabled by Default (4 checks):**
+- **Output-file collision detection** prevents silent overwrites
+- **Aspect declaration enforcement** (instances only use declared aspects)
+- **Legacy `$aspects` array** format removed (object format only)
+- **AJV strict mode** enabled (`strictRequired`, `strictTypes`)
 
----
+### Migration Guide
 
-## v0.5.0-alpha (Planned - Default Strict Mode)
+**Fix instances:**
+- Add `$id` to all instances
+- Fix invalid JSON syntax
+- Ensure class names referenced exist
 
-**Status**: Planned  
-**Scope**: Enable strict checks by default (no opt-in flags)
+**Fix aspect usage:**
+- Add missing aspects to class `$uses_aspects` arrays
+- Convert any `$aspects` arrays to object format
+- Aspects accumulate through inheritance (child can use parent's aspects)
 
-**Changes:**
-- Output-file collisions now throw (two outputs to same file)
-- Instances may only use aspects declared in `$uses_aspects`
-- Legacy `$aspects` array format removed (object format only)
-- AJV strict mode enabled (`strictRequired`, `strictTypes`)
+**Fix schemas:**
+- Ensure `required` fields are defined in `properties`
+- Fix loose type definitions for AJV strict mode
 
-**Migration:**
-- Ensure all aspect usage is declared in class `$uses_aspects`
-- Convert `$aspects` arrays to object format
-- Update schemas to satisfy AJV strict rules
+**Fix collisions:**
+- Remove duplicate render tasks targeting same output file
+- Use unique output paths for each render task
 
-**Rationale**: Strict defaults catch real issues early and keep the data model consistent.
+**Fix paths:**
+- Ensure explicitly configured directories exist
+- Remove template outputs escaping build directory
+
+### Real Impact
+
+**Bugs caught during migration:**
+- 7 classes with undeclared aspects (backbone example)
+- 3 output file collisions (viewer.html, terraform files)
+- 1 tool_link class missing aspect declaration
+
+**Error improvements:**
+- Aspect validation shows full class lineage for debugging
+- Collision errors show which templates/instances conflict
+- AJV strict mode catches schema authoring errors early
+
+### Documentation
+
+- See [Validation Concepts](concepts-validation.md#ajv-strict-mode) for AJV strict mode details
+- See [Build Pipeline](concepts-build-pipeline.md#output-collision-detection) for collision detection
+- All 492 tests passing with strict validation
+
+### Rationale
+
+These checks catch real bugs (proven with examples), prevent security issues, and enforce data integrity. Alpha status means we can implement correct behavior without backward compatibility burden.
 
 ---
 

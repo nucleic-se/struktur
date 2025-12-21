@@ -261,9 +261,9 @@ Error (instance: web-01)
 - Schema warnings → errors (`--warnings-as-errors=true`)
 - Extra fields → warnings (`--warn-extra-fields=true`)
 - Constraint conflicts → always errors (no opt-out)
-- **AJV strict mode enabled** (v0.5.0+): `strictRequired` and `strictTypes`
+- **AJV strict mode enabled** (v0.4.0+): `strictRequired` and `strictTypes`
 
-**AJV Strict Mode (v0.5.0+):**
+**AJV Strict Mode (v0.4.0+):**
 
 Struktur enables AJV's strict validation flags to catch schema errors early:
 

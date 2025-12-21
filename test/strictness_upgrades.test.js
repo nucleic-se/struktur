@@ -80,6 +80,23 @@ describe('Strictness upgrades', () => {
     );
   });
 
+  it('should skip missing default directories silently', async () => {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'struktur-missing-defaults-'));
+    const originalCwd = process.cwd();
+
+    try {
+      process.chdir(tempDir);
+      const result = await buildStack({
+        buildDir: path.join(tempDir, 'build'),
+        quiet: true
+      });
+      await fs.access(result.buildDir);
+    } finally {
+      process.chdir(originalCwd);
+      await fs.rm(tempDir, { recursive: true, force: true });
+    }
+  });
+
   it('should throw when buildDir is missing', async () => {
     await assert.rejects(
       async () => {

@@ -177,6 +177,8 @@ struktur build --template-engine nunjucks
 
 **Build directory behavior:** Hash-based build directories are the default. Use `--exact` to force exact paths or `--no-deterministic` to allow overwrites.
 
+**Directory defaults vs explicit:** If you omit `classes`, `instances`, `aspects`, or `templates`, Struktur uses default directories (`./classes`, `./instances`, `./aspects`, `./templates`). Missing default directories are skipped silently, so you don't need to create empty folders. If you explicitly set a directory path (via config or CLI), it must exist or the build fails.
+
 ## Generating Configs from CLI
 
 Instead of writing configs manually, generate them from successful builds:

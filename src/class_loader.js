@@ -47,7 +47,7 @@ export class ClassLoader {
 
     if (Array.isArray(classDef.$aspects)) {
       throw new Error(
-        `Class definition uses legacy $aspects array format (removed in v0.5.0): ${filePath}\n` +
+        `Class definition uses legacy $aspects array format (removed in v0.4.0): ${filePath}\n` +
         `  Legacy format: "$aspects": ["aspect_network", "aspect_docker"]\n` +
         `  Correct format: "$aspects": {"aspect_network": {"required": false}}`
       );

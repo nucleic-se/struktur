@@ -310,7 +310,7 @@ Instance render arrays are merged with config render arrays:
 
 1. **Config render tasks execute first** (in order)
 2. **Instance render tasks execute second** (alphabetically by filename)
-3. **Duplicate outputs:** Last task wins (later overwrites earlier)
+3. **Duplicate outputs:** Build fails with an output collision error
 
 ### Use Cases
 

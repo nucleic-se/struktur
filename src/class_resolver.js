@@ -154,7 +154,7 @@ export class ClassResolver {
       if (classDef.$aspects) {
         if (Array.isArray(classDef.$aspects)) {
           throw new Error(
-            `Class uses legacy $aspects array format (removed in v0.5.0)\n` +
+            `Class uses legacy $aspects array format (removed in v0.4.0)\n` +
             `  Class: ${className}\n` +
             `  Legacy format: "$aspects": ["aspect_network", "aspect_docker"]\n` +
             `  Correct format: "$aspects": {"aspect_network": {"required": false}}\n` +

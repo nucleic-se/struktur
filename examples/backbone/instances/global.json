@@ -6,7 +6,7 @@
   "$render": [
     {
       "template": "viewer.html",
-      "output": "/index.html"
+      "output": "/viewer.html"
     }
   ]
 }
