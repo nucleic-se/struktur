@@ -1,6 +1,6 @@
 {
-  "id": "test_012",
-  "class": "tool_link",
+  "$id": "test_012",
+  "$class": "tool_link",
   "title": "Tape",
   "url": "https://github.com/tape-testing/tape",
   "description": "TAP-producing test harness for Node.js and browsers",

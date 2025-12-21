@@ -18,21 +18,23 @@ Instance     → Actual Data
 
 ### What is a Class?
 
-A class is a `.schema.json` file that defines:
+A class is a `.class.json` file that defines:
 - A unique class name
 - Optional parent class(es) for inheritance
 - Default field values
 - Validation schema
 
-**Example: `classes/service.schema.json`**
+**Example: `classes/service.class.json`**
 ```json
 {
-  "class": "service",
-  "parent": "entity_base",
-  "port": null,
-  "replicas": 1,
-  "status": "running",
-  "schema": {
+  "$class": "service",
+  "$parent": "entity_base",
+  "$fields": {
+    "port": null,
+    "replicas": 1,
+    "status": "running"
+  },
+  "$schema": {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
@@ -46,23 +48,25 @@ A class is a `.schema.json` file that defines:
 
 ### Class Fields
 
-- `class` (required) — Unique identifier, must match filename
-- `parent` (optional) — Single parent or array of parents
-- `aspect_types` (optional) — Array of aspect names this class uses (accumulates through inheritance)
-- `aspect_defaults` (optional) — Default values for aspect data (see [Aspect Defaults](#aspect-defaults))
-- All other fields — Default values for instances
+- `$class` (required) — Unique identifier, must match filename
+- `$parent` (optional) — Single parent or array of parents
+- `$uses_aspects` (optional) — Array of aspect names this class uses (accumulates through inheritance)
+- `$aspect_defaults` (optional) — Default values for aspect data (see [Aspect Defaults](#aspect-defaults))
+- `$fields` — Default values for instances
 
-### The `class` Field Requirement
+### The `$class` Field Requirement
 
-Since v0.2.0, class files **must** include a `"class"` field matching the filename:
+Since v0.2.0, class files **must** include a `"$class"` field matching the filename:
 
 ```json
-// service.schema.json
+// service.class.json
 {
-  "class": "service",           // ← Required, must match filename
-  "parent": "entity_base",
-  "port": null,
-  "schema": {
+  "$class": "service",           // ← Required, must match filename
+  "$parent": "entity_base",
+  "$fields": {
+    "port": null
+  },
+  "$schema": {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": { ... }
@@ -70,7 +74,7 @@ Since v0.2.0, class files **must** include a `"class"` field matching the filena
 }
 ```
 
-**Why?** Prevents errors when refactoring or moving files. The class field makes class files self-documenting and eliminates filename-based inference.
+**Why?** Prevents errors when refactoring or moving files. The $class field makes class files self-documenting and eliminates filename-based inference.
 
 ### Naming Conventions
 
@@ -80,7 +84,7 @@ Since v0.2.0, class files **must** include a `"class"` field matching the filena
 - Avoid abbreviations unless universal: `db` ok, `svr` not
 
 **File names:**
-- Class file: `<classname>.schema.json`
+- Class file: `<classname>.class.json`
 - Must match class name exactly
 - Contains both defaults and schema
 
@@ -92,10 +96,12 @@ Since v0.2.0, class files **must** include a `"class"` field matching the filena
 
 ```json
 {
-  "class": "web_server",
-  "parent": "server",
-  "framework": "express",
-  "node_version": "20"
+  "$class": "web_server",
+  "$parent": "server",
+  "$fields": {
+    "framework": "express",
+    "node_version": "20"
+  }
 }
 ```
 
@@ -110,8 +116,8 @@ entity_base
 
 ```json
 {
-  "class": "production_db",
-  "parent": ["database", "production_config", "monitored"]
+  "$class": "production_db",
+  "$parent": ["database", "production_config", "monitored"]
 }
 ```
 
@@ -143,41 +149,41 @@ entity_base
 
 ### Defining Aspect Defaults in Classes
 
-Classes can provide default values for aspect data using the `aspect_defaults` field:
+Classes can provide default values for aspect data using the `$aspect_defaults` field:
 
 ```json
-// classes/proxmox_lxc.schema.json
+// classes/proxmox_lxc.class.json
 {
-  "class": "proxmox_lxc",
-  "parent": "proxmox_guest",
-  "aspect_types": ["proxmox_guest", "network_interface"],
-  "aspect_defaults": {
-    "proxmox_guest": {
+  "$class": "proxmox_lxc",
+  "$parent": "proxmox_guest",
+  "$uses_aspects": ["aspect_proxmox_guest", "aspect_network_interface"],
+  "$aspect_defaults": {
+    "aspect_proxmox_guest": {
       "host_node": "polaris",
       "ostemplate": "local:vztmpl/debian-13-standard_13.1-2_amd64.tar.zst",
       "rootfs_storage": "local-lvm",
       "start": true,
       "unprivileged": true
     },
-    "network_interface": {
+    "aspect_network_interface": {
       "bridge": "vmbr0",
       "gateway": "192.168.68.1"
     }
   },
-  "schema": { ... }
+  "$schema": { ... }
 }
 ```
 
 ### Inheritance and Accumulation
 
-Like other class fields, `aspect_defaults` deep merge through the inheritance chain:
+Like other $class fields, `$aspect_defaults` deep merge through the inheritance chain:
 
 ```json
 // parent class
 {
-  "class": "base_container",
-  "aspect_defaults": {
-    "docker": {
+  "$class": "base_container",
+  "$aspect_defaults": {
+    "aspect_docker": {
       "restart": "unless-stopped",
       "network_mode": "bridge"
     }
@@ -186,10 +192,10 @@ Like other class fields, `aspect_defaults` deep merge through the inheritance ch
 
 // child class
 {
-  "class": "web_container",
-  "parent": "base_container",
-  "aspect_defaults": {
-    "docker": {
+  "$class": "web_container",
+  "$parent": "base_container",
+  "$aspect_defaults": {
+    "aspect_docker": {
       "restart": "always"  // Overrides parent
       // network_mode inherited from parent
     }
@@ -200,7 +206,7 @@ Like other class fields, `aspect_defaults` deep merge through the inheritance ch
 **Result for `web_container` instances:**
 ```json
 {
-  "docker": {
+  "aspect_docker": {
     "restart": "always",        // From child
     "network_mode": "bridge"    // From parent
   }
@@ -212,8 +218,8 @@ Like other class fields, `aspect_defaults` deep merge through the inheritance ch
 Aspect data merges from three sources:
 
 1. **Aspect definition defaults** (base layer)
-2. **Class aspect_defaults** (class-specific overrides)
-3. **Instance aspects** (highest priority)
+2. **Class $aspect_defaults** (class-specific overrides)
+3. **Instance $aspects** (highest priority)
 
 See [Concepts: Aspects - Aspect Defaults](concepts-aspects.md#aspect-defaults) for complete details.
 
@@ -223,17 +229,19 @@ See [Concepts: Aspects - Aspect Defaults](concepts-aspects.md#aspect-defaults) f
 
 ### What is a Schema?
 
-The `schema` property within a class file defines validation rules using JSON Schema.
+The `$schema` property within a class file defines validation rules using JSON Schema.
 
-**Example: `classes/service.schema.json`**
+**Example: `classes/service.class.json`**
 ```json
 {
-  "class": "service",
-  "parent": "entity_base",
-  "port": null,
-  "replicas": 1,
-  "status": "running",
-  "schema": {
+  "$class": "service",
+  "$parent": "entity_base",
+  "$fields": {
+    "port": null,
+    "replicas": 1,
+    "status": "running"
+  },
+  "$schema": {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
@@ -374,7 +382,7 @@ Use class defaults for values that are:
 **Examples:**
 ```json
 {
-  "class": "server",
+  "$class": "server",
   "replicas": 1,          // Safe default
   "auto_restart": true,   // Reasonable default
   "log_level": "info"     // Safe default
@@ -405,7 +413,7 @@ Use schema `required` for values that:
 ```json
 // BAD: Environment-specific default
 {
-  "class": "database",
+  "$class": "database",
   "host": "prod-db.example.com"  // Wrong for dev/staging!
 }
 ```
@@ -414,7 +422,7 @@ Use schema `required` for values that:
 ```json
 // GOOD: Leave unset, require in schema
 {
-  "class": "database"
+  "$class": "database"
   // No host field
 }
 
@@ -433,11 +441,11 @@ Use schema `required` for values that:
 Each class in the inheritance chain validates independently:
 
 ```
-entity_base.schema.json  → Validates base fields (id, name)
+entity_base.class.json  → Validates base fields ($id, name)
     ↓
-server.schema.json       → Validates server fields (hostname, ip)
+server.class.json       → Validates server fields (hostname, ip)
     ↓
-web_server.schema.json   → Validates web fields (port, ssl)
+web_server.class.json   → Validates web fields (port, ssl)
 ```
 
 **Why?** Keeps schemas focused and debuggable. When validation fails, you see which schema failed.
@@ -454,32 +462,32 @@ web_server.schema.json   → Validates web fields (port, ssl)
 **Classes:**
 ```json
 // entity_base.json
-{ "class": "entity_base", "id": "", "name": "" }
+{ "$class": "entity_base", "$fields": { "$id": "", "name": "" } }
 
 // server.json
-{ "class": "server", "parent": "entity_base", "hostname": "" }
+{ "$class": "server", "$parent": "entity_base", "$fields": { "hostname": "" } }
 
 // web_server.json
-{ "class": "web_server", "parent": "server", "port": 80 }
+{ "$class": "web_server", "$parent": "server", "$fields": { "port": 80 } }
 ```
 
 **Schemas:**
 ```json
-// entity_base.schema.json
-{ "required": ["id", "name"] }
+// entity_base.class.json
+{ "required": ["$id", "name"] }
 
-// server.schema.json
+// server.class.json
 { "required": ["hostname"] }
 
-// web_server.schema.json  
+// web_server.class.json  
 { "required": ["port"] }
 ```
 
 **Instance validation:**
 ```json
 {
-  "id": "web-01",
-  "class": "web_server",
+  "$id": "web-01",
+  "$class": "web_server",
   "name": "Web Server",
   "hostname": "web-01.example.com",
   "port": 8080
@@ -487,9 +495,9 @@ web_server.schema.json   → Validates web fields (port, ssl)
 ```
 
 Validates against:
-1. `entity_base.schema.json` ✓ (has id, name)
-2. `server.schema.json` ✓ (has hostname)
-3. `web_server.schema.json` ✓ (has port)
+1. `entity_base.class.json` ✓ (has $id, name)
+2. `server.class.json` ✓ (has hostname)
+3. `web_server.class.json` ✓ (has port)
 
 ---
 
@@ -537,16 +545,16 @@ Validates against:
 
 ```
 classes/
-├── entity_base.schema.json
-├── server.schema.json
-└── web_server.schema.json
+├── entity_base.class.json
+├── server.class.json
+└── web_server.class.json
 ```
 
 **Rules:**
-- One class per file (`.schema.json`)
+- One class per file (`.class.json`)
 - File contains class definition, defaults, and schema
 - Alphabetical order
-- Clear naming (filename must match `class` field)
+- Clear naming (filename must match `$class` field)
 
 ---
 
@@ -556,8 +564,8 @@ classes/
 
 ```json
 {
-  "class": "standalone_service",
-  "parent": null  // No inheritance
+  "$class": "standalone_service",
+  "$parent": null  // No inheritance
 }
 ```
 
@@ -603,8 +611,8 @@ Reference definitions in same schema:
 ### Missing Class Field
 
 ```
-Error: Schema file "service.schema.json" missing required "class" field
-Expected: "class": "service"
+Error: Schema file "service.class.json" missing required "$class" field
+Expected: "$class": "service"
 ```
 
 **Fix:** Add `"class"` field matching filename.
@@ -613,7 +621,7 @@ Expected: "class": "service"
 
 ```
 Error: Class "web_server" has no schema file
-Expected: classes/web_server.schema.json
+Expected: classes/web_server.class.json
 ```
 
 **Fix:** Create schema file with matching name.

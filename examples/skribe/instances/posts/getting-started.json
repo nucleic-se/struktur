@@ -1,13 +1,13 @@
 {
-  "id": "getting-started",
-  "class": "blog_post",
+  "$id": "getting-started",
+  "$class": "blog_post",
   "title": "Getting Started with Struktur",
   "slug": "getting-started",
   "description": "Understanding classes, instances, and templates",
-  "aspects": {
-    "blog_post": {
+  "$aspects": {
+    "aspect_blog_post": {
       "date": "2025-12-05",
-      "content": "Let's break down how Skribe works in five minutes. There are three main concepts: classes, instances, and templates. Once you understand how they interact, the rest clicks into place.\n\n**Classes** define shapes. Think of them as blueprints. The content_base class says 'all content has an id, title, slug, and description.' The blog_post class extends content_base and adds 'also, blog posts have a date, author, and tags.' This is inheritance—child classes get everything from their parents plus their own specific fields.\n\n**Instances** are actual content. Each blog post you're reading is an instance. It references a class ('blog_post') and provides the actual data (this title, this date, this content). Struktur merges the class defaults with the instance data and validates everything against JSON schemas. By the time templates see the data, it's guaranteed to be complete and correct.\n\n**Templates** render the validated data into outputs. They use Handlebars syntax with powerful helpers. The index template iterates over instances and generates individual post pages using the render_file helper. Tag pages are generated dynamically by querying instances. One template can produce dozens of output files.\n\nThe beautiful part? It's all deterministic. Same inputs, same outputs, every time. No timestamps, no random ordering, no surprises. Build it twice, diff the outputs—they're identical. This isn't just a nice feature; it's the foundation that makes everything else reliable.",
+      "content": "Let's break down how Skribe works in five minutes. There are three main concepts: classes, instances, and templates. Once you understand how they interact, the rest clicks into place.\n\n**Classes** define shapes. Think of them as blueprints. The content_base class says 'all content has an id, title, slug, and description.' The blog_post class extends content_base and adds 'also, blog posts have a date, author, and tags.' This is inheritance\u2014child classes get everything from their parents plus their own specific fields.\n\n**Instances** are actual content. Each blog post you're reading is an instance. It references a class ('blog_post') and provides the actual data (this title, this date, this content). Struktur merges the class defaults with the instance data and validates everything against JSON schemas. By the time templates see the data, it's guaranteed to be complete and correct.\n\n**Templates** render the validated data into outputs. They use Handlebars syntax with powerful helpers. The index template iterates over instances and generates individual post pages using the render_file helper. Tag pages are generated dynamically by querying instances. One template can produce dozens of output files.\n\nThe beautiful part? It's all deterministic. Same inputs, same outputs, every time. No timestamps, no random ordering, no surprises. Build it twice, diff the outputs\u2014they're identical. This isn't just a nice feature; it's the foundation that makes everything else reliable.",
       "tags": [
         "tutorial"
       ]

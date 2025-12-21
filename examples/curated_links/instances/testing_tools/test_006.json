@@ -1,6 +1,6 @@
 {
-  "id": "test_006",
-  "class": "tool_link",
+  "$id": "test_006",
+  "$class": "tool_link",
   "url": "https://testing-library.com",
   "title": "Testing Library",
   "description": "Simple and complete testing utilities that encourage good testing practices",

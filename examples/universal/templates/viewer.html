@@ -46,9 +46,29 @@
           {{else}}
           <div class="px-3 mb-3">
             <h5>Universal Viewer</h5>
-            <p class="text-muted small mb-0">Aspect Tree Browser</p>
+            <p class="text-muted small mb-0">Tree Browser</p>
           </div>
           {{/if}}
+          
+          <div class="px-3 mb-3">
+            <label class="small text-muted mb-2 d-block">VIEW BY</label>
+            <div class="btn-group w-100" role="group" aria-label="View Selector">
+              <input type="radio" class="btn-check" name="viewMode" id="viewClass" value="class" checked>
+              <label class="btn btn-outline-secondary btn-sm" for="viewClass">
+                <i class="bi bi-diagram-3"></i> Class
+              </label>
+              
+              <input type="radio" class="btn-check" name="viewMode" id="viewDomain" value="domain">
+              <label class="btn btn-outline-secondary btn-sm" for="viewDomain">
+                <i class="bi bi-grid-3x3"></i> Domain
+              </label>
+              
+              <input type="radio" class="btn-check" name="viewMode" id="viewAspect" value="aspect">
+              <label class="btn btn-outline-secondary btn-sm" for="viewAspect">
+                <i class="bi bi-tag"></i> Aspect
+              </label>
+            </div>
+          </div>
           
           <div class="px-3 mb-3">
             <input type="text" class="form-control form-control-sm" id="searchInput" placeholder="Search...">
@@ -56,7 +76,7 @@
           
           <div class="px-3 mb-2">
             <div class="d-flex justify-content-between align-items-center">
-              <span class="small fw-bold text-muted">ASPECT TREES</span>
+              <span class="small fw-bold text-muted" id="treeSectionLabel">CLASS HIERARCHY</span>
               <div>
                 <button class="btn btn-link btn-sm p-0 me-2" id="expandAll" title="Expand All"><i class="bi bi-arrows-expand"></i></button>
                 <button class="btn btn-link btn-sm p-0" id="collapseAll" title="Collapse All"><i class="bi bi-arrows-collapse"></i></button>
@@ -112,8 +132,8 @@
   <script>
     // Load canonical data (single source of truth)
     const canonical = {{{json canonical}}};
-    const allInstances = canonical.instances.filter(obj => obj.id !== 'global');
-    const allClasses = Object.values(canonical.classes_by_id);
+    const allInstances = canonical.$instances.filter(obj => obj.$id !== 'global');
+    const allClasses = Object.values(canonical.$classes_by_id);
     
     // Build relation indexes (drift-safe unidirectional)
     const relationIndexes = buildRelationIndexes(allInstances);
@@ -124,7 +144,7 @@
       
       instances.forEach(inst => {
         if (inst.relations && typeof inst.relations === 'object') {
-          outbound.set(inst.id, inst.relations);
+          outbound.set(inst.$id, inst.relations);
           
           // Build inverse index (derived relations)
           for (const [relationType, targets] of Object.entries(inst.relations)) {
@@ -136,7 +156,7 @@
               if (!inbound.get(targetId)[relationType]) {
                 inbound.get(targetId)[relationType] = [];
               }
-              inbound.get(targetId)[relationType].push(inst.id);
+              inbound.get(targetId)[relationType].push(inst.$id);
             });
           }
         }
@@ -145,9 +165,9 @@
       return { outbound, inbound };
     }
     
-    // Build aspect metadata map from canonical.aspects_by_id (single source of truth)
+    // Build aspect metadata map from canonical.$aspects_by_id (single source of truth)
     const aspectMetadata = new Map();
-    const aspectsByKind = canonical.aspects_by_id || {};
+    const aspectsByKind = canonical.$aspects_by_id || {};
     Object.entries(aspectsByKind).forEach(([kind, meta]) => {
       aspectMetadata.set(kind, {
         pretty_name: meta.pretty_name || kind.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
@@ -155,75 +175,174 @@
       });
     });
     
-    // Build tree structure from classes
-    const aspectTrees = new Map();  // kind -> { classes: Map<className, {class, children, instances}> }
-    const classToParent = new Map(); // class -> direct parent class (within same kind)
+    // Group instances by class (reused for multiple views)
     const instancesByClass = new Map(); // class -> [instances]
-    
-    // Group instances by class
     allInstances.forEach(inst => {
-      if (!instancesByClass.has(inst.class)) instancesByClass.set(inst.class, []);
-      instancesByClass.get(inst.class).push(inst);
+      if (!instancesByClass.has(inst.$class)) instancesByClass.set(inst.$class, []);
+      instancesByClass.get(inst.$class).push(inst);
     });
     
-    // Build class hierarchy per aspect tree
-    allClasses.forEach(cls => {
-      if (!cls.aspect_types || cls.aspect_types.length === 0) return;
+    function buildAspectTrees() {
+      const aspectTrees = new Map();  // kind -> { classes: Map<className, {class, children, instances}> }
       
-      // Add class to ALL aspect trees it belongs to
-      cls.aspect_types.forEach(kind => {
-        if (!aspectTrees.has(kind)) {
-          aspectTrees.set(kind, { name: kind, classes: new Map(), roots: [] });
-        }
+      // Build class hierarchy per aspect tree
+      allClasses.forEach(cls => {
+        if (!cls.$uses_aspects || cls.$uses_aspects.length === 0) return;
         
-        const tree = aspectTrees.get(kind);
-        tree.classes.set(cls.class, {
-          class: cls.class,
+        // Add class to ALL aspect trees it belongs to
+        cls.$uses_aspects.forEach(kind => {
+          if (!aspectTrees.has(kind)) {
+            aspectTrees.set(kind, { name: kind, classes: new Map(), roots: [] });
+          }
+          
+          const tree = aspectTrees.get(kind);
+          tree.classes.set(cls.$class, {
+            class: cls.$class,
+            data: cls,
+            children: [],
+            instances: instancesByClass.get(cls.$class) || [],
+            parent: null
+          });
+        });
+      });
+      
+      // Determine parent-child relationships within each tree
+      aspectTrees.forEach((tree) => {
+        tree.classes.forEach((node, className) => {
+          // Find the closest parent that's in the same tree
+          const parentChain = Array.isArray(node.data.$parent)
+            ? node.data.$parent
+            : (node.data.$parent ? [node.data.$parent] : []);
+          for (let i = parentChain.length - 1; i >= 0; i--) {
+            const potentialParent = parentChain[i];
+            if (tree.classes.has(potentialParent) && potentialParent !== className) {
+              node.parent = potentialParent;
+              tree.classes.get(potentialParent).children.push(className);
+              break;
+            }
+          }
+        });
+        
+        // Find root classes (no parent in this tree)
+        tree.classes.forEach((node, className) => {
+          if (!node.parent) {
+            tree.roots.push(className);
+          }
+        });
+        
+        // Sort roots alphabetically
+        tree.roots.sort();
+      });
+      
+      return aspectTrees;
+    }
+    
+    function buildClassTree() {
+      const classTree = {
+        classes: new Map(),
+        roots: []
+      };
+      
+      allClasses.forEach(cls => {
+        classTree.classes.set(cls.$class, {
+          class: cls.$class,
           data: cls,
           children: [],
-          instances: instancesByClass.get(cls.class) || [],
+          instances: instancesByClass.get(cls.$class) || [],
           parent: null
         });
       });
-    });
-    
-    // Determine parent-child relationships within each tree
-    aspectTrees.forEach((tree, kind) => {
-      tree.classes.forEach((node, className) => {
-        // Find the closest parent that's in the same tree
-        const parentChain = node.data.parent || [];
-        for (let i = parentChain.length - 1; i >= 0; i--) {
-          const potentialParent = parentChain[i];
-          if (tree.classes.has(potentialParent) && potentialParent !== className) {
-            node.parent = potentialParent;
-            tree.classes.get(potentialParent).children.push(className);
-            break;
-          }
+      
+      classTree.classes.forEach((node, className) => {
+        const parentChain = Array.isArray(node.data.$parent)
+          ? node.data.$parent
+          : (node.data.$parent ? [node.data.$parent] : []);
+        const directParent = parentChain.length > 0 ? parentChain[parentChain.length - 1] : null;
+        if (directParent && classTree.classes.has(directParent) && directParent !== className) {
+          node.parent = directParent;
+          classTree.classes.get(directParent).children.push(className);
         }
       });
       
-      // Find root classes (no parent in this tree)
-      tree.classes.forEach((node, className) => {
+      classTree.classes.forEach((node, className) => {
         if (!node.parent) {
-          tree.roots.push(className);
+          classTree.roots.push(className);
         }
       });
       
-      // Sort roots alphabetically
-      tree.roots.sort();
-    });
+      classTree.roots.sort();
+      return classTree;
+    }
+    
+    function buildDomainTree() {
+      const domainTrees = new Map(); // domain -> { classes: Map<className, node> }
+      
+      allInstances.forEach(inst => {
+        const domains = inst.domains && inst.domains.length > 0 ? inst.domains : ['uncategorized'];
+        domains.forEach(domain => {
+          if (!domainTrees.has(domain)) {
+            domainTrees.set(domain, { name: domain, classes: new Map(), roots: [] });
+          }
+          const tree = domainTrees.get(domain);
+          if (!tree.classes.has(inst.$class)) {
+            tree.classes.set(inst.$class, {
+              class: inst.$class,
+              data: allClasses.find(c => c.$class === inst.$class) || null,
+              children: [],
+              instances: [],
+              parent: null
+            });
+          }
+          tree.classes.get(inst.$class).instances.push(inst);
+        });
+      });
+      
+      // Domain view is flat: classes are instance-backed (created only when instances exist)
+      domainTrees.forEach(tree => {
+        tree.roots = Array.from(tree.classes.keys()).sort();
+      });
+      
+      return domainTrees;
+    }
     
     // Current selection state
+    let currentView = 'class';
+    let selectedDomain = null;
     let selectedKind = null;
     let selectedClass = null;
     let selectedInstance = null;
     let searchTerm = '';
     let domainFilter = '';
     
+    const treeCache = {
+      class: null,
+      domain: null,
+      aspect: null
+    };
+    
+    function ensureTreeCache(viewMode) {
+      if (treeCache[viewMode]) return;
+      if (viewMode === 'aspect') treeCache.aspect = buildAspectTrees();
+      if (viewMode === 'class') treeCache.class = buildClassTree();
+      if (viewMode === 'domain') treeCache.domain = buildDomainTree();
+    }
+    
     // Render the tree
     function renderTree() {
+      ensureTreeCache(currentView);
+      if (currentView === 'aspect') renderAspectTree(treeCache.aspect);
+      if (currentView === 'class') renderClassTree(treeCache.class);
+      if (currentView === 'domain') renderDomainTree(treeCache.domain);
+    }
+    
+    function renderAspectTree(aspectTrees) {
       const container = document.getElementById('treeContainer');
       container.innerHTML = '';
+      
+      if (aspectTrees.size === 0) {
+        container.innerHTML = '<div class="text-muted small px-2">No aspects available</div>';
+        return;
+      }
       
       // Sort aspect trees alphabetically
       const sortedKinds = Array.from(aspectTrees.keys()).sort();
@@ -232,9 +351,9 @@
         const tree = aspectTrees.get(kind);
         const kindInstances = countTreeInstances(tree);
         
-        // Get aspect metadata for label
+        // Get aspect metadata for label (with aspect_ prefix stripped)
         const metadata = aspectMetadata.get(kind);
-        const label = metadata?.pretty_name || formatLabel(kind);
+        const label = metadata?.pretty_name || formatAspectName(kind);
         
         // If only one root class, skip the aspect level and show class directly
         if (tree.roots.length === 1) {
@@ -248,7 +367,7 @@
           const classNode = document.createElement('div');
           classNode.className = 'tree-kind mb-1';
           classNode.innerHTML = `
-            <div class="tree-node tree-level-1 py-1 rounded d-flex align-items-center ${selectedClass === singleClass ? 'selected' : ''}" data-kind="${kind}" data-class="${singleClass}">
+            <div class="tree-node tree-level-1 py-1 rounded d-flex align-items-center ${selectedClass === singleClass ? 'selected' : ''}" ${buildDataAttrs({ view: 'aspect', kind, class: singleClass })}>
               <span class="tree-toggle">${toggleIcon}</span>
               <i class="bi bi-folder tree-icon text-secondary"></i>
               <span class="flex-grow-1">${escapeHtml(formatClassName(singleClass))}</span>
@@ -262,7 +381,7 @@
           
           // Render child classes
           if (node.children.length > 0) {
-            renderClassNodes(tree, node.children, childContainer, kind, 2);
+            renderClassNodes(tree, node.children, childContainer, { viewMode: 'aspect', kind, level: 2 });
           }
           
           // Render instances
@@ -271,7 +390,7 @@
             instNode.className = 'tree-instance';
             const displayName = getInstanceName(inst);
             instNode.innerHTML = `
-              <div class="tree-node tree-level-2 py-1 rounded d-flex align-items-center instance-item ${selectedInstance === inst.id ? 'selected' : ''}" data-kind="${kind}" data-class="${singleClass}" data-instance="${inst.id}">
+              <div class="tree-node tree-level-2 py-1 rounded d-flex align-items-center instance-item ${selectedInstance === inst.$id ? 'selected' : ''}" ${buildDataAttrs({ view: 'aspect', kind, class: singleClass, instance: inst.$id })}>
                 <span class="tree-toggle"></span>
                 <i class="bi bi-file-earmark tree-icon text-muted"></i>
                 <span>${escapeHtml(displayName)}</span>
@@ -284,7 +403,7 @@
           const kindNode = document.createElement('div');
           kindNode.className = 'tree-kind mb-1';
           kindNode.innerHTML = `
-            <div class="tree-node tree-level-1 py-1 rounded d-flex align-items-center ${selectedKind === kind && !selectedClass ? 'selected' : ''}" data-kind="${kind}">
+            <div class="tree-node tree-level-1 py-1 rounded d-flex align-items-center ${selectedKind === kind && !selectedClass ? 'selected' : ''}" ${buildDataAttrs({ view: 'aspect', kind })}>
               <span class="tree-toggle"><i class="bi bi-chevron-right"></i></span>
               <i class="bi bi-diagram-3 tree-icon text-primary"></i>
               <span class="flex-grow-1">${escapeHtml(label)}</span>
@@ -296,24 +415,168 @@
           
           // Render class nodes
           const childContainer = kindNode.querySelector('.tree-children');
-          renderClassNodes(tree, tree.roots, childContainer, kind, 2);
+          renderClassNodes(tree, tree.roots, childContainer, { viewMode: 'aspect', kind, level: 2 });
         }
       });
       
-      // Attach tree node click handlers
-      container.querySelectorAll('.tree-node[data-kind]').forEach(node => {
+      attachTreeHandlers(container);
+    }
+    
+    function renderClassTree(classTree) {
+      const container = document.getElementById('treeContainer');
+      container.innerHTML = '';
+      
+      if (!classTree || classTree.roots.length === 0) {
+        container.innerHTML = '<div class="text-muted small px-2">No classes available</div>';
+        return;
+      }
+      
+      renderClassNodes(classTree, classTree.roots, container, { viewMode: 'class', level: 1 });
+      attachTreeHandlers(container);
+    }
+    
+    function renderDomainTree(domainTrees) {
+      const container = document.getElementById('treeContainer');
+      container.innerHTML = '';
+      
+      const sortedDomains = Array.from(domainTrees.keys()).sort();
+      if (sortedDomains.length === 0) {
+        container.innerHTML = '<div class="text-muted small px-2">No domains available</div>';
+        return;
+      }
+      
+      sortedDomains.forEach(domain => {
+        const tree = domainTrees.get(domain);
+        const domainInstances = countTreeInstances(tree);
+        const label = formatLabel(domain);
+        
+        const domainNode = document.createElement('div');
+        domainNode.className = 'tree-kind mb-1';
+        domainNode.innerHTML = `
+          <div class="tree-node tree-level-1 py-1 rounded d-flex align-items-center ${selectedDomain === domain && !selectedClass ? 'selected' : ''}" ${buildDataAttrs({ view: 'domain', domain })}>
+            <span class="tree-toggle"><i class="bi bi-chevron-right"></i></span>
+            <i class="bi bi-grid-3x3 tree-icon text-success"></i>
+            <span class="flex-grow-1">${escapeHtml(label)}</span>
+            <span class="tree-count">${domainInstances}</span>
+          </div>
+          <div class="tree-children" id="domain-${domain}"></div>
+        `;
+        container.appendChild(domainNode);
+        
+        const childContainer = domainNode.querySelector('.tree-children');
+        renderClassNodes(tree, tree.roots, childContainer, { viewMode: 'domain', domain, level: 2, idPrefix: `domain-${domain}-class` });
+      });
+      
+      attachTreeHandlers(container);
+    }
+    
+    function renderClassNodes(tree, classNames, container, options) {
+      const viewMode = options.viewMode;
+      const kind = options.kind || null;
+      const domain = options.domain || null;
+      const level = options.level;
+      const idPrefix = options.idPrefix || 'class';
+      
+      classNames.filter(Boolean).sort().forEach(className => {
+        const node = tree.classes.get(className);
+        if (!node) return;
+        
+        const hasChildren = node.children.length > 0;
+        const instanceCount = countClassInstances(tree, className);
+        
+        // Skip empty nodes in all views
+        if (instanceCount === 0) return;
+        
+        // Skip intermediate single-child levels with no direct instances (Class/Aspect views only)
+        if (viewMode !== 'domain' && node.children.length === 1 && node.instances.length === 0) {
+          // Render the child directly, skipping this level
+          renderClassNodes(tree, node.children, container, { viewMode, kind, domain, level, idPrefix });
+          return;
+        }
+        
+        // Use chevron for expandable nodes, empty span for leaf nodes (keeps indentation)
+        const toggleIcon = hasChildren ? '<i class="bi bi-chevron-right"></i>' : '';
+        
+        const classNode = document.createElement('div');
+        classNode.className = 'tree-class';
+        classNode.innerHTML = `
+          <div class="tree-node tree-level-${level} py-1 rounded d-flex align-items-center ${selectedClass === className ? 'selected' : ''}" ${buildDataAttrs({ view: viewMode, kind, domain, class: className })}>
+            <span class="tree-toggle">${toggleIcon}</span>
+            <i class="bi bi-folder tree-icon text-secondary"></i>
+            <span class="flex-grow-1">${escapeHtml(formatClassName(className))}</span>
+            <span class="tree-count">${instanceCount}</span>
+          </div>
+          <div class="tree-children" id="${idPrefix}-${className}"></div>
+        `;
+        container.appendChild(classNode);
+        
+        const childContainer = classNode.querySelector('.tree-children');
+        
+        // Render child classes
+        if (node.children.length > 0) {
+          renderClassNodes(tree, node.children, childContainer, { viewMode, kind, domain, level: level + 1, idPrefix });
+        }
+        
+        // Render instances
+        node.instances.forEach(inst => {
+          const instNode = document.createElement('div');
+          instNode.className = 'tree-instance';
+          const displayName = getInstanceName(inst);
+          instNode.innerHTML = `
+            <div class="tree-node tree-level-${level + 1} py-1 rounded d-flex align-items-center instance-item ${selectedInstance === inst.$id ? 'selected' : ''}" ${buildDataAttrs({ view: viewMode, kind, domain, class: className, instance: inst.$id })}>
+              <span class="tree-toggle"></span>
+              <i class="bi bi-file-earmark tree-icon text-muted"></i>
+              <span>${escapeHtml(displayName)}</span>
+            </div>
+          `;
+          childContainer.appendChild(instNode);
+        });
+      });
+    }
+    
+    function buildDataAttrs(attrs) {
+      return Object.entries(attrs)
+        .filter(([, value]) => value !== null && value !== undefined && value !== '')
+        .map(([key, value]) => `data-${key}="${escapeHtml(String(value))}"`)
+        .join(' ');
+    }
+    
+    function attachTreeHandlers(container) {
+      container.querySelectorAll('.tree-node').forEach(node => {
         node.addEventListener('click', (e) => {
           e.stopPropagation();
+          const view = node.dataset.view;
           const kind = node.dataset.kind;
+          const domain = node.dataset.domain;
           const cls = node.dataset.class;
           const inst = node.dataset.instance;
           
-          if (inst) {
-            selectInstance(kind, cls, inst);
-          } else if (cls) {
-            selectClass(kind, cls);
-          } else {
-            selectKind(kind);
+          if (view === 'aspect') {
+            if (inst) {
+              selectAspectInstance(kind, cls, inst);
+            } else if (cls) {
+              selectAspectClass(kind, cls);
+            } else {
+              selectAspectKind(kind);
+            }
+          }
+          
+          if (view === 'class') {
+            if (inst) {
+              selectClassInstance(cls, inst);
+            } else if (cls) {
+              selectClassOnly(cls);
+            }
+          }
+          
+          if (view === 'domain') {
+            if (inst) {
+              selectDomainInstance(domain, cls, inst);
+            } else if (cls) {
+              selectDomainClass(domain, cls);
+            } else {
+              selectDomain(domain);
+            }
           }
         });
         
@@ -326,66 +589,13 @@
             if (children && children.classList.contains('tree-children')) {
               children.classList.toggle('expanded');
               const icon = toggle.querySelector('i');
-              icon.classList.toggle('bi-chevron-right');
-              icon.classList.toggle('bi-chevron-down');
+              if (icon) {
+                icon.classList.toggle('bi-chevron-right');
+                icon.classList.toggle('bi-chevron-down');
+              }
             }
           });
         }
-      });
-    }
-    
-    function renderClassNodes(tree, classNames, container, kind, level) {
-      classNames.filter(Boolean).sort().forEach(className => {
-        const node = tree.classes.get(className);
-        if (!node) return;
-        
-        const hasChildren = node.children.length > 0;
-        const instanceCount = countClassInstances(tree, className);
-        
-        // Skip this level if: only one child class AND no instances
-        if (node.children.length === 1 && node.instances.length === 0) {
-          // Render the child directly, skipping this level
-          renderClassNodes(tree, node.children, container, kind, level);
-          return;
-        }
-        
-        // Use chevron for expandable nodes, empty span for leaf nodes (keeps indentation)
-        const toggleIcon = hasChildren ? '<i class="bi bi-chevron-right"></i>' : '';
-        
-        const classNode = document.createElement('div');
-        classNode.className = 'tree-class';
-        classNode.innerHTML = `
-          <div class="tree-node tree-level-${level} py-1 rounded d-flex align-items-center ${selectedClass === className ? 'selected' : ''}" data-kind="${kind}" data-class="${className}">
-            <span class="tree-toggle">${toggleIcon}</span>
-            <i class="bi bi-folder tree-icon text-secondary"></i>
-            <span class="flex-grow-1">${escapeHtml(formatClassName(className))}</span>
-            <span class="tree-count">${instanceCount}</span>
-          </div>
-          <div class="tree-children" id="class-${className}"></div>
-        `;
-        container.appendChild(classNode);
-        
-        const childContainer = classNode.querySelector('.tree-children');
-        
-        // Render child classes
-        if (node.children.length > 0) {
-          renderClassNodes(tree, node.children, childContainer, kind, level + 1);
-        }
-        
-        // Render instances
-        node.instances.forEach(inst => {
-          const instNode = document.createElement('div');
-          instNode.className = 'tree-instance';
-          const displayName = getInstanceName(inst);
-          instNode.innerHTML = `
-            <div class="tree-node tree-level-${level + 1} py-1 rounded d-flex align-items-center instance-item ${selectedInstance === inst.id ? 'selected' : ''}" data-kind="${kind}" data-class="${className}" data-instance="${inst.id}">
-              <span class="tree-toggle"></span>
-              <i class="bi bi-file-earmark tree-icon text-muted"></i>
-              <span>${escapeHtml(displayName)}</span>
-            </div>
-          `;
-          childContainer.appendChild(instNode);
-        });
       });
     }
     
@@ -409,18 +619,23 @@
       return count;
     }
     
+    function isDomainFilterActive() {
+      return domainFilter && currentView !== 'domain';
+    }
+    
     function countFilteredInstances(instances) {
-      if (!domainFilter) return instances.length;
+      if (!isDomainFilterActive()) return instances.length;
       return instances.filter(inst => 
         inst.domains && inst.domains.includes(domainFilter)
       ).length;
     }
     
     // Selection handlers
-    function selectKind(kind) {
+    function selectAspectKind(kind) {
       selectedKind = kind;
       selectedClass = null;
       selectedInstance = null;
+      selectedDomain = null;
       
       // Expand this tree
       const treeEl = document.getElementById(`tree-${kind}`);
@@ -436,29 +651,90 @@
       updateUI();
     }
     
-    function selectClass(kind, cls) {
+    function selectAspectClass(kind, cls) {
       selectedKind = kind;
       selectedClass = cls;
       selectedInstance = null;
+      selectedDomain = null;
       
       // Expand path to this class
-      expandPathToClass(kind, cls);
+      expandPathToAspectClass(kind, cls);
       
       updateUI();
     }
     
-    function selectInstance(kind, cls, instId) {
+    function selectAspectInstance(kind, cls, instId) {
       selectedKind = kind;
       selectedClass = cls;
       selectedInstance = instId;
+      selectedDomain = null;
       
       // Expand path
-      expandPathToClass(kind, cls);
+      expandPathToAspectClass(kind, cls);
       
       updateUI();
     }
     
-    function expandPathToClass(kind, cls) {
+    function selectClassOnly(cls) {
+      selectedKind = null;
+      selectedDomain = null;
+      selectedClass = cls;
+      selectedInstance = null;
+      
+      expandPathToClassView(cls);
+      updateUI();
+    }
+    
+    function selectClassInstance(cls, instId) {
+      selectedKind = null;
+      selectedDomain = null;
+      selectedClass = cls;
+      selectedInstance = instId;
+      
+      expandPathToClassView(cls);
+      updateUI();
+    }
+    
+    function selectDomain(domain) {
+      selectedDomain = domain;
+      selectedKind = null;
+      selectedClass = null;
+      selectedInstance = null;
+      
+      const treeEl = document.getElementById(`domain-${domain}`);
+      if (treeEl) {
+        treeEl.classList.add('expanded');
+        const toggle = treeEl.previousElementSibling?.querySelector('.tree-toggle i');
+        if (toggle) {
+          toggle.classList.remove('bi-chevron-right');
+          toggle.classList.add('bi-chevron-down');
+        }
+      }
+      
+      updateUI();
+    }
+    
+    function selectDomainClass(domain, cls) {
+      selectedDomain = domain;
+      selectedKind = null;
+      selectedClass = cls;
+      selectedInstance = null;
+      
+      expandPathToDomain(domain, cls);
+      updateUI();
+    }
+    
+    function selectDomainInstance(domain, cls, instId) {
+      selectedDomain = domain;
+      selectedKind = null;
+      selectedClass = cls;
+      selectedInstance = instId;
+      
+      expandPathToDomain(domain, cls);
+      updateUI();
+    }
+    
+    function expandPathToAspectClass(kind, cls) {
       // Expand kind
       const treeEl = document.getElementById(`tree-${kind}`);
       if (treeEl) {
@@ -471,7 +747,7 @@
       }
       
       // Expand class ancestors
-      const tree = aspectTrees.get(kind);
+      const tree = treeCache.aspect?.get(kind);
       if (!tree) return;
       
       let current = cls;
@@ -490,6 +766,48 @@
       }
     }
     
+    function expandPathToClassView(cls) {
+      const tree = treeCache.class;
+      if (!tree) return;
+      
+      let current = cls;
+      while (current) {
+        const classEl = document.getElementById(`class-${current}`);
+        if (classEl) {
+          classEl.classList.add('expanded');
+          const toggle = classEl.previousElementSibling?.querySelector('.tree-toggle i');
+          if (toggle) {
+            toggle.classList.remove('bi-chevron-right');
+            toggle.classList.add('bi-chevron-down');
+          }
+        }
+        const node = tree.classes.get(current);
+        current = node?.parent;
+      }
+    }
+    
+    function expandPathToDomain(domain, cls) {
+      const treeEl = document.getElementById(`domain-${domain}`);
+      if (treeEl) {
+        treeEl.classList.add('expanded');
+        const toggle = treeEl.previousElementSibling?.querySelector('.tree-toggle i');
+        if (toggle) {
+          toggle.classList.remove('bi-chevron-right');
+          toggle.classList.add('bi-chevron-down');
+        }
+      }
+      
+      const classEl = document.getElementById(`domain-${domain}-class-${cls}`);
+      if (classEl) {
+        classEl.classList.add('expanded');
+        const toggle = classEl.previousElementSibling?.querySelector('.tree-toggle i');
+        if (toggle) {
+          toggle.classList.remove('bi-chevron-right');
+          toggle.classList.add('bi-chevron-down');
+        }
+      }
+    }
+    
     function updateUI() {
       updateTreeSelection();
       filterAndRender();
@@ -501,32 +819,131 @@
       // Update selection highlights without rebuilding tree
       document.querySelectorAll('.tree-node').forEach(node => {
         node.classList.remove('selected');
+        if (node.dataset.view !== currentView) return;
         
         const kind = node.dataset.kind;
+        const domain = node.dataset.domain;
         const cls = node.dataset.class;
         const inst = node.dataset.instance;
         
         if (inst && inst === selectedInstance) {
           node.classList.add('selected');
-        } else if (cls && cls === selectedClass && !selectedInstance) {
-          node.classList.add('selected');
-        } else if (kind && kind === selectedKind && !cls && !inst && !selectedClass && !selectedInstance) {
-          // Only select top-level kind nodes (no class/instance attributes)
-          node.classList.add('selected');
+          return;
+        }
+        
+        if (currentView === 'aspect') {
+          if (cls && cls === selectedClass && !selectedInstance) {
+            node.classList.add('selected');
+          } else if (kind && kind === selectedKind && !cls && !inst && !selectedClass && !selectedInstance) {
+            node.classList.add('selected');
+          }
+        }
+        
+        if (currentView === 'class') {
+          if (cls && cls === selectedClass && !selectedInstance) {
+            node.classList.add('selected');
+          }
+        }
+        
+        if (currentView === 'domain') {
+          if (cls && cls === selectedClass && !selectedInstance) {
+            node.classList.add('selected');
+          } else if (domain && domain === selectedDomain && !cls && !inst && !selectedClass && !selectedInstance) {
+            node.classList.add('selected');
+          }
         }
       });
+    }
+    
+    function updateSectionLabel(viewMode) {
+      const labels = {
+        class: 'CLASS HIERARCHY',
+        domain: 'BY DOMAIN',
+        aspect: 'BY ASPECT'
+      };
+      const label = labels[viewMode] || 'TREE';
+      document.getElementById('treeSectionLabel').textContent = label;
+    }
+    
+    function updateViewControls() {
+      const domainSelect = document.getElementById('domainFilter');
+      const disableDomainFilter = currentView === 'domain';
+      domainSelect.disabled = disableDomainFilter;
+    }
+    
+    function setSelectionForViewFromInstance(inst) {
+      selectedInstance = inst.$id;
+      selectedClass = inst.$class;
+      
+      if (currentView === 'aspect') {
+        const aspectNamesFromData = Object.keys(inst.$aspects || {});
+        const declaredAspects = Array.isArray(inst.$uses_aspects) ? inst.$uses_aspects : [];
+        const displayAspects = aspectNamesFromData.length > 0 ? aspectNamesFromData : declaredAspects;
+        selectedKind = displayAspects.length > 0 ? displayAspects[0] : null;
+        selectedDomain = null;
+      }
+      
+      if (currentView === 'class') {
+        selectedKind = null;
+        selectedDomain = null;
+      }
+      
+      if (currentView === 'domain') {
+        const domains = inst.domains && inst.domains.length > 0 ? inst.domains : ['uncategorized'];
+        selectedDomain = domains[0];
+        selectedKind = null;
+      }
+    }
+    
+    function normalizeSelectionForView() {
+      if (currentView === 'aspect') {
+        if (!selectedKind) selectedClass = null;
+        selectedDomain = null;
+      }
+      
+      if (currentView === 'class') {
+        selectedKind = null;
+        selectedDomain = null;
+      }
+      
+      if (currentView === 'domain') {
+        if (!selectedDomain) selectedClass = null;
+        selectedKind = null;
+      }
+    }
+    
+    function setView(viewMode) {
+      currentView = viewMode;
+      updateSectionLabel(viewMode);
+      updateViewControls();
+      
+      if (selectedInstance) {
+        const inst = allInstances.find(i => i.$id === selectedInstance);
+        if (inst) {
+          setSelectionForViewFromInstance(inst);
+        } else {
+          selectedInstance = null;
+        }
+      } else {
+        normalizeSelectionForView();
+      }
+      
+      renderTree();
+      updateUI();
     }
     
     function updateTitle() {
       const title = document.getElementById('viewTitle');
       if (selectedInstance) {
-        const inst = allInstances.find(i => i.id === selectedInstance);
+        const inst = allInstances.find(i => i.$id === selectedInstance);
         title.textContent = inst ? getInstanceName(inst) : selectedInstance;
       } else if (selectedClass) {
         title.textContent = formatClassName(selectedClass);
-      } else if (selectedKind) {
+      } else if (currentView === 'aspect' && selectedKind) {
         const metadata = aspectMetadata.get(selectedKind);
         title.textContent = metadata?.pretty_name || (formatLabel(selectedKind) + 's');
+      } else if (currentView === 'domain' && selectedDomain) {
+        title.textContent = formatLabel(selectedDomain);
       } else {
         title.textContent = 'All Instances';
       }
@@ -537,7 +954,7 @@
       const ol = breadcrumb.querySelector('ol');
       ol.innerHTML = '';
       
-      if (!selectedKind) {
+      if (!selectedKind && !selectedDomain && !selectedClass && !selectedInstance) {
         breadcrumb.classList.add('d-none');
         return;
       }
@@ -547,49 +964,93 @@
       // Add "All" link
       ol.innerHTML += `<li class="breadcrumb-item"><a href="#" onclick="showAll(); return false;">All</a></li>`;
       
-      // Add kind
-      if (selectedKind) {
-        const metadata = aspectMetadata.get(selectedKind);
-        const kindLabel = metadata?.pretty_name || formatLabel(selectedKind);
+      if (currentView === 'aspect') {
+        // Add kind
+        if (selectedKind) {
+          const metadata = aspectMetadata.get(selectedKind);
+          const kindLabel = metadata?.pretty_name || formatLabel(selectedKind);
+          
+          if (selectedClass || selectedInstance) {
+            ol.innerHTML += `<li class="breadcrumb-item"><a href="#" onclick="selectAspectKind('${selectedKind}'); return false;">${escapeHtml(kindLabel)}</a></li>`;
+          } else {
+            ol.innerHTML += `<li class="breadcrumb-item active">${escapeHtml(kindLabel)}</li>`;
+          }
+        }
         
-        if (selectedClass || selectedInstance) {
-          ol.innerHTML += `<li class="breadcrumb-item"><a href="#" onclick="selectKind('${selectedKind}'); return false;">${escapeHtml(kindLabel)}</a></li>`;
-        } else {
-          ol.innerHTML += `<li class="breadcrumb-item active">${escapeHtml(kindLabel)}</li>`;
+        // Add class hierarchy
+        if (selectedClass) {
+          const tree = treeCache.aspect?.get(selectedKind);
+          if (tree) {
+            const path = [];
+            let current = selectedClass;
+            while (current) {
+              path.unshift(current);
+              const node = tree.classes.get(current);
+              current = node?.parent;
+            }
+            
+            path.forEach((cls, idx) => {
+              if (idx === path.length - 1 && !selectedInstance) {
+                ol.innerHTML += `<li class="breadcrumb-item active">${escapeHtml(formatClassName(cls))}</li>`;
+              } else {
+                ol.innerHTML += `<li class="breadcrumb-item"><a href="#" onclick="selectAspectClass('${selectedKind}', '${cls}'); return false;">${escapeHtml(formatClassName(cls))}</a></li>`;
+              }
+            });
+          }
         }
       }
       
-      // Add class hierarchy
-      if (selectedClass) {
-        const tree = aspectTrees.get(selectedKind);
-        if (tree) {
-          const path = [];
-          let current = selectedClass;
-          while (current) {
-            path.unshift(current);
-            const node = tree.classes.get(current);
-            current = node?.parent;
-          }
-          
-          path.forEach((cls, idx) => {
-            if (idx === path.length - 1 && !selectedInstance) {
-              ol.innerHTML += `<li class="breadcrumb-item active">${escapeHtml(formatClassName(cls))}</li>`;
-            } else {
-              ol.innerHTML += `<li class="breadcrumb-item"><a href="#" onclick="selectClass('${selectedKind}', '${cls}'); return false;">${escapeHtml(formatClassName(cls))}</a></li>`;
+      if (currentView === 'class') {
+        if (selectedClass) {
+          const tree = treeCache.class;
+          if (tree) {
+            const path = [];
+            let current = selectedClass;
+            while (current) {
+              path.unshift(current);
+              const node = tree.classes.get(current);
+              current = node?.parent;
             }
-          });
+            
+            path.forEach((cls, idx) => {
+              if (idx === path.length - 1 && !selectedInstance) {
+                ol.innerHTML += `<li class="breadcrumb-item active">${escapeHtml(formatClassName(cls))}</li>`;
+              } else {
+                ol.innerHTML += `<li class="breadcrumb-item"><a href="#" onclick="selectClassOnly('${cls}'); return false;">${escapeHtml(formatClassName(cls))}</a></li>`;
+              }
+            });
+          }
+        }
+      }
+      
+      if (currentView === 'domain') {
+        if (selectedDomain) {
+          if (selectedClass || selectedInstance) {
+            ol.innerHTML += `<li class="breadcrumb-item"><a href="#" onclick="selectDomain('${selectedDomain}'); return false;">${escapeHtml(formatLabel(selectedDomain))}</a></li>`;
+          } else {
+            ol.innerHTML += `<li class="breadcrumb-item active">${escapeHtml(formatLabel(selectedDomain))}</li>`;
+          }
+        }
+        
+        if (selectedClass) {
+          if (selectedInstance) {
+            ol.innerHTML += `<li class="breadcrumb-item"><a href="#" onclick="selectDomainClass('${selectedDomain}', '${selectedClass}'); return false;">${escapeHtml(formatClassName(selectedClass))}</a></li>`;
+          } else {
+            ol.innerHTML += `<li class="breadcrumb-item active">${escapeHtml(formatClassName(selectedClass))}</li>`;
+          }
         }
       }
       
       // Add instance
       if (selectedInstance) {
-        const inst = allInstances.find(i => i.id === selectedInstance);
+        const inst = allInstances.find(i => i.$id === selectedInstance);
         ol.innerHTML += `<li class="breadcrumb-item active">${escapeHtml(inst ? getInstanceName(inst) : selectedInstance)}</li>`;
       }
     }
     
     function showAll() {
       selectedKind = null;
+      selectedDomain = null;
       selectedClass = null;
       selectedInstance = null;
       domainFilter = '';
@@ -609,7 +1070,7 @@
       }
       
       // Filter by domain
-      if (domainFilter) {
+      if (isDomainFilterActive()) {
         filtered = filtered.filter(obj => 
           obj.domains && obj.domains.includes(domainFilter)
         );
@@ -617,18 +1078,40 @@
       
       // Filter by selection
       if (selectedInstance) {
-        filtered = filtered.filter(obj => obj.id === selectedInstance);
+        filtered = filtered.filter(obj => obj.$id === selectedInstance);
       } else if (selectedClass) {
-        // Include instances of this class and all descendant classes
-        const tree = aspectTrees.get(selectedKind);
-        if (tree) {
-          const validClasses = getDescendantClasses(tree, selectedClass);
-          validClasses.add(selectedClass);
-          filtered = filtered.filter(obj => validClasses.has(obj.class));
+        if (currentView === 'aspect') {
+          // Include instances of this class and all descendant classes
+          const tree = treeCache.aspect?.get(selectedKind);
+          if (tree) {
+            const validClasses = getDescendantClasses(tree, selectedClass);
+            validClasses.add(selectedClass);
+            filtered = filtered.filter(obj => validClasses.has(obj.$class));
+          }
         }
-      } else if (selectedKind) {
+        
+        if (currentView === 'class') {
+          const tree = treeCache.class;
+          if (tree) {
+            const validClasses = getDescendantClasses(tree, selectedClass);
+            validClasses.add(selectedClass);
+            filtered = filtered.filter(obj => validClasses.has(obj.$class));
+          }
+        }
+        
+        if (currentView === 'domain') {
+          filtered = filtered.filter(obj => obj.$class === selectedClass);
+          if (selectedDomain) {
+            filtered = filtered.filter(obj => obj.domains && obj.domains.includes(selectedDomain));
+          }
+        }
+      } else if (currentView === 'aspect' && selectedKind) {
         filtered = filtered.filter(obj => 
-          obj.aspect_types && obj.aspect_types.includes(selectedKind)
+          obj.$aspects && Object.prototype.hasOwnProperty.call(obj.$aspects, selectedKind)
+        );
+      } else if (currentView === 'domain' && selectedDomain) {
+        filtered = filtered.filter(obj => 
+          obj.domains && obj.domains.includes(selectedDomain)
         );
       }
       
@@ -671,7 +1154,7 @@
     
     // Create card HTML - universal renderer
     function createCard(obj) {
-      const aspects = obj.aspects || {};
+      const aspects = obj.$aspects || {};
       const aspectNames = Object.keys(aspects).filter(k => k !== 'domain');
       const displayName = getInstanceName(obj);
       const primaryAspect = aspectNames[0] || '';
@@ -680,7 +1163,7 @@
         <div class="card h-100" ${primaryAspect ? `data-aspect="${escapeHtml(primaryAspect)}"` : ''}>
           <div class="card-header">
             <h5 class="card-title mb-0">${escapeHtml(displayName)}</h5>
-            <small class="text-muted">${escapeHtml(obj.id)}</small>
+            <small class="text-muted">${escapeHtml(obj.$id)}</small>
           </div>
           <div class="card-body">
       `;
@@ -704,9 +1187,9 @@
       const parents = Array.isArray(obj.parent) ? obj.parent : (obj.parent ? [obj.parent] : []);
       // Find children: any instance whose parent includes this object's id
       const children = allInstances.filter(inst => {
-        if (inst.id === obj.id) return false;
+        if (inst.$id === obj.$id) return false;
         const p = Array.isArray(inst.parent) ? inst.parent : (inst.parent ? [inst.parent] : []);
-        return p.includes(obj.id);
+        return p.includes(obj.$id);
       });
 
       if (parents.length > 0 || children.length > 0) {
@@ -715,7 +1198,7 @@
           html += `<div class="mb-1"><strong class="text-uppercase small text-muted">Parents</strong><ul class="mb-0">`;
           parents.forEach(pid => {
             // Try to find the parent instance for display name
-            const parentObj = allInstances.find(i => i.id === pid);
+            const parentObj = allInstances.find(i => i.$id === pid);
             html += `<li>${parentObj ? escapeHtml(getInstanceName(parentObj)) + ' <span class=\"text-muted\">(' + escapeHtml(pid) + ')</span>' : escapeHtml(pid)}</li>`;
           });
           html += `</ul></div>`;
@@ -723,15 +1206,15 @@
         if (children.length > 0) {
           html += `<div class="mb-1"><strong class="text-uppercase small text-muted">Children</strong><ul class="mb-0">`;
           children.forEach(child => {
-            html += `<li>${escapeHtml(getInstanceName(child))} <span class=\"text-muted\">(${escapeHtml(child.id)})</span></li>`;
+            html += `<li>${escapeHtml(getInstanceName(child))} <span class=\"text-muted\">(${escapeHtml(child.$id)})</span></li>`;
           });
           html += `</ul></div>`;
         }
       }
       
       // --- Relations Section (Drift-Safe Topology) ---
-      const outboundRels = relationIndexes.outbound.get(obj.id);
-      const inboundRels = relationIndexes.inbound.get(obj.id);
+      const outboundRels = relationIndexes.outbound.get(obj.$id);
+      const inboundRels = relationIndexes.inbound.get(obj.$id);
       
       if (outboundRels || inboundRels) {
         html += `<hr class="my-2"><div class="mb-2"><span class="badge bg-warning">Relations</span></div>`;
@@ -745,7 +1228,7 @@
             const showArrow = !relType.includes('/'); // Only show arrow for legacy format
             html += `<div class="mb-2"><strong class="text-uppercase small text-muted">${escapeHtml(formatLabel(outboundLabel))}</strong>${showArrow ? ' <i class="bi bi-arrow-right text-muted"></i>' : ''}<ul class="mb-0">`;
             targets.forEach(targetId => {
-              const targetObj = allInstances.find(i => i.id === targetId);
+              const targetObj = allInstances.find(i => i.$id === targetId);
               const displayName = targetObj ? getInstanceName(targetObj) : targetId;
               html += `<li><a href="#" onclick="selectInstanceById('${escapeHtml(targetId)}'); return false;">${escapeHtml(displayName)}</a> <span class="text-muted small">(${escapeHtml(targetId)})</span></li>`;
             });
@@ -762,7 +1245,7 @@
             const showArrow = !relType.includes('/'); // Only show arrow for legacy format
             html += `<div class="mb-2">${showArrow ? '<i class="bi bi-arrow-left text-muted"></i> ' : ''}<strong class="text-uppercase small text-muted">${escapeHtml(formatLabel(inboundLabel))}</strong><ul class="mb-0">`;
             sources.forEach(sourceId => {
-              const sourceObj = allInstances.find(i => i.id === sourceId);
+              const sourceObj = allInstances.find(i => i.$id === sourceId);
               const displayName = sourceObj ? getInstanceName(sourceObj) : sourceId;
               html += `<li><a href="#" onclick="selectInstanceById('${escapeHtml(sourceId)}'); return false;">${escapeHtml(displayName)}</a> <span class="text-muted small">(${escapeHtml(sourceId)})</span></li>`;
             });
@@ -772,10 +1255,13 @@
       }
 
       // Kinds and domains badges
-      if ((obj.aspect_types && obj.aspect_types.length) || (obj.domains && obj.domains.length)) {
+      const aspectNamesFromData = Object.keys(obj.$aspects || {});
+      const declaredAspects = Array.isArray(obj.$uses_aspects) ? obj.$uses_aspects : [];
+      const displayAspects = aspectNamesFromData.length > 0 ? aspectNamesFromData : declaredAspects;
+      if (displayAspects.length > 0 || (obj.domains && obj.domains.length)) {
         html += `<div class="mt-3 pt-3 border-top">`;
-        if (obj.aspect_types) {
-          obj.aspect_types.forEach(k => {
+        if (displayAspects.length > 0) {
+          displayAspects.forEach(k => {
             html += `<span class="badge bg-primary me-1">${escapeHtml(k)}</span>`;
           });
         }
@@ -790,7 +1276,7 @@
       html += `
           </div>
           <div class="card-footer">
-            <small class="text-muted">Class: <code>${escapeHtml(obj.class)}</code></small>
+            <small class="text-muted">Class: <code>${escapeHtml(obj.$class)}</code></small>
           </div>
         </div>
       `;
@@ -803,25 +1289,31 @@
       if (obj.name) return obj.name;
       
       // 2. Fall back to searching aspects (skip 'domain' as it's metadata)
-      const aspects = obj.aspects || {};
+      const aspects = obj.$aspects || {};
       for (const [aspectKey, aspectData] of Object.entries(aspects)) {
         if (aspectKey === 'domain') continue; // Skip domain metadata
         if (aspectData?.name) return aspectData.name;
       }
       
       // 3. Final fallback to ID
-      return obj.id;
+      return obj.$id;
     }
     
     function formatLabel(key) {
       return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
     }
     
+    function formatAspectName(aspectName) {
+      // Strip "aspect_" prefix for cleaner display
+      const stripped = aspectName.replace(/^aspect_/i, '');
+      return formatLabel(stripped);
+    }
+    
     function formatClassName(cls) {
       if (!cls) return 'Unknown';
       
       // Check if class has pretty_name in canonical data
-      const classData = allClasses.find(c => c.class === cls);
+      const classData = allClasses.find(c => c.$class === cls);
       if (classData && classData.pretty_name) {
         return classData.pretty_name;
       }
@@ -871,20 +1363,22 @@
     
     // Helper to select instance by ID (used in relation links)
     function selectInstanceById(instanceId) {
-      const inst = allInstances.find(i => i.id === instanceId);
+      const inst = allInstances.find(i => i.$id === instanceId);
       if (!inst) return;
       
-      // Find which tree this instance belongs to
-      if (inst.aspect_types && inst.aspect_types.length > 0) {
-        const kind = inst.aspect_types[0];
-        selectInstance(kind, inst.class, instanceId);
-      } else {
-        // Fallback: just filter by ID
-        selectedInstance = instanceId;
-        selectedClass = inst.class;
-        selectedKind = null;
-        updateUI();
+      setSelectionForViewFromInstance(inst);
+      
+      if (currentView === 'aspect' && selectedKind) {
+        expandPathToAspectClass(selectedKind, inst.$class);
       }
+      if (currentView === 'class') {
+        expandPathToClassView(inst.$class);
+      }
+      if (currentView === 'domain' && selectedDomain) {
+        expandPathToDomain(selectedDomain, inst.$class);
+      }
+      
+      updateUI();
     }
     
     // Initialize domain filter
@@ -917,6 +1411,12 @@
     
     document.getElementById('showAll').addEventListener('click', showAll);
     
+    document.querySelectorAll('input[name="viewMode"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        setView(e.target.value);
+      });
+    });
+    
     document.getElementById('expandAll').addEventListener('click', () => {
       document.querySelectorAll('.tree-children').forEach(el => {
         el.classList.add('expanded');
@@ -939,8 +1439,7 @@
     
     // Initialize
     initDomainFilter();
-    renderTree();
-    filterAndRender();
+    setView(currentView);
   </script>
 </body>
 </html>

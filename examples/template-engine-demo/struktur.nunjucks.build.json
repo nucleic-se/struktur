@@ -1,13 +1,28 @@
 {
-  "classes": ["../universal/classes", "classes"],
-  "aspects": ["../universal/aspects"],
-  "instances": ["instances"],
-  "templates": ["templates/nunjucks"],
+  "classes": [
+    "../universal/classes",
+    "classes"
+  ],
+  "aspects": [
+    "../universal/aspects"
+  ],
+  "instances": [
+    "instances"
+  ],
+  "templates": [
+    "templates/nunjucks"
+  ],
   "template_engine": "nunjucks",
   "build_dir": "build/nunjucks",
   "render": [
-    { "nginx.conf.njk": "/nginx.conf" },
-    { "docker-compose.yml.njk": "/docker-compose.yml" },
-    { "README.md.njk": "/README.md" }
+    {
+      "nginx.conf.njk": "/nginx.conf"
+    },
+    {
+      "docker-compose.yml.njk": "/docker-compose.yml"
+    },
+    {
+      "README.md.njk": "/README.md"
+    }
   ]
 }

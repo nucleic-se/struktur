@@ -1,6 +1,6 @@
 {
-  "id": "css_025",
-  "class": "tool_link",
+  "$id": "css_025",
+  "$class": "tool_link",
   "url": "https://vuetifyjs.com",
   "title": "Vuetify",
   "description": "Material Design component framework for Vue.js",

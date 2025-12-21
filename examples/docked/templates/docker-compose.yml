@@ -11,69 +11,69 @@
 # Health checks ensure each service is ready before dependents start.
 
 services:
-{{#each instances_by_id}}{{#if aspects.docker_container}}{{#unless (eq id "global")}}
-  # {{#if description}}{{description}}{{else}}{{id}} service{{/if}}
-  {{id}}:
-{{#if aspects.docker_container.image}}
-    image: {{aspects.docker_container.image}}
+{{#each $instances_by_id}}{{#if $aspects.aspect_docker_container}}{{#unless (eq $id "global")}}
+  # {{#if description}}{{description}}{{else}}{{$id}} service{{/if}}
+  {{$id}}:
+{{#if $aspects.aspect_docker_container.image}}
+    image: {{$aspects.aspect_docker_container.image}}
 {{/if}}
-{{#if aspects.docker_container.build}}
-{{#if (eq (typeof aspects.docker_container.build) "string")}}
-    build: {{aspects.docker_container.build}}
+{{#if $aspects.aspect_docker_container.build}}
+{{#if (eq (typeof $aspects.aspect_docker_container.build) "string")}}
+    build: {{$aspects.aspect_docker_container.build}}
 {{else}}
     build:
-      context: {{aspects.docker_container.build.context}}
-{{#if aspects.docker_container.build.dockerfile}}
-      dockerfile: {{aspects.docker_container.build.dockerfile}}
+      context: {{$aspects.aspect_docker_container.build.context}}
+{{#if $aspects.aspect_docker_container.build.dockerfile}}
+      dockerfile: {{$aspects.aspect_docker_container.build.dockerfile}}
 {{/if}}
-{{#if aspects.docker_container.build.target}}
-      target: {{aspects.docker_container.build.target}}
+{{#if $aspects.aspect_docker_container.build.target}}
+      target: {{$aspects.aspect_docker_container.build.target}}
 {{/if}}
-{{#if aspects.docker_container.build.args}}
+{{#if $aspects.aspect_docker_container.build.args}}
       args:
-{{#each aspects.docker_container.build.args}}
+{{#each $aspects.aspect_docker_container.build.args}}
         {{@key}}: {{this}}
 {{/each}}
 {{/if}}
 {{/if}}
 {{/if}}
-    container_name: {{id}}
-{{#if aspects.docker_container.command}}
-    command: {{{aspects.docker_container.command}}}
+    container_name: {{$id}}
+{{#if $aspects.aspect_docker_container.command}}
+    command: {{{$aspects.aspect_docker_container.command}}}
 {{/if}}
-{{#if aspects.docker_container.working_dir}}
-    working_dir: {{aspects.docker_container.working_dir}}
+{{#if $aspects.aspect_docker_container.working_dir}}
+    working_dir: {{$aspects.aspect_docker_container.working_dir}}
 {{/if}}
-{{#if aspects.docker_container.restart_policy}}
-    restart: {{aspects.docker_container.restart_policy}}
+{{#if $aspects.aspect_docker_container.restart_policy}}
+    restart: {{$aspects.aspect_docker_container.restart_policy}}
 {{/if}}
-{{#if aspects.docker_container.ports}}
+{{#if $aspects.aspect_docker_container.ports}}
     ports:
-{{#each aspects.docker_container.ports}}
+{{#each $aspects.aspect_docker_container.ports}}
       - "{{this}}"
 {{/each}}
 {{/if}}
-{{#if aspects.docker_container.volumes}}
+{{#if $aspects.aspect_docker_container.volumes}}
     volumes:
-{{#each aspects.docker_container.volumes}}
+{{#each $aspects.aspect_docker_container.volumes}}
       - {{this}}
 {{/each}}
 {{/if}}
-{{#if aspects.docker_container.environment}}
+{{#if $aspects.aspect_docker_container.environment}}
     environment:
-{{#each aspects.docker_container.environment}}
+{{#each $aspects.aspect_docker_container.environment}}
       {{@key}}: "{{{this}}}"
 {{/each}}
 {{/if}}
-{{#if aspects.docker_container.networks}}
+{{#if $aspects.aspect_docker_container.networks}}
     networks:
-{{#each aspects.docker_container.networks}}
+{{#each $aspects.aspect_docker_container.networks}}
       - {{this}}
 {{/each}}
 {{/if}}
-{{#if aspects.docker_container.depends_on}}
+{{#if $aspects.aspect_docker_container.depends_on}}
     depends_on:
-{{#each aspects.docker_container.depends_on}}
+{{#each $aspects.aspect_docker_container.depends_on}}
       - {{this}}
 {{/each}}
 {{else}}{{#if relations.[manages/managed_by]}}
@@ -87,42 +87,42 @@ services:
       - {{this}}
 {{/each}}
 {{/if}}{{/if}}{{/if}}
-{{#if aspects.docker_container.healthcheck}}
+{{#if $aspects.aspect_docker_container.healthcheck}}
     healthcheck:
-      test: [{{#each aspects.docker_container.healthcheck.test}}"{{this}}"{{#unless @last}}, {{/unless}}{{/each}}]
-{{#if aspects.docker_container.healthcheck.interval}}
-      interval: {{aspects.docker_container.healthcheck.interval}}
+      test: [{{#each $aspects.aspect_docker_container.healthcheck.test}}"{{this}}"{{#unless @last}}, {{/unless}}{{/each}}]
+{{#if $aspects.aspect_docker_container.healthcheck.interval}}
+      interval: {{$aspects.aspect_docker_container.healthcheck.interval}}
 {{/if}}
-{{#if aspects.docker_container.healthcheck.timeout}}
-      timeout: {{aspects.docker_container.healthcheck.timeout}}
+{{#if $aspects.aspect_docker_container.healthcheck.timeout}}
+      timeout: {{$aspects.aspect_docker_container.healthcheck.timeout}}
 {{/if}}
-{{#if aspects.docker_container.healthcheck.retries}}
-      retries: {{aspects.docker_container.healthcheck.retries}}
+{{#if $aspects.aspect_docker_container.healthcheck.retries}}
+      retries: {{$aspects.aspect_docker_container.healthcheck.retries}}
 {{/if}}
-{{#if aspects.docker_container.healthcheck.start_period}}
-      start_period: {{aspects.docker_container.healthcheck.start_period}}
+{{#if $aspects.aspect_docker_container.healthcheck.start_period}}
+      start_period: {{$aspects.aspect_docker_container.healthcheck.start_period}}
 {{/if}}
 {{/if}}
-{{#if aspects.docker_container.deploy}}
+{{#if $aspects.aspect_docker_container.deploy}}
     deploy:
-{{#if aspects.docker_container.deploy.resources}}
+{{#if $aspects.aspect_docker_container.deploy.resources}}
       resources:
-{{#if aspects.docker_container.deploy.resources.limits}}
+{{#if $aspects.aspect_docker_container.deploy.resources.limits}}
         limits:
-{{#if aspects.docker_container.deploy.resources.limits.cpus}}
-          cpus: '{{aspects.docker_container.deploy.resources.limits.cpus}}'
+{{#if $aspects.aspect_docker_container.deploy.resources.limits.cpus}}
+          cpus: '{{$aspects.aspect_docker_container.deploy.resources.limits.cpus}}'
 {{/if}}
-{{#if aspects.docker_container.deploy.resources.limits.memory}}
-          memory: {{aspects.docker_container.deploy.resources.limits.memory}}
+{{#if $aspects.aspect_docker_container.deploy.resources.limits.memory}}
+          memory: {{$aspects.aspect_docker_container.deploy.resources.limits.memory}}
 {{/if}}
 {{/if}}
-{{#if aspects.docker_container.deploy.resources.reservations}}
+{{#if $aspects.aspect_docker_container.deploy.resources.reservations}}
         reservations:
-{{#if aspects.docker_container.deploy.resources.reservations.cpus}}
-          cpus: '{{aspects.docker_container.deploy.resources.reservations.cpus}}'
+{{#if $aspects.aspect_docker_container.deploy.resources.reservations.cpus}}
+          cpus: '{{$aspects.aspect_docker_container.deploy.resources.reservations.cpus}}'
 {{/if}}
-{{#if aspects.docker_container.deploy.resources.reservations.memory}}
-          memory: {{aspects.docker_container.deploy.resources.reservations.memory}}
+{{#if $aspects.aspect_docker_container.deploy.resources.reservations.memory}}
+          memory: {{$aspects.aspect_docker_container.deploy.resources.reservations.memory}}
 {{/if}}
 {{/if}}
 {{/if}}
@@ -130,18 +130,17 @@ services:
 {{/unless}}{{/if}}{{/each}}
 
 networks:
-{{#each instances_by_id}}{{#if aspects.docker_network}}{{#unless (eq id "global")}}
-  {{id}}:
-{{#if aspects.docker_network.driver}}
-    driver: {{aspects.docker_network.driver}}
+{{#each $instances_by_id}}{{#if $aspects.aspect_docker_network}}{{#unless (eq $id "global")}}
+  {{$id}}:
+{{#if $aspects.aspect_docker_network.driver}}
+    driver: {{$aspects.aspect_docker_network.driver}}
 {{/if}}
 {{/unless}}{{/if}}{{/each}}
 
 volumes:
-{{#each instances_by_id}}{{#if aspects.docker_volume}}{{#unless (eq id "global")}}
-  {{id}}:
-{{#if aspects.docker_volume.driver}}
-    driver: {{aspects.docker_volume.driver}}
+{{#each $instances_by_id}}{{#if $aspects.aspect_docker_volume}}{{#unless (eq $id "global")}}
+  {{$id}}:
+{{#if $aspects.aspect_docker_volume.driver}}
+    driver: {{$aspects.aspect_docker_volume.driver}}
 {{/if}}
 {{/unless}}{{/if}}{{/each}}
-

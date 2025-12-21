@@ -1,6 +1,6 @@
 {
-  "id": "css_014",
-  "class": "tool_link",
+  "$id": "css_014",
+  "$class": "tool_link",
   "url": "https://tachyons.io",
   "title": "Tachyons",
   "description": "Functional CSS for humans with immutable and composable classes",

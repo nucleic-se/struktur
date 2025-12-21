@@ -1,0 +1,1 @@
+{"$class":"aspect_deep","$aspect":"aspect_deep","description":"Deeply nested aspect","$schema":{"type":"object","properties":{"deep_field":{"type":"string"}}}}

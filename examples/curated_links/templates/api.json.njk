@@ -2,13 +2,13 @@
 {% import "_macros.njk" as m %}
 {
   "collection": {
-    "title": "{{ instances_by_id['metadata'].title }}",
-    "description": "{{ instances_by_id['metadata'].description }}",
-    "url": "{{ instances_by_id['metadata'].url }}",
-    "total_links": {{ m.toolCount(instances) }}
+    "title": "{{ $instances_by_id['metadata'].title }}",
+    "description": "{{ $instances_by_id['metadata'].description }}",
+    "url": "{{ $instances_by_id['metadata'].url }}",
+    "total_links": {{ m.toolCount($instances) }}
   },
   "links": [
-    {% set links = instances | selectattr('class', 'equalto', 'tool_link') | list %}
+    {% set links = $instances | selectattr('$class', 'equalto', 'tool_link') | list %}
     {% for link in links %}
 {{ m.linkJSON(link, loop.last) }}
     {% endfor %}

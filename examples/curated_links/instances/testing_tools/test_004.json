@@ -1,6 +1,6 @@
 {
-  "id": "test_004",
-  "class": "tool_link",
+  "$id": "test_004",
+  "$class": "tool_link",
   "url": "https://playwright.dev",
   "title": "Playwright",
   "description": "Cross-browser automation library for reliable end-to-end testing",

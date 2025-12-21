@@ -71,7 +71,7 @@ class SemanticValidator {
           code: 'empty_field',
           message: `Field '${field}' is empty`,
           path: `/${field}`,
-          instance: instance.id
+          instance: instance.$id
         });
       }
     }
@@ -86,7 +86,7 @@ class SemanticValidator {
               code: 'placeholder_value',
               message: `Field contains placeholder: ${value}`,
               path,
-              instance: instance.id
+              instance: instance.$id
             });
             break; // Only warn once per field
           }

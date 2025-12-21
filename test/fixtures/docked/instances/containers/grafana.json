@@ -1,14 +1,20 @@
 {
-  "id": "grafana",
-  "class": "docked_container",
-  "domains": ["monitoring"],
-  "aspects": {
-    "docker_container": {
+  "$id": "grafana",
+  "$class": "docked_container",
+  "domains": [
+    "monitoring"
+  ],
+  "$aspects": {
+    "aspect_docker_container": {
       "image": "grafana/grafana:latest",
       "description": "Metrics visualization and monitoring dashboards",
       "web_ui": "http://localhost:3000",
-      "ports": ["3000:3000"],
-      "networks": ["docked"],
+      "ports": [
+        "3000:3000"
+      ],
+      "networks": [
+        "docked"
+      ],
       "restart_policy": "unless-stopped",
       "volumes": [
         "grafana-data:/var/lib/grafana",
@@ -23,6 +29,8 @@
     }
   },
   "relations": {
-    "monitors/monitored_by": ["redis"]
+    "monitors/monitored_by": [
+      "redis"
+    ]
   }
 }

@@ -1,6 +1,6 @@
 {
-  "id": "test_016",
-  "class": "tool_link",
+  "$id": "test_016",
+  "$class": "tool_link",
   "title": "Chai",
   "url": "https://www.chaijs.com",
   "description": "BDD/TDD assertion library for Node.js and browsers",

@@ -1,0 +1,44 @@
+{
+  "$class": "infrastructure_entity",
+  "$parent": "entity_base",
+  "$uses_aspects": [
+    "aspect_infrastructure"
+  ],
+  "$schema": {
+    "type": "object",
+    "properties": {
+      "$aspects": {
+        "type": "object",
+        "properties": {
+          "aspect_infrastructure": {
+            "type": "object",
+            "properties": {
+              "environment": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Environment where the infrastructure component is deployed (lab, home, production, remote)"
+              },
+              "location": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Physical location of the infrastructure component"
+              },
+              "notes": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Additional notes or documentation about this component"
+              }
+            }
+          }
+        }
+      }
+    },
+    "additionalProperties": true
+  }
+}

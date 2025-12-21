@@ -1,10 +1,11 @@
 {
-  "id": "global",
-  "class": "global",
+  "$id": "global",
+  "$class": "global",
   "description": "Universal stack base configuration",
-  "build": [
+  "$render": [
     {
-      "viewer.html": "/index.html"
+      "template": "viewer.html",
+      "output": "/index.html"
     }
   ]
 }

@@ -32,11 +32,11 @@ cd universal
 ```
 universal/
 ├── classes/
-│   ├── entity_base.schema.json   # Entity class with schema
-│   ├── global.schema.json         # Global config class
-│   ├── universal_base.schema.json # Root base class
+│   ├── entity_base.class.json   # Entity class with schema
+│   ├── global.class.json         # Global config class
+│   ├── universal_base.class.json # Root base class
 │   └── domains/
-│       └── domain_root.schema.json  # Domain container class
+│       └── domain_root.class.json  # Domain container class
 ├── instances/
 │   └── global.json                # Global instance
 └── templates/
@@ -66,8 +66,8 @@ Total: 4 classes
 mkdir -p instances
 cat > instances/my-domain.json <<EOF
 {
-  "id": "engineering",
-  "class": "domain_root",
+  "$id": "engineering",
+  "$class": "domain_root",
   "name": "Engineering",
   "description": "Engineering department"
 }
@@ -97,7 +97,7 @@ Errors:   0
 ## Build
 
 ```bash
-struktur build . --exact
+struktur build .
 ```
 
 **Output:**
@@ -110,7 +110,7 @@ struktur build . --exact
 🔍 Validating stack...
   ✓ All 2 class-bearing instances valid
 
-📁 Preparing build directory: ./build
+📁 Preparing build directory: ./build/build-<hash>/
 
 📝 Writing outputs...
   ✓ canonical.json (2 instances)
@@ -125,24 +125,25 @@ struktur build . --exact
   📊 2 instances validated
   📦 4 class definitions
   🎨 1 templates rendered
-  📂 ./build/
+  📂 ./build/build-<hash>/
 
-✨ Open ./build/index.html to view your stack
+✨ Open ./build/build-<hash>/index.html to view your stack
 
 Build Output:
   build/
-  ├── .struktur-manifest.json
-  ├── canonical.json       # Validated data
-  ├── index.html           # Interactive tree view
-  └── meta/
-      ├── classes/         # Class definitions
-      └── validation.json
+  └── build-<hash>/
+      ├── .struktur-manifest.json
+      ├── canonical.json       # Validated data
+      ├── index.html           # Interactive tree view
+      └── meta/
+          ├── classes/         # Class definitions
+          └── validation.json
 ```
 
 ## View Result
 
 ```bash
-open build/index.html
+open build/build-*/index.html
 ```
 
 **You'll see:** Interactive hierarchical tree viewer with your domain instance.
@@ -156,15 +157,15 @@ open build/index.html
 ```bash
 cat > instances/web-team.json <<EOF
 {
-  "id": "web-team",
-  "class": "entity_base",
+  "$id": "web-team",
+  "$class": "entity_base",
   "name": "Web Team",
   "description": "Frontend and backend developers",
   "domains": ["engineering"]
 }
 EOF
 
-struktur validate . && struktur build . --exact
+struktur validate . && struktur build .
 ```
 
 ### Explore Examples
@@ -190,17 +191,17 @@ mkdir mystack && cd mystack
 mkdir -p classes instances templates
 
 # Create global class and instance (needed for build tasks)
-cat > classes/global.schema.json <<EOF
+cat > classes/global.class.json <<EOF
 {
-  "class": "global",
-  "schema": {
+  "$class": "global",
+  "$schema": {
     "\$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
-      "id": {"type": "string"},
-      "class": {"type": "string"},
+      "$id": {"type": "string"},
+      "$class": {"type": "string"},
       "description": {"type": "string"},
-      "build": {"type": "array"}
+      "$render": {"type": "array"}
     }
   }
 }
@@ -208,32 +209,35 @@ EOF
 
 cat > instances/global.json <<EOF
 {
-  "id": "global",
-  "class": "global",
+  "$id": "global",
+  "$class": "global",
   "description": "Blog configuration",
-  "build": [
+  "$render": [
     {
-      "posts.html": "/posts.html"
+      "template": "posts.html",
+      "output": "/posts.html"
     }
   ]
 }
 EOF
 
 # Create custom blog_post class
-cat > classes/blog_post.schema.json <<EOF
+cat > classes/blog_post.class.json <<EOF
 {
-  "class": "blog_post",
-  "title": "",
-  "content": "",
-  "author": "Anonymous",
-  "status": "draft",
-  "schema": {
+  "$class": "blog_post",
+  "$fields": {
+    "title": "",
+    "content": "",
+    "author": "Anonymous",
+    "status": "draft"
+  },
+  "$schema": {
     "\$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
-    "required": ["id", "class", "title", "content"],
+    "required": ["$id", "$class", "title", "content"],
     "properties": {
-      "id": {"type": "string"},
-      "class": {"type": "string"},
+      "$id": {"type": "string"},
+      "$class": {"type": "string"},
       "title": {"type": "string"},
       "author": {"type": "string"},
       "content": {"type": "string"},
@@ -246,8 +250,8 @@ EOF
 # Create blog post instance
 cat > instances/welcome.json <<EOF
 {
-  "id": "welcome-post",
-  "class": "blog_post",
+  "$id": "welcome-post",
+  "$class": "blog_post",
   "title": "Welcome to My Blog",
   "content": "This is my first post!",
   "author": "Alice",
@@ -263,7 +267,7 @@ cat > templates/posts.html <<EOF
 <head><title>Blog Posts</title></head>
 <body>
   <h1>Blog Posts</h1>
-  {{#each (where instances "class" "blog_post")}}
+  {{#each (where $instances "$class" "blog_post")}}
     <article>
       <h2>{{title}}</h2>
       <p>By {{author}} - {{status}}</p>
@@ -276,8 +280,8 @@ EOF
 
 # Validate and build
 struktur validate .
-struktur build . --exact
-open build/posts.html
+struktur build .
+open build/build-*/posts.html
 ```
 
 **Success!** You've created a custom class, validated instances, and rendered templates.
@@ -355,7 +359,7 @@ ls classes/ instances/ templates/
 
 1. **Installed Struktur** - Global CLI tool
 2. **Initialized Universal** - Base classes (entity_base, aspect_base, domain_root)
-3. **Created Instance** - JSON file with `id`, `class`, `name`
+3. **Created Instance** - JSON file with `$id`, `$class`, `name`
 4. **Validated** - Checked instance against schema
 5. **Built** - Merged data, validated, rendered templates
 6. **Viewed Output** - Interactive HTML viewer

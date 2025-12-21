@@ -1,0 +1,44 @@
+{
+  "$class": "aspect_network_interface",
+  "$aspect": "aspect_network_interface",
+  "$schema": {
+    "type": "object",
+    "properties": {
+      "hostname": {
+        "type": "string",
+        "description": "Hostname for the interface"
+      },
+      "ip": {
+        "type": "string",
+        "description": "Primary IP address"
+      },
+      "mac": {
+        "type": "string",
+        "description": "MAC address"
+      },
+      "bridge": {
+        "type": "string",
+        "description": "Bridge interface name"
+      },
+      "gateway": {
+        "type": "string",
+        "description": "Default gateway"
+      },
+      "nameserver": {
+        "type": "string",
+        "description": "Nameserver(s) for this interface"
+      }
+    },
+    "required": [
+      "hostname",
+      "ip",
+      "mac"
+    ],
+    "additionalProperties": false
+  },
+  "$defaults": {
+    "bridge": "vmbr0",
+    "gateway": "192.168.68.1",
+    "nameserver": "192.168.68.10"
+  }
+}

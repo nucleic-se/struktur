@@ -1,6 +1,6 @@
 {
-  "id": "link_013",
-  "class": "tool_link",
+  "$id": "link_013",
+  "$class": "tool_link",
   "url": "https://oxc-project.github.io",
   "title": "Oxc",
   "description": "Collection of JavaScript tools written in Rust including parser, linter, and formatter",
@@ -14,8 +14,8 @@
   "github_stars": 11000,
   "license": "MIT",
   "github_url": "https://github.com/oxc-project/oxc",
-  "aspects": {
-    "quality": {
+  "$aspects": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 3,

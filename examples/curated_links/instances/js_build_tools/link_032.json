@@ -1,6 +1,6 @@
 {
-  "id": "link_032",
-  "class": "tool_link",
+  "$id": "link_032",
+  "$class": "tool_link",
   "url": "https://jsdoc.app",
   "title": "JSDoc",
   "description": "API documentation generator for JavaScript",
@@ -14,8 +14,8 @@
   "github_stars": 15000,
   "license": "Apache-2.0",
   "github_url": "https://github.com/jsdoc/jsdoc",
-  "aspects": {
-    "quality": {
+  "$aspects": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 4,

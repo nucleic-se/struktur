@@ -1,6 +1,6 @@
 {
-  "id": "test_040",
-  "class": "tool_link",
+  "$id": "test_040",
+  "$class": "tool_link",
   "url": "https://benchmarkjs.com",
   "title": "Benchmark.js",
   "description": "Robust benchmarking library that supports high-resolution timers",

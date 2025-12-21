@@ -1,6 +1,6 @@
 {
-  "id": "test_033",
-  "class": "tool_link",
+  "$id": "test_033",
+  "$class": "tool_link",
   "url": "https://github.com/ladjs/supertest",
   "title": "Supertest",
   "description": "HTTP assertions made easy via superagent",

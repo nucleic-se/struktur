@@ -28,7 +28,7 @@ Handlebars escapes HTML special characters by default, **which breaks configurat
 
 ```handlebars
 ❌ WRONG - Gets HTML escaped
-command: {{aspects.docker_container.command}}
+command: {{$aspects.aspect_docker_container.command}}
 # Result: sh -c &#x27;npm install&#x27; (BROKEN!)
 
 environment:
@@ -36,7 +36,7 @@ environment:
 # Result: postgresql://user:pass@host:5432/db (= becomes &#x3D;)
 
 ✅ CORRECT - No escaping
-command: {{{aspects.docker_container.command}}}
+command: {{{$aspects.aspect_docker_container.command}}}
 # Result: sh -c 'npm install' (WORKS!)
 
 environment:
@@ -215,15 +215,17 @@ Every template receives the same context object:
 ```javascript
 {
   // Top-level convenience
-  instances: [...],           // All instances (array)
-  instances_by_id: {...},     // Instances by ID (object)
-  classes: [...],             // All classes (array)
-  classes_by_id: {...},       // Classes by name (object)
-  aspects: [...],             // All aspects (array)
-  aspects_by_id: {...},       // Aspects by name (object)
+  $instances: [...],           // All instances (array)
+  $instances_by_id: {...},     // Instances by ID (object)
+  $classes: [...],             // All classes (array)
+  $classes_by_id: {...},       // Classes by name (object)
+  $class_names: [...],         // Class name list
+  $aspects: [...],             // All aspects (array)
+  $aspects_by_id: {...},       // Aspects by name (object)
+  $aspect_names: [...],        // Aspect name list
   
   // Build metadata
-  buildContext: {
+  $metadata: {
     timestamp: "2025-12-16T10:30:00Z",
     version: "0.2.3-alpha",
     generator: "struktur"
@@ -231,13 +233,15 @@ Every template receives the same context object:
   
   // Full canonical structure
   canonical: {
-    instances: [...],
-    instances_by_id: {...},
-    classes: [...],
-    classes_by_id: {...},
-    aspects: [...],
-    aspects_by_id: {...},
-    metadata: {...}
+    $instances: [...],
+    $instances_by_id: {...},
+    $classes: [...],
+    $classes_by_id: {...},
+    $class_names: [...],
+    $aspects: [...],
+    $aspects_by_id: {...},
+    $aspect_names: [...],
+    $metadata: {...}
   }
 }
 ```
@@ -246,33 +250,33 @@ Every template receives the same context object:
 
 **Handlebars:**
 ```handlebars
-{{!-- Loop through instances --}}
-{{#each instances}}
+{{!-- Loop through $instances --}}
+{{#each $instances}}
   <div>{{name}}</div>
 {{/each}}
 
 {{!-- Look up by ID --}}
-{{#with (lookup instances_by_id "web-01")}}
+{{#with (lookup $instances_by_id "web-01")}}
   <h1>{{name}}</h1>
 {{/with}}
 
 {{!-- Access build info --}}
-<p>Built: {{buildContext.timestamp}}</p>
+<p>Built: {{$metadata.timestamp}}</p>
 ```
 
 **Nunjucks:**
 ```nunjucks
 {# Loop through instances #}
-{% for instance in instances %}
+{% for instance in $instances %}
   <div>{{ instance.name }}</div>
 {% endfor %}
 
 {# Look up by ID #}
-{% set web = instances_by_id["web-01"] %}
+{% set web = $instances_by_id["web-01"] %}
 <h1>{{ web.name }}</h1>
 
 {# Access build info #}
-<p>Built: {{ buildContext.timestamp }}</p>
+<p>Built: {{ $metadata.timestamp }}</p>
 ```
 
 ---
@@ -290,7 +294,7 @@ Most templates generate a single output file:
 </head>
 <body>
   <h1>Posts</h1>
-  {{#each (where instances "class" "post")}}
+  {{#each (where $instances "$class" "post")}}
     <article>
       <h2>{{title}}</h2>
       <p>{{excerpt}}</p>
@@ -328,11 +332,11 @@ The `render_file` helper generates multiple output files from a single template:
 <body>
   <h1>Posts</h1>
   <ul>
-    {{#each (where instances "class" "post")}}
-      <li><a href="posts/{{id}}.html">{{title}}</a></li>
+    {{#each (where $instances "$class" "post")}}
+      <li><a href="posts/{{$id}}.html">{{title}}</a></li>
       
       {{!-- Generate individual post page --}}
-      {{render_file "post.html.hbs" (concat "posts/" id ".html") this}}
+      {{render_file "post.html.hbs" (concat "posts/" $id ".html") this}}
     {{/each}}
   </ul>
 </body>
@@ -369,16 +373,16 @@ The third parameter determines what data the rendered template sees:
 
 **Pass current instance:**
 ```handlebars
-{{#each instances}}
-  {{render_file "detail.hbs" (concat id ".html") this}}
+{{#each $instances}}
+  {{render_file "detail.hbs" (concat $id ".html") this}}
   <!--                                          ^^^^ instance data only -->
 {{/each}}
 ```
 
 **Pass full context:**
 ```handlebars
-{{#each instances}}
-  {{render_file "detail.hbs" (concat id ".html") ..}}
+{{#each $instances}}
+  {{render_file "detail.hbs" (concat $id ".html") ..}}
   <!--                                           ^^ parent context (all data) -->
 {{/each}}
 ```
@@ -386,8 +390,8 @@ The third parameter determines what data the rendered template sees:
 **Pass custom context:**
 ```handlebars
 {{render_file "stats.html" "stats.html" (hash 
-  total=(length instances)
-  classes=(pluck classes "class")
+  total=(length $instances)
+  classes=(pluck $classes "class")
 )}}
 ```
 
@@ -436,16 +440,16 @@ Templates can use built-in helpers. See [Helper Reference](helpers-reference.md)
 
 ### Common Patterns
 
-**Filter by class:**
+**Filter by $class:**
 ```handlebars
-{{#each (where instances "class" "post")}}
+{{#each (where $instances "$class" "post")}}
   <h2>{{title}}</h2>
 {{/each}}
 ```
 
 **Filter by inheritance:**
 ```handlebars
-{{#each (filter_inherits instances "entity_base" classes_by_id)}}
+{{#each (filter_inherits $instances "entity_base" $classes_by_id)}}
   <div class="entity">{{name}}</div>
 {{/each}}
 ```
@@ -466,8 +470,8 @@ Templates can use built-in helpers. See [Helper Reference](helpers-reference.md)
   <article>{{content}}</article>
 {{/if}}
 
-{{#if aspects.monitoring}}
-  <div>Monitoring: :{{aspects.monitoring.port}}</div>
+{{#if $aspects.monitoring}}
+  <div>Monitoring: :{{$aspects.monitoring.port}}</div>
 {{/if}}
 ```
 
@@ -574,9 +578,9 @@ templates/
 <html>
 <body>
   <h1>All Items</h1>
-  {{#each instances}}
-    <a href="{{id}}.html">{{name}}</a>
-    {{render_file "detail.html.hbs" (concat id ".html") this}}
+  {{#each $instances}}
+    <a href="{{$id}}.html">{{name}}</a>
+    {{render_file "detail.html.hbs" (concat $id ".html") this}}
   {{/each}}
 </body>
 </html>
@@ -585,7 +589,7 @@ templates/
 ### Generate Per-Category Pages
 
 ```handlebars
-{{#each (group_by instances "category")}}
+{{#each (group_by $instances "category")}}
   {{render_file "category.html.hbs" (concat "categories/" @key ".html") (hash
     category=@key
     items=this
@@ -596,9 +600,9 @@ templates/
 ### Conditional File Generation
 
 ```handlebars
-{{#each instances}}
+{{#each $instances}}
   {{#if (eq status "published")}}
-    {{render_file "published.html.hbs" (concat "posts/" id ".html") this}}
+    {{render_file "published.html.hbs" (concat "posts/" $id ".html") this}}
   {{/if}}
 {{/each}}
 ```
@@ -606,8 +610,8 @@ templates/
 ### Nested Directory Generation
 
 ```handlebars
-{{#each instances}}
-  {{render_file "detail.html.hbs" (concat class "/" id ".html") this}}
+{{#each $instances}}
+  {{render_file "detail.html.hbs" (concat $class "/" $id ".html") this}}
 {{/each}}
 ```
 
@@ -661,7 +665,7 @@ build/
 
 ```handlebars
 {{!-- Good: deterministic paths --}}
-{{render_file "post.html.hbs" (concat "posts/" id ".html") this}}
+{{render_file "post.html.hbs" (concat "posts/" $id ".html") this}}
 
 {{!-- Bad: spaces, special characters --}}
 {{render_file "post.html.hbs" (concat title ".html") this}}
@@ -702,9 +706,9 @@ Shows complete context object.
 ```handlebars
 <h2>Available Context</h2>
 <ul>
-  <li>Instances: {{length instances}}</li>
-  <li>Classes: {{length classes}}</li>
-  <li>Aspects: {{length aspects}}</li>
+  <li>Instances: {{length $instances}}</li>
+  <li>Classes: {{length $classes}}</li>
+  <li>Aspects: {{length $aspects}}</li>
 </ul>
 ```
 
@@ -716,8 +720,8 @@ Result: {{slugify "Hello World"}}
 <!-- Should show: hello-world -->
 
 {{!-- Check filter result --}}
-{{#each (where instances "class" "post")}}
-  Found: {{id}}
+{{#each (where $instances "$class" "post")}}
+  Found: {{$id}}
 {{/each}}
 ```
 
@@ -783,7 +787,7 @@ Error: "author" is undefined
 
 **Fix:** Check variable exists or use default:
 ```handlebars
-{{default author "Anonymous"}}
+{{default_value author "Anonymous"}}
 ```
 
 ### Invalid Path
@@ -806,13 +810,13 @@ Error: Output path contains invalid characters
 ```handlebars
 ✅ GOOD
 environment:
-{{#each aspects.docker_container.environment}}
+{{#each $aspects.aspect_docker_container.environment}}
   {{@key}}: "{{{this}}}"
 {{/each}}
 
 ❌ BAD
 environment:
-{{#each aspects.docker_container.environment}}
+{{#each $aspects.aspect_docker_container.environment}}
   {{@key}}: {{{this}}}
 {{/each}}
 ```
@@ -821,19 +825,19 @@ environment:
 
 ```handlebars
 ✅ GOOD
-{{#if aspects.docker_container.volumes}}
-{{#if (gt aspects.docker_container.volumes.length 0)}}
+{{#if $aspects.aspect_docker_container.volumes}}
+{{#if (gt $aspects.aspect_docker_container.volumes.length 0)}}
 volumes:
-{{#each aspects.docker_container.volumes}}
+{{#each $aspects.aspect_docker_container.volumes}}
   - {{this}}
 {{/each}}
 {{/if}}
 {{/if}}
 
 ❌ BAD (outputs empty "volumes:" if array is empty)
-{{#if aspects.docker_container.volumes}}
+{{#if $aspects.aspect_docker_container.volumes}}
 volumes:
-{{#each aspects.docker_container.volumes}}
+{{#each $aspects.aspect_docker_container.volumes}}
   - {{this}}
 {{/each}}
 {{/if}}
@@ -863,13 +867,13 @@ volumes:
 {{!--
   Template: docker-compose.yml
   Inputs:
-    - instances: All instances with docker_container aspect
-    - buildContext: Build metadata
+    - $instances: All $instances with aspect_docker_container aspect
+    - $metadata: Build metadata
   Outputs:
     - docker-compose.yml: Service definitions
   
-  Required aspects:
-    - docker_container.image OR docker_container.build
+  Required $aspects:
+    - aspect_docker_container.image OR aspect_docker_container.build
 --}}
 ```
 
@@ -891,7 +895,7 @@ healthcheck:
 {{/if}}
 
 {{!-- main template --}}
-{{> healthcheck healthcheck=aspects.docker_container.healthcheck}}
+{{> healthcheck healthcheck=$aspects.aspect_docker_container.healthcheck}}
 ```
 
 ---
@@ -927,9 +931,9 @@ volumes:
 
 **Fix:** Check array length before outputting section headers:
 ```handlebars
-{{#if (gt aspects.docker_container.volumes.length 0)}}
+{{#if (gt $aspects.aspect_docker_container.volumes.length 0)}}
 volumes:
-{{#each aspects.docker_container.volumes}}
+{{#each $aspects.aspect_docker_container.volumes}}
   - {{this}}
 {{/each}}
 {{/if}}

@@ -1,6 +1,6 @@
 {
-  "id": "css_036",
-  "class": "tool_link",
+  "$id": "css_036",
+  "$class": "tool_link",
   "url": "https://posthtml.org",
   "title": "PostHTML",
   "description": "Tool for transforming HTML with JavaScript plugins",

@@ -1,6 +1,6 @@
 {
-  "id": "link_015",
-  "class": "tool_link",
+  "$id": "link_015",
+  "$class": "tool_link",
   "url": "https://www.npmjs.com",
   "title": "npm",
   "description": "Package manager for JavaScript and the world's largest software registry",
@@ -13,8 +13,8 @@
   "github_stars": 8500,
   "license": "Artistic-2.0",
   "github_url": "https://github.com/npm/cli",
-  "aspects": {
-    "quality": {
+  "$aspects": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 5,

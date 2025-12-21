@@ -1,6 +1,6 @@
 {
-  "id": "css_004",
-  "class": "tool_link",
+  "$id": "css_004",
+  "$class": "tool_link",
   "url": "https://bulma.io",
   "title": "Bulma",
   "description": "Modern CSS framework based on Flexbox with clean and simple syntax",

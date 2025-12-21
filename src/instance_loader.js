@@ -12,9 +12,9 @@
  * - Recursive directory traversal (excludes 'mixins' and 'stacks')
  * - Both single-object and array JSON formats supported
  * - Alphabetical loading order for determinism
- * - Classless instance rejection (requires 'class' field)
+ * - Classless instance rejection (requires '$class' field)
  * - Invalid JSON logged as warnings (helps users debug)
- * - Adds `_source_file` metadata to each instance
+ * - Adds `$source_file` metadata to each instance
  * 
  * ## Comparison with Other Loaders
  * 
@@ -46,8 +46,8 @@
  *   { logger: console }
  * );
  * 
- * // instances: Array of valid instance objects (have 'class' field)
- * // classlessRejects: Array of {id, file} for instances missing 'class'
+ * // instances: Array of valid instance objects (have '$class' field)
+ * // classlessRejects: Array of {id, file} for instances missing '$class'
  * ```
  * 
  * @module instance_loader
@@ -56,11 +56,52 @@
 import fs from 'fs/promises';
 import path from 'path';
 
+function validateRenderFormat(renderValue, instanceId, filePath) {
+  if (!Array.isArray(renderValue)) {
+    throw new Error(
+      `Instance ${instanceId}: $render must be an array of {template, output} objects. ` +
+      `File: ${filePath}`
+    );
+  }
+
+  for (let i = 0; i < renderValue.length; i++) {
+    const task = renderValue[i];
+    if (!task || typeof task !== 'object' || Array.isArray(task)) {
+      throw new Error(
+        `Instance ${instanceId}: $render[${i}] must be an object with "template" and "output". ` +
+        `File: ${filePath}`
+      );
+    }
+
+    if (typeof task.template !== 'string' || task.template.trim() === '') {
+      throw new Error(
+        `Instance ${instanceId}: $render[${i}].template must be a non-empty string. ` +
+        `File: ${filePath}`
+      );
+    }
+
+    if (typeof task.output !== 'string' || task.output.trim() === '') {
+      throw new Error(
+        `Instance ${instanceId}: $render[${i}].output must be a non-empty string. ` +
+        `File: ${filePath}`
+      );
+    }
+
+    const extraKeys = Object.keys(task).filter(key => key !== 'template' && key !== 'output');
+    if (extraKeys.length > 0) {
+      throw new Error(
+        `Instance ${instanceId}: $render[${i}] has unexpected keys: ${extraKeys.join(', ')}. ` +
+        `Only "template" and "output" are allowed. File: ${filePath}`
+      );
+    }
+  }
+}
+
 /**
  * Load instances from a directory recursively
  * 
- * Scans the directory tree for JSON files (excluding .schema.json files),
- * parses them, and returns valid instances with `class` and `id` fields.
+ * Scans the directory tree for JSON files (excluding .class.json files),
+ * parses them, and returns valid instances with `$class` and `$id` fields.
  * 
  * ## Directory Exclusions
  * 
@@ -78,8 +119,8 @@ import path from 'path';
  * **Single object:**
  * ```json
  * {
- *   "id": "my-server",
- *   "class": "server",
+ *   "$id": "my-server",
+ *   "$class": "server",
  *   "name": "Production Server"
  * }
  * ```
@@ -87,20 +128,20 @@ import path from 'path';
  * **Array of objects:**
  * ```json
  * [
- *   {"id": "server-1", "class": "server", "name": "Server 1"},
- *   {"id": "server-2", "class": "server", "name": "Server 2"}
+ *   {"$id": "server-1", "$class": "server", "name": "Server 1"},
+ *   {"$id": "server-2", "$class": "server", "name": "Server 2"}
  * ]
  * ```
  * 
  * ## Instance Requirements
  * 
  * To be loaded successfully, instances must have:
- * - `id` field (string identifier)
- * - `class` field (references a schema)
+ * - `$id` field (string identifier)
+ * - `$class` field (references a class definition)
  * 
  * Instances missing either field are rejected:
- * - No `id`: Silently skipped (not a valid instance)
- * - No `class`: Added to `classlessRejects` array for error reporting
+ * - No `$id`: Silently skipped (not a valid instance)
+ * - No `$class`: Added to `classlessRejects` array for error reporting
  * 
  * ## Error Handling
  * 
@@ -119,8 +160,8 @@ import path from 'path';
  * 
  * @returns {Promise<{instances: Array<Object>, classlessRejects: Array<{id: string, file: string}>}>}
  *   Result object containing:
- *   - `instances`: Array of valid instances (with `_source_file` metadata)
- *   - `classlessRejects`: Array of rejected instances (have `id` but no `class`)
+ *   - `instances`: Array of valid instances (with `$source_file` metadata)
+ *   - `classlessRejects`: Array of rejected instances (have `$id` but no `$class`)
  * 
  * @example
  * // Load all instances from a directory
@@ -131,12 +172,12 @@ import path from 'path';
  * 
  * // Check for classless instances
  * if (classlessRejects.length > 0) {
- *   console.error('Found instances without class field:', classlessRejects);
+ *   console.error('Found instances without $class field:', classlessRejects);
  * }
  * 
- * // Each instance has _source_file metadata
+ * // Each instance has $source_file metadata
  * instances.forEach(inst => {
- *   console.log(`${inst.id} from ${inst._source_file}`);
+ *   console.log(`${inst.$id} from ${inst.$source_file}`);
  * });
  */
 export async function loadInstancesFromDir(dirPath, options = {}) {
@@ -160,7 +201,7 @@ export async function loadInstancesFromDir(dirPath, options = {}) {
             continue;
           }
           await loadFromDir(fullPath);
-        } else if (entry.name.endsWith('.json') && !entry.name.includes('.schema.')) {
+        } else if (entry.name.endsWith('.json') && !entry.name.includes('.schema.') && !entry.name.includes('.class.')) {
           try {
             const content = await fs.readFile(fullPath, 'utf-8');
             const data = JSON.parse(content);
@@ -179,25 +220,46 @@ export async function loadInstancesFromDir(dirPath, options = {}) {
               continue;
             }
             
-            if (data && typeof data === 'object' && data.id) {
-              // Single object with id
-              if (!data.class) {
-                // Reject classless instances
-                classlessRejects.push({ id: data.id, file: path.basename(fullPath) });
-              } else {
-                instances.push({ ...data, _source_file: fullPath });
+            if (data && typeof data === 'object') {
+              const legacyFields = ['id', 'class', 'render', 'aspects'].filter(field => field in data);
+              if (legacyFields.length > 0) {
+                throw new Error(
+                  `Instance uses legacy fields (${legacyFields.join(', ')}). ` +
+                  `Use $id/$class/$render/$aspects. File: ${fullPath}`
+                );
+              }
+
+              if (data.$id) {
+                // Single object with $id
+                if (!data.$class) {
+                  // Reject classless instances
+                  classlessRejects.push({ id: data.$id, file: path.basename(fullPath) });
+                } else {
+                  if (data.$render !== undefined) {
+                    validateRenderFormat(data.$render, data.$id, fullPath);
+                  }
+                  instances.push({ ...data, $source_file: fullPath });
+                }
               }
             }
           } catch (error) {
-            // Log warning for invalid JSON (helps users debug typos)
-            if (logger?.warn) {
-              logger.warn(`Skipping ${fullPath}: Invalid JSON - ${error.message}`);
+            if (error instanceof SyntaxError) {
+              // Log warning for invalid JSON (helps users debug typos)
+              if (logger?.warn) {
+                logger.warn(`Skipping ${fullPath}: Invalid JSON - ${error.message}`);
+              }
+            } else {
+              throw error;
             }
           }
         }
       }
-    } catch {
+    } catch (error) {
       // Directory doesn't exist or not readable - silently skip
+      if (error?.code === 'ENOENT' || error?.code === 'ENOTDIR') {
+        return;
+      }
+      throw error;
     }
   }
 

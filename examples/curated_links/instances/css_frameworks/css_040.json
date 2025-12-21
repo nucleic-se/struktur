@@ -1,6 +1,6 @@
 {
-  "id": "css_040",
-  "class": "tool_link",
+  "$id": "css_040",
+  "$class": "tool_link",
   "url": "https://panda-css.com",
   "title": "Panda CSS",
   "description": "CSS-in-JS with build-time generated styles and type-safety",

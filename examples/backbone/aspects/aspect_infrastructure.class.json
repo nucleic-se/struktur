@@ -1,0 +1,29 @@
+{
+  "$class": "aspect_infrastructure",
+  "$aspect": "aspect_infrastructure",
+  "$schema": {
+    "type": "object",
+    "properties": {
+      "environment": {
+        "type": "string",
+        "description": "Environment identifier (production, lab, etc.)"
+      },
+      "location": {
+        "type": "string",
+        "description": "Physical/logical location"
+      },
+      "notes": {
+        "type": "string",
+        "description": "Free-form notes about the entity"
+      }
+    },
+    "required": [
+      "notes"
+    ],
+    "additionalProperties": false
+  },
+  "$defaults": {
+    "environment": "production",
+    "location": "homelab"
+  }
+}

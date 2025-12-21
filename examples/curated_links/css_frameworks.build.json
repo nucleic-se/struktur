@@ -1,14 +1,31 @@
 {
-  "classes": ["classes"],
-  "instances": ["instances/css_frameworks"],
-  "templates": ["templates"],
+  "classes": [
+    "classes"
+  ],
+  "instances": [
+    "instances/css_frameworks"
+  ],
+  "templates": [
+    "templates"
+  ],
   "build_dir": "build/css_frameworks",
-  "exact": true,
   "template_engine": "nunjucks",
   "render": [
-    {"template": "README.md.njk", "output": "/README.md"},
-    {"template": "index.html.njk", "output": "/index.html"},
-    {"template": "api.json.njk", "output": "/api.json"},
-    {"template": "feed.rss.njk", "output": "/feed.rss"}
+    {
+      "template": "README.md.njk",
+      "output": "/README.md"
+    },
+    {
+      "template": "index.html.njk",
+      "output": "/index.html"
+    },
+    {
+      "template": "api.json.njk",
+      "output": "/api.json"
+    },
+    {
+      "template": "feed.rss.njk",
+      "output": "/feed.rss"
+    }
   ]
 }

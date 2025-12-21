@@ -59,26 +59,26 @@ async function createTestStack(tempDir, configFile = null) {
 
   // Create minimal class schema
   const classSchema = {
-    class: 'test_class',
-    schema: {
+    $class: 'test_class',
+    $schema: {
       type: 'object',
       properties: {
-        id: { type: 'string' },
-        class: { type: 'string' },
+        $id: { type: 'string' },
+        $class: { type: 'string' },
         name: { type: 'string' }
       },
-      required: ['id', 'class']
+      required: ['$id', '$class']
     }
   };
   await fs.writeFile(
-    join(tempDir, 'classes', 'test_class.schema.json'),
+    join(tempDir, 'classes', 'test_class.class.json'),
     JSON.stringify(classSchema, null, 2)
   );
 
   // Create minimal instance
   const instance = {
-    id: 'test_instance',
-    class: 'test_class',
+    $id: 'test_instance',
+    $class: 'test_class',
     name: 'Test'
   };
   await fs.writeFile(
@@ -94,9 +94,9 @@ async function createTestStack(tempDir, configFile = null) {
 
   // Create global instance with render field
   const global = {
-    id: 'global',
-    class: 'test_class',
-    render: [
+    $id: 'global',
+    $class: 'test_class',
+    $render: [
       { template: 'output.txt', output: '/output.txt' }
     ]
   };
@@ -271,8 +271,8 @@ describe('Config Loading', () => {
       // Create alternate classes directory
       await fs.mkdir(join(tempDir, 'alt-classes'), { recursive: true });
       await fs.copyFile(
-        join(tempDir, 'classes', 'test_class.schema.json'),
-        join(tempDir, 'alt-classes', 'test_class.schema.json')
+        join(tempDir, 'classes', 'test_class.class.json'),
+        join(tempDir, 'alt-classes', 'test_class.class.json')
       );
       
       const config = {
@@ -321,9 +321,9 @@ describe('Config Loading', () => {
       
       // Update global to have empty render
       const global = {
-        id: 'global',
-        class: 'test_class',
-        render: []
+        $id: 'global',
+        $class: 'test_class',
+        $render: []
       };
       await fs.writeFile(
         join(tempDir, 'instances', 'global.json'),
@@ -340,9 +340,9 @@ describe('Config Loading', () => {
       
       // Update global with render field containing object
       const global = {
-        id: 'global',
-        class: 'test_class',
-        render: [
+        $id: 'global',
+        $class: 'test_class',
+        $render: [
           { 'output.txt': '/custom/path.txt' }
         ]
       };

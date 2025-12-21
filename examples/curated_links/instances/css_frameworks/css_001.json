@@ -1,6 +1,6 @@
 {
-  "id": "css_001",
-  "class": "tool_link",
+  "$id": "css_001",
+  "$class": "tool_link",
   "url": "https://tailwindcss.com",
   "title": "Tailwind CSS",
   "description": "Utility-first CSS framework for rapidly building custom user interfaces",

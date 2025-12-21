@@ -1,6 +1,6 @@
 {
-  "id": "link_031",
-  "class": "tool_link",
+  "$id": "link_031",
+  "$class": "tool_link",
   "url": "https://lightningcss.dev",
   "title": "Lightning CSS",
   "description": "Extremely fast CSS parser, transformer, bundler, and minifier written in Rust",
@@ -13,8 +13,8 @@
   "github_stars": 6000,
   "license": "MPL-2.0",
   "github_url": "https://github.com/parcel-bundler/lightningcss",
-  "aspects": {
-    "quality": {
+  "$aspects": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 3,

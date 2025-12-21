@@ -51,7 +51,7 @@ cd my-blog
 
 Build the site (uses `struktur.build.json` config):
 ```bash
-struktur build --exact
+struktur build
 ```
 
 The config includes RSS feed and dark theme by default.
@@ -63,19 +63,19 @@ struktur build -i instances -t templates
 
 CLI flags override the config file.
 
-Open `build/index.html` in your browser.
+Open `build/build-*/index.html` in your browser.
 
 ## Structure
 
 ```
 skribe/
   aspects/              # Aspect type definitions
-    blog_post.aspect.json     # Blog post fields: date, content, author, tags
-    page.aspect.json          # Page fields: content, menu placement
+    aspect_blog_post.class.json     # Blog post fields: date, content, author, tags
+    aspect_page.class.json          # Page fields: content, menu placement
   classes/              # Content type definitions
-    content_base.schema.json  # Shared: title, slug, description
-    blog_post.schema.json     # Extends content_base, uses blog_post aspect
-    page.schema.json          # Extends content_base, uses page aspect
+    content_base.class.json  # Shared: title, slug, description
+    blog_post.class.json     # Extends content_base, uses blog_post aspect
+    page.class.json          # Extends content_base, uses page aspect
   instances/            # Content organized by type
     posts/              # 16 blog posts
       welcome.json
@@ -117,10 +117,10 @@ skribe/
 **Class inheritance + aspects**: All content types extend `content_base` and declare aspect types
 ```json
 {
-  "class": "blog_post",
-  "parent": "content_base",
-  "aspect_types": ["blog_post"],
-  "aspect_defaults": {
+  "$class": "blog_post",
+  "$parent": "content_base",
+  "$uses_aspects": ["blog_post"],
+  "$aspect_defaults": {
     "blog_post": {
       "author": "Struktur Team"
     }
@@ -137,7 +137,7 @@ skribe/
 **Schema validation**: Required fields enforced at build time
 ```json
 {
-  "required": ["id", "class", "title", "slug"],
+  "required": ["$id", "$class", "title", "slug"],
   "properties": {
     "date": { "type": "string", "minLength": 1 }
   }
@@ -152,8 +152,8 @@ skribe/
 
 **Multi-file rendering**: Generate pages dynamically via render_file helper
 ```handlebars
-{{#each instances}}
-{{#if (eq class "blog_post")}}
+{{#each $instances}}
+{{#if (eq $class "blog_post")}}
 {{render_file "blog-post" (concat "posts/" slug ".html")}}
 {{/if}}
 {{/each}}
@@ -197,7 +197,7 @@ struktur build base mixin1 mixin2  # Later sources merge into earlier
 **Menu placement control**: Pages specify where they appear via page aspect
 ```json
 {
-  "aspects": {
+  "$aspects": {
     "page": {
       "menu": "header"  // Options: "header", "footer", "both", "none"
     }
@@ -237,12 +237,12 @@ Running `struktur build . --build-dir build` generates:
 Create `instances/posts/my-post.json`:
 ```json
 {
-  "id": "my-post",
-  "class": "blog_post",
+  "$id": "my-post",
+  "$class": "blog_post",
   "title": "My First Post",
   "slug": "my-first-post",
   "description": "A short description for listings and RSS",
-  "aspects": {
+  "$aspects": {
     "blog_post": {
       "date": "2025-12-14",
       "author": "Your Name",
@@ -253,7 +253,7 @@ Create `instances/posts/my-post.json`:
 }
 ```
 
-**Note**: Author defaults to "Struktur Team" (from class `aspect_defaults`). Only specify if different.
+**Note**: Author defaults to "Struktur Team" (from class `$aspect_defaults`). Only specify if different.
 
 **Note**: Use `\n\n` to separate paragraphs. The template converts these to `</p><p>` tags.
 
@@ -262,11 +262,11 @@ Create `instances/posts/my-post.json`:
 Create `instances/pages/team.json`:
 ```json
 {
-  "id": "team",
-  "class": "page",
+  "$id": "team",
+  "$class": "page",
   "title": "Our Team",
   "slug": "team",
-  "aspects": {
+  "$aspects": {
     "page": {
       "menu": "header",
       "content": "Meet the team..."
@@ -280,7 +280,7 @@ Create `instances/pages/team.json`:
 Just add it to a post's `tags` array in the blog_post aspect. Tag pages generate automatically:
 ```json
 {
-  "aspects": {
+  "$aspects": {
     "blog_post": {
       "tags": ["tutorial", "my-new-tag"]
     }
@@ -303,14 +303,14 @@ Edit `templates/css/custom.css`:
 
 **Best Practice**: Define aspect first (data structure), then class (ties aspect to content_base hierarchy).
 
-1. Create `aspects/tutorial.aspect.json` (defines tutorial-specific fields):
+1. Create `aspects/aspect_tutorial.class.json` (defines tutorial-specific fields):
 ```json
 {
   "aspect": "tutorial",
   "difficulty": "beginner",
   "duration": "30min",
   "prerequisites": [],
-  "schema": {
+  "$schema": {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "required": ["difficulty"],
@@ -329,19 +329,19 @@ Edit `templates/css/custom.css`:
 }
 ```
 
-2. Create `classes/tutorial.schema.json` (extends content_base, uses tutorial aspect):
+2. Create `classes/tutorial.class.json` (extends content_base, uses tutorial aspect):
 ```json
 {
-  "class": "tutorial",
-  "parent": "content_base",
-  "aspect_types": ["tutorial"],
-  "aspect_defaults": {
+  "$class": "tutorial",
+  "$parent": "content_base",
+  "$uses_aspects": ["tutorial"],
+  "$aspect_defaults": {
     "tutorial": {
       "difficulty": "beginner",
       "duration": "30 minutes"
     }
   },
-  "schema": {
+  "$schema": {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {},
@@ -353,16 +353,16 @@ Edit `templates/css/custom.css`:
 3. Create instance `instances/tutorials/first-tutorial.json`:
 ```json
 {
-  "id": "first-tutorial",
-  "class": "tutorial",
+  "$id": "first-tutorial",
+  "$class": "tutorial",
   "title": "Getting Started Tutorial",
   "slug": "getting-started-tutorial",
   "description": "Learn the basics",
-  "aspects": {
+  "$aspects": {
     "tutorial": {
       "difficulty": "beginner",
       "prerequisites": ["Basic HTML knowledge"]
-      // duration inherited from aspect_defaults
+      // duration inherited from $aspect_defaults
     }
   }
 }
@@ -378,14 +378,14 @@ Edit `templates/css/custom.css`:
   <article>
     <h1>{{title}}</h1>
     <div class="tutorial-meta">
-      Difficulty: {{aspects.tutorial.difficulty}} | 
-      Duration: {{aspects.tutorial.duration}}
+      Difficulty: {{$aspects.tutorial.difficulty}} | 
+      Duration: {{$aspects.tutorial.duration}}
     </div>
-    {{#if aspects.tutorial.prerequisites}}
+    {{#if $aspects.tutorial.prerequisites}}
     <div class="prerequisites">
       <h3>Prerequisites</h3>
       <ul>
-        {{#each aspects.tutorial.prerequisites}}
+        {{#each $aspects.tutorial.prerequisites}}
         <li>{{this}}</li>
         {{/each}}
       </ul>
@@ -399,8 +399,8 @@ Edit `templates/css/custom.css`:
 
 5. Update `templates/index.html` to render tutorials:
 ```handlebars
-{{#each instances}}
-{{#if (eq class "tutorial")}}
+{{#each $instances}}
+{{#if (eq $class "tutorial")}}
 {{render_file "layouts/tutorial" (concat "tutorials/" slug ".html") pathPrefix="../"}}
 {{/if}}
 {{/each}}
@@ -409,7 +409,7 @@ Edit `templates/css/custom.css`:
 **Key Design Principles**:
 - **Aspects define data structure** - field names, types, validation
 - **Classes define inheritance** - parent relationships, aspect composition
-- **aspect_defaults eliminate duplication** - common values defined once
+- **$aspect_defaults eliminate duplication** - common values defined once
 - **Instances provide unique data** - only what differs from defaults
 
 ## Mixin System
@@ -457,15 +457,15 @@ Skribe uses Struktur's built-in Handlebars helpers:
 - **`json`** - Output JSON (for debugging)
 
 **Collection Helpers**:
-- **`sort_by`** - Sort array by field: `{{#each (sort_by instances "date")}}`
+- **`sort_by`** - Sort array by field: `{{#each (sort_by $instances "date")}}`
 - **`where_includes`** - Filter array where field includes value
 - **`filterList`** - Filter array by custom logic
 - **`length`** - Get array length
 
 Example - Generate post pages:
 ```handlebars
-{{#each instances}}
-{{#if (eq class "blog_post")}}
+{{#each $instances}}
+{{#if (eq $class "blog_post")}}
 {{render_file "blog-post" (concat "posts/" slug ".html")}}
 {{/if}}
 {{/each}}
@@ -473,10 +473,10 @@ Example - Generate post pages:
 
 Example - Filter and sort posts:
 ```handlebars
-{{#each (sort_by (filterList instances class="blog_post") "aspects.blog_post.date")}}
+{{#each (sort_by (filterList $instances class="blog_post") "$aspects.blog_post.date")}}
   <article>
     <h2>{{title}}</h2>
-    <time>{{aspects.blog_post.date}}</time>
+    <time>{{$aspects.blog_post.date}}</time>
   </article>
 {{/each}}
 ```
@@ -586,11 +586,11 @@ aws s3 sync dist/ s3://my-bucket/ --delete
 
 **2. Rebuild**: `struktur build . --build-dir build`
 
-**3. Preview**: Open `build/index.html` (or use `python -m http.server` in build/)
+**3. Preview**: Open `build/build-*/index.html` (or use `python -m http.server` in `build/build-*/`)
 
-**4. Validate**: Check `build/meta/validation.json` for warnings
+**4. Validate**: Check `build/build-*/meta/validation.json` for warnings
 
-**5. Inspect**: Review `build/canonical.json` to see merged data
+**5. Inspect**: Review `build/build-*/canonical.json` to see merged data
 
 **6. Compare**: Diff builds to verify changes
 
@@ -598,7 +598,7 @@ aws s3 sync dist/ s3://my-bucket/ --delete
 
 ## Troubleshooting
 
-**Build fails with validation error**: Check `build/meta/validation.json` for details
+**Build fails with validation error**: Check `build/build-*/meta/validation.json` for details
 ```bash
 struktur build . --build-dir build  # Validation runs automatically
 ```
@@ -612,7 +612,7 @@ struktur build . --build-dir build  # Validation runs automatically
 
 **Tag page not generating**: Ensure tag is in at least one post's `tags` array
 
-**Post not showing**: Verify `class: "blog_post"` and required fields (id, title, slug, date)
+**Post not showing**: Verify `$class: "blog_post"` and required fields ($id, title, slug, date)
 
 **Path issues in nested pages**: Check `pathPrefix` parameter passed to partials
 

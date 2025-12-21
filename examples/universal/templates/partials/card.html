@@ -2,7 +2,7 @@
 <div class="card h-100">
   <div class="card-header">
     <h5 class="card-title mb-0">{{displayName}}</h5>
-    <small class="text-muted">{{id}}</small>
+    <small class="text-muted">{{$id}}</small>
   </div>
   <div class="card-body">
     {{#each aspectData}}
@@ -32,6 +32,6 @@
     {{/if}}
   </div>
   <div class="card-footer">
-    <small class="text-muted">Class: <code>{{class}}</code></small>
+    <small class="text-muted">Class: <code>{{$class}}</code></small>
   </div>
 </div>

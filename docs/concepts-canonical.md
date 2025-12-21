@@ -39,49 +39,63 @@ struktur generate -c classes/ -i instances/ -o canonical.json
 
 ```json
 {
-  "instances": [...],
-  "instances_by_id": {...},
-  "classes": [...],
-  "classes_by_id": {...},
-  "aspects": [...],
-  "aspects_by_id": {...},
-  "metadata": {...}
+  "$instances": [...],
+  "$instances_by_id": {...},
+  "$classes": [...],
+  "$classes_by_id": {...},
+  "$class_names": [...],
+  "$aspects": [...],
+  "$aspects_by_id": {...},
+  "$aspect_names": [...],
+  "$metadata": {...},
+  "$validation": {...}
 }
 ```
 
 ### Field Descriptions
 
-**`instances`** (Array)
+**`$instances`** (Array)
 - All instances after merging
 - Fully resolved with class defaults
 - Validated against schemas
 
-**`instances_by_id`** (Object)
-- Same instances, keyed by `id`
+**`$instances_by_id`** (Object)
+- Same instances, keyed by `$id`
 - Fast lookup by ID
-- Used in templates: `{{lookup instances_by_id "web-01"}}`
+- Used in templates: `{{lookup $instances_by_id "web-01"}}`
 
-**`classes`** (Array)
+**`$classes`** (Array)
 - All class definitions
 - Includes inheritance information
 - Schema references
 
-**`classes_by_id`** (Object)
+**`$classes_by_id`** (Object)
 - Classes keyed by class name
 - Used for inheritance checks
 - Available to helpers
 
-**`aspects`** (Array)
-- All aspect definitions
-- Schema and kind information
+**`$class_names`** (Array)
+- List of unique class names
+- Convenience for iteration and UI
 
-**`aspects_by_id`** (Object)
+**`$aspects`** (Array)
+- All aspect definitions
+- Schema and descriptive metadata
+
+**`$aspects_by_id`** (Object)
 - Aspects keyed by ID
 - Fast aspect lookup
 
-**`metadata`** (Object)
+**`$aspect_names`** (Array)
+- List of unique aspect names
+- Convenience for iteration and UI
+
+**`$metadata`** (Object)
 - Build information
 - Timestamp, version, generator
+
+**`$validation`** (Object)
+- Validation results (when generated with validation)
 
 ---
 
@@ -91,14 +105,14 @@ struktur generate -c classes/ -i instances/ -o canonical.json
 
 **Input:**
 
-**`classes/service.schema.json`:**
+**`classes/service.class.json`:**
 ```json
 {
-  "class": "service",
-  "parent": null,
+  "$class": "service",
+  "$parent": null,
   "replicas": 1,
   "auto_restart": true,
-  "schema": {
+  "$schema": {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
@@ -113,8 +127,8 @@ struktur generate -c classes/ -i instances/ -o canonical.json
 **`instances/web.json`:**
 ```json
 {
-  "id": "web-app",
-  "class": "service",
+  "$id": "web-app",
+  "$class": "service",
   "port": 8080
 }
 ```
@@ -122,57 +136,64 @@ struktur generate -c classes/ -i instances/ -o canonical.json
 **Output: `canonical.json`:**
 ```json
 {
-  "instances": [
+  "$instances": [
     {
-      "id": "web-app",
-      "class": "service",
+      "$id": "web-app",
+      "$class": "service",
       "port": 8080,
       "replicas": 1,
       "auto_restart": true
     }
   ],
-  "instances_by_id": {
+  "$instances_by_id": {
     "web-app": {
-      "id": "web-app",
-      "class": "service",
+      "$id": "web-app",
+      "$class": "service",
       "port": 8080,
       "replicas": 1,
       "auto_restart": true
     }
   },
-  "classes": [
+  "$classes": [
     {
-      "class": "service",
-      "parent": null,
-      "replicas": 1,
-      "auto_restart": true
+      "$class": "service",
+      "$parent": null,
+      "$fields": {
+        "replicas": 1,
+        "auto_restart": true
+      }
     }
   ],
-  "classes_by_id": {
+  "$classes_by_id": {
     "service": {
-      "class": "service",
-      "parent": null,
-      "replicas": 1,
-      "auto_restart": true,
-      "_lineage": [],
-      "_schema": "service.schema.json"
+      "$class": "service",
+      "$parent": null,
+      "$fields": {
+        "replicas": 1,
+        "auto_restart": true
+      },
+      "$lineage": [],
+      "$schemas": [{ ... }]
     }
   },
-  "aspects": [],
-  "aspects_by_id": {},
-  "metadata": {
+  "$class_names": ["service"],
+  "$aspects": [],
+  "$aspects_by_id": {},
+  "$aspect_names": [],
+  "$metadata": {
     "timestamp": "2025-12-16T10:30:00Z",
     "version": "0.2.3-alpha",
     "generator": "struktur",
-    "instance_count": 1,
-    "class_count": 1
+    "count": 1,
+    "classes": 1,
+    "aspects": 0
   }
 }
 ```
 
 ---
 
-## Instances Array
+## $instances Array
 
 Each instance in the array contains:
 
@@ -180,15 +201,15 @@ Each instance in the array contains:
 
 ```json
 {
-  "id": "web-01",              // Instance ID
-  "class": "server",           // Class name
+  "$id": "web-01",              // Instance ID
+  "$class": "server",           // Class name
   "hostname": "web-01",        // Instance-specific field
   "replicas": 1,               // From class default
   "auto_restart": true,        // From parent class default
   "domain": "@production",     // Tag reference
   "labels": ["web", "nginx"],  // Array field (merged)
-  "aspects": {                 // Aspect data
-    "monitoring": {
+  "$aspects": {                // Aspect data
+    "aspect_monitoring": {
       "port": 9090
     }
   }
@@ -218,25 +239,26 @@ Each instance in the array contains:
 
 ```json
 {
-  "class": "web_server",
-  "parent": "server",
-  "port": 80,
-  "ssl": false,
-  "_lineage": ["entity_base", "server", "web_server"],
-  "_schema": "web_server.schema.json"
+  "$class": "web_server",
+  "$parent": "server",
+  "$fields": {
+    "port": 80,
+    "ssl": false
+  },
+  "$lineage": ["entity_base", "server", "web_server"],
+  "$schemas": [{ ... }]
 }
 ```
 
 ### Internal Fields
 
-**`_lineage`** (Array)
+**`$lineage`** (Array)
 - Full inheritance chain (root → leaf)
 - Used by `inherits` helper
 - Used by `class_lineage` helper
 
-**`_schema`** (String)
-- Schema filename
-- Relative to class directory
+**`$schemas`** (Array)
+- Schema objects for each class in the lineage (base → child)
 
 ---
 
@@ -246,11 +268,9 @@ Each instance in the array contains:
 
 ```json
 {
-  "id": "monitoring",
-  "class": "aspect_base",
-  "name": "Monitoring Configuration",
-  "kind": "optional",
-  "schema": {
+  "$aspect": "aspect_monitoring",
+  "description": "Monitoring configuration",
+  "$schema": {
     "type": "object",
     "properties": {
       "port": { "type": "integer" }
@@ -262,7 +282,7 @@ Each instance in the array contains:
 
 **Used for:**
 - Aspect validation
-- Template checks (`{{#if aspects.monitoring}}`)
+- Template checks (`{{#if $aspects.aspect_monitoring}}`)
 - Documentation generation
 
 ---
@@ -307,16 +327,16 @@ cat debug.json | jq .
 
 ```bash
 # List all instance IDs
-jq '.instances[] | .id' canonical.json
+jq '."$instances"[] | ."$id"' canonical.json
 
 # Find instances by class
-jq '.instances[] | select(.class == "server")' canonical.json
+jq '."$instances"[] | select(."$class" == "server")' canonical.json
 
 # Get class lineage
-jq '.classes_by_id.web_server._lineage' canonical.json
+jq '."$classes_by_id".web_server.$lineage' canonical.json
 
 # Count by class
-jq '[.instances[] | .class] | group_by(.) | map({class: .[0], count: length})' canonical.json
+jq '[."$instances"[] | ."$class"] | group_by(.) | map({$class: .[0], count: length})' canonical.json
 ```
 
 ### Use in External Tools
@@ -334,9 +354,9 @@ import json
 with open('canonical.json') as f:
     data = json.load(f)
 
-for instance in data['instances']:
+for instance in data['$instances']:
     if instance['class'] == 'server':
-        print(f"{instance['id']}: {instance['hostname']}")
+        print(f"{instance['$id']}: {instance['hostname']}")
 ```
 
 ---
@@ -349,18 +369,18 @@ Struktur validates canonical structure itself:
 
 ```json
 {
-  "instances": [],      // Must exist
-  "instances_by_id": {},// Must exist
-  "classes": [],        // Must exist
-  "classes_by_id": {},  // Must exist
-  "metadata": {}        // Must exist
+  "$instances": [],      // Must exist
+  "$instances_by_id": {},// Must exist
+  "$classes": [],        // Must exist
+  "$classes_by_id": {},  // Must exist
+  "$metadata": {}        // Must exist
 }
 ```
 
 ### Array Integrity
 
-- `instances` array matches `instances_by_id` keys
-- `classes` array matches `classes_by_id` keys
+- `$instances` array matches `$instances_by_id` keys
+- `$classes` array matches `$classes_by_id` keys
 - No duplicate IDs
 
 ### Metadata Completeness
@@ -399,18 +419,18 @@ Templates receive canonical as context:
 ### Direct Access
 
 ```handlebars
-{{!-- Access instances array --}}
-{{#each instances}}
+{{!-- Access $instances array --}}
+{{#each $instances}}
   <div>{{name}}</div>
 {{/each}}
 
 {{!-- Lookup by ID --}}
-{{#with (lookup instances_by_id "web-01")}}
+{{#with (lookup $instances_by_id "web-01")}}
   <h1>{{name}}</h1>
 {{/with}}
 
 {{!-- Check class inheritance --}}
-{{#if (inherits class "entity_base" classes_by_id)}}
+{{#if (inherits $class "entity_base" $classes_by_id)}}
   <span class="entity">{{name}}</span>
 {{/if}}
 ```
@@ -419,9 +439,9 @@ Templates receive canonical as context:
 
 ```handlebars
 <footer>
-  <p>Generated: {{buildContext.timestamp}}</p>
-  <p>Version: {{buildContext.version}}</p>
-  <p>Total instances: {{length instances}}</p>
+  <p>Generated: {{$metadata.timestamp}}</p>
+  <p>Version: {{$metadata.version}}</p>
+  <p>Total instances: {{length $instances}}</p>
 </footer>
 ```
 
@@ -510,7 +530,7 @@ struktur build --canonical data.json -t markdown-templates/
 struktur generate . -o canonical.json
 
 # Transform with jq
-jq '[.instances[] | select(.class == "server")]' canonical.json > servers.json
+jq '[."$instances"[] | select(."$class" == "server")]' canonical.json > servers.json
 
 # Use transformed data elsewhere
 ```
@@ -523,15 +543,18 @@ Canonical follows a JSON Schema:
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "required": ["instances", "instances_by_id", "classes", "classes_by_id", "metadata"],
+  "required": ["$instances", "$instances_by_id", "$classes", "$classes_by_id", "$metadata"],
   "properties": {
-    "instances": { "type": "array" },
-    "instances_by_id": { "type": "object" },
-    "classes": { "type": "array" },
-    "classes_by_id": { "type": "object" },
-    "aspects": { "type": "array" },
-    "aspects_by_id": { "type": "object" },
-    "metadata": { "type": "object" }
+    "$instances": { "type": "array" },
+    "$instances_by_id": { "type": "object" },
+    "$classes": { "type": "array" },
+    "$classes_by_id": { "type": "object" },
+    "$class_names": { "type": "array" },
+    "$aspects": { "type": "array" },
+    "$aspects_by_id": { "type": "object" },
+    "$aspect_names": { "type": "array" },
+    "$metadata": { "type": "object" },
+    "$validation": { "type": "object" }
   }
 }
 ```
@@ -551,7 +574,7 @@ Canonical follows a JSON Schema:
 4. Check class lineage
 
 ```bash
-jq '.classes_by_id.myclass' canonical.json
+jq '."$classes_by_id".myclass' canonical.json
 ```
 
 ### Canonical Has Unexpected Values
@@ -561,7 +584,7 @@ jq '.classes_by_id.myclass' canonical.json
 **Check merge order:**
 ```bash
 # See all instances with same ID
-grep -r '"id": "myinstance"' instances/
+grep -r '"$id": "myinstance"' instances/
 ```
 
 Later files override earlier files.

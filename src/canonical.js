@@ -14,66 +14,61 @@ const { version: PACKAGE_VERSION } = require('../package.json');
 /**
  * Merge instance with class field defaults and aspect defaults
  * @param {Object} instance - Instance data
- * @param {Object} resolvedClass - Resolved class with fields and aspect_defaults
+ * @param {Object} resolvedClass - Resolved class with fields and $aspect_defaults
  * @param {Object} aspectLoader - Aspect loader for aspect definitions
  * @returns {Object} - Merged instance
  */
 function mergeInstanceWithFields(instance, resolvedClass = {}, aspectLoader = null) {
-  const fields = resolvedClass.fields || {};
+  const fields = resolvedClass.$fields || {};
   
   // Deep merge: start with empty object, merge defaults, then instance (instance wins)
   const merged = classMerge(classMerge({}, fields), instance);
 
   // Three-layer aspect data merge
-  // Collect all aspect names from: instance, class aspect_types, class aspect_defaults
+  // Collect all aspect names from: instance, class $uses_aspects, class $aspect_defaults
   const allAspectNames = new Set();
   
-  if (instance.aspects && typeof instance.aspects === 'object') {
-    Object.keys(instance.aspects).forEach(name => allAspectNames.add(name));
+  if (instance.$aspects && typeof instance.$aspects === 'object') {
+    Object.keys(instance.$aspects).forEach(name => allAspectNames.add(name));
   }
   
-  if (resolvedClass.aspect_types && Array.isArray(resolvedClass.aspect_types)) {
-    resolvedClass.aspect_types.forEach(name => allAspectNames.add(name));
+  if (resolvedClass.$uses_aspects && Array.isArray(resolvedClass.$uses_aspects)) {
+    resolvedClass.$uses_aspects.forEach(name => allAspectNames.add(name));
   }
   
-  if (resolvedClass.aspect_defaults) {
-    Object.keys(resolvedClass.aspect_defaults).forEach(name => allAspectNames.add(name));
+  if (resolvedClass.$aspect_defaults) {
+    Object.keys(resolvedClass.$aspect_defaults).forEach(name => allAspectNames.add(name));
   }
   
   if (allAspectNames.size > 0) {
-    merged.aspects = {};
+    merged.$aspects = {};
     
     for (const aspectName of allAspectNames) {
       let aspectData = {};
       
       // Layer 1: Aspect definition defaults (from aspect file)
       if (aspectLoader && aspectLoader.aspects) {
-        // Aspect definitions are stored with "aspect_" prefix, but instances use them without
-        const aspectKey = aspectName.startsWith('aspect_') ? aspectName : `aspect_${aspectName}`;
-        const aspectDef = aspectLoader.aspects.get(aspectKey);
+        const aspectDef = aspectLoader.aspects.get(aspectName);
         if (aspectDef) {
-          const { aspect, schema, ...defaults } = aspectDef;
+          const defaults = aspectDef.$defaults || {};
           aspectData = classMerge(aspectData, defaults);
         }
       }
       
-      // Layer 2: Class hierarchy aspect_defaults (from resolved class)
-      if (resolvedClass.aspect_defaults && resolvedClass.aspect_defaults[aspectName]) {
-        aspectData = classMerge(aspectData, resolvedClass.aspect_defaults[aspectName]);
+      // Layer 2: Class hierarchy $aspect_defaults (from resolved class)
+      if (resolvedClass.$aspect_defaults && resolvedClass.$aspect_defaults[aspectName]) {
+        aspectData = classMerge(aspectData, resolvedClass.$aspect_defaults[aspectName]);
       }
       
       // Layer 3: Instance aspect values (always win)
-      if (instance.aspects && instance.aspects[aspectName]) {
-        aspectData = classMerge(aspectData, instance.aspects[aspectName]);
+      if (instance.$aspects && instance.$aspects[aspectName]) {
+        aspectData = classMerge(aspectData, instance.$aspects[aspectName]);
       }
       
-      merged.aspects[aspectName] = aspectData;
+      merged.$aspects[aspectName] = aspectData;
     }
     
-    // Auto-populate aspect_types from all merged aspects for convenient filtering
-    if (!merged.aspect_types) {
-      merged.aspect_types = Array.from(allAspectNames);
-    }
+    // Note: $uses_aspects is not auto-populated on instances
   }
 
   return merged;
@@ -92,8 +87,8 @@ function buildClassIndex(instances, resolver, logger) {
 
   // Collect unique class names from instances
   for (const obj of instances) {
-    if (obj.class) {
-      uniqueClasses.add(obj.class);
+    if (obj.$class) {
+      uniqueClasses.add(obj.$class);
     }
   }
 
@@ -131,18 +126,18 @@ export function generateCanonical(instances, resolver, options = {}) {
 
   // Merge instances with class defaults
   const mergedInstances = instances.map(instance => {
-    if (!instance.class) {
-      // No class field - return as-is (should not happen if filtered correctly)
+    if (!instance.$class) {
+      // No $class field - return as-is (should not happen if filtered correctly)
       return instance;
     }
     
     try {
-      const resolved = resolver.resolve(instance.class);
+      const resolved = resolver.resolve(instance.$class);
       return mergeInstanceWithFields(instance, resolved, aspectLoader);
     } catch (error) {
       // If class resolution fails, return instance as-is
       if (logger) {
-        logger.warn(`Warning: Could not resolve class ${instance.class}: ${error.message}`);
+        logger.warn(`Warning: Could not resolve class ${instance.$class}: ${error.message}`);
       }
       return instance;
     }
@@ -150,53 +145,58 @@ export function generateCanonical(instances, resolver, options = {}) {
 
   // Build canonical structure
   const canonical = {
-    instances: mergedInstances
+    $instances: mergedInstances
   };
   
-  // Add instances_by_id for fast lookup
+  // Add $instances_by_id for fast lookup
   const instancesById = {};
   for (const obj of mergedInstances) {
-    if (obj.id) {
-      instancesById[obj.id] = obj;
+    if (obj.$id) {
+      instancesById[obj.$id] = obj;
     }
   }
-  canonical.instances_by_id = instancesById;
+  canonical.$instances_by_id = instancesById;
 
   // Add class index with resolved class objects (not instance IDs)
   if (includeClassIndex) {
-    canonical.classes_by_id = buildClassIndex(mergedInstances, resolver, logger);
+    canonical.$classes_by_id = buildClassIndex(mergedInstances, resolver, logger);
     // Also provide classes as array for consistency with instances
-    canonical.classes = Object.values(canonical.classes_by_id);
+    canonical.$classes = Object.values(canonical.$classes_by_id);
+    canonical.$class_names = Object.keys(canonical.$classes_by_id).sort();
   }
 
-  // Add aspects_by_id (first-class entities)
+  // Add $aspects_by_id (first-class entities)
   if (aspectLoader && aspectLoader.aspects) {
     const aspectsById = {};
     for (const [aspectName, aspectDef] of aspectLoader.aspects.entries()) {
-      // Extract defaults: all top-level fields except 'aspect' and 'schema'
-      const { aspect, schema, ...defaults } = aspectDef;
-      
+      // Extract defaults from $defaults and metadata from $schema
+      const schema = aspectDef.$schema || {};
+      const defaults = aspectDef.$defaults || null;
+      const prettyName = aspectDef.$pretty_name || aspectName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+      const description = aspectDef.$description || schema.description || null;
+
       aspectsById[aspectName] = {
-        aspect: aspectName,
-        description: schema?.description || null,
-        pretty_name: aspectName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-        schema: schema || {},
-        defaults: Object.keys(defaults).length > 0 ? defaults : null
+        $aspect: aspectName,
+        $description: description,
+        $pretty_name: prettyName,
+        $schema: schema,
+        $defaults: defaults && Object.keys(defaults).length > 0 ? defaults : null
       };
     }
-    canonical.aspects_by_id = aspectsById;
+    canonical.$aspects_by_id = aspectsById;
     // Also provide aspects as array for consistency with instances
-    canonical.aspects = Object.values(aspectsById);
+    canonical.$aspects = Object.values(aspectsById);
+    canonical.$aspect_names = Object.keys(aspectsById).sort();
   }
 
   // Add metadata
   if (includeMetadata) {
-    canonical.metadata = {
+    canonical.$metadata = {
       timestamp,
       version: PACKAGE_VERSION,
       generator: 'struktur',
       count: mergedInstances.length,
-      classes: Object.keys(canonical.classes_by_id || {}).length,
+      classes: Object.keys(canonical.$classes_by_id || {}).length,
       aspects: aspectLoader ? aspectLoader.aspects.size : 0
     };
   }
@@ -204,7 +204,7 @@ export function generateCanonical(instances, resolver, options = {}) {
   // Add validation metadata if requested
   if (includeValidation && options.validationResults) {
     const results = options.validationResults;
-    canonical.validation = {
+    canonical.$validation = {
       total: results.length,
       valid: results.filter(r => r.valid).length,
       invalid: results.filter(r => !r.valid).length,
@@ -228,7 +228,7 @@ export function generateCanonical(instances, resolver, options = {}) {
  */
 export function generateCanonicalWithValidation(instances, struktur, options = {}) {
   // All instances must have class field for validation
-  const validatableInstances = instances.filter(inst => inst.class);
+  const validatableInstances = instances.filter(inst => inst.$class);
   
   // Validate all instances
   const validationResults = validatableInstances.length > 0 

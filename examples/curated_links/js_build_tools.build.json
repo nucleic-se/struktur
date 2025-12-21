@@ -1,14 +1,31 @@
 {
-  "classes": ["classes"],
-  "instances": ["instances/js_build_tools"],
-  "templates": ["templates"],
+  "classes": [
+    "classes"
+  ],
+  "instances": [
+    "instances/js_build_tools"
+  ],
+  "templates": [
+    "templates"
+  ],
   "build_dir": "build/js_build_tools",
-  "exact": true,
   "template_engine": "nunjucks",
   "render": [
-    {"template": "README.md.njk", "output": "/README.md"},
-    {"template": "index.html.njk", "output": "/index.html"},
-    {"template": "api.json.njk", "output": "/api.json"},
-    {"template": "feed.rss.njk", "output": "/feed.rss"}
+    {
+      "template": "README.md.njk",
+      "output": "/README.md"
+    },
+    {
+      "template": "index.html.njk",
+      "output": "/index.html"
+    },
+    {
+      "template": "api.json.njk",
+      "output": "/api.json"
+    },
+    {
+      "template": "feed.rss.njk",
+      "output": "/feed.rss"
+    }
   ]
 }

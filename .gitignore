@@ -34,3 +34,4 @@ temp/
 test-results/
 test/build-warnings-test/.struktur-manifest.json
 test/build-warnings-test/canonical.json
+test/build-warnings-test/build-*/

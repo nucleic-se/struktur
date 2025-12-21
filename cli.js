@@ -85,7 +85,7 @@ program
 
       // Warn about classless instances
       if (allClasslessRejects.length > 0 && !options.quiet) {
-        console.warn(`⚠ Rejected ${allClasslessRejects.length} classless instances (missing 'class' field):`);
+        console.warn(`⚠ Rejected ${allClasslessRejects.length} classless instances (missing '$class' field):`);
         const examples = allClasslessRejects.slice(0, 5);
         for (const reject of examples) {
           console.warn(`   - '${reject.id}' in ${reject.file}`);
@@ -157,12 +157,12 @@ program
       console.log('\n=== Classes ===');
       const classes = struktur.classLoader.getAllClasses();
       for (const cls of classes) {
-        const inherits = cls.parent
-          ? Array.isArray(cls.parent)
-            ? cls.parent.join(', ')
-            : cls.parent
+        const inherits = cls.$parent
+          ? Array.isArray(cls.$parent)
+            ? cls.$parent.join(', ')
+            : cls.$parent
           : 'none';
-        console.log(`  ${cls.class} (inherits: ${inherits})`);
+        console.log(`  ${cls.$class} (inherits: ${inherits})`);
       }
       console.log(`\nTotal: ${classes.length} classes`);
 
@@ -170,7 +170,7 @@ program
         console.log('\n=== Aspects ===');
         const aspects = struktur.aspectLoader.getAllAspects();
         for (const aspect of aspects) {
-          console.log(`  ${aspect.aspect}`);
+          console.log(`  ${aspect.$aspect}`);
         }
         console.log(`\nTotal: ${aspects.length} aspects`);
       }
@@ -200,12 +200,19 @@ function createTemplateAdapter(engineName) {
  *   - class.schema.outputExtension
  *   - class.schema.x-struktur.extension
  * 
- * @param {string} _className - Class name (currently unused)
+ * @param {string} className - Class name (for error context)
+ * @param {Object} [classDef] - Resolved class definition (optional)
  * @returns {string} File extension without dot
  */
-function getOutputExtension(_className) {
-  // Default to .txt for single-file output mode
-  // Multi-file output uses template names with extensions
+function getOutputExtension(className, classDef) {
+  const schema = classDef?.$schemas?.[classDef.$schemas.length - 1] || classDef?.$schema;
+  const extension = schema?.outputExtension || schema?.['x-struktur']?.extension;
+  if (typeof extension === 'string' && extension.trim().length > 0) {
+    return extension.replace(/^\./, '');
+  }
+
+  // Default to .txt for single-file output mode.
+  // Multi-file output uses template names with extensions.
   return 'txt';
 }
 
@@ -349,24 +356,25 @@ program
         const outputDir = options.output || './output';
         await fs.mkdir(outputDir, { recursive: true });
 
-        for (const obj of canonical.instances) {
-          const templateName = `${obj.class}.hbs`;
+        for (const obj of canonical.$instances) {
+          const templateName = `${obj.$class}.hbs`;
           try {
             const rendered = await adapter.render(templateName, obj);
-            const relativeOutput = `${obj.id}.${getOutputExtension(obj.class)}`;
+            const classDef = canonical.$classes_by_id?.[obj.$class];
+            const relativeOutput = `${obj.$id}.${getOutputExtension(obj.$class, classDef)}`;
             const safeOutput = resolveOutputPath(templateName, relativeOutput, outputDir, console);
             if (!safeOutput) {
-              console.warn(`Warning: Skipping render for ${obj.id} due to unsafe output path '${relativeOutput}'`);
+              console.warn(`Warning: Skipping render for ${obj.$id} due to unsafe output path '${relativeOutput}'`);
               continue;
             }
             await fs.writeFile(safeOutput, rendered, 'utf-8');
             console.log(`Rendered: ${safeOutput}`);
           } catch (error) {
-            console.warn(`Warning: Could not render ${obj.id}: ${error.message}`);
+            console.warn(`Warning: Could not render ${obj.$id}: ${error.message}`);
           }
         }
 
-        console.log(`\nRendered ${canonical.instances.length} instances to ${outputDir}`);
+        console.log(`\nRendered ${canonical.$instances.length} instances to ${outputDir}`);
       } else {
         // Output canonical JSON
         let output;
@@ -376,10 +384,10 @@ program
             success: true,
             canonical,
             stats: {
-              instances: canonical.instances?.length || 0,
-              classes: Object.keys(canonical.classes_by_id || {}).length,
-              aspects: Object.keys(canonical.aspects_by_id || {}).length,
-              validationErrors: canonical.validation?.invalid || 0
+              instances: canonical.$instances?.length || 0,
+              classes: Object.keys(canonical.$classes_by_id || {}).length,
+              aspects: Object.keys(canonical.$aspects_by_id || {}).length,
+              validationErrors: canonical.$validation?.invalid || 0
             }
           }, null, 2);
         } else {
@@ -416,7 +424,7 @@ program
   .option('--engine <name>', 'Template engine (handlebars, nunjucks)', 'handlebars')
   .option('-q, --quiet', 'Suppress output except errors')
   .option('--json', 'Output results as JSON')
-  .option('--no-deterministic', 'Disable deterministic build directories (allows overwrites)')
+  .option('--no-deterministic', 'Use simple build directory (allows overwrites, not recommended for production)')
   .option('--exact', 'Use exact build directory path without hash suffix (overrides deterministic)')
   .option('--allow-template-collisions', 'Allow templates with same name in multiple directories (last wins)')
   .action(async (stackDirs, options) => {
@@ -608,7 +616,7 @@ program
         
         // Add render tasks if present
         if (configFromFile.render) {
-          config.render = configFromFile.render;
+          config.$render = configFromFile.render;
         }
         
         // Write config file

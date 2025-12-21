@@ -1,12 +1,12 @@
 {
-  "id": "privacy",
-  "class": "page",
+  "$id": "privacy",
+  "$class": "page",
   "title": "Privacy",
   "slug": "privacy",
   "description": "Privacy information",
-  "aspects": {
-    "page": {
-      "content": "This is a static site with no analytics, tracking, or cookies. All content is generated at build time using Struktur. No server-side processing occurs. No user data is collected or stored. This page exists primarily to demonstrate footer-only navigation—secondary pages that don't clutter the main header but remain accessible when needed.",
+  "$aspects": {
+    "aspect_page": {
+      "content": "This is a static site with no analytics, tracking, or cookies. All content is generated at build time using Struktur. No server-side processing occurs. No user data is collected or stored. This page exists primarily to demonstrate footer-only navigation\u2014secondary pages that don't clutter the main header but remain accessible when needed.",
       "menu": "footer"
     }
   }

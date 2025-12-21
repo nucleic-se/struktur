@@ -16,7 +16,7 @@ export class ClassLoader {
 
   /**
    * Load class definition from file
-   * @param {string} filePath - Path to class schema JSON file
+   * @param {string} filePath - Path to class definition JSON file
    * @returns {Promise<ClassDefinition>}
    */
   async loadClass(filePath) {
@@ -24,35 +24,35 @@ export class ClassLoader {
     const classDef = JSON.parse(content);
 
     // Validate required fields (check class field first)
-    if (!classDef.class) {
-      throw new Error(`Class definition missing 'class' field: ${filePath}`);
+    if (!classDef.$class) {
+      throw new Error(`Class definition missing '$class' field: ${filePath}`);
     }
 
-    if (!classDef.schema) {
-      throw new Error(`Class definition missing 'schema' field: ${filePath}`);
+    if (!classDef.$schema) {
+      throw new Error(`Class definition missing '$schema' field: ${filePath}`);
     }
 
     // Meta-validate schema against JSON Schema draft-07 (security: fail fast)
     try {
       const ajv = new Ajv({ strict: true, strictRequired: false, strictTypes: false, validateSchema: true, validateFormats: false });
-      ajv.compile(classDef.schema);
+      ajv.compile(classDef.$schema);
     } catch (error) {
       throw new Error(
-        `Invalid JSON Schema in class '${classDef.class}' (${filePath}): ${error.message}`
+        `Invalid JSON Schema in class '${classDef.$class}' (${filePath}): ${error.message}`
       );
     }
 
     // Check for duplicate class names
-    if (this.classes.has(classDef.class)) {
+    if (this.classes.has(classDef.$class)) {
 
       throw new Error(
-        `Duplicate class name '${classDef.class}' found in ${filePath}. ` +
+        `Duplicate class name '${classDef.$class}' found in ${filePath}. ` +
         'Already loaded from previous location.'
       );
     }
 
     // Store in registry (raw, no merging)
-    this.classes.set(classDef.class, classDef);
+    this.classes.set(classDef.$class, classDef);
 
     return classDef;
   }
@@ -81,7 +81,7 @@ export class ClassLoader {
           // Recurse into subdirectories
           const subClasses = await this.loadClassesFromDirectory(fullPath, options);
           classes.push(...subClasses);
-        } else if (entry.isFile() && entry.name.endsWith('.schema.json')) {
+        } else if (entry.isFile() && entry.name.endsWith('.class.json')) {
           try {
             const classDef = await this.loadClass(fullPath);
             classes.push(classDef);

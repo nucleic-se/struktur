@@ -1,0 +1,13 @@
+{
+  "$class": "printer",
+  "$parent": [
+    "infrastructure_entity",
+    "domain_physical"
+  ],
+  "$pretty_name": "Printer",
+  "$schema": {
+    "type": "object",
+    "description": "Network printer device",
+    "additionalProperties": true
+  }
+}

@@ -1,6 +1,6 @@
 {
-  "id": "global",
-  "class": "global",
+  "$id": "global",
+  "$class": "global",
   "description": "Skribe site configuration and build manifest",
   "site": {
     "title": "Skribe Demo",
@@ -11,15 +11,18 @@
     "css/style.css",
     "css/custom.css"
   ],
-  "build": [
+  "$render": [
     {
-      "index.html": "/index.html"
+      "template": "index.html",
+      "output": "/index.html"
     },
     {
-      "css/style.css": "/css/style.css"
+      "template": "css/style.css",
+      "output": "/css/style.css"
     },
     {
-      "css/custom.css": "/css/custom.css"
+      "template": "css/custom.css",
+      "output": "/css/custom.css"
     }
   ]
 }

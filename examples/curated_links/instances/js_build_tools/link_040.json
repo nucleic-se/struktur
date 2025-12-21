@@ -1,6 +1,6 @@
 {
-  "id": "link_040",
-  "class": "tool_link",
+  "$id": "link_040",
+  "$class": "tool_link",
   "url": "https://moonrepo.dev",
   "title": "Moon",
   "description": "Build system and monorepo management tool for the JavaScript ecosystem",
@@ -13,8 +13,8 @@
   "github_stars": 2800,
   "license": "MIT",
   "github_url": "https://github.com/moonrepo/moon",
-  "aspects": {
-    "quality": {
+  "$aspects": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 2,

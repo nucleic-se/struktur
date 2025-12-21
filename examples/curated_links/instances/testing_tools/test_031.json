@@ -1,6 +1,6 @@
 {
-  "id": "test_031",
-  "class": "tool_link",
+  "$id": "test_031",
+  "$class": "tool_link",
   "url": "https://shouldjs.github.io",
   "title": "Should.js",
   "description": "BDD style assertions for Node.js",

@@ -1,19 +1,30 @@
 {
-  "id": "redis",
-  "class": "docked_container",
+  "$id": "redis",
+  "$class": "docked_container",
   "description": "In-memory data store for caching and session management",
-  "domains": ["cache", "application"],
-  "aspects": {
-    "docker_container": {
+  "domains": [
+    "cache",
+    "application"
+  ],
+  "$aspects": {
+    "aspect_docker_container": {
       "image": "redis:alpine",
       "description": "In-memory cache for application performance",
-      "ports": ["6379:6379"],
+      "ports": [
+        "6379:6379"
+      ],
       "volumes": [
         "redis-data:/data"
       ],
       "command": "redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}",
       "healthcheck": {
-        "test": ["CMD", "redis-cli", "--raw", "incr", "ping"],
+        "test": [
+          "CMD",
+          "redis-cli",
+          "--raw",
+          "incr",
+          "ping"
+        ],
         "timeout": "3s",
         "start_period": "5s"
       },

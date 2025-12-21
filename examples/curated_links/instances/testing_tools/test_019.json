@@ -1,6 +1,6 @@
 {
-  "id": "test_019",
-  "class": "tool_link",
+  "$id": "test_019",
+  "$class": "tool_link",
   "title": "k6",
   "url": "https://k6.io",
   "description": "Modern load testing tool using Go and JavaScript",

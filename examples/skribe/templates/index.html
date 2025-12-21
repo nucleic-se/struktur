@@ -7,20 +7,20 @@
 
 {{!-- Main content --}}
 {{#buffer name="content"}}
-  <h1>{{global.site.title}}</h1>
-  <p>{{global.site.description}}</p>
+  <h1>{{@root.$instances_by_id.global.site.title}}</h1>
+  <p>{{@root.$instances_by_id.global.site.description}}</p>
 
   <h2>Recent Posts</h2>
-  {{#each instances}}
-  {{#if (eq class "blog_post")}}
+  {{#each $instances}}
+  {{#if (eq $class "blog_post")}}
   <article class="post">
     <h3><a href="posts/{{slug}}.html">{{title}}</a></h3>
     <div class="post-meta">
-      {{aspects.blog_post.date}} • {{aspects.blog_post.author}}
+      {{$aspects.aspect_blog_post.date}} • {{$aspects.aspect_blog_post.author}}
     </div>
     <p>{{description}}</p>
-    {{#if aspects.blog_post.tags}}
-    {{> partials/tags.html tags=aspects.blog_post.tags}}
+    {{#if $aspects.aspect_blog_post.tags}}
+    {{> partials/tags.html tags=$aspects.aspect_blog_post.tags}}
     {{/if}}
   </article>
   {{/if}}
@@ -28,20 +28,20 @@
 {{/buffer}}
 
 {{!-- Generate individual blog post pages using render_file helper --}}
-{{#each instances}}
-{{#if (eq class "blog_post")}}
+{{#each $instances}}
+{{#if (eq $class "blog_post")}}
 {{render_file "blog-post.html" (concat "posts/" slug ".html")}}
 {{/if}}
 {{/each}}
 
 {{!-- Generate individual page files using render_file helper --}}
-{{#each instances}}
-{{#if (eq class "page")}}
+{{#each $instances}}
+{{#if (eq $class "page")}}
 {{render_file "page.html" (concat slug ".html")}}
 {{/if}}
 {{/each}}
 
 {{!-- Generate tag index pages --}}
-{{#each (unique (flatten (pluck (where instances "class" "blog_post") "aspects.blog_post.tags")))}}
-{{render_file "tag.html" (concat "tags/" this ".html") tagName=this posts=(where_includes @root.instances "aspects.blog_post.tags" this)}}
+{{#each (unique (flatten (pluck (where $instances "$class" "blog_post") "$aspects.aspect_blog_post.tags")))}}
+{{render_file "tag.html" (concat "tags/" this ".html") tagName=this posts=(where_includes @root.$instances "$aspects.aspect_blog_post.tags" this)}}
 {{/each}}

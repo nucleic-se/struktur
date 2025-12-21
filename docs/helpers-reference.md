@@ -8,13 +8,15 @@ All templates receive a context object with the following structure:
 
 ```javascript
 {
-  instances: [...],           // All instances (array)
-  instances_by_id: {...},     // Instances by id (object)
-  classes: [...],             // All class definitions (array)
-  classes_by_id: {...},       // Classes by name (object)
-  aspects: [...],             // All aspect definitions (array)  
-  aspects_by_id: {...},       // Aspects by name (object)
-  buildContext: {             // Build metadata
+  $instances: [...],           // All instances (array)
+  $instances_by_id: {...},     // Instances by $id (object)
+  $classes: [...],             // All class definitions (array)
+  $classes_by_id: {...},       // Classes by name (object)
+  $class_names: [...],         // Class name list
+  $aspects: [...],             // All aspect definitions (array)
+  $aspects_by_id: {...},       // Aspects by name (object)
+  $aspect_names: [...],        // Aspect name list
+  $metadata: {                 // Build metadata
     timestamp: "2025-12-16T...",
     version: "0.2.3-alpha",
     generator: "struktur"
@@ -26,17 +28,17 @@ Access instances in templates:
 
 **Handlebars:**
 ```handlebars
-{{#each instances}}
+{{#each $instances}}
   <h1>{{name}}</h1>
-  <p>Class: {{class}}</p>
+  <p>Class: {{$class}}</p>
 {{/each}}
 ```
 
 **Nunjucks:**
 ```nunjucks
-{% for instance in instances %}
+{% for instance in $instances %}
   <h1>{{ instance.name }}</h1>
-  <p>Class: {{ instance.class }}</p>
+  <p>Class: {{ instance.$class }}</p>
 {% endfor %}
 ```
 
@@ -544,23 +546,23 @@ Split string by delimiter.
 
 ## Data Helpers
 
-### `default(value, defaultValue)`
+### `default_value(value, defaultValue)`
 
 Provide default for falsy values.
 
 **Handlebars:**
 ```handlebars
-<p>Author: {{default author "Anonymous"}}</p>
+<p>Author: {{default_value author "Anonymous"}}</p>
 <!-- If author is null/undefined → "Anonymous" -->
 
-<span class="{{default priority 'normal'}}">
+<span class="{{default_value priority 'normal'}}">
   {{title}}
 </span>
 ```
 
 **Nunjucks:**
 ```nunjucks
-<p>Author: {{ author | default("Anonymous") }}</p>
+<p>Author: {{ author | default_value("Anonymous") }}</p>
 ```
 
 ---
@@ -575,7 +577,7 @@ Concatenate strings.
   {{title}}
 </a>
 
-<img src="{{concat "/images/" category "/" id ".jpg"}}">
+<img src="{{concat "/images/" category "/" $id ".jpg"}}">
 ```
 
 **Nunjucks:**
@@ -617,16 +619,16 @@ Get object values as array.
 
 **Handlebars:**
 ```handlebars
-<!-- classes_by_id = {post: {...}, page: {...}} -->
-{{#each (values classes_by_id)}}
-  <li>{{this.class}}</li>
+<!-- $classes_by_id = {post: {...}, page: {...}} -->
+{{#each (values $classes_by_id)}}
+  <li>{{this.$class}}</li>
 {{/each}}
 ```
 
 **Nunjucks:**
 ```nunjucks
-{% for classObj in classes_by_id | values %}
-  <li>{{ classObj.class }}</li>
+{% for classObj in $classes_by_id | values %}
+  <li>{{ classObj.$class }}</li>
 {% endfor %}
 ```
 
@@ -662,8 +664,8 @@ Check if class inherits from target class.
 
 **Handlebars:**
 ```handlebars
-{{#each instances}}
-  {{#if (inherits class "entity_base" classes_by_id)}}
+{{#each $instances}}
+  {{#if (inherits $class "entity_base" $classes_by_id)}}
     <div class="entity">
       {{name}}
     </div>
@@ -673,8 +675,8 @@ Check if class inherits from target class.
 
 **Nunjucks:**
 ```nunjucks
-{% for instance in instances %}
-  {% if inherits(instance.class, "entity_base", classes_by_id) %}
+{% for instance in $instances %}
+  {% if inherits(instance.$class, "entity_base", $classes_by_id) %}
     <div class="entity">{{ instance.name }}</div>
   {% endif %}
 {% endfor %}
@@ -688,7 +690,7 @@ Check if class inherits from any target.
 
 **Handlebars:**
 ```handlebars
-{{#if (inherits_any class "page" "post" classes_by_id)}}
+{{#if (inherits_any $class "page" "post" $classes_by_id)}}
   <article>{{content}}</article>
 {{/if}}
 ```
@@ -701,7 +703,7 @@ Check if class inherits from all targets.
 
 **Handlebars:**
 ```handlebars
-{{#if (inherits_all class "entity_base" "timestamped" classes_by_id)}}
+{{#if (inherits_all $class "entity_base" "timestamped" $classes_by_id)}}
   <time>{{created_at}}</time>
 {{/if}}
 ```
@@ -715,13 +717,13 @@ Get full parent chain.
 **Handlebars:**
 ```handlebars
 <!-- Show inheritance chain -->
-<p>Lineage: {{join (class_lineage class classes_by_id) " → "}}</p>
+<p>Lineage: {{join (class_lineage $class $classes_by_id) " → "}}</p>
 <!-- Output: entity_base → content_base → post -->
 ```
 
 **Nunjucks:**
 ```nunjucks
-<p>Lineage: {{ class_lineage(class, classes_by_id) | join(" → ") }}</p>
+<p>Lineage: {{ class_lineage($class, $classes_by_id) | join(" → ") }}</p>
 ```
 
 ---
@@ -733,7 +735,7 @@ Filter instances by inheritance.
 **Handlebars:**
 ```handlebars
 <!-- Get all instances inheriting from "container" -->
-{{#each (filter_inherits instances "container" classes_by_id)}}
+{{#each (filter_inherits $instances "container" $classes_by_id)}}
   <div class="container-item">
     {{name}}
   </div>
@@ -742,7 +744,7 @@ Filter instances by inheritance.
 
 **Nunjucks:**
 ```nunjucks
-{% for item in instances | filter_inherits("container", classes_by_id) %}
+{% for item in $instances | filter_inherits("container", $classes_by_id) %}
   <div>{{ item.name }}</div>
 {% endfor %}
 ```
@@ -755,7 +757,7 @@ Check if property is required in schema.
 
 **Handlebars:**
 ```handlebars
-{{#if (schema_required class "title" classes_by_id)}}
+{{#if (schema_required $class "title" $classes_by_id)}}
   <label>Title <span class="required">*</span></label>
 {{/if}}
 ```
@@ -768,7 +770,7 @@ Check if schema has property defined.
 
 **Handlebars:**
 ```handlebars
-{{#if (schema_has class "excerpt" classes_by_id)}}
+{{#if (schema_has $class "excerpt" $classes_by_id)}}
   <p class="excerpt">{{excerpt}}</p>
 {{/if}}
 ```
@@ -783,7 +785,7 @@ Get all schema property names.
 ```handlebars
 <h3>Properties:</h3>
 <ul>
-  {{#each (schema_props class classes_by_id)}}
+  {{#each (schema_props $class $classes_by_id)}}
     <li>{{this}}</li>
   {{/each}}
 </ul>
@@ -907,13 +909,13 @@ Check if a buffer has been written.
 {# Write to docker-compose.yml #}
 {% buffer name="service" destination="docker-compose.yml" mode="append" %}
 services:
-  {{id}}:
+  {{$id}}:
     image: {{image}}
 {% endbuffer %}
 
 {# Write to README.md #}
 {% buffer name="docs" destination="README.md" mode="append" %}
-## {{id}}
+## {{$id}}
 Documentation here.
 {% endbuffer %}
 ```
@@ -1005,12 +1007,12 @@ Render template to separate output file.
 <html>
 <body>
   {{!-- Generate individual post pages --}}
-  {{#each (where instances "class" "post")}}
+  {{#each (where $instances "$class" "post")}}
     {{render_file "post.html.hbs" (concat "posts/" slug ".html") this}}
   {{/each}}
   
   <ul>
-    {{#each (where instances "class" "post")}}
+    {{#each (where $instances "$class" "post")}}
       <li><a href="posts/{{slug}}.html">{{title}}</a></li>
     {{/each}}
   </ul>
@@ -1033,8 +1035,8 @@ Render template to separate output file.
 **Common Pattern - Generate Per-Instance Files:**
 ```handlebars
 {{!-- Generate page for each instance --}}
-{{#each instances}}
-  {{render_file "detail.html.hbs" (concat class "/" id ".html") this}}
+{{#each $instances}}
+  {{render_file "detail.html.hbs" (concat $class "/" $id ".html") this}}
 {{/each}}
 ```
 
@@ -1078,7 +1080,7 @@ Combine helpers for powerful transformations:
 
 <!-- See what classes are available -->
 <script>
-  console.log('Classes:', {{{json classes_by_id}}});
+  console.log('Classes:', {{{json $classes_by_id}}});
 </script>
 ```
 
@@ -1088,7 +1090,7 @@ Combine helpers for powerful transformations:
 ```handlebars
 <pre>
 Available context keys:
-{{#each (array "instances" "classes" "aspects" "buildContext")}}
+{{#each (array "$instances" "$classes" "$aspects" "$metadata")}}
   - {{this}}: {{length (lookup ../ this)}}
 {{/each}}
 </pre>

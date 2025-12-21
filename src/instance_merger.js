@@ -92,24 +92,24 @@ export function mergeInstances(instances) {
   const byId = new Map();
   
   for (const inst of instances) {
-    if (!inst.id) {
-      throw new Error('Instance missing required "id" field');
+    if (!inst.$id) {
+      throw new Error('Instance missing required "$id" field');
     }
     
-    if (!byId.has(inst.id)) {
-      byId.set(inst.id, {
+    if (!byId.has(inst.$id)) {
+      byId.set(inst.$id, {
         merged: { ...inst },
-        sources: [inst._source_file || 'unknown']
+        sources: [inst.$source_file || 'unknown']
       });
     } else {
-      const existing = byId.get(inst.id);
+      const existing = byId.get(inst.$id);
       
       // Fail fast: class mismatch
-      if (inst.class && existing.merged.class && existing.merged.class !== inst.class) {
+      if (inst.$class && existing.merged.$class && existing.merged.$class !== inst.$class) {
         throw new Error(
-          `Instance '${inst.id}' has conflicting classes:\n` +
-          `  ${existing.merged.class} in ${existing.sources[0]}\n` +
-          `  ${inst.class} in ${inst._source_file || 'unknown'}\n` +
+          `Instance '${inst.$id}' has conflicting classes:\n` +
+          `  ${existing.merged.$class} in ${existing.sources[0]}\n` +
+          `  ${inst.$class} in ${inst.$source_file || 'unknown'}\n` +
           `\n` +
           `Tip: Use explicit flags to compose stacks at class level:\n` +
           `  struktur build -c stack1/classes -c stack2/classes -i stack2/instances`
@@ -117,12 +117,12 @@ export function mergeInstances(instances) {
       }
       
       try {
-        existing.merged = deepMerge(existing.merged, inst, inst.id);
-        existing.sources.push(inst._source_file || 'unknown');
+        existing.merged = deepMerge(existing.merged, inst, inst.$id);
+        existing.sources.push(inst.$source_file || 'unknown');
       } catch (error) {
         throw new Error(
-          `Failed to merge instance '${inst.id}': ${error.message}\n` +
-          `  Sources: ${existing.sources.join(', ')}, ${inst._source_file || 'unknown'}`
+          `Failed to merge instance '${inst.$id}': ${error.message}\n` +
+          `  Sources: ${existing.sources.join(', ')}, ${inst.$source_file || 'unknown'}`
         );
       }
     }
@@ -131,7 +131,7 @@ export function mergeInstances(instances) {
   // Return merged instances with source tracking
   return Array.from(byId.values()).map(({ merged, sources }) => ({
     ...merged,
-    _merged_from: sources.length > 1 ? sources : undefined
+    $merged_from: sources.length > 1 ? sources : undefined
   }));
 }
 
@@ -142,7 +142,7 @@ export function mergeInstances(instances) {
  * @returns {Object} Statistics
  */
 export function getMergeStats(instances, merged) {
-  const mergedCount = merged.filter(m => m._merged_from).length;
+  const mergedCount = merged.filter(m => m.$merged_from).length;
   const totalSources = instances.length;
   const uniqueInstances = merged.length;
   

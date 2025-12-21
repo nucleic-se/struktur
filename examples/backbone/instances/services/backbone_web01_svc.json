@@ -1,22 +1,24 @@
 {
-  "id": "backbone_web01_svc",
+  "$id": "backbone_web01_svc",
   "name": "Web Service 01",
-  "class": "web_service",
-  "domains": ["services"],
-  "aspects": {
-    "infrastructure": {
+  "$class": "web_service",
+  "domains": [
+    "services"
+  ],
+  "$aspects": {
+    "aspect_infrastructure": {
       "environment": "production",
       "notes": "Generic web application service",
       "location": "homelab"
     },
-    "service": {
+    "aspect_service": {
       "type": "web",
       "port": 8080,
       "protocol": "HTTP",
       "url": "http://web01.home"
     },
-    "service_entity": {
-      "parent": "backbone_web01",
+    "aspect_service_entity": {
+      "$parent": "backbone_web01",
       "status": "active"
     }
   }

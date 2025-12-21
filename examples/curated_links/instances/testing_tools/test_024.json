@@ -1,6 +1,6 @@
 {
-  "id": "test_024",
-  "class": "tool_link",
+  "$id": "test_024",
+  "$class": "tool_link",
   "url": "https://qunitjs.com",
   "title": "QUnit",
   "description": "Powerful JavaScript unit testing framework",

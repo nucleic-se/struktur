@@ -1,6 +1,6 @@
 {
-  "id": "test_025",
-  "class": "tool_link",
+  "$id": "test_025",
+  "$class": "tool_link",
   "url": "https://karma-runner.github.io",
   "title": "Karma",
   "description": "Test runner that runs tests in multiple browsers",

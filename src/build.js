@@ -13,6 +13,46 @@ import { mergeInstances, getMergeStats } from './instance_merger.js';
 import { loadInstancesFromDir } from './instance_loader.js';
 import { TemplateRenderer } from './template_renderer.js';
 
+function validateRenderTasks(renderTasks, sourceLabel) {
+  if (renderTasks === undefined) {
+    return;
+  }
+  if (!Array.isArray(renderTasks)) {
+    throw new Error(
+      `${sourceLabel}: render must be an array of {template, output} objects.`
+    );
+  }
+
+  for (let i = 0; i < renderTasks.length; i++) {
+    const task = renderTasks[i];
+    if (!task || typeof task !== 'object' || Array.isArray(task)) {
+      throw new Error(
+        `${sourceLabel}: render[${i}] must be an object with "template" and "output".`
+      );
+    }
+
+    if (typeof task.template !== 'string' || task.template.trim() === '') {
+      throw new Error(
+        `${sourceLabel}: render[${i}].template must be a non-empty string.`
+      );
+    }
+
+    if (typeof task.output !== 'string' || task.output.trim() === '') {
+      throw new Error(
+        `${sourceLabel}: render[${i}].output must be a non-empty string.`
+      );
+    }
+
+    const extraKeys = Object.keys(task).filter(key => key !== 'template' && key !== 'output');
+    if (extraKeys.length > 0) {
+      throw new Error(
+        `${sourceLabel}: render[${i}] has unexpected keys: ${extraKeys.join(', ')}. ` +
+        'Only "template" and "output" are allowed.'
+      );
+    }
+  }
+}
+
 /**
  * Build a stack with organized output directory
  * @param {Object} options - Build options
@@ -28,7 +68,7 @@ export async function buildStack(options) {
     engine = 'handlebars',
     quiet = false,
     logger,
-    deterministic = false,
+    deterministic = true,
     failOnCollisions = true,
     renderTasks = []
   } = options;
@@ -39,6 +79,7 @@ export async function buildStack(options) {
   }
 
   const log = logger || createLogger({ quiet });
+  validateRenderTasks(renderTasks, 'Build config');
   
   // Generate deterministic build dir by default (disable with deterministic=false)
   let buildDir = requestedBuildDir;
@@ -94,9 +135,9 @@ export async function buildStack(options) {
   
   log.log(`  ✓ Loaded ${allInstances.length} instances`);
   
-  // Enforce class field requirement - throw error for classless instances
+  // Enforce $class field requirement - throw error for classless instances
   if (allClasslessRejects.length > 0) {
-    const errorMessage = [`\nError: Found ${allClasslessRejects.length} instances missing required 'class' field:\n`];
+    const errorMessage = [`\nError: Found ${allClasslessRejects.length} instances missing required '$class' field:\n`];
     // Show first 5 examples
     const examples = allClasslessRejects.slice(0, 5);
     for (const reject of examples) {
@@ -105,7 +146,7 @@ export async function buildStack(options) {
     if (allClasslessRejects.length > 5) {
       errorMessage.push(`  ... and ${allClasslessRejects.length - 5} more`);
     }
-    errorMessage.push('\nAll instances must have a "class" field that references a valid class definition.');
+    errorMessage.push('\nAll instances must have a "$class" field that references a valid class definition.');
     throw new Error(errorMessage.join('\n'));
   }
 
@@ -116,7 +157,7 @@ export async function buildStack(options) {
     log.log(`  ✓ Merged ${mergeStats.reduction} duplicate IDs into ${instances.length} unique instances`);
   }
 
-  // Step 2: Generate canonical with validation (includes aspects_by_id)
+  // Step 2: Generate canonical with validation (includes $aspects_by_id)
   log.log('\n🔍 Validating stack...');
   const canonical = generateCanonicalWithValidation(instances, struktur, {
     includeMetadata: true,
@@ -126,14 +167,14 @@ export async function buildStack(options) {
     logger: log
   });
 
-  const summary = getValidationSummary(canonical.validation);
+  const summary = getValidationSummary(canonical.$validation);
   if (summary.invalid > 0) {
     log.log(`  ✗ Validation failed: ${summary.invalid} invalid instances`);
     
     // Display detailed error information
-    if (canonical.validation && canonical.validation.errors) {
+    if (canonical.$validation && canonical.$validation.errors) {
       log.log('');
-      displayValidationErrors(canonical.validation, log);
+      displayValidationErrors(canonical.$validation, log);
     }
     
     throw new Error('Validation failed');
@@ -151,7 +192,7 @@ export async function buildStack(options) {
     throw new Error('Security: canonical.json path resolution failed');
   }
   await fs.writeFile(canonicalPath, JSON.stringify(canonical, null, 2), 'utf-8');
-  log.log(`  ✓ canonical.json (${canonical.instances.length} instances)`);
+  log.log(`  ✓ canonical.json (${canonical.$instances.length} instances)`);
 
   // Step 5: Write class definitions
   const classDefsDir = path.join(buildDir, 'meta', 'classes');
@@ -179,13 +220,13 @@ export async function buildStack(options) {
   if (!validationPath) {
     throw new Error('Security: validation.json path resolution failed');
   }
-  await fs.writeFile(validationPath, JSON.stringify(canonical.validation, null, 2), 'utf-8');
+  await fs.writeFile(validationPath, JSON.stringify(canonical.$validation, null, 2), 'utf-8');
   log.log('  ✓ meta/validation.json');
 
   // Step 6.5: Extract render tasks from instances and merge with config render tasks
-  const instanceRenderTasks = canonical.instances
-    .filter(inst => inst.render && Array.isArray(inst.render) && inst.render.length > 0)
-    .flatMap(inst => inst.render);
+  const instanceRenderTasks = canonical.$instances
+    .filter(inst => inst.$render && Array.isArray(inst.$render) && inst.$render.length > 0)
+    .flatMap(inst => inst.$render);
   
   // Merge: config tasks first, then instance tasks
   const allRenderTasks = [...renderTasks, ...instanceRenderTasks];
@@ -224,7 +265,7 @@ export async function buildStack(options) {
 
     // Use merged render tasks
     if (allRenderTasks.length === 0) {
-      log.log(`  ℹ No render tasks found (no "render" array in config or instances)`);
+    log.log(`  ℹ No render tasks found (no "$render" array in config or instances)`);
       log.log(`     Templates will not be rendered. This is OK if you only need canonical output.`);
     } else {
       log.log(`  Found ${allRenderTasks.length} render tasks`);

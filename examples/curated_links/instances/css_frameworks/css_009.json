@@ -1,6 +1,6 @@
 {
-  "id": "css_009",
-  "class": "tool_link",
+  "$id": "css_009",
+  "$class": "tool_link",
   "url": "https://mui.com",
   "title": "Material-UI",
   "description": "Popular React UI framework implementing Google's Material Design",

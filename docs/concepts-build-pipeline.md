@@ -27,7 +27,7 @@ Discover and load data files from directories.
 
 1. **Scan directories** for files
 2. **Load class definitions** (`.json` files)
-3. **Load schemas** (`.schema.json` files)
+3. **Load schemas** (`.class.json` files)
 4. **Load aspects** (aspect definitions)
 5. **Load instances** (instance data files)
 6. **Load templates** (`.hbs`, `.njk` files)
@@ -104,10 +104,10 @@ Combine data from multiple sources into complete instances.
 ### Process
 
 1. **Resolve class inheritance** (build lineage)
-2. **Accumulate aspect_types and aspect_defaults** (parent → child)
+2. **Accumulate $uses_aspects and $aspect_defaults** (parent → child)
 3. **Merge class defaults** (parent → child)
 4. **Merge multi-file instances** (same ID)
-5. **Apply three-layer aspect merge** (aspect.defaults → class.aspect_defaults → instance.aspects)
+5. **Apply three-layer aspect merge** (aspect.defaults → class.$aspect_defaults → instance.$aspects)
 6. **Build canonical structure**
 
 ### Merge Order
@@ -129,8 +129,8 @@ Later sources override earlier sources
 **For aspect data specifically:**
 ```
 1. Aspect definition defaults      (from aspect file)
-2. Parent class aspect_defaults    (accumulated through inheritance)
-3. Child class aspect_defaults     (deep merged with parents)
+2. Parent class $aspect_defaults    (accumulated through inheritance)
+3. Child class $aspect_defaults     (deep merged with parents)
 4. Instance aspects                (highest priority)
 
 Each layer deep merges with previous, instance always wins
@@ -142,16 +142,20 @@ Each layer deep merges with previous, instance always wins
 ```json
 // entity_base.json
 {
-  "class": "entity_base",
-  "name": "",
-  "labels": []
+  "$class": "entity_base",
+  "$fields": {
+    "name": "",
+    "labels": []
+  }
 }
 
 // server.json
 {
-  "class": "server",
-  "parent": "entity_base",
-  "replicas": 1
+  "$class": "server",
+  "$parent": "entity_base",
+  "$fields": {
+    "replicas": 1
+  }
 }
 ```
 
@@ -159,15 +163,15 @@ Each layer deep merges with previous, instance always wins
 ```json
 // base/web-01.json
 {
-  "id": "web-01",
-  "class": "server",
+  "$id": "web-01",
+  "$class": "server",
   "name": "Web Server 01",
   "hostname": "web-01.local"
 }
 
 // prod/web-01.json
 {
-  "id": "web-01",
+  "$id": "web-01",
   "replicas": 3,
   "labels": ["production"]
 }
@@ -176,8 +180,8 @@ Each layer deep merges with previous, instance always wins
 **Merged Result:**
 ```json
 {
-  "id": "web-01",
-  "class": "server",
+  "$id": "web-01",
+  "$class": "server",
   "name": "Web Server 01",        // From base/web-01.json
   "hostname": "web-01.local",     // From base/web-01.json
   "replicas": 3,                  // From prod/web-01.json (overrides class default)
@@ -250,12 +254,12 @@ Ensure merged data satisfies schemas and constraints.
 Each class in inheritance chain validates independently:
 
 ```
-Instance: { "id": "web-01", "class": "web_server", ... }
+Instance: { "$id": "web-01", "$class": "web_server", ... }
 
 Validates against:
-1. entity_base.schema.json
-2. server.schema.json
-3. web_server.schema.json
+1. entity_base.class.json
+2. server.class.json
+3. web_server.class.json
 ```
 
 **All must pass.**
@@ -286,7 +290,7 @@ Build Phase: Validation
 ```
 [VALIDATE] Validation Error (instance: web-01)
   Property "hostname" is required but not provided
-  Schema: server.schema.json
+  Schema: server.class.json
   Class: web_server (inherits: entity_base → server → web_server)
 ```
 
@@ -295,14 +299,14 @@ Build Phase: Validation
 [VALIDATE] Validation Error (instance: app)
   Property "port" expected type "integer" but got "string"
   Value: "8080"
-  Schema: service.schema.json
+  Schema: service.class.json
 ```
 
 **Constraint violation:**
 ```
 [VALIDATE] Validation Error (instance: db)
   Property "replicas" value -1 violates minimum constraint (1)
-  Schema: database.schema.json
+  Schema: database.class.json
 ```
 
 **Extra field warning (promoted to error):**
@@ -335,13 +339,15 @@ Every template receives:
 
 ```javascript
 {
-  instances: [...],
-  instances_by_id: {...},
-  classes: [...],
-  classes_by_id: {...},
-  aspects: [...],
-  aspects_by_id: {...},
-  buildContext: {
+  $instances: [...],
+  $instances_by_id: {...},
+  $classes: [...],
+  $classes_by_id: {...},
+  $class_names: [...],
+  $aspects: [...],
+  $aspects_by_id: {...},
+  $aspect_names: [...],
+  $metadata: {
     timestamp: "2025-12-16T10:30:00Z",
     version: "0.2.3-alpha",
     generator: "struktur"
@@ -520,7 +526,7 @@ Fix: Remove circular parent reference
 ```
 [VALIDATE] Validation Error (instance: web-01)
   Property "port" is required but not provided
-  Schema: server.schema.json
+  Schema: server.class.json
   File: instances/web-01.json
 
 Fix: Add "port" field to instance
@@ -532,7 +538,7 @@ Fix: Add "port" field to instance
 Line 15: Cannot read property 'name' of undefined
 Context: {{post.author.name}}
 
-Fix: Check that author exists or use {{default post.author.name "Anonymous"}}
+Fix: Check that author exists or use {{default_value post.author.name "Anonymous"}}
 ```
 
 ---
@@ -717,7 +723,7 @@ grep -r '"parent"' classes/
 ```bash
 struktur validate . --json | jq .
 struktur generate . -o debug.json
-jq '.instances[] | select(.id == "problematic-id")' debug.json
+jq '."$instances"[] | select(."$id" == "problematic-id")' debug.json
 ```
 
 ### Build Fails in RENDER

@@ -79,8 +79,8 @@ struktur build [options] [stack-dirs...]
 - `--engine <name>` - Template engine: `handlebars` or `nunjucks` (default: `handlebars`)
 - `-q, --quiet` - Suppress output except errors
 - `--json` - Output build results as JSON
-- `--exact` - Use exact build directory path without hash suffix (recommended)
-- `--no-deterministic` - Disable deterministic build directories (allows overwrites)
+- `--exact` - Use exact build directory path without hash suffix (overrides deterministic)
+- `--no-deterministic` - Use simple build directory (allows overwrites; not recommended for production)
 - `--allow-template-collisions` - Allow templates with same name in multiple directories (last wins)
 - `-h, --help` - Show command help
 
@@ -105,7 +105,10 @@ struktur build mystack --engine nunjucks
 # Allow template name conflicts (last directory wins)
 struktur build base overlay --allow-template-collisions
 
-# Use exact build directory (recommended for tutorials and production)
+# Default deterministic build (hash-based)
+struktur build mystack
+
+# Use exact build directory (no hash suffix)
 struktur build mystack --exact
 
 # Non-deterministic build (overwrites previous build)
@@ -120,7 +123,7 @@ struktur build mystack --no-deterministic
 
 **Build Output:**
 - By default: `./build/build-<hash>/` (deterministic, based on input hash)
-- With `--exact`: `./build/` (uses exact path, simpler for tutorials/production)
+- With `--exact`: `./build/` (uses exact path, no hash suffix)
 - With `--no-deterministic`: `./build/` (overwrites previous, with collision warnings)
 - Custom: Specify with `-b/--build-dir`
 
@@ -193,18 +196,21 @@ struktur generate -c classes/ -i instances/ -o canonical.json
 **Canonical Output Structure:**
 ```json
 {
-  "instances": [...],           // Array of all instances
-  "instances_by_id": {...},     // Map of id -> instance
-  "classes": [...],             // Array of class definitions
-  "classes_by_id": {...},       // Map of class name -> resolved class
-  "aspects": [...],             // Array of aspect definitions
-  "aspects_by_id": {...},       // Map of aspect name -> definition
-  "metadata": {
+  "$instances": [...],           // Array of all instances
+  "$instances_by_id": {...},     // Map of $id -> instance
+  "$classes": [...],             // Array of class definitions
+  "$classes_by_id": {...},       // Map of class name -> resolved class
+  "$class_names": [...],         // List of class names
+  "$aspects": [...],            // Array of aspect definitions
+  "$aspects_by_id": {...},       // Map of aspect name -> definition
+  "$aspect_names": [...],        // List of aspect names
+  "$metadata": {
     "timestamp": "2025-12-16T...",
     "version": "0.2.3-alpha",
     "generator": "struktur",
     "count": 42
-  }
+  },
+  "$validation": {...}          // Validation results (if enabled)
 }
 ```
 
@@ -235,7 +241,7 @@ struktur info -c classes/
 struktur info -c classes/ -a aspects/
 
 # JSON format for scripting
-struktur info -c classes/ --json | jq '.classes[] | .class'
+struktur info -c classes/ --json | jq '."$classes"[] | ."$class"'
 ```
 
 **Behavior:**
@@ -311,7 +317,9 @@ Optional configuration file for build settings. Automatically discovered when bu
   "templates": ["./templates"],
   "build_dir": "./build",
   "template_engine": "handlebars",
-  "exact": true,
+  "render": [
+    { "template": "index.html.hbs", "output": "/index.html" }
+  ],
   "allow_template_collisions": false,
   "warn_extra_fields": true,
   "warnings_as_errors": true,
@@ -326,6 +334,7 @@ Optional configuration file for build settings. Automatically discovered when bu
 - `templates` (string | string[]) - Template directories (relative to config file)
 - `build_dir` (string) - Build output directory (relative to config file)
 - `template_engine` (string) - Template engine: `handlebars` or `nunjucks` (default: `handlebars`)
+- `render` (array) - Config render tasks (config only, runs before instance `$render`)
 - `exact` (boolean) - Use exact build directory without hash suffix (default: false)
 - `allow_template_collisions` (boolean) - Allow template name conflicts (default: false)
 - `warn_extra_fields` (boolean) - Warn about fields not in schema (default: true)
@@ -347,8 +356,7 @@ Optional configuration file for build settings. Automatically discovered when bu
   "classes": ["../universal/classes", "./classes"],
   "instances": ["./instances"],
   "templates": ["./templates"],
-  "build_dir": "./build",
-  "exact": true
+  "build_dir": "./build"
 }
 
 # Build uses paths relative to mystack/
@@ -386,18 +394,17 @@ struktur build mystack --exact --save-config mystack/struktur.build.json
 
 ### Build Flags
 
-**`--exact`** (Recommended)
+**`--exact`**
 - Uses exact build directory path without hash suffix
 - Builds into `./build/` instead of `./build/build-<hash>/`
 - Overrides `--deterministic` setting
-- Recommended for tutorials, production builds, and predictable paths
 - Example: `struktur build mystack --exact` → `./build/`
 
 **`--no-deterministic`**
 - Disables hash-based build directories
 - Builds directly into `--build-dir` path (overwrites previous builds)
 - Default behavior: `build/build-<hash>/` for deterministic builds
-- Use when you want predictable output paths
+- Use when you want a fixed output path (not recommended for production)
 
 **`--allow-template-collisions`**
 - Permits templates with the same name in multiple directories
@@ -430,7 +437,7 @@ struktur build mystack --exact --save-config mystack/struktur.build.json
 **`-i, --instances <dirs...>`**
 - Specifies instance file directories
 - Multiple directories supported
-- Instances with same `id` are merged (later overrides earlier)
+- Instances with same `$id` are merged (later overrides earlier)
 
 **`-t, --templates <dirs...>`**
 - Specifies template directories

@@ -1,0 +1,16 @@
+{
+  "$class": "server",
+  "$parent": [
+    "compute_node",
+    "domain_physical"
+  ],
+  "$pretty_name": "Server",
+  "$uses_aspects": [
+    "aspect_network_interface"
+  ],
+  "$schema": {
+    "type": "object",
+    "description": "Physical server compute infrastructure",
+    "additionalProperties": true
+  }
+}

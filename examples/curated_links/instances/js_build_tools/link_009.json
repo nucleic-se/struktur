@@ -1,6 +1,6 @@
 {
-  "id": "link_009",
-  "class": "tool_link",
+  "$id": "link_009",
+  "$class": "tool_link",
   "url": "https://babeljs.io",
   "title": "Babel",
   "description": "JavaScript compiler that transforms modern JavaScript into backwards compatible versions",
@@ -14,8 +14,8 @@
   "github_stars": 43000,
   "license": "MIT",
   "github_url": "https://github.com/babel/babel",
-  "aspects": {
-    "quality": {
+  "$aspects": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 5,

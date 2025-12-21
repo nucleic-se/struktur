@@ -21,38 +21,38 @@ describe('ClassLoader', () => {
 
   describe('loadClass', () => {
     it('should load a valid class definition', async () => {
-      const classDef = await loader.loadClass(path.join(fixturesDir, 'entity_base.schema.json'));
+      const classDef = await loader.loadClass(path.join(fixturesDir, 'entity_base.class.json'));
 
-      assert.strictEqual(classDef.class, 'entity_base');
-      assert.ok(classDef.schema);
-      assert.ok(classDef.schema.properties);
+      assert.strictEqual(classDef.$class, 'entity_base');
+      assert.ok(classDef.$schema);
+      assert.ok(classDef.$schema.properties);
     });
 
     it('should throw error for missing class field', async () => {
       const invalidDir = path.join(__dirname, 'fixtures', 'invalid_classes');
       await assert.rejects(
-        async () => loader.loadClass(path.join(invalidDir, 'invalid_no_class.schema.json')),
-        /missing 'class' field/
+        async () => loader.loadClass(path.join(invalidDir, 'invalid_no_class.class.json')),
+        /missing '\$class' field/
       );
     });
 
     it('should throw error for missing schema field', async () => {
       const invalidDir = path.join(__dirname, 'fixtures', 'invalid_classes');
       await assert.rejects(
-        async () => loader.loadClass(path.join(invalidDir, 'invalid_no_schema.schema.json')),
-        /missing 'schema' field/
+        async () => loader.loadClass(path.join(invalidDir, 'invalid_no_schema.class.json')),
+        /missing '\$schema' field/
       );
     });
 
     it('should store class in registry', async () => {
-      await loader.loadClass(path.join(fixturesDir, 'entity_base.schema.json'));
+      await loader.loadClass(path.join(fixturesDir, 'entity_base.class.json'));
 
       assert.ok(loader.hasClass('entity_base'));
-      assert.strictEqual(loader.getClass('entity_base').class, 'entity_base');
+      assert.strictEqual(loader.getClass('entity_base').$class, 'entity_base');
     });
 
     it('should detect duplicate class names', async () => {
-      const filePath = path.join(fixturesDir, 'entity_base.schema.json');
+      const filePath = path.join(fixturesDir, 'entity_base.class.json');
       await loader.loadClass(filePath);
 
       // Try to load the same class again
@@ -92,11 +92,11 @@ describe('ClassLoader', () => {
     });
 
     it('should return class definition for known class', async () => {
-      await loader.loadClass(path.join(fixturesDir, 'entity_base.schema.json'));
+      await loader.loadClass(path.join(fixturesDir, 'entity_base.class.json'));
       const classDef = loader.getClass('entity_base');
 
       assert.ok(classDef);
-      assert.strictEqual(classDef.class, 'entity_base');
+      assert.strictEqual(classDef.$class, 'entity_base');
     });
   });
 
@@ -106,8 +106,8 @@ describe('ClassLoader', () => {
     });
 
     it('should return all loaded classes', async () => {
-      await loader.loadClass(path.join(fixturesDir, 'entity_base.schema.json'));
-      await loader.loadClass(path.join(fixturesDir, 'service.schema.json'));
+      await loader.loadClass(path.join(fixturesDir, 'entity_base.class.json'));
+      await loader.loadClass(path.join(fixturesDir, 'service.class.json'));
 
       const classes = loader.getAllClasses();
       assert.strictEqual(classes.length, 2);
@@ -116,7 +116,7 @@ describe('ClassLoader', () => {
 
   describe('clear', () => {
     it('should clear all loaded classes', async () => {
-      await loader.loadClass(path.join(fixturesDir, 'entity_base.schema.json'));
+      await loader.loadClass(path.join(fixturesDir, 'entity_base.class.json'));
       assert.ok(loader.hasClass('entity_base'));
 
       loader.clear();

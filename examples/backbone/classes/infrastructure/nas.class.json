@@ -1,0 +1,16 @@
+{
+  "$class": "nas",
+  "$parent": [
+    "storage_device",
+    "domain_physical"
+  ],
+  "$pretty_name": "NAS",
+  "$uses_aspects": [
+    "aspect_network_interface"
+  ],
+  "$schema": {
+    "type": "object",
+    "description": "Network attached storage device",
+    "additionalProperties": true
+  }
+}

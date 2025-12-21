@@ -45,22 +45,22 @@ export class TemplateRenderer {
     const strukturInheritance = await import('./template_helpers/struktur/inheritance.js');
     
     // Bind helpers with canonical context
-    const strukturContext = { classes_by_id: canonical.classes_by_id };
-    this.adapter.registerHelper('schemaRequired', (className, fieldName) => 
+    const strukturContext = { $classes_by_id: canonical.$classes_by_id };
+    this.adapter.registerHelper('schema_required', (className, fieldName) =>
       strukturSchema.schemaRequired(strukturContext, className, fieldName));
-    this.adapter.registerHelper('schemaHas', (className, fieldName) => 
+    this.adapter.registerHelper('schema_has', (className, fieldName) =>
       strukturSchema.schemaHas(strukturContext, className, fieldName));
-    this.adapter.registerHelper('schemaProps', (className) => 
+    this.adapter.registerHelper('schema_props', (className) =>
       strukturSchema.schemaProps(strukturContext, className));
-    this.adapter.registerHelper('schemaPropSource', (className, fieldName) => 
+    this.adapter.registerHelper('schema_prop_source', (className, fieldName) =>
       strukturSchema.schemaPropSource(strukturContext, className, fieldName));
-    this.adapter.registerHelper('schemaRequiredBySource', (className) => 
+    this.adapter.registerHelper('schema_required_by_source', (className) =>
       strukturSchema.schemaRequiredBySource(strukturContext, className));
     this.adapter.registerHelper('inherits', (className, targetClasses) => 
       strukturInheritance.inherits(strukturContext, className, targetClasses));
-    this.adapter.registerHelper('filterInherits', (entries, targetClasses) => 
+    this.adapter.registerHelper('filter_inherits', (entries, targetClasses) =>
       strukturInheritance.filterInherits(strukturContext, entries, targetClasses));
-    this.adapter.registerHelper('classLineage', (className) => 
+    this.adapter.registerHelper('class_lineage', (className) =>
       strukturInheritance.classLineage(strukturContext, className));
     
     // Register buffer helpers (for extends/yields support)
@@ -102,20 +102,15 @@ export class TemplateRenderer {
    */
   buildContext(canonical, globalInstance, renderContext) {
     // Handle both full canonical structure and simple context objects
-    const instances = canonical.instances || [];
-    
-    // Build instances_by_id map for backward compatibility
-    const instancesById = {};
-    instances.forEach(obj => {
-      instancesById[obj.id] = obj;
-    });
+    const instances = canonical.$instances || [];
+    const instancesById = canonical.$instances_by_id || {};
 
     // Prepare context with canonical as single source of truth
     // Include __context for buffer helpers
     return {
       global: globalInstance,
-      instances,
-      instances_by_id: instancesById,  // v1 compatibility
+      $instances: instances,
+      $instances_by_id: instancesById,
       canonical,
       __context: renderContext,  // Buffer system access
       ...canonical
@@ -138,29 +133,28 @@ export class TemplateRenderer {
     if (!buildDir || typeof buildDir !== 'string') {
       throw new Error('buildDir must be a non-empty string');
     }
-    
-    // Normalize tasks to new format {template, output}
-    const normalizedTasks = this.normalizeTasks(renderTasks);
+
+    this.validateRenderTasks(renderTasks);
     
     // Create render context (holds canonical data + buffers)
     const renderContext = new RenderContext(canonical, buildDir, metadata);
     
     // Pre-flight validation (find ALL issues before rendering)
-    await this.validateAllTasks(normalizedTasks);
+    await this.validateAllTasks(renderTasks);
     
     // Register engine helpers with render context outputs
     const renderFileOutputs = [];
     await this.registerEngineHelpers(buildDir, renderFileOutputs);
     
     // Find global instance (handle both full canonical and simple context)
-    const instances = canonical.instances || [];
+    const instances = canonical.$instances || [];
     const globalInstance = instances.find?.(obj => obj.id === 'global') || null;
     
     // Build template context with render context for buffers
     const templateContext = this.buildContext(canonical, globalInstance, renderContext);
     
     // Separate tasks by type (for extends/yields support)
-    const { contentTasks, layoutTasks } = this.categorizeTasks(normalizedTasks);
+    const { contentTasks, layoutTasks } = this.categorizeTasks(renderTasks);
     
     // Phase 1: Render content templates (write to buffers)
     for (const task of contentTasks) {
@@ -205,22 +199,6 @@ export class TemplateRenderer {
       renderedCount: outputs.length,
       outputs
     };
-  }
-  
-  /**
-   * Normalize render tasks to standard format
-   * Only supports {template, output} format
-   */
-  normalizeTasks(tasks) {
-    return tasks.map(task => {
-      if (!task.template || !task.output) {
-        throw new Error(
-          'Render tasks must use format: {"template": "...", "output": "..."}\n' +
-          `Got: ${JSON.stringify(task)}`
-        );
-      }
-      return task;
-    });
   }
   
   /**
@@ -278,6 +256,28 @@ export class TemplateRenderer {
         this.log.log('');
       }
       throw new Error(`${issues.length} validation issue(s). Fix above errors and retry.`);
+    }
+  }
+
+  validateRenderTasks(renderTasks) {
+    for (let i = 0; i < renderTasks.length; i++) {
+      const task = renderTasks[i];
+      if (!task || typeof task !== 'object' || Array.isArray(task)) {
+        throw new Error(
+          'Render tasks must use format: {"template": "...", "output": "..."}'
+        );
+      }
+      if (!task.template || !task.output) {
+        throw new Error(
+          'Render tasks must use format: {"template": "...", "output": "..."}'
+        );
+      }
+      const extraKeys = Object.keys(task).filter(key => key !== 'template' && key !== 'output');
+      if (extraKeys.length > 0) {
+        throw new Error(
+          'Render tasks must use format: {"template": "...", "output": "..."}'
+        );
+      }
     }
   }
   
@@ -471,4 +471,3 @@ export class TemplateRenderer {
     return false;
   }
 }
-

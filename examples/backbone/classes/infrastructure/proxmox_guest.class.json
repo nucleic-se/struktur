@@ -1,0 +1,13 @@
+{
+  "$class": "proxmox_guest",
+  "$parent": "compute_node",
+  "$pretty_name": "Proxmox Guest",
+  "$uses_aspects": [
+    "aspect_proxmox_guest",
+    "aspect_network_interface"
+  ],
+  "$schema": {
+    "type": "object",
+    "description": "Base class for Proxmox guest virtual machines and containers"
+  }
+}

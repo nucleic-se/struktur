@@ -1,13 +1,13 @@
 {
-  "id": "template-partials-guide",
-  "class": "blog_post",
+  "$id": "template-partials-guide",
+  "$class": "blog_post",
   "title": "Mastering Template Partials",
   "slug": "template-partials-guide",
   "description": "How to organize templates with reusable partials",
-  "aspects": {
-    "blog_post": {
+  "$aspects": {
+    "aspect_blog_post": {
       "date": "2025-12-02",
-      "content": "Partials are your secret weapon for maintainable templates. If you find yourself copying the same HTML across multiple templates, you need a partial.\n\nIn Skribe, the navigation and footer are partials. Instead of duplicating that nav HTML in index.html, blog-post.html, page.html, and tag.html, we extract it to `partials/nav.html` and include it with `{{> partials/nav}}`. Now when you want to add a link to the nav, you change one file and it updates everywhere. This is the DRY principle in action.\n\n**Context passing is the tricky part.** When you include a partial, it inherits the current template context. Inside a partial, you can access the same variables as the parent template. But nested contexts (like inside `{{#each}}` loops) can get confusing. Use `@root` to access top-level data from anywhere: `@root.global.site.title`. Use explicit parameters for clarity: `{{> partials/nav pathPrefix='../'}}` then access it in the partial as `{{pathPrefix}}`.\n\nSkribe's partials demonstrate both patterns. The nav partial uses `@root.instances` to iterate over pages, and accepts `pathPrefix` as a parameter to handle relative paths correctly. This keeps the partial reusable whether it's included from the root index or from posts/ subdirectory.\n\nPartials become even more powerful when combined with the render_file helper. You can create layout partials that define full page structures, then render them as separate output files. This is how Skribe generates all blog posts from the layouts/blog-post.html partial. One template definition, sixteen output files. That's the power of composition.",
+      "content": "Partials are your secret weapon for maintainable templates. If you find yourself copying the same HTML across multiple templates, you need a partial.\n\nIn Skribe, the navigation and footer are partials. Instead of duplicating that nav HTML in index.html, blog-post.html, page.html, and tag.html, we extract it to `partials/nav.html` and include it with `{{> partials/nav}}`. Now when you want to add a link to the nav, you change one file and it updates everywhere. This is the DRY principle in action.\n\n**Context passing is the tricky part.** When you include a partial, it inherits the current template context. Inside a partial, you can access the same variables as the parent template. But nested contexts (like inside `{{#each}}` loops) can get confusing. Use `@root` to access top-level data from anywhere: `@root.global.site.title`. Use explicit parameters for clarity: `{{> partials/nav pathPrefix='../'}}` then access it in the partial as `{{pathPrefix}}`.\n\nSkribe's partials demonstrate both patterns. The nav partial uses `@root.$instances` to iterate over pages, and accepts `pathPrefix` as a parameter to handle relative paths correctly. This keeps the partial reusable whether it's included from the root index or from posts/ subdirectory.\n\nPartials become even more powerful when combined with the render_file helper. You can create layout partials that define full page structures, then render them as separate output files. This is how Skribe generates all blog posts from the layouts/blog-post.html partial. One template definition, sixteen output files. That's the power of composition.",
       "tags": [
         "tutorial",
         "best-practices"

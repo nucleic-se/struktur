@@ -26,7 +26,7 @@ This example showcases several powerful Struktur features:
 5. **Multiple instance sets** - Different `instances_*` folders with separate build configs
 6. **Nunjucks templates** - Modern template engine with filters and conditionals
 7. **Tag strategy** - 2 broad tags per item (~10 unique tags per collection)
-8. **Class-based filtering** - Semantic type checking: `instance.class == 'tool_link'`
+8. **Class-based filtering** - Semantic type checking: `instance.$class == 'tool_link'`
 
 ## Quick Start
 
@@ -50,9 +50,9 @@ cat build/css_frameworks/api.json | jq '.collection'
 ```
 curated_links/
 ├── classes/                         # Schemas (shared by all collections)
-│   ├── collection_metadata.schema.json
-│   ├── link_base.schema.json       
-│   └── tool_link.schema.json       
+│   ├── collection_metadata.class.json
+│   ├── link_base.class.json       
+│   └── tool_link.class.json       
 ├── templates/                       # Templates (shared by all collections)
 │   ├── readme.md.njk               
 │   ├── index.html.njk              
@@ -87,18 +87,18 @@ curated_links/
 - JSON output: Manually build JSON to avoid trailing commas with `loop.last`
 
 ### Schema Design
-- `class` field at root level (not inside `schema` object)
+- `$class` field at root level (not inside `schema` object)
 - No `$schema` declarations needed
-- Aspects: Simple `{aspect, schema}` structure
+- Aspects: Simple `{$aspect, $schema}` structure
 
 ### Multi-format Output
 - Same canonical data → multiple output formats
-- Each template accesses: `instances`, `instances_by_id`, `classes_by_id`
+- Each template accesses: `$instances`, `$instances_by_id`, `$classes_by_id`
 - Templates can filter, sort, group data independently
 
 ### Data Modeling
 - **Proper schema for metadata**: `collection_metadata` schema instead of forcing into `link_base`
-- **Semantic naming**: `metadata.json` with `id: "metadata"` (not "global")
+- **Semantic naming**: `metadata.json` with `$id: "metadata"` (not "global")
 - **No dead code**: Only 3 schemas, all actively used (deleted unused article_link/resource_link)
 - **Clean separation**: Metadata instance separate from link instances
 - **Tag consolidation**: 2 broad tags per item instead of 5 verbose tags (reduces noise)
@@ -107,8 +107,8 @@ curated_links/
 
 **Class-based filtering** (semantic, type-safe):
 ```nunjucks
-{% for instance in instances %}
-  {% if instance.class == 'tool_link' %}
+{% for instance in $instances %}
+  {% if instance.$class == 'tool_link' %}
     {# process link #}
   {% endif %}
 {% endfor %}
@@ -117,8 +117,8 @@ curated_links/
 **Counting with manual loop**:
 ```nunjucks
 {% set count = 0 %}
-{% for i in instances %}
-  {% if i.class == 'tool_link' %}
+{% for i in $instances %}
+  {% if i.$class == 'tool_link' %}
     {% set count = count + 1 %}
   {% endif %}
 {% endfor %}
@@ -128,14 +128,14 @@ curated_links/
 **Array building**:
 ```nunjucks
 {% set links = [] %}
-{% for i in instances %}
-  {% if i.class == 'tool_link' %}
+{% for i in $instances %}
+  {% if i.$class == 'tool_link' %}
     {% set links = links.concat([i]) %}
   {% endif %}
 {% endfor %}
 ```
 
-**Note**: Struktur's `filterInherits` helper is registered but not accessible in Nunjucks template context, so manual filtering is required.
+**Tip**: Use `filter_inherits` to keep templates concise (no manual loops needed).
 
 ## Interactive Features (HTML)
 
@@ -158,7 +158,7 @@ curated_links/
   },
   "links": [
     {
-      "id": "link_001",
+      "$id": "link_001",
       "title": "Webpack",
       "url": "https://webpack.js.org",
       "description": "...",
@@ -181,17 +181,13 @@ curated_links/
 ## Known Limitations
 
 1. **Metadata as instance** - Collection metadata (`metadata.json`) lives as an instance alongside links
-   - Templates must filter: `{% if instance.class == 'tool_link' %}`
+   - Templates must filter: `{% if instance.$class == 'tool_link' %}`
    - Proper solution: Build config `metadata` field (see `task_build_config_metadata.md`)
    - Current approach is functional but not ideal architecture
 
 2. **Template extensions** - Must specify `.njk` explicitly in build configs
-   - Build config: `{"index.html.njk": "/index.html"}`
+  - Build config: `{"template": "index.html.njk", "output": "/index.html"}`
    - Auto-extension fallback is unreliable
-
-3. **Helper registration** - Some helpers registered but not accessible in templates
-   - `filterInherits` registered but returns "undefined or falsey" in templates
-   - Use manual filtering with loops instead
 
 ## Extending This Example
 
@@ -210,8 +206,8 @@ curated_links/
 ### Add New Format
 1. Create template: `templates/myformat.ext.njk`
 2. Add to `render` object in build config: `{"myformat.ext.njk": "/output.ext"}`
-3. Access same data: `instances`, `instances_by_id`, `classes_by_id`
-4. Filter links: `{% if instance.class == 'tool_link' %}`
+3. Access same data: `$instances`, `$instances_by_id`, `$classes_by_id`
+4. Filter links: `{% if instance.$class == 'tool_link' %}`
 
 
 

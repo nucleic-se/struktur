@@ -1,5 +1,5 @@
 {
-  "id": "global",
+  "$id": "global",
   "config": {
     "name": "Test Global Config"
   }

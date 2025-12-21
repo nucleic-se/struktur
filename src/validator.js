@@ -54,7 +54,7 @@ export class MultiPassValidator {
    * @param {ResolvedClass} resolvedClass - Resolved class with lineage
    */
   registerClass(resolvedClass) {
-    const { lineage, schemas } = resolvedClass;
+    const { $lineage: lineage, $schemas: schemas } = resolvedClass;
 
     // Compile and cache validator for each schema in lineage
     for (let i = 0; i < lineage.length; i++) {
@@ -73,7 +73,7 @@ export class MultiPassValidator {
    * @param {AspectDefinition} aspectDef - Aspect definition
    */
   registerAspect(aspectDef) {
-    const { aspect, schema } = aspectDef;
+    const { $aspect: aspect, $schema: schema } = aspectDef;
 
     if (!this.aspectValidators.has(aspect)) {
       const validator = this.ajv.compile(schema);
@@ -89,13 +89,13 @@ export class MultiPassValidator {
    */
   validate(instance, resolvedClass) {
     const errors = [];
-    const { lineage, aspects } = resolvedClass;
+    const { $lineage: lineage, $aspects } = resolvedClass;
 
-    // Pass 0: Validate against base instance schema (id, class, render)
+    // Pass 0: Validate against base instance schema ($id, $class, $render)
     const baseValid = this.baseValidator(instance);
     if (!baseValid && this.baseValidator.errors) {
       for (const err of this.baseValidator.errors) {
-        errors.push(this._formatBaseSchemaError(err, instance.id));
+        errors.push(this._formatBaseSchemaError(err, instance.$id));
       }
     }
 
@@ -109,7 +109,7 @@ export class MultiPassValidator {
           code: 'no_validator',
           layer: layerName,
           message: `No validator registered for class: ${layerName}`,
-          instance: instance.id
+          instance: instance.$id
         });
         continue;
       }
@@ -117,18 +117,18 @@ export class MultiPassValidator {
       const valid = validator(instance);
       if (!valid && validator.errors) {
         for (const err of validator.errors) {
-          errors.push(this._formatSchemaError(layerName, err, instance.id));
+          errors.push(this._formatSchemaError(layerName, err, instance.$id));
         }
       }
     }
 
     // Pass 2: Validate aspects
-    // aspects is now always an object: {aspectName: {required: boolean}, ...}
-    const aspectList = Object.keys(aspects || {});
+    // $aspects is now always an object: {aspectName: {required: boolean}, ...}
+    const aspectList = Object.keys($aspects || {});
 
     for (const aspectName of aspectList) {
-      const aspectData = instance.aspects?.[aspectName];
-      const requirement = aspects[aspectName];
+      const aspectData = instance.$aspects?.[aspectName];
+      const requirement = $aspects[aspectName];
       const isRequired = requirement?.required === true;
 
       // Check required
@@ -138,7 +138,7 @@ export class MultiPassValidator {
           code: 'missing_required_aspect',
           layer: `aspect:${aspectName}`,
           message: `[aspect:${aspectName}] Required aspect not provided`,
-          instance: instance.id,
+          instance: instance.$id,
           aspect: aspectName
         });
         continue;
@@ -154,7 +154,7 @@ export class MultiPassValidator {
             code: 'no_validator',
             layer: `aspect:${aspectName}`,
             message: `No validator registered for aspect: ${aspectName}`,
-            instance: instance.id,
+            instance: instance.$id,
             aspect: aspectName
           });
           continue;
@@ -163,7 +163,7 @@ export class MultiPassValidator {
         const valid = validator(aspectData);
         if (!valid && validator.errors) {
           for (const err of validator.errors) {
-            errors.push(this._formatAspectError(aspectName, err, instance.id));
+            errors.push(this._formatAspectError(aspectName, err, instance.$id));
           }
         }
       }
@@ -203,12 +203,12 @@ export class MultiPassValidator {
     const results = [];
 
     for (const instance of instances) {
-      const resolvedClass = getResolvedClass(instance.class);
+      const resolvedClass = getResolvedClass(instance.$class);
       const result = this.validate(instance, resolvedClass);
 
       results.push({
-        instance: instance.id,
-        class: instance.class,
+        instance: instance.$id,
+        class: instance.$class,
         ...result
       });
     }

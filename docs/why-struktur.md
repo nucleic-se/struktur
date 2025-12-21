@@ -57,8 +57,8 @@ Error: instances/api-prod.json
 ```json
 // Struktur: Standard JSON Schema (works everywhere)
 {
-  "class": "service",
-  "schema": {
+  "$class": "service",
+  "$schema": {
     "type": "object",
     "required": ["port"],
     "properties": {
@@ -96,12 +96,12 @@ entity → service → web_service → api_service
 
 ```json
 {
-  "id": "api",
-  "class": "service",
-  "aspects": {
+  "$id": "api",
+  "$class": "service",
+  "$aspects": {
     "web_service": { "port": 8080 },
     "database": { "connection": "postgres://..." },
-    "monitoring": { "metrics_port": 9090 }
+    "aspect_monitoring": { "metrics_port": 9090 }
   }
 }
 ```
@@ -122,10 +122,10 @@ services:
 ```json
 // ✅ Explicit merge (traceable)
 {
-  "id": "api",
-  "class": "service",  // ← Inherited: replicas: 1
+  "$id": "api",
+  "$class": "service",  // ← Inherited: replicas: 1
   "port": 8080,        // ← Explicit override
-  "aspects": {
+  "$aspects": {
     "web_service": {   // ← Aspect adds: proxy_pass
       "upstream": "backend:3000"
     }
@@ -270,12 +270,12 @@ Start with 3 services, grow to 300. Schema + aspects + inheritance = maintainabl
 Canonical output shows **exactly** what got merged:
 ```json
 {
-  "id": "api-prod",
-  "class": "service",
+  "$id": "api-prod",
+  "$class": "service",
   "_meta": {
     "merged_from": [
-      "classes/service.schema.json (replicas: 1)",
-      "aspects/web_service.aspect.json (port, upstream)",
+      "classes/service.class.json (replicas: 1)",
+      "aspects/aspect_web_service.class.json (port, upstream)",
       "instances/api-prod.json (replicas: 3, port: 8080)"
     ]
   }

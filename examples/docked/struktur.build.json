@@ -1,18 +1,56 @@
 {
-  "classes": ["../universal/classes", "classes"],
-  "aspects": ["../universal/aspects", "aspects"],
-  "instances": ["instances"],
-  "templates": ["../universal/templates", "templates"],
+  "classes": [
+    "../universal/classes",
+    "classes"
+  ],
+  "aspects": [
+    "../universal/aspects",
+    "aspects"
+  ],
+  "instances": [
+    "instances"
+  ],
+  "templates": [
+    "../universal/templates",
+    "templates"
+  ],
   "build_dir": "build",
   "render": [
-    {"template": "viewer.html", "output": "/viewer.html"},
-    {"template": "frontend.html", "output": "/frontend/index.html"},
-    {"template": "docker-compose.yml", "output": "/docker-compose.yml"},
-    {"template": ".env.development", "output": "/.env.development"},
-    {"template": ".env.staging", "output": "/.env.staging"},
-    {"template": ".env.production", "output": "/.env.production"},
-    {"template": "nginx.conf", "output": "/nginx.conf"},
-    {"template": "api/server.js", "output": "/api/server.js"},
-    {"template": "api/package.json", "output": "/api/package.json"}
+    {
+      "template": "viewer.html",
+      "output": "/viewer.html"
+    },
+    {
+      "template": "frontend.html",
+      "output": "/frontend/index.html"
+    },
+    {
+      "template": "docker-compose.yml",
+      "output": "/docker-compose.yml"
+    },
+    {
+      "template": ".env.development",
+      "output": "/.env.development"
+    },
+    {
+      "template": ".env.staging",
+      "output": "/.env.staging"
+    },
+    {
+      "template": ".env.production",
+      "output": "/.env.production"
+    },
+    {
+      "template": "nginx.conf",
+      "output": "/nginx.conf"
+    },
+    {
+      "template": "api/server.js",
+      "output": "/api/server.js"
+    },
+    {
+      "template": "api/package.json",
+      "output": "/api/package.json"
+    }
   ]
 }

@@ -1,6 +1,6 @@
 {
-  "id": "css_029",
-  "class": "tool_link",
+  "$id": "css_029",
+  "$class": "tool_link",
   "url": "https://picturepan2.github.io/spectre",
   "title": "Spectre.css",
   "description": "Lightweight, responsive and modern CSS framework",

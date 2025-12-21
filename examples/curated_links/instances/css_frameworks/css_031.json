@@ -1,6 +1,6 @@
 {
-  "id": "css_031",
-  "class": "tool_link",
+  "$id": "css_031",
+  "$class": "tool_link",
   "url": "https://vanilla-extract.style",
   "title": "Vanilla Extract",
   "description": "Zero-runtime Stylesheets in TypeScript with type-safe styles",

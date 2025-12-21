@@ -1,13 +1,13 @@
 {
-  "id": "file-helper-magic",
-  "class": "blog_post",
+  "$id": "file-helper-magic",
+  "$class": "blog_post",
   "title": "The Magic of the File Helper",
   "slug": "file-helper-magic",
   "description": "How one template can generate dozens of files",
-  "aspects": {
-    "blog_post": {
+  "$aspects": {
+    "aspect_blog_post": {
       "date": "2025-12-08",
-      "content": "Here's where Skribe gets interesting. Most static site generators follow a simple rule: one template file produces one output file. Want ten blog posts? Create ten template files or ten markdown files. Struktur throws that constraint out the window.\n\nThe **file helper** lets one template generate multiple output files. Look at Skribe's index.html—it's not just the homepage. Buried in that template are loops that generate all sixteen blog posts, four pages, and four tag indexes. One template, 25 output files. Add a new blog post instance? The template automatically generates another page for it. No configuration, no routing tables, no manual steps.\n\nThe syntax is simple: `{{#file 'posts/my-post.html'}}...{{/file}}`. Everything inside that block becomes a separate output file. You can nest this inside loops to generate files dynamically. Skribe iterates over instances, filters for blog posts, and generates one file per post using the render_file helper (which is like file but renders a partial).\n\nWhy does this matter? **Scalability**. Add 100 more blog posts—same template, just more data. The build time scales linearly, not exponentially. The complexity stays constant. This is data-driven generation at its best.\n\nWant to generate an RSS feed? Add another file block. Want JSON API endpoints? Another file block. Want a sitemap? You get the idea. One source of truth (your instances), infinite output formats. That's the power of treating templates as programs that generate files, not just content.",
+      "content": "Here's where Skribe gets interesting. Most static site generators follow a simple rule: one template file produces one output file. Want ten blog posts? Create ten template files or ten markdown files. Struktur throws that constraint out the window.\n\nThe **file helper** lets one template generate multiple output files. Look at Skribe's index.html\u2014it's not just the homepage. Buried in that template are loops that generate all sixteen blog posts, four pages, and four tag indexes. One template, 25 output files. Add a new blog post instance? The template automatically generates another page for it. No configuration, no routing tables, no manual steps.\n\nThe syntax is simple: `{{#file 'posts/my-post.html'}}...{{/file}}`. Everything inside that block becomes a separate output file. You can nest this inside loops to generate files dynamically. Skribe iterates over instances, filters for blog posts, and generates one file per post using the render_file helper (which is like file but renders a partial).\n\nWhy does this matter? **Scalability**. Add 100 more blog posts\u2014same template, just more data. The build time scales linearly, not exponentially. The complexity stays constant. This is data-driven generation at its best.\n\nWant to generate an RSS feed? Add another file block. Want JSON API endpoints? Another file block. Want a sitemap? You get the idea. One source of truth (your instances), infinite output formats. That's the power of treating templates as programs that generate files, not just content.",
       "tags": [
         "advanced",
         "tutorial"

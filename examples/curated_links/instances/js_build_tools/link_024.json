@@ -1,6 +1,6 @@
 {
-  "id": "link_024",
-  "class": "tool_link",
+  "$id": "link_024",
+  "$class": "tool_link",
   "url": "https://turbo.build",
   "title": "Turborepo",
   "description": "High-performance build system for JavaScript and TypeScript monorepos",
@@ -13,8 +13,8 @@
   "github_stars": 26000,
   "license": "MPL-2.0",
   "github_url": "https://github.com/vercel/turbo",
-  "aspects": {
-    "quality": {
+  "$aspects": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 4,

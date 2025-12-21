@@ -1,0 +1,14 @@
+{
+  "$class": "web_service",
+  "$parent": "service_entity",
+  "$pretty_name": "Web Service",
+  "$uses_aspects": [],
+  "$kinds": [
+    "service"
+  ],
+  "$schema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": true
+  }
+}

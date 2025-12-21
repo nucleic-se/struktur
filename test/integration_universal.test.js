@@ -37,8 +37,8 @@ describe('Integration: Universal Stack', () => {
 
     const resolved = struktur.classResolver.resolve('entity_base');
 
-    assert.deepStrictEqual(resolved.lineage, ['universal_base', 'entity_base']);
-    assert.strictEqual(resolved.schemas.length, 2);
+    assert.deepStrictEqual(resolved.$lineage, ['universal_base', 'entity_base']);
+    assert.strictEqual(resolved.$schemas.length, 2);
   });
 
   it('should load aspect_base aspect definition', async () => {
@@ -63,7 +63,7 @@ describe('Integration: Universal Stack', () => {
     );
 
     // Add class field for v2 format (global.json is minimal in v1)
-    global.class = 'universal_base';
+    global.$class = 'universal_base';
 
     const results = struktur.validate([global]);
 
@@ -81,7 +81,7 @@ describe('Integration: Universal Stack', () => {
 
     const resolved = struktur.classResolver.resolve('domain_root');
     // domain_root → universal_base (single inheritance in this test fixture)
-    assert.ok(resolved.lineage.includes('universal_base'));
+    assert.ok(resolved.$lineage.includes('universal_base'));
   });
 
   it('should validate multi-layer inheritance chain', async () => {
@@ -92,8 +92,8 @@ describe('Integration: Universal Stack', () => {
     // domain_root → entity_base → universal_base
     const resolved = struktur.classResolver.resolve('domain_root');
 
-    assert.ok(resolved.lineage.length >= 2, 'Should have multi-level lineage');
-    assert.strictEqual(resolved.schemas.length, resolved.lineage.length);
+    assert.ok(resolved.$lineage.length >= 2, 'Should have multi-level lineage');
+    assert.strictEqual(resolved.$schemas.length, resolved.$lineage.length);
   });
 
   it('should merge fields across inheritance chain', async () => {
@@ -104,7 +104,7 @@ describe('Integration: Universal Stack', () => {
     const resolved = struktur.classResolver.resolve('entity_base');
 
     // entity_base should inherit fields from universal_base
-    assert.ok(resolved.fields !== undefined, 'Should have merged fields');
+    assert.ok(resolved.$fields !== undefined, 'Should have merged fields');
   });
 
   it('should support recursive directory scanning', async () => {
@@ -115,7 +115,7 @@ describe('Integration: Universal Stack', () => {
     // Should find classes in subdirectories (domains/, aspects/)
     const allClasses = struktur.classLoader.getAllClasses();
     const hasSubdirClasses = allClasses.some(c =>
-      c.class === 'domain_root'
+      c.$class === 'domain_root'
     );
 
     assert.ok(hasSubdirClasses, 'Should load classes from subdirectories');

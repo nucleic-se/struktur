@@ -3,14 +3,14 @@
 {% import "_macros.njk" as m %}
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:github="https://github.com/">
   <channel>
-    <title>{{ instances_by_id['metadata'].title }}</title>
-    <description>{{ instances_by_id['metadata'].description }}</description>
-    <link>{{ instances_by_id['metadata'].url }}</link>
-    <atom:link href="{{ instances_by_id['metadata'].url }}/feed.rss" rel="self" type="application/rss+xml" />
+    <title>{{ $instances_by_id['metadata'].title }}</title>
+    <description>{{ $instances_by_id['metadata'].description }}</description>
+    <link>{{ $instances_by_id['metadata'].url }}</link>
+    <atom:link href="{{ $instances_by_id['metadata'].url }}/feed.rss" rel="self" type="application/rss+xml" />
     <language>en-us</language>
-    <item:count>{{ m.toolCount(instances) }}</item:count>
+    <item:count>{{ m.toolCount($instances) }}</item:count>
     
-    {% for link in instances %}{% if link.class == 'tool_link' %}
+    {% for link in $instances %}{% if link.$class == 'tool_link' %}
 {{ m.rssItem(link) }}
     {% endif %}{% endfor %}
   </channel>

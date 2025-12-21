@@ -1,0 +1,22 @@
+{
+  "$class": "multi_parent",
+  "$parent": [
+    "mixin_a",
+    "mixin_b"
+  ],
+  "$schema": {
+    "type": "object",
+    "properties": {
+      "prop_c": {
+        "type": "boolean",
+        "description": "Property from multi_parent"
+      }
+    },
+    "required": [
+      "prop_c"
+    ]
+  },
+  "$fields": {
+    "prop_c": true
+  }
+}

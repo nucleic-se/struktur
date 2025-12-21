@@ -1,6 +1,6 @@
 {
-  "id": "test_018",
-  "class": "tool_link",
+  "$id": "test_018",
+  "$class": "tool_link",
   "title": "Chromatic",
   "url": "https://www.chromatic.com",
   "description": "Visual testing and review tool for Storybook",

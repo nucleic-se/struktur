@@ -1,6 +1,6 @@
 {
-  "id": "link_030",
-  "class": "tool_link",
+  "$id": "link_030",
+  "$class": "tool_link",
   "url": "https://sass-lang.com",
   "title": "Sass",
   "description": "Mature, stable, and powerful professional grade CSS extension language",
@@ -13,8 +13,8 @@
   "github_stars": 15000,
   "license": "MIT",
   "github_url": "https://github.com/sass/sass",
-  "aspects": {
-    "quality": {
+  "$aspects": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 5,

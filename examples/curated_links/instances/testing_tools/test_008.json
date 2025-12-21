@@ -1,6 +1,6 @@
 {
-  "id": "test_008",
-  "class": "tool_link",
+  "$id": "test_008",
+  "$class": "tool_link",
   "title": "Puppeteer",
   "url": "https://pptr.dev",
   "description": "Node.js library for controlling Chrome/Chromium over DevTools Protocol",

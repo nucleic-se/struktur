@@ -1,6 +1,6 @@
 {
-  "id": "link_006",
-  "class": "tool_link",
+  "$id": "link_006",
+  "$class": "tool_link",
   "url": "https://turbo.build/pack",
   "title": "Turbopack",
   "description": "Incremental bundler optimized for JavaScript and TypeScript, written in Rust",
@@ -14,8 +14,8 @@
   "github_stars": 25000,
   "license": "MPL-2.0",
   "github_url": "https://github.com/vercel/turbo",
-  "aspects": {
-    "quality": {
+  "$aspects": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 4,

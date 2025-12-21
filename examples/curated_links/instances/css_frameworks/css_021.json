@@ -1,6 +1,6 @@
 {
-  "id": "css_021",
-  "class": "tool_link",
+  "$id": "css_021",
+  "$class": "tool_link",
   "url": "https://mantine.dev",
   "title": "Mantine",
   "description": "Full-featured React components library with focus on usability and developer experience",

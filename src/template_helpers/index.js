@@ -105,7 +105,7 @@ export class HelperRegistry {
   /**
    * Register all helpers to a template adapter
    * @param {Object} adapter - Template adapter (Handlebars, Nunjucks, etc.)
-   * @param {Object} [context] - Struktur context (classes_by_id, canonical, etc.)
+   * @param {Object} [context] - Struktur context ($classes_by_id, canonical, etc.)
    * @param {Object} [buildContext] - Build context (buildDir, outputs, log)
    */
   registerToAdapter(adapter, context = {}, buildContext = {}) {

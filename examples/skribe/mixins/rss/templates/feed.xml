@@ -9,18 +9,18 @@
     <copyright>{{global.rss.copyright}}</copyright>
     {{/if}}
     <atom:link href="{{global.rss.link}}/feed.xml" rel="self" type="application/rss+xml" />
-    {{#each (sort_by @root.instances "date" reverse=true)}}
+    {{#each (sort_by @root.$instances "date" reverse=true)}}
     {{#if (eq class "blog_post")}}
     <item>
       <title>{{title}}</title>
       <link>{{@root.global.rss.link}}/posts/{{slug}}.html</link>
       <guid>{{@root.global.rss.link}}/posts/{{slug}}.html</guid>
-      <pubDate>{{aspects.blog_post.date}}</pubDate>
+      <pubDate>{{$aspects.blog_post.date}}</pubDate>
       <description>{{description}}</description>
-      {{#if aspects.blog_post.author}}
-      <author>{{aspects.blog_post.author}}</author>
+      {{#if $aspects.blog_post.author}}
+      <author>{{$aspects.blog_post.author}}</author>
       {{/if}}
-      {{#each aspects.blog_post.tags}}
+      {{#each $aspects.blog_post.tags}}
       <category>{{this}}</category>
       {{/each}}
     </item>

@@ -1,6 +1,6 @@
 {
-  "id": "link_012",
-  "class": "tool_link",
+  "$id": "link_012",
+  "$class": "tool_link",
   "url": "https://biomejs.dev",
   "title": "Biome",
   "description": "Fast formatter and linter for JavaScript, TypeScript, and JSON written in Rust",
@@ -14,8 +14,8 @@
   "github_stars": 14000,
   "license": "MIT",
   "github_url": "https://github.com/biomejs/biome",
-  "aspects": {
-    "quality": {
+  "$aspects": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 4,

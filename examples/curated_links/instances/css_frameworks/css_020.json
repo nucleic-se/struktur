@@ -1,6 +1,6 @@
 {
-  "id": "css_020",
-  "class": "tool_link",
+  "$id": "css_020",
+  "$class": "tool_link",
   "url": "https://stitches.dev",
   "title": "Stitches",
   "description": "CSS-in-JS with near-zero runtime, SSR, multi-variant support",

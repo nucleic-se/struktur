@@ -1,6 +1,6 @@
 {
-  "id": "link_005",
-  "class": "tool_link",
+  "$id": "link_005",
+  "$class": "tool_link",
   "url": "https://parceljs.org",
   "title": "Parcel",
   "description": "Zero configuration build tool for the web with blazing fast performance",
@@ -14,8 +14,8 @@
   "github_stars": 43000,
   "license": "MIT",
   "github_url": "https://github.com/parcel-bundler/parcel",
-  "aspects": {
-    "quality": {
+  "$aspects": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 4,

@@ -1,6 +1,6 @@
 {
-  "id": "link_004",
-  "class": "tool_link",
+  "$id": "link_004",
+  "$class": "tool_link",
   "url": "https://esbuild.github.io",
   "title": "esbuild",
   "description": "Extremely fast JavaScript bundler and minifier written in Go",
@@ -14,8 +14,8 @@
   "github_stars": 38000,
   "license": "MIT",
   "github_url": "https://github.com/evanw/esbuild",
-  "aspects": {
-    "quality": {
+  "$aspects": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 5,

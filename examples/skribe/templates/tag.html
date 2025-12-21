@@ -18,12 +18,12 @@
       <article class="post-summary">
         <h2><a href="{{../pathPrefix}}posts/{{slug}}.html">{{title}}</a></h2>
         <p class="post-meta">
-          <time datetime="{{aspects.blog_post.date}}">{{aspects.blog_post.date}}</time>
-          {{#if aspects.blog_post.author}}by {{aspects.blog_post.author}}{{/if}}\n        </p>
+          <time datetime="{{$aspects.aspect_blog_post.date}}">{{$aspects.aspect_blog_post.date}}</time>
+          {{#if $aspects.aspect_blog_post.author}}by {{$aspects.aspect_blog_post.author}}{{/if}}\n        </p>
         {{#if description}}
         <p>{{description}}</p>
         {{/if}}
-        {{> partials/tags.html tags=aspects.blog_post.tags}}
+        {{> partials/tags.html tags=$aspects.aspect_blog_post.tags}}
       </article>
       {{/each}}
     </section>

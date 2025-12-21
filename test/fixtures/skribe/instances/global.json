@@ -1,5 +1,6 @@
 {
-  "id": "global",
+  "$id": "global",
+  "$class": "global",
   "site": {
     "title": "Skribe Demo",
     "url": "https://example.com",
@@ -9,15 +10,18 @@
     "style.css",
     "custom.css"
   ],
-  "build": [
+  "$render": [
     {
-      "index.html": "/index.html"
+      "template": "index.html",
+      "output": "/index.html"
     },
     {
-      "style.css": "/style.css"
+      "template": "style.css",
+      "output": "/style.css"
     },
     {
-      "custom.css": "/custom.css"
+      "template": "custom.css",
+      "output": "/custom.css"
     }
   ]
 }

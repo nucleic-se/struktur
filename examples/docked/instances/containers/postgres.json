@@ -1,13 +1,17 @@
 {
-  "id": "postgres",
-  "class": "docked_container",
+  "$id": "postgres",
+  "$class": "docked_container",
   "description": "PostgreSQL database for application data persistence",
-  "domains": ["database"],
-  "aspects": {
-    "docker_container": {
+  "domains": [
+    "database"
+  ],
+  "$aspects": {
+    "aspect_docker_container": {
       "image": "postgres:16-alpine",
       "description": "Primary application database",
-      "ports": ["5432:5432"],
+      "ports": [
+        "5432:5432"
+      ],
       "volumes": [
         "postgres-data:/var/lib/postgresql/data"
       ],
@@ -17,7 +21,10 @@
         "POSTGRES_PASSWORD": "${POSTGRES_PASSWORD}"
       },
       "healthcheck": {
-        "test": ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-docked}"],
+        "test": [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-docked}"
+        ],
         "start_period": "10s"
       },
       "deploy": {

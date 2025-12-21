@@ -1,6 +1,6 @@
 {
-  "id": "link_038",
-  "class": "tool_link",
+  "$id": "link_038",
+  "$class": "tool_link",
   "url": "https://farmfe.org",
   "title": "Farm",
   "description": "Extremely fast Rust-based web build tool",
@@ -14,8 +14,8 @@
   "github_stars": 2500,
   "license": "MIT",
   "github_url": "https://github.com/farm-fe/farm",
-  "aspects": {
-    "quality": {
+  "$aspects": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 2,

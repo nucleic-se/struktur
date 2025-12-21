@@ -1,6 +1,6 @@
 {
-  "id": "test_029",
-  "class": "tool_link",
+  "$id": "test_029",
+  "$class": "tool_link",
   "url": "https://wiremock.org",
   "title": "WireMock",
   "description": "Flexible API mocking tool for fast, robust and comprehensive testing",

@@ -1,0 +1,12 @@
+{
+  "$class": "aspect_storage_device",
+  "$aspect": "aspect_storage_device",
+  "$schema": {
+    "type": "object",
+    "properties": {
+      "storage": {
+        "type": "string"
+      }
+    }
+  }
+}

@@ -59,26 +59,26 @@ async function createTestStack(tempDir) {
 
   // Create minimal class schema
   const classSchema = {
-    class: 'simple_class',
-    schema: {
+    $class: 'simple_class',
+    $schema: {
       type: 'object',
       properties: {
-        id: { type: 'string' },
-        class: { type: 'string' },
+        $id: { type: 'string' },
+        $class: { type: 'string' },
         name: { type: 'string' }
       },
-      required: ['id', 'class']
+      required: ['$id', '$class']
     }
   };
   await fs.writeFile(
-    join(tempDir, 'classes', 'simple_class.schema.json'),
+    join(tempDir, 'classes', 'simple_class.class.json'),
     JSON.stringify(classSchema, null, 2)
   );
 
   // Create minimal instance
   const instance = {
-    id: 'test',
-    class: 'simple_class',
+    $id: 'test',
+    $class: 'simple_class',
     name: 'Test Instance'
   };
   await fs.writeFile(
@@ -94,9 +94,9 @@ async function createTestStack(tempDir) {
 
   // Create global instance with render field
   const global = {
-    id: 'global',
-    class: 'simple_class',
-    render: [
+    $id: 'global',
+    $class: 'simple_class',
+    $render: [
       { template: 'output.txt', output: '/output.txt' }
     ]
   };
@@ -344,8 +344,8 @@ describe('Config Generation (--save-config)', () => {
       // Create alternate classes directory
       await fs.mkdir(join(tempDir, 'classes2'), { recursive: true });
       await fs.copyFile(
-        join(tempDir, 'classes', 'simple_class.schema.json'),
-        join(tempDir, 'classes2', 'simple_class.schema.json')
+        join(tempDir, 'classes', 'simple_class.class.json'),
+        join(tempDir, 'classes2', 'simple_class.class.json')
       );
 
       // Build with config but override classes
@@ -365,7 +365,7 @@ describe('Config Generation (--save-config)', () => {
 
       // Create instance with invalid schema (missing required field)
       const invalidInstance = {
-        id: 'invalid',
+        $id: 'invalid',
         // Missing required 'class' field
         name: 'Invalid'
       };

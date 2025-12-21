@@ -1,0 +1,15 @@
+{
+  "$class": "test_array_aspects",
+  "$parent": "entity_base",
+  "$schema": {
+    "type": "object",
+    "properties": {
+      "test_field": {
+        "type": "string"
+      }
+    }
+  },
+  "$aspects": [
+    "aspect_network_interface"
+  ]
+}

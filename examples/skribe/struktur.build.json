@@ -1,14 +1,41 @@
 {
-  "aspects": ["aspects"],
-  "classes": ["classes"],
-  "instances": ["instances", "mixins/rss/instances", "mixins/dark-theme/instances"],
-  "templates": ["templates", "mixins/rss/templates", "mixins/dark-theme/templates"],
+  "aspects": [
+    "aspects"
+  ],
+  "classes": [
+    "classes"
+  ],
+  "instances": [
+    "instances",
+    "mixins/rss/instances",
+    "mixins/dark-theme/instances"
+  ],
+  "templates": [
+    "templates",
+    "mixins/rss/templates",
+    "mixins/dark-theme/templates"
+  ],
   "build_dir": "build",
   "render": [
-    {"template": "index.html", "output": "/index.html"},
-    {"template": "css/style.css", "output": "/css/style.css"},
-    {"template": "css/custom.css", "output": "/css/custom.css"},
-    {"template": "css/dark-theme.css", "output": "/css/dark-theme.css"},
-    {"template": "feed.xml", "output": "/feed.xml"}
+    {
+      "template": "index.html",
+      "output": "/index.html"
+    },
+    {
+      "template": "css/style.css",
+      "output": "/css/style.css"
+    },
+    {
+      "template": "css/custom.css",
+      "output": "/css/custom.css"
+    },
+    {
+      "template": "css/dark-theme.css",
+      "output": "/css/dark-theme.css"
+    },
+    {
+      "template": "feed.xml",
+      "output": "/feed.xml"
+    }
   ]
 }

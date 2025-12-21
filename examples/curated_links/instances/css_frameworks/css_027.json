@@ -1,6 +1,6 @@
 {
-  "id": "css_027",
-  "class": "tool_link",
+  "$id": "css_027",
+  "$class": "tool_link",
   "url": "https://picocss.com",
   "title": "Pico.css",
   "description": "Minimal CSS framework for semantic HTML with no classes",

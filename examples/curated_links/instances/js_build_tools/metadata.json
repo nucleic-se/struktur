@@ -1,6 +1,6 @@
 {
-  "id": "metadata",
-  "class": "collection_metadata",
+  "$id": "metadata",
+  "$class": "collection_metadata",
   "title": "JavaScript Build Tool Ecosystem",
   "description": "A curated collection of modern build tools, bundlers, transpilers, linters, and development utilities for JavaScript and TypeScript projects",
   "url": "https://github.com/nucleic-se/struktur/tree/main/examples/curated_links"

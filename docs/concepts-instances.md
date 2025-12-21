@@ -21,8 +21,8 @@ Result     → Merged, validated data
 **`instances/web-server.json`:**
 ```json
 {
-  "id": "web-prod-01",
-  "class": "server",
+  "$id": "web-prod-01",
+  "$class": "server",
   "hostname": "web-prod-01.example.com",
   "ip_address": "10.0.1.10",
   "port": 8080
@@ -32,19 +32,19 @@ Result     → Merged, validated data
 ### Required Fields
 
 Every instance must have:
-- **`id`** — Unique identifier (string, minLength: 1)
-- **`class`** — Class name this instance belongs to (string, minLength: 1)
+- **`$id`** — Unique identifier (string, minLength: 1)
+- **`$class`** — Class name this instance belongs to (string, minLength: 1)
 
 These are enforced by the universal **instance base schema** (`instance_base.schema.json`) which validates ALL instances before class-specific validation.
 
 ### Optional Fields
 
-**`render`** — Array of render tasks for this instance:
+**`$render`** — Array of render tasks for this instance:
 ```json
 {
-  "id": "my-service",
-  "class": "service",
-  "render": [
+  "$id": "my-service",
+  "$class": "service",
+  "$render": [
     { "template": "config.yml.hbs", "output": "/config/my-service.yml" },
     { "template": "docs.md.hbs", "output": "/docs/my-service.md" }
   ]
@@ -77,25 +77,29 @@ Instance inherits defaults from class hierarchy:
 ```json
 // entity_base.json
 {
-  "class": "entity_base",
-  "labels": [],
-  "domain": null
+  "$class": "entity_base",
+  "$fields": {
+    "labels": [],
+    "domain": null
+  }
 }
 
 // server.json
 {
-  "class": "server",
-  "parent": "entity_base",
-  "replicas": 1,
-  "auto_restart": true
+  "$class": "server",
+  "$parent": "entity_base",
+  "$fields": {
+    "replicas": 1,
+    "auto_restart": true
+  }
 }
 ```
 
 **Instance:**
 ```json
 {
-  "id": "my-server",
-  "class": "server",
+  "$id": "my-server",
+  "$class": "server",
   "hostname": "server-01"
 }
 ```
@@ -103,8 +107,8 @@ Instance inherits defaults from class hierarchy:
 **Merged result:**
 ```json
 {
-  "id": "my-server",
-  "class": "server",
+  "$id": "my-server",
+  "$class": "server",
   "hostname": "server-01",
   "replicas": 1,           // From server
   "auto_restart": true,    // From server
@@ -115,13 +119,13 @@ Instance inherits defaults from class hierarchy:
 
 ### 2. Multi-File Instance Merge
 
-Multiple files with the same `id` are merged:
+Multiple files with the same `$id` are merged:
 
 **`base/app.json`:**
 ```json
 {
-  "id": "myapp",
-  "class": "service",
+  "$id": "myapp",
+  "$class": "service",
   "port": 8080,
   "replicas": 1
 }
@@ -130,7 +134,7 @@ Multiple files with the same `id` are merged:
 **`prod/app.json`:**
 ```json
 {
-  "id": "myapp",
+  "$id": "myapp",
   "replicas": 5,
   "region": "us-east"
 }
@@ -139,8 +143,8 @@ Multiple files with the same `id` are merged:
 **Merged result:**
 ```json
 {
-  "id": "myapp",
-  "class": "service",
+  "$id": "myapp",
+  "$class": "service",
   "port": 8080,
   "replicas": 5,        // Overridden by prod
   "region": "us-east"   // Added by prod
@@ -252,16 +256,16 @@ Objects merge recursively:
 
 ## Render Arrays
 
-Instances can specify their own render tasks using the `render` field. This is useful when different instances need different template outputs.
+Instances can specify their own render tasks using the `$render` field. This is useful when different instances need different template outputs.
 
 ### Basic Usage
 
 ```json
 {
-  "id": "nginx-proxy",
-  "class": "server",
+  "$id": "nginx-proxy",
+  "$class": "server",
   "hostname": "proxy.example.com",
-  "render": [
+  "$render": [
     { "template": "nginx/proxy.conf.hbs", "output": "/nginx/proxy.conf" },
     { "template": "nginx/upstream.conf.hbs", "output": "/nginx/upstream.conf" }
   ]
@@ -285,9 +289,9 @@ Instance render arrays are merged with config render arrays:
 **Instance (`instances/nginx.json`):**
 ```json
 {
-  "id": "nginx",
-  "class": "server",
-  "render": [
+  "$id": "nginx",
+  "$class": "server",
+  "$render": [
     { "template": "nginx.conf.hbs", "output": "/nginx.conf" }
   ]
 }
@@ -313,9 +317,9 @@ Instance render arrays are merged with config render arrays:
 **Per-Instance Configs:**
 ```json
 {
-  "id": "db-primary",
-  "class": "database",
-  "render": [
+  "$id": "db-primary",
+  "$class": "database",
+  "$render": [
     { "template": "postgres/primary.conf.hbs", "output": "/postgres/primary.conf" }
   ]
 }
@@ -324,9 +328,9 @@ Instance render arrays are merged with config render arrays:
 **Service-Specific Docs:**
 ```json
 {
-  "id": "api-service",
-  "class": "service",
-  "render": [
+  "$id": "api-service",
+  "$class": "service",
+  "$render": [
     { "template": "api-docs.md.hbs", "output": "/docs/api.md" }
   ]
 }
@@ -335,9 +339,9 @@ Instance render arrays are merged with config render arrays:
 **Environment-Specific:**
 ```json
 {
-  "id": "prod-settings",
-  "class": "environment",
-  "render": [
+  "$id": "prod-settings",
+  "$class": "environment",
+  "$render": [
     { "template": "env/production.yml.hbs", "output": "/config/production.yml" }
   ]
 }
@@ -345,7 +349,7 @@ Instance render arrays are merged with config render arrays:
 
 ### Validation
 
-The `render` field is validated by `instance_base.schema.json`:
+The `$render` field is validated by `instance_base.schema.json`:
 
 - Must be an array (if present)
 - Each item must have `template` and `output` properties
@@ -355,7 +359,7 @@ The `render` field is validated by `instance_base.schema.json`:
 **Valid:**
 ```json
 {
-  "render": [
+  "$render": [
     { "template": "config.yml.hbs", "output": "/config.yml" }
   ]
 }
@@ -364,7 +368,7 @@ The `render` field is validated by `instance_base.schema.json`:
 **Invalid:**
 ```json
 {
-  "render": [
+  "$render": [
     { "template": "config.yml.hbs" }  // Missing "output"
   ]
 }
@@ -380,8 +384,8 @@ Instances can reference other instances using tags:
 
 ```json
 {
-  "id": "web-server",
-  "class": "server",
+  "$id": "web-server",
+  "$class": "server",
   "load_balancer": "@lb-01",
   "domain": "@production"
 }
@@ -394,8 +398,8 @@ Instances can reference other instances using tags:
 **One-to-One:**
 ```json
 {
-  "id": "app",
-  "class": "service",
+  "$id": "app",
+  "$class": "service",
   "database": "@postgres-prod"
 }
 ```
@@ -403,8 +407,8 @@ Instances can reference other instances using tags:
 **One-to-Many:**
 ```json
 {
-  "id": "cluster",
-  "class": "cluster",
+  "$id": "cluster",
+  "$class": "cluster",
   "servers": ["@web-01", "@web-02", "@web-03"]
 }
 ```
@@ -412,8 +416,8 @@ Instances can reference other instances using tags:
 **Hierarchical (domain):**
 ```json
 {
-  "id": "web-team",
-  "class": "team",
+  "$id": "web-team",
+  "$class": "team",
   "domain": "@engineering"
 }
 ```
@@ -422,7 +426,7 @@ Instances can reference other instances using tags:
 
 Tags are stored as strings in canonical output. Templates can:
 1. Use tags directly (as IDs)
-2. Look up referenced instances from `instances_by_id`
+2. Look up referenced instances from `$instances_by_id`
 3. Use future `resolve` helper (planned)
 
 **Example template usage:**
@@ -431,7 +435,7 @@ Tags are stored as strings in canonical output. Templates can:
 Database: {{database}}
 
 {{!-- Look up full database instance --}}
-{{#with (lookup ../instances_by_id database)}}
+{{#with (lookup ../$instances_by_id database)}}
   Database: {{name}} at {{host}}:{{port}}
 {{/with}}
 ```
@@ -440,7 +444,7 @@ Database: {{database}}
 
 ## Special Fields
 
-### `id` Field
+### `$id` Field
 
 - **Type:** String
 - **Required:** Yes
@@ -453,7 +457,7 @@ Database: {{database}}
 - Be descriptive: `web-prod-01` not `server1`
 - No spaces or special characters (except `-` and `_`)
 
-### `class` Field
+### `$class` Field
 
 - **Type:** String
 - **Required:** Yes
@@ -474,8 +478,8 @@ If using Universal:
 **Example:**
 ```json
 {
-  "id": "web-01",
-  "class": "server",
+  "$id": "web-01",
+  "$class": "server",
   "domain": "@web-tier"
 }
 ```
@@ -490,8 +494,8 @@ If using Universal:
 **Example:**
 ```json
 {
-  "id": "web-01",
-  "class": "server",
+  "$id": "web-01",
+  "$class": "server",
   "labels": ["production", "nginx", "us-east"]
 }
 ```
@@ -533,13 +537,13 @@ instances/
 **Each file:**
 ```json
 // app-base.json
-{ "id": "myapp", "class": "service", "port": 8080 }
+{ "$id": "myapp", "$class": "service", "port": 8080 }
 
 // app-dev.json
-{ "id": "myapp", "replicas": 1, "debug": true }
+{ "$id": "myapp", "replicas": 1, "debug": true }
 
 // app-prod.json
-{ "id": "myapp", "replicas": 10, "debug": false }
+{ "$id": "myapp", "replicas": 10, "debug": false }
 ```
 
 ### Pattern 3: Mixins
@@ -617,10 +621,10 @@ instances/
 **1. Descriptive IDs**
 ```json
 // Good
-{ "id": "web-prod-us-east-01" }
+{ "$id": "web-prod-us-east-01" }
 
 // Bad
-{ "id": "server1" }
+{ "$id": "server1" }
 ```
 
 **2. Complete Data**
@@ -663,15 +667,15 @@ struktur build base overlay custom
 **2. Avoid Circular References**
 ```json
 // BAD
-{ "id": "a", "ref": "@b" }
-{ "id": "b", "ref": "@a" }
+{ "$id": "a", "ref": "@b" }
+{ "$id": "b", "ref": "@a" }
 ```
 
 **3. Use Hierarchical Domains**
 ```json
-{ "id": "production", "class": "domain_root" }
-{ "id": "web-tier", "domain": "@production" }
-{ "id": "web-01", "domain": "@web-tier" }
+{ "$id": "production", "$class": "domain_root" }
+{ "$id": "web-tier", "domain": "@production" }
+{ "$id": "web-01", "domain": "@web-tier" }
 ```
 
 ---
@@ -693,15 +697,15 @@ Use labels for conditional configuration:
 
 ```json
 {
-  "id": "app",
-  "class": "service",
+  "$id": "app",
+  "$class": "service",
   "labels": ["ssl-enabled"]
 }
 ```
 
 **In template:**
 ```handlebars
-{{#if (whereIncludes labels "ssl-enabled")}}
+{{#if (where_includes labels "ssl-enabled")}}
   ssl_certificate: /etc/ssl/cert.pem
 {{/if}}
 ```
@@ -713,16 +717,16 @@ Group related instances:
 ```json
 // web-01.json
 {
-  "id": "web-01",
-  "class": "web_server",
+  "$id": "web-01",
+  "$class": "web_server",
   "cluster": "web-cluster",
   "index": 1
 }
 
 // web-02.json
 {
-  "id": "web-02",
-  "class": "web_server",
+  "$id": "web-02",
+  "$class": "web_server",
   "cluster": "web-cluster",
   "index": 2
 }
@@ -730,8 +734,8 @@ Group related instances:
 
 **Filter in template:**
 ```handlebars
-{{#each (where instances "cluster" "web-cluster")}}
-  - {{id}}: {{hostname}}
+{{#each (where $instances "cluster" "web-cluster")}}
+  - {{$id}}: {{hostname}}
 {{/each}}
 ```
 
@@ -743,14 +747,14 @@ Group related instances:
 
 ```
 Error: Instance "my-server" missing required field "hostname"
-Schema: server.schema.json
+Schema: server.class.json
 ```
 
 **Fix:** Add the required field:
 ```json
 {
-  "id": "my-server",
-  "class": "server",
+  "$id": "my-server",
+  "$class": "server",
   "hostname": "server-01.example.com"
 }
 ```
@@ -778,8 +782,8 @@ Available classes: service, server, database
 **Fix:** Create the class or fix the class name:
 ```json
 {
-  "id": "my-app",
-  "class": "service"  // Use existing class
+  "$id": "my-app",
+  "$class": "service"  // Use existing class
 }
 ```
 
@@ -793,8 +797,8 @@ Value: "8080"
 **Fix:** Remove quotes:
 ```json
 {
-  "id": "app",
-  "class": "service",
+  "$id": "app",
+  "$class": "service",
   "port": 8080  // Number, not string
 }
 ```
@@ -823,7 +827,7 @@ struktur validate -c classes/ -i instances/ --json | jq .
 
 ```bash
 struktur generate -c classes/ -i instances/ -o debug.json
-cat debug.json | jq '.instances[] | {id, class}'
+cat debug.json | jq '."$instances"[] | {"$id": ."$id", "$class": ."$class"}'
 ```
 
 ---

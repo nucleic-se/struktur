@@ -39,6 +39,7 @@ Quick lookup for specifics:
 
 - **[CLI Reference](cli-reference.md)** - All commands, flags, and config options
 - **[Helper Reference](helpers-reference.md)** - Built-in template helpers
+- **[Naming Conventions](conventions/naming.md)** - System fields, classes, helpers
 - **[Error Troubleshooting](errors-troubleshooting.md)** - Common problems and solutions
 
 ## 🛠️ Guides

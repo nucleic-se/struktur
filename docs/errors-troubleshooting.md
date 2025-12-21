@@ -152,7 +152,7 @@ templates/
 ```
 Validation Error (instance: my-post)
 Property "title" is required but not provided
-Schema: post.schema.json
+Schema: post.class.json
 ```
 
 **Cause:**
@@ -163,8 +163,8 @@ Instance missing required field from schema.
 1. **Add missing property:**
    ```json
    {
-     "id": "my-post",
-     "class": "post",
+     "$id": "my-post",
+     "$class": "post",
      "title": "My Post Title"
    }
    ```
@@ -206,8 +206,8 @@ Property value doesn't match schema type.
 1. **Fix instance value:**
    ```json
    {
-     "id": "user-123",
-     "class": "user",
+     "$id": "user-123",
+     "$class": "user",
      "age": 25
    }
    ```
@@ -301,8 +301,8 @@ Instance has property not in schema (warnings-as-errors mode).
 2. **Remove property from instance:**
    ```json
    {
-     "id": "my-post",
-     "class": "post",
+     "$id": "my-post",
+     "$class": "post",
      "title": "My Post"
    }
    ```
@@ -321,8 +321,8 @@ Instance has property not in schema (warnings-as-errors mode).
 
 ```
 BREAKING CHANGE VIOLATION
-Schema file "entity_base.schema.json" missing required "class" field
-Expected: "class": "entity_base"
+Schema file "entity_base.class.json" missing required "$class" field
+Expected: "$class": "entity_base"
 
 This requirement was added in v0.2.0 for refactoring safety.
 ```
@@ -336,7 +336,7 @@ Schema file doesn't have `"class"` field matching filename.
    ```json
    {
      "$schema": "http://json-schema.org/draft-07/schema#",
-     "class": "entity_base",
+     "$class": "entity_base",
      "type": "object",
      "properties": {
        ...
@@ -346,16 +346,16 @@ Schema file doesn't have `"class"` field matching filename.
 
 2. **Ensure filename matches:**
    ```
-   entity_base.schema.json → "class": "entity_base"
-   post.schema.json → "class": "post"
+   entity_base.class.json → "$class": "entity_base"
+   post.class.json → "$class": "post"
    ```
 
 3. **Automated migration:**
    ```bash
-   # Add class field to all schemas
-   for f in classes/*.schema.json; do
-     name=$(basename "$f" .schema.json)
-     jq --arg class "$name" '. + {class: $class}' "$f" > tmp && mv tmp "$f"
+   # Add $class field to all schemas
+   for f in classes/*.class.json; do
+     name=$(basename "$f" .class.json)
+     jq --arg class "$name" '. + {"$class": $class}' "$f" > tmp && mv tmp "$f"
    done
    ```
 
@@ -382,14 +382,14 @@ Class inheritance chain loops back to itself.
    ```json
    // post.json
    {
-     "class": "post",
-     "parent": "content"
+     "$class": "post",
+     "$parent": "content"
    }
    
    // content.json
    {
-     "class": "content",
-     "parent": "entity_base"  // Not "post"
+     "$class": "content",
+     "$parent": "entity_base"  // Not "post"
    }
    ```
 
@@ -409,13 +409,13 @@ Instance references class that doesn't exist in class directories.
 
 1. **Create class definition:**
    ```json
-   // classes/blog_post.schema.json
+   // classes/blog_post.class.json
    {
-     "class": "blog_post",
-     "parent": "entity_base",
+     "$class": "blog_post",
+     "$parent": "entity_base",
      "title": "",
      "content": "",
-     "schema": {
+     "$schema": {
        "$schema": "http://json-schema.org/draft-07/schema#",
        "type": "object",
        "properties": {
@@ -430,8 +430,8 @@ Instance references class that doesn't exist in class directories.
 2. **Fix instance class reference:**
    ```json
    {
-     "id": "my-post",
-     "class": "post",  // Use existing class
+     "$id": "my-post",
+     "$class": "post",  // Use existing class
      "title": "My Post"
    }
    ```
@@ -499,16 +499,16 @@ Template references undefined variable.
 1. **Add missing data to instance:**
    ```json
    {
-     "id": "my-post",
-     "class": "post",
+     "$id": "my-post",
+     "$class": "post",
      "title": "My Post",
      "author": "Alice"
    }
    ```
 
-2. **Use default helper:**
+2. **Use default_value helper:**
    ```handlebars
-   <p>Author: {{default author "Anonymous"}}</p>
+   <p>Author: {{default_value author "Anonymous"}}</p>
    ```
 
 3. **Check for property existence:**
@@ -665,10 +665,10 @@ Build worked before upgrade, now fails with schema errors.
 
 2. **Migrate schemas:**
    ```bash
-   # Add class field to all schemas
-   for f in classes/*.schema.json; do
-     name=$(basename "$f" .schema.json)
-     jq --arg class "$name" '. + {class: $class}' "$f" > tmp && mv tmp "$f"
+   # Add $class field to all schemas
+   for f in classes/*.class.json; do
+     name=$(basename "$f" .class.json)
+     jq --arg class "$name" '. + {"$class": $class}' "$f" > tmp && mv tmp "$f"
    done
    ```
 
@@ -727,8 +727,8 @@ fi
 struktur generate mystack -o debug.json
 
 # Inspect structure
-jq '.instances[] | {id, class}' debug.json
-jq '.classes_by_id | keys' debug.json
+jq '."$instances"[] | {"$id": ."$id", "$class": ."$class"}' debug.json
+jq '."$classes_by_id" | keys' debug.json
 ```
 
 ---
@@ -742,8 +742,8 @@ Add to template:
 
 <!-- See specific sections -->
 <pre>
-Instances: {{length instances}}
-Classes: {{length classes}}
+Instances: {{length $instances}}
+Classes: {{length $classes}}
 </pre>
 
 <!-- Check if property exists -->

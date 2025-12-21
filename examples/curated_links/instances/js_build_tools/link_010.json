@@ -1,6 +1,6 @@
 {
-  "id": "link_010",
-  "class": "tool_link",
+  "$id": "link_010",
+  "$class": "tool_link",
   "url": "https://swc.rs",
   "title": "SWC",
   "description": "Super-fast TypeScript/JavaScript compiler written in Rust",
@@ -14,8 +14,8 @@
   "github_stars": 31000,
   "license": "Apache-2.0",
   "github_url": "https://github.com/swc-project/swc",
-  "aspects": {
-    "quality": {
+  "$aspects": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 4,

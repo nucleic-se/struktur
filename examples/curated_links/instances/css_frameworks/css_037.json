@@ -1,6 +1,6 @@
 {
-  "id": "css_037",
-  "class": "tool_link",
+  "$id": "css_037",
+  "$class": "tool_link",
   "url": "https://stylifycss.com",
   "title": "Stylify",
   "description": "Write CSS directly in HTML using utility-first CSS-like syntax",

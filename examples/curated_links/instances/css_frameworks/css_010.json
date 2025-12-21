@@ -1,6 +1,6 @@
 {
-  "id": "css_010",
-  "class": "tool_link",
+  "$id": "css_010",
+  "$class": "tool_link",
   "url": "https://ant.design",
   "title": "Ant Design",
   "description": "Enterprise-class UI design system and React component library",

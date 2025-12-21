@@ -10,7 +10,7 @@ describe('LintValidator', () => {
   describe('missing description check', () => {
     test('should warn when description is missing', () => {
       const validator = new LintValidator();
-      const instance = { id: 'test-1', name: 'Test' };
+      const instance = { $id: 'test-1', name: 'Test' };
       const warnings = validator.validateInstance(instance);
       
       const descWarning = warnings.find(w => w.code === 'missing_description');
@@ -21,7 +21,7 @@ describe('LintValidator', () => {
 
     test('should warn when description is empty string', () => {
       const validator = new LintValidator();
-      const instance = { id: 'test-1', description: '' };
+      const instance = { $id: 'test-1', description: '' };
       const warnings = validator.validateInstance(instance);
       
       const descWarning = warnings.find(w => w.code === 'missing_description');
@@ -30,7 +30,7 @@ describe('LintValidator', () => {
 
     test('should warn when description is only whitespace', () => {
       const validator = new LintValidator();
-      const instance = { id: 'test-1', description: '   ' };
+      const instance = { $id: 'test-1', description: '   ' };
       const warnings = validator.validateInstance(instance);
       
       const descWarning = warnings.find(w => w.code === 'missing_description');
@@ -39,7 +39,7 @@ describe('LintValidator', () => {
 
     test('should not warn when description is present', () => {
       const validator = new LintValidator();
-      const instance = { id: 'test-1', description: 'A valid description' };
+      const instance = { $id: 'test-1', description: 'A valid description' };
       const warnings = validator.validateInstance(instance);
       
       const descWarning = warnings.find(w => w.code === 'missing_description');
@@ -61,7 +61,7 @@ describe('LintValidator', () => {
 
     test('should reject IDs with uppercase', () => {
       const validator = new LintValidator();
-      const instance = { id: 'TestId' };
+      const instance = { $id: 'TestId' };
       const warnings = validator.validateInstance(instance);
       
       const idWarning = warnings.find(w => w.code === 'malformed_id');
@@ -71,7 +71,7 @@ describe('LintValidator', () => {
 
     test('should reject IDs with underscores', () => {
       const validator = new LintValidator();
-      const instance = { id: 'test_id' };
+      const instance = { $id: 'test_id' };
       const warnings = validator.validateInstance(instance);
       
       const idWarning = warnings.find(w => w.code === 'malformed_id');
@@ -80,7 +80,7 @@ describe('LintValidator', () => {
 
     test('should reject IDs starting with hyphen', () => {
       const validator = new LintValidator();
-      const instance = { id: '-test' };
+      const instance = { $id: '-test' };
       const warnings = validator.validateInstance(instance);
       
       const idWarning = warnings.find(w => w.code === 'malformed_id');
@@ -89,7 +89,7 @@ describe('LintValidator', () => {
 
     test('should reject IDs ending with hyphen', () => {
       const validator = new LintValidator();
-      const instance = { id: 'test-' };
+      const instance = { $id: 'test-' };
       const warnings = validator.validateInstance(instance);
       
       const idWarning = warnings.find(w => w.code === 'malformed_id');
@@ -98,7 +98,7 @@ describe('LintValidator', () => {
 
     test('should reject IDs with consecutive hyphens', () => {
       const validator = new LintValidator();
-      const instance = { id: 'test--id' };
+      const instance = { $id: 'test--id' };
       const warnings = validator.validateInstance(instance);
       
       const idWarning = warnings.find(w => w.code === 'malformed_id');
@@ -109,7 +109,7 @@ describe('LintValidator', () => {
   describe('empty array check', () => {
     test('should warn on empty tags array', () => {
       const validator = new LintValidator();
-      const instance = { id: 'test-1', tags: [] };
+      const instance = { $id: 'test-1', tags: [] };
       const warnings = validator.validateInstance(instance);
       
       const arrayWarning = warnings.find(w => w.code === 'empty_array');
@@ -119,7 +119,7 @@ describe('LintValidator', () => {
 
     test('should not warn on non-empty tags array', () => {
       const validator = new LintValidator();
-      const instance = { id: 'test-1', tags: ['web', 'api'] };
+      const instance = { $id: 'test-1', tags: ['web', 'api'] };
       const warnings = validator.validateInstance(instance);
       
       const arrayWarning = warnings.find(w => w.code === 'empty_array');
@@ -128,7 +128,7 @@ describe('LintValidator', () => {
 
     test('should not warn when tags field is missing', () => {
       const validator = new LintValidator();
-      const instance = { id: 'test-1' };
+      const instance = { $id: 'test-1' };
       const warnings = validator.validateInstance(instance);
       
       const arrayWarning = warnings.find(w => w.code === 'empty_array');
@@ -138,7 +138,7 @@ describe('LintValidator', () => {
     test('should check other array fields', () => {
       const validator = new LintValidator();
       const instance = { 
-        id: 'test-1',
+        $id: 'test-1',
         categories: [],
         labels: []
       };
@@ -152,7 +152,7 @@ describe('LintValidator', () => {
   describe('suspicious values check', () => {
     test('should warn on default port 0', () => {
       const validator = new LintValidator();
-      const instance = { id: 'test-1', port: 0 };
+      const instance = { $id: 'test-1', port: 0 };
       const warnings = validator.validateInstance(instance);
       
       const portWarning = warnings.find(w => w.code === 'suspicious_value');
@@ -162,7 +162,7 @@ describe('LintValidator', () => {
 
     test('should warn on empty name', () => {
       const validator = new LintValidator();
-      const instance = { id: 'test-1', name: '' };
+      const instance = { $id: 'test-1', name: '' };
       const warnings = validator.validateInstance(instance);
       
       const nameWarning = warnings.find(w => w.code === 'suspicious_value');
@@ -171,7 +171,7 @@ describe('LintValidator', () => {
 
     test('should not warn on valid port', () => {
       const validator = new LintValidator();
-      const instance = { id: 'test-1', port: 8080 };
+      const instance = { $id: 'test-1', port: 8080 };
       const warnings = validator.validateInstance(instance);
       
       const portWarning = warnings.find(w => w.code === 'suspicious_value');
@@ -183,7 +183,7 @@ describe('LintValidator', () => {
     test('should return warnings with instance context', () => {
       const validator = new LintValidator();
       const instance = { 
-        id: 'BadID',
+        $id: 'BadID',
         description: ''
       };
       const warnings = validator.validateInstance(instance);
@@ -196,7 +196,7 @@ describe('LintValidator', () => {
     test('should handle instances without issues', () => {
       const validator = new LintValidator();
       const instance = { 
-        id: 'good-id',
+        $id: 'good-id',
         name: 'Good Name',
         description: 'Good description',
         port: 8080
@@ -209,7 +209,7 @@ describe('LintValidator', () => {
     test('should detect multiple issues in one instance', () => {
       const validator = new LintValidator();
       const instance = { 
-        id: 'Bad_ID',
+        $id: 'Bad_ID',
         description: '',
         tags: [],
         port: 0
@@ -231,7 +231,7 @@ describe('LintValidator', () => {
         checkDescription: false,
         checkId: false
       });
-      const instance = { id: 'BadID', description: '' };
+      const instance = { $id: 'BadID', description: '' };
       const warnings = validator.validateInstance(instance);
       
       const descWarning = warnings.find(w => w.code === 'missing_description');
@@ -245,7 +245,7 @@ describe('LintValidator', () => {
         arrayFields: ['custom_array']
       });
       const instance = { 
-        id: 'test-1',
+        $id: 'test-1',
         custom_array: [],
         tags: [] // Should not be checked
       };

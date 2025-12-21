@@ -1,6 +1,6 @@
 {
-  "id": "link_036",
-  "class": "tool_link",
+  "$id": "link_036",
+  "$class": "tool_link",
   "url": "https://github.com/changesets/changesets",
   "title": "Changesets",
   "description": "Way to manage versioning and changelogs with multi-package repositories",
@@ -13,8 +13,8 @@
   "github_stars": 5500,
   "license": "MIT",
   "github_url": "https://github.com/changesets/changesets",
-  "aspects": {
-    "quality": {
+  "$aspects": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 4,

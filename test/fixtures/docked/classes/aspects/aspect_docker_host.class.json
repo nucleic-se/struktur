@@ -1,0 +1,19 @@
+{
+  "$class": "aspect_docker_host",
+  "$aspect": "aspect_docker_host",
+  "$schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "description": "Aspect classes for docked stack",
+    "additionalProperties": true
+  },
+  "$fields": {
+    "pretty_name": "Docker Hosts",
+    "$aspects": {
+      "aspect": {
+        "kind": "docker_host",
+        "description": "Docker daemon hosts running containers"
+      }
+    }
+  }
+}

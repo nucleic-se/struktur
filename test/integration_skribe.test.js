@@ -50,18 +50,18 @@ describe('Integration: Skribe Stack', () => {
     const resolved = struktur.classResolver.resolve('blog_post');
 
     // Check lineage
-    assert.deepStrictEqual(resolved.lineage, ['content_base', 'blog_post']);
+    assert.deepStrictEqual(resolved.$lineage, ['content_base', 'blog_post']);
 
     // Check schemas are separate (not merged)
-    assert.strictEqual(resolved.schemas.length, 2);
+    assert.strictEqual(resolved.$schemas.length, 2);
 
     // content_base schema should have title, slug, etc
-    const contentBaseSchema = resolved.schemas[0];
+    const contentBaseSchema = resolved.$schemas[0];
     assert.ok(contentBaseSchema.properties.title);
     assert.ok(contentBaseSchema.properties.slug);
 
     // blog_post schema should have additional fields (date required, tags)
-    const blogPostSchema = resolved.schemas[1];
+    const blogPostSchema = resolved.$schemas[1];
     assert.ok(blogPostSchema.required.includes('date'));
     assert.ok(blogPostSchema.properties.tags);
 
@@ -92,8 +92,8 @@ describe('Integration: Skribe Stack', () => {
 
     // Create invalid instance (missing required fields from both layers)
     const invalidPost = {
-      id: 'invalid-post',
-      class: 'blog_post'
+      $id: 'invalid-post',
+      $class: 'blog_post'
       // Missing: title, slug (required by content_base)
       // Missing: date (required by blog_post)
     };
@@ -158,8 +158,8 @@ describe('Integration: Skribe Stack', () => {
     const resolved = struktur.classResolver.resolve('blog_post');
 
     // blog_post provides default for tags
-    if (resolved.fields.tags !== undefined) {
-      assert.ok(Array.isArray(resolved.fields.tags));
+    if (resolved.$fields.tags !== undefined) {
+      assert.ok(Array.isArray(resolved.$fields.tags));
     }
   });
 
@@ -171,8 +171,8 @@ describe('Integration: Skribe Stack', () => {
     const resolved = struktur.classResolver.resolve('page');
 
     // page also extends content_base
-    assert.deepStrictEqual(resolved.lineage, ['content_base', 'page']);
-    assert.strictEqual(resolved.schemas.length, 2);
+    assert.deepStrictEqual(resolved.$lineage, ['content_base', 'page']);
+    assert.strictEqual(resolved.$schemas.length, 2);
   });
 
   it('should cache resolved classes for performance', async () => {

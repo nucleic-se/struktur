@@ -1,6 +1,6 @@
 {
-  "id": "css_017",
-  "class": "tool_link",
+  "$id": "css_017",
+  "$class": "tool_link",
   "url": "https://animate.style",
   "title": "Animate.css",
   "description": "Cross-browser library of ready-to-use CSS animations",

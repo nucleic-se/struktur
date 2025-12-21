@@ -1,6 +1,6 @@
 {
-  "id": "css_038",
-  "class": "tool_link",
+  "$id": "css_038",
+  "$class": "tool_link",
   "url": "https://css.master.co",
   "title": "Master CSS",
   "description": "Virtual CSS language with enhanced syntax",

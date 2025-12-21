@@ -1,6 +1,6 @@
 {
-  "id": "link_029",
-  "class": "tool_link",
+  "$id": "link_029",
+  "$class": "tool_link",
   "url": "https://postcss.org",
   "title": "PostCSS",
   "description": "Tool for transforming CSS with JavaScript plugins",
@@ -13,8 +13,8 @@
   "github_stars": 28000,
   "license": "MIT",
   "github_url": "https://github.com/postcss/postcss",
-  "aspects": {
-    "quality": {
+  "$aspects": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 5,

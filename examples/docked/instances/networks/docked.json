@@ -1,10 +1,12 @@
 {
-  "id": "docked",
-  "class": "docked_network",
+  "$id": "docked",
+  "$class": "docked_network",
   "description": "Bridge network connecting all docked containers",
-  "domains": ["infrastructure"],
-  "aspects": {
-    "docker_network": {
+  "domains": [
+    "infrastructure"
+  ],
+  "$aspects": {
+    "aspect_docker_network": {
       "driver": "bridge"
     }
   }

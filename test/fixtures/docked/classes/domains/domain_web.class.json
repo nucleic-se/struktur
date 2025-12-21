@@ -1,0 +1,54 @@
+{
+  "$class": "domain_web",
+  "$parent": "domain_root",
+  "$schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "domains": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "$aspects": {
+        "type": "object",
+        "properties": {
+          "aspect_domain": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "description"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "required": [
+      "domains"
+    ],
+    "additionalProperties": true
+  },
+  "$fields": {
+    "domains": [
+      "web"
+    ],
+    "$aspects": {
+      "domain": {
+        "name": "Web Services",
+        "description": "Web servers and HTTP services"
+      }
+    }
+  },
+  "$aspects": null
+}

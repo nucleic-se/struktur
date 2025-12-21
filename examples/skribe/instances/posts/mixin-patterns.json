@@ -1,13 +1,13 @@
 {
-  "id": "mixin-patterns",
-  "class": "blog_post",
+  "$id": "mixin-patterns",
+  "$class": "blog_post",
   "title": "Advanced Mixin Patterns",
   "slug": "mixin-patterns",
   "description": "Using mixins to layer functionality without forking",
-  "aspects": {
-    "blog_post": {
+  "$aspects": {
+    "aspect_blog_post": {
       "date": "2025-12-03",
-      "content": "Mixins are Struktur's answer to the 'fork vs. extend' problem. How do you add features to a stack without modifying the original? Mixins.\n\nIn Skribe, we have two mixins: RSS and dark-theme. Neither touches the base stack. They live in mixins/ subdirectories and provide additional sources for the build. To use them, you just add them to the build command: `struktur build . mixins/rss --build-dir build`. Struktur merges the base and mixin sources, with **later sources winning** for conflicts.\n\nThe dark-theme mixin demonstrates template overlays. The base provides `templates/custom.css` with light theme colors. The mixin provides its own `templates/custom.css` with dark theme colors. When you build with the mixin, its version shadows the base version. Same file path, different content. This is intentional override behavior—powerful for theming, localization, or environment-specific configs.\n\nThe RSS mixin demonstrates additive layering. It adds `templates/feed.xml` and `instances/rss_feed.json` without replacing anything. The base stack doesn't even know about RSS. The mixin extends it transparently. This pattern scales: you could have mixins for analytics, SEO metadata, search indexes, or A/B testing variants.\n\n**The key insight: composition over modification.** Don't fork the base stack and maintain two versions. Don't add conditional logic for every possible feature. Instead, keep the base minimal and layer features via mixins. Each mixin is a focused extension. Users can pick and choose which features they want. Build once, extend infinitely.",
+      "content": "Mixins are Struktur's answer to the 'fork vs. extend' problem. How do you add features to a stack without modifying the original? Mixins.\n\nIn Skribe, we have two mixins: RSS and dark-theme. Neither touches the base stack. They live in mixins/ subdirectories and provide additional sources for the build. To use them, you just add them to the build command: `struktur build . mixins/rss --build-dir build`. Struktur merges the base and mixin sources, with **later sources winning** for conflicts.\n\nThe dark-theme mixin demonstrates template overlays. The base provides `templates/custom.css` with light theme colors. The mixin provides its own `templates/custom.css` with dark theme colors. When you build with the mixin, its version shadows the base version. Same file path, different content. This is intentional override behavior\u2014powerful for theming, localization, or environment-specific configs.\n\nThe RSS mixin demonstrates additive layering. It adds `templates/feed.xml` and `instances/rss_feed.json` without replacing anything. The base stack doesn't even know about RSS. The mixin extends it transparently. This pattern scales: you could have mixins for analytics, SEO metadata, search indexes, or A/B testing variants.\n\n**The key insight: composition over modification.** Don't fork the base stack and maintain two versions. Don't add conditional logic for every possible feature. Instead, keep the base minimal and layer features via mixins. Each mixin is a focused extension. Users can pick and choose which features they want. Build once, extend infinitely.",
       "tags": [
         "advanced",
         "best-practices"

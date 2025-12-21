@@ -1,6 +1,6 @@
 {
-  "id": "test_032",
-  "class": "tool_link",
+  "$id": "test_032",
+  "$class": "tool_link",
   "url": "https://github.com/mjackson/expect",
   "title": "Expect",
   "description": "Minimalist BDD assertion toolkit",

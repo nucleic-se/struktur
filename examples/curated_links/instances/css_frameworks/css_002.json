@@ -1,6 +1,6 @@
 {
-  "id": "css_002",
-  "class": "tool_link",
+  "$id": "css_002",
+  "$class": "tool_link",
   "url": "https://getbootstrap.com",
   "title": "Bootstrap",
   "description": "Most popular CSS framework for building responsive, mobile-first sites",

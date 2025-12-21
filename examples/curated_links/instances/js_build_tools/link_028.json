@@ -1,6 +1,6 @@
 {
-  "id": "link_028",
-  "class": "tool_link",
+  "$id": "link_028",
+  "$class": "tool_link",
   "url": "https://github.com/google/closure-compiler",
   "title": "Closure Compiler",
   "description": "JavaScript optimizer that compiles code down to better JavaScript",
@@ -14,8 +14,8 @@
   "github_stars": 7300,
   "license": "Apache-2.0",
   "github_url": "https://github.com/google/closure-compiler",
-  "aspects": {
-    "quality": {
+  "$aspects": {
+    "aspect_quality": {
       "is_maintained": true,
       "is_free": true,
       "popularity_score": 3,

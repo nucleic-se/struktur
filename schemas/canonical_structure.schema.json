@@ -5,39 +5,43 @@
   "description": "Schema for validating the structure of canonical.json output from struktur builds",
   "type": "object",
   "required": [
-    "instances",
-    "instances_by_id"
+    "$instances",
+    "$instances_by_id"
   ],
   "properties": {
-    "instances": {
+    "$instances": {
       "type": "array",
       "description": "Array of all merged instances in build order",
       "items": {
         "type": "object",
-        "required": ["id", "class"],
+        "required": ["$id", "$class"],
         "properties": {
-          "id": {
+          "$id": {
             "type": "string",
             "description": "Unique instance identifier"
           },
-          "class": {
+          "$class": {
             "type": "string",
             "description": "Class name this instance belongs to"
           },
-          "aspects": {
+          "$render": {
+            "type": "array",
+            "description": "Optional array of render tasks for this instance"
+          },
+          "$aspects": {
             "type": "object",
             "description": "Aspect data keyed by aspect name"
           },
-          "aspect_types": {
+          "$uses_aspects": {
             "type": "array",
             "items": { "type": "string" },
-            "description": "List of aspect names (auto-derived from aspects keys)"
+            "description": "Explicit list of aspect names if provided (not auto-populated)"
           },
-          "_source_file": {
+          "$source_file": {
             "type": "string",
             "description": "Source file path for debugging"
           },
-          "_merged_from": {
+          "$merged_from": {
             "type": "array",
             "items": { "type": "string" },
             "description": "List of files this instance was merged from"
@@ -46,43 +50,44 @@
         "additionalProperties": true
       }
     },
-    "instances_by_id": {
+    "$instances_by_id": {
       "type": "object",
       "description": "Map of instance ID to instance object for fast lookup",
       "additionalProperties": {
         "type": "object",
-        "required": ["id", "class"],
+        "required": ["$id", "$class"],
         "properties": {
-          "id": { "type": "string" },
-          "class": { "type": "string" }
+          "$id": { "type": "string" },
+          "$class": { "type": "string" }
         }
       }
     },
-    "classes": {
+    "$classes": {
       "type": "array",
       "description": "Array of all resolved class definitions (optional, only if includeClassIndex=true)",
       "items": {
         "type": "object",
-        "required": ["class", "lineage", "schema"],
+        "required": ["$class", "$lineage", "$schemas"],
         "properties": {
-          "class": {
+          "$class": {
             "type": "string",
             "description": "Class name"
           },
-          "lineage": {
+          "$lineage": {
             "type": "array",
             "items": { "type": "string" },
             "description": "Inheritance chain from base to this class"
           },
-          "schema": {
-            "type": "object",
-            "description": "Merged JSON Schema for this class"
+          "$schemas": {
+            "type": "array",
+            "description": "Schema chain (one per lineage entry)",
+            "items": { "type": "object" }
           },
-          "fields": {
+          "$fields": {
             "type": "object",
             "description": "Default field values"
           },
-          "aspects": {
+          "$aspects": {
             "description": "Required/optional aspects for this class",
             "oneOf": [
               {
@@ -100,39 +105,37 @@
               }
             ]
           },
-          "_source_file": {
-            "type": "string",
-            "description": "Source file path for debugging"
-          }
+          "$source_file": { "type": "string" }
         },
         "additionalProperties": true
       }
     },
-    "classes_by_id": {
+    "$classes_by_id": {
       "type": "object",
       "description": "Map of class name to resolved class definition (optional, only if includeClassIndex=true)",
       "additionalProperties": {
         "type": "object",
-        "required": ["class", "lineage", "schema"],
+        "required": ["$class", "$lineage", "$schemas"],
         "properties": {
-          "class": {
+          "$class": {
             "type": "string",
             "description": "Class name"
           },
-          "lineage": {
+          "$lineage": {
             "type": "array",
             "items": { "type": "string" },
             "description": "Inheritance chain from base to this class"
           },
-          "schema": {
-            "type": "object",
-            "description": "Merged JSON Schema for this class"
+          "$schemas": {
+            "type": "array",
+            "description": "Schema chain (one per lineage entry)",
+            "items": { "type": "object" }
           },
-          "fields": {
+          "$fields": {
             "type": "object",
             "description": "Default field values"
           },
-          "aspects": {
+          "$aspects": {
             "description": "Required/optional aspects for this class",
             "oneOf": [
               {
@@ -150,69 +153,74 @@
               }
             ]
           },
-          "_source_file": {
-            "type": "string",
-            "description": "Source file path for debugging"
-          }
+          "$source_file": { "type": "string" }
         },
         "additionalProperties": true
       }
     },
-    "aspects": {
+    "$aspects": {
       "type": "array",
       "description": "Array of all aspect definitions (optional, only if includeAspectsIndex=true)",
       "items": {
         "type": "object",
-        "required": ["aspect", "schema"],
+        "required": ["$aspect", "$schema"],
         "properties": {
-          "aspect": {
+          "$aspect": {
             "type": "string",
             "description": "Aspect name"
           },
-          "schema": {
+          "$schema": {
             "type": "object",
             "description": "JSON Schema for this aspect"
           },
-          "description": {
+          "$description": {
             "type": "string",
             "description": "Human-readable description"
           },
-          "_source_file": {
-            "type": "string",
-            "description": "Source file path for debugging"
-          }
+          "$pretty_name": { "type": "string" },
+          "$defaults": { "type": ["object", "null"] },
+          "$source_file": { "type": "string" }
         },
         "additionalProperties": true
       }
     },
-    "aspects_by_id": {
+    "$aspects_by_id": {
       "type": "object",
       "description": "Map of aspect name to aspect definition (optional, only if includeAspectsIndex=true)",
       "additionalProperties": {
         "type": "object",
-        "required": ["aspect", "schema"],
+        "required": ["$aspect", "$schema"],
         "properties": {
-          "aspect": {
+          "$aspect": {
             "type": "string",
             "description": "Aspect name"
           },
-          "schema": {
+          "$schema": {
             "type": "object",
             "description": "JSON Schema for aspect data validation"
           },
-          "description": {
+          "$description": {
             "type": "string",
             "description": "Human-readable aspect description"
           },
-          "_source_file": {
-            "type": "string",
-            "description": "Source file path for debugging"
-          }
+          "$pretty_name": { "type": "string" },
+          "$defaults": { "type": ["object", "null"] },
+          "$source_file": { "type": "string" }
         },
         "additionalProperties": true
       }
     },
-    "metadata": {
+    "$class_names": {
+      "type": "array",
+      "description": "List of unique class names (optional, only if includeClassIndex=true)",
+      "items": { "type": "string" }
+    },
+    "$aspect_names": {
+      "type": "array",
+      "description": "List of unique aspect names (optional, only if includeAspectsIndex=true)",
+      "items": { "type": "string" }
+    },
+    "$metadata": {
       "type": "object",
       "description": "Build metadata (optional)",
       "properties": {
@@ -247,7 +255,7 @@
       },
       "additionalProperties": false
     },
-    "validation": {
+    "$validation": {
       "type": "object",
       "description": "Validation results (optional)",
       "required": ["total", "valid", "invalid", "errors"],

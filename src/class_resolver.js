@@ -36,7 +36,7 @@ export class ClassResolver {
     // Collect schemas (one per lineage entry, no merging)
     const schemas = lineage.map(name => {
       const def = this.classLoader.getClass(name);
-      return def.schema;
+      return def.$schema;
     });
 
     // Merge fields (simple field defaults, not schemas)
@@ -53,17 +53,17 @@ export class ClassResolver {
     }
 
     const resolved = {
-      class: className,
-      lineage,
-      schemas,
-      fields,
-      aspects,
+      $class: className,
+      $lineage: lineage,
+      $schemas: schemas,
+      $fields: fields,
+      $aspects: aspects,
       // Include metadata from class definition for viewer
-      aspect_types: this._mergeAspectTypes(lineage),
-      aspect_defaults: this._mergeAspectDefaults(lineage),
-      pretty_name: classDef.pretty_name || className,
-      domains: classDef.domains || [],
-      parent: lineage.slice(0, -1)  // All parents in lineage order
+      $uses_aspects: this._mergeAspectTypes(lineage),
+      $aspect_defaults: this._mergeAspectDefaults(lineage),
+      $pretty_name: classDef.$pretty_name || className,
+      $domains: classDef.$domains || [],
+      $parent: lineage.slice(0, -1)  // All parents in lineage order
     };
 
     // Cache result
@@ -100,7 +100,7 @@ export class ClassResolver {
       }
 
       // Handle both single parent (string) and multi-parent (array)
-      const parents = classDef.parent;
+      const parents = classDef.$parent;
       if (parents) {
         const parentArray = Array.isArray(parents) ? parents : [parents];
         for (const parent of parentArray) {
@@ -132,8 +132,8 @@ export class ClassResolver {
 
     for (const className of lineage) {
       const classDef = this.classLoader.getClass(className);
-      if (classDef.fields) {
-        merged = classMerge(merged, classDef.fields);
+      if (classDef.$fields) {
+        merged = classMerge(merged, classDef.$fields);
       }
     }
 
@@ -151,17 +151,17 @@ export class ClassResolver {
 
     for (const className of lineage) {
       const classDef = this.classLoader.getClass(className);
-      if (classDef.aspects) {
-        if (Array.isArray(classDef.aspects)) {
+      if (classDef.$aspects) {
+        if (Array.isArray(classDef.$aspects)) {
           // Handle array format: ["aspect1", "aspect2"] - assume optional
-          classDef.aspects.forEach(aspect => {
+          classDef.$aspects.forEach(aspect => {
             if (!aspectMap[aspect]) {
               aspectMap[aspect] = { required: false };
             }
           });
         } else {
           // Handle object format: { aspect1: {required: true}, aspect2: {required: false} }
-          for (const [aspectName, aspectConfig] of Object.entries(classDef.aspects)) {
+          for (const [aspectName, aspectConfig] of Object.entries(classDef.$aspects)) {
             // Parent required=true takes precedence over child required=false
             if (!aspectMap[aspectName]) {
               aspectMap[aspectName] = { required: aspectConfig.required === true };
@@ -178,10 +178,10 @@ export class ClassResolver {
   }
 
   /**
-   * Accumulate aspect_types across lineage
+   * Accumulate $uses_aspects across lineage
    * @private
    * @param {Array<string>} lineage - Lineage chain (base → child order)
-   * @returns {Array<string>} - Accumulated aspect_types, deduplicated
+   * @returns {Array<string>} - Accumulated $uses_aspects, deduplicated
    */
   _mergeAspectTypes(lineage) {
     const accumulated = [];
@@ -190,9 +190,9 @@ export class ClassResolver {
     // Traverse lineage in order (base → child)
     for (const className of lineage) {
       const classDef = this.classLoader.getClass(className);
-      const aspectTypes = classDef.aspect_types || [];
+      const aspectTypes = classDef.$uses_aspects || [];
 
-      // Add new aspect_types, deduplicate
+      // Add new $uses_aspects, deduplicate
       for (const aspectType of aspectTypes) {
         if (!seen.has(aspectType)) {
           seen.add(aspectType);
@@ -205,7 +205,7 @@ export class ClassResolver {
   }
 
   /**
-   * Accumulate aspect_defaults across lineage
+   * Accumulate $aspect_defaults across lineage
    * @private
    * @param {Array<string>} lineage - Lineage chain (base → child order)
    * @returns {Object.<string, Object>} - Merged aspect defaults by aspect name
@@ -216,9 +216,9 @@ export class ClassResolver {
     // Traverse lineage in order (base → child, child wins)
     for (const className of lineage) {
       const classDef = this.classLoader.getClass(className);
-      if (classDef.aspect_defaults) {
+      if (classDef.$aspect_defaults) {
         // Deep merge each aspect's defaults
-        for (const [aspectName, defaults] of Object.entries(classDef.aspect_defaults)) {
+        for (const [aspectName, defaults] of Object.entries(classDef.$aspect_defaults)) {
           if (!merged[aspectName]) {
             merged[aspectName] = {};
           }
