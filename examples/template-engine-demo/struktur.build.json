@@ -3,9 +3,6 @@
     "../universal/classes",
     "classes"
   ],
-  "aspects": [
-    "../universal/aspects"
-  ],
   "instances": [
     "instances"
   ],

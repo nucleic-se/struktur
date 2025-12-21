@@ -3,9 +3,6 @@
     "../universal/classes",
     "classes"
   ],
-  "aspects": [
-    "../universal/aspects"
-  ],
   "instances": [
     "instances"
   ],
@@ -16,13 +13,16 @@
   "build_dir": "build/nunjucks",
   "render": [
     {
-      "nginx.conf.njk": "/nginx.conf"
+      "template": "nginx.conf.njk",
+      "output": "/nginx.conf"
     },
     {
-      "docker-compose.yml.njk": "/docker-compose.yml"
+      "template": "docker-compose.yml.njk",
+      "output": "/docker-compose.yml"
     },
     {
-      "README.md.njk": "/README.md"
+      "template": "README.md.njk",
+      "output": "/README.md"
     }
   ]
 }
