@@ -83,6 +83,6 @@
         "description": "Source files merged into this instance (metadata added by merger)"
       }
     },
-    "additionalProperties": false
+    "additionalProperties": true
   }
 }
