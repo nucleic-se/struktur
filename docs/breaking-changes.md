@@ -6,11 +6,83 @@ This document tracks breaking changes in Struktur's alpha releases.
 
 ---
 
-## v0.3.0-alpha (In Progress - December 2025)
+## v0.4.0-alpha (December 2025)
 
-**Status**: Feature branch `feature_v0.3.0`, not yet tagged  
-**Current package.json**: `0.2.14-alpha`  
-**Base commits**: f61d3fc → a5dbf2b (4 breaking changes)
+**Status**: Released  
+**Tag**: v0.4.0-alpha  
+**Package version**: `0.4.0-alpha`  
+**Focus**: Strictness & Safety
+
+### Breaking Changes
+
+**Fail-Fast Security & Integrity (6 fixes):**
+- **Unsafe output paths** throw (path traversal blocked)
+- **Unresolved classes** throw during canonical generation
+- **Missing `$id`** throws on instance load (required field)
+- **Invalid JSON** throws with context (no silent skip)
+- **Explicitly configured directories** must exist (catch typos)
+- **Missing `buildDir`** throws in template helpers
+
+**Strict Validation Enabled by Default (4 checks):**
+- **Output-file collision detection** prevents silent overwrites
+- **Aspect declaration enforcement** (instances only use declared aspects)
+- **Legacy `$aspects` array** format removed (object format only)
+- **AJV strict mode** enabled (`strictRequired`, `strictTypes`)
+
+### Migration Guide
+
+**Fix instances:**
+- Add `$id` to all instances
+- Fix invalid JSON syntax
+- Ensure class names referenced exist
+
+**Fix aspect usage:**
+- Add missing aspects to class `$uses_aspects` arrays
+- Convert any `$aspects` arrays to object format
+- Aspects accumulate through inheritance (child can use parent's aspects)
+
+**Fix schemas:**
+- Ensure `required` fields are defined in `properties`
+- Fix loose type definitions for AJV strict mode
+
+**Fix collisions:**
+- Remove duplicate render tasks targeting same output file
+- Use unique output paths for each render task
+
+**Fix paths:**
+- Ensure explicitly configured directories exist
+- Remove template outputs escaping build directory
+
+### Real Impact
+
+**Bugs caught during migration:**
+- 7 classes with undeclared aspects (backbone example)
+- 3 output file collisions (viewer.html, terraform files)
+- 1 tool_link class missing aspect declaration
+
+**Error improvements:**
+- Aspect validation shows full class lineage for debugging
+- Collision errors show which templates/instances conflict
+- AJV strict mode catches schema authoring errors early
+
+### Documentation
+
+- See [Validation Concepts](concepts-validation.md#ajv-strict-mode) for AJV strict mode details
+- See [Build Pipeline](concepts-build-pipeline.md#output-collision-detection) for collision detection
+- All 492 tests passing with strict validation
+
+### Rationale
+
+These checks catch real bugs (proven with examples), prevent security issues, and enforce data integrity. Alpha status means we can implement correct behavior without backward compatibility burden.
+
+---
+
+## v0.3.0-alpha (December 2025)
+
+**Status**: Released  
+**Tag**: v0.3.0-alpha  
+**Package version**: `0.3.0-alpha`  
+**Base commits**: f61d3fc → a5dbf2b (6 breaking changes)
 
 ### System Property Prefix (`$`) for Data Model
 
@@ -255,77 +327,6 @@ struktur build mystack --exact
 - Builds are reproducible and easy to compare
 - Safer default for production
 - Easier debugging (multiple builds preserved)
-
----
-
-## v0.4.0-alpha (December 2025)
-
-**Status**: Released  
-**Tag**: v0.4.0-alpha  
-**Package version**: `0.4.0-alpha`  
-**Focus**: Strictness & Safety
-
-### Breaking Changes
-
-**Fail-Fast Security & Integrity (6 fixes):**
-- **Unsafe output paths** throw (path traversal blocked)
-- **Unresolved classes** throw during canonical generation
-- **Missing `$id`** throws on instance load (required field)
-- **Invalid JSON** throws with context (no silent skip)
-- **Explicitly configured directories** must exist (catch typos)
-- **Missing `buildDir`** throws in template helpers
-
-**Strict Validation Enabled by Default (4 checks):**
-- **Output-file collision detection** prevents silent overwrites
-- **Aspect declaration enforcement** (instances only use declared aspects)
-- **Legacy `$aspects` array** format removed (object format only)
-- **AJV strict mode** enabled (`strictRequired`, `strictTypes`)
-
-### Migration Guide
-
-**Fix instances:**
-- Add `$id` to all instances
-- Fix invalid JSON syntax
-- Ensure class names referenced exist
-
-**Fix aspect usage:**
-- Add missing aspects to class `$uses_aspects` arrays
-- Convert any `$aspects` arrays to object format
-- Aspects accumulate through inheritance (child can use parent's aspects)
-
-**Fix schemas:**
-- Ensure `required` fields are defined in `properties`
-- Fix loose type definitions for AJV strict mode
-
-**Fix collisions:**
-- Remove duplicate render tasks targeting same output file
-- Use unique output paths for each render task
-
-**Fix paths:**
-- Ensure explicitly configured directories exist
-- Remove template outputs escaping build directory
-
-### Real Impact
-
-**Bugs caught during migration:**
-- 7 classes with undeclared aspects (backbone example)
-- 3 output file collisions (viewer.html, terraform files)
-- 1 tool_link class missing aspect declaration
-
-**Error improvements:**
-- Aspect validation shows full class lineage for debugging
-- Collision errors show which templates/instances conflict
-- AJV strict mode catches schema authoring errors early
-
-### Documentation
-
-- See [Validation Concepts](concepts-validation.md#ajv-strict-mode) for AJV strict mode details
-- See [Build Pipeline](concepts-build-pipeline.md#output-collision-detection) for collision detection
-- All 492 tests passing with strict validation
-
-### Rationale
-
-These checks catch real bugs (proven with examples), prevent security issues, and enforce data integrity. Alpha status means we can implement correct behavior without backward compatibility burden.
 
 ---
 
