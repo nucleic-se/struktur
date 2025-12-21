@@ -56,6 +56,47 @@
 import fs from 'fs/promises';
 import path from 'path';
 
+function validateRenderFormat(renderValue, instanceId, filePath) {
+  if (!Array.isArray(renderValue)) {
+    throw new Error(
+      `Instance ${instanceId}: $render must be an array of {template, output} objects. ` +
+      `File: ${filePath}`
+    );
+  }
+
+  for (let i = 0; i < renderValue.length; i++) {
+    const task = renderValue[i];
+    if (!task || typeof task !== 'object' || Array.isArray(task)) {
+      throw new Error(
+        `Instance ${instanceId}: $render[${i}] must be an object with "template" and "output". ` +
+        `File: ${filePath}`
+      );
+    }
+
+    if (typeof task.template !== 'string' || task.template.trim() === '') {
+      throw new Error(
+        `Instance ${instanceId}: $render[${i}].template must be a non-empty string. ` +
+        `File: ${filePath}`
+      );
+    }
+
+    if (typeof task.output !== 'string' || task.output.trim() === '') {
+      throw new Error(
+        `Instance ${instanceId}: $render[${i}].output must be a non-empty string. ` +
+        `File: ${filePath}`
+      );
+    }
+
+    const extraKeys = Object.keys(task).filter(key => key !== 'template' && key !== 'output');
+    if (extraKeys.length > 0) {
+      throw new Error(
+        `Instance ${instanceId}: $render[${i}] has unexpected keys: ${extraKeys.join(', ')}. ` +
+        `Only "template" and "output" are allowed. File: ${filePath}`
+      );
+    }
+  }
+}
+
 /**
  * Load instances from a directory recursively
  * 
@@ -194,20 +235,31 @@ export async function loadInstancesFromDir(dirPath, options = {}) {
                   // Reject classless instances
                   classlessRejects.push({ id: data.$id, file: path.basename(fullPath) });
                 } else {
-                instances.push({ ...data, $source_file: fullPath });
+                  if (data.$render !== undefined) {
+                    validateRenderFormat(data.$render, data.$id, fullPath);
+                  }
+                  instances.push({ ...data, $source_file: fullPath });
                 }
               }
             }
           } catch (error) {
-            // Log warning for invalid JSON (helps users debug typos)
-            if (logger?.warn) {
-              logger.warn(`Skipping ${fullPath}: Invalid JSON - ${error.message}`);
+            if (error instanceof SyntaxError) {
+              // Log warning for invalid JSON (helps users debug typos)
+              if (logger?.warn) {
+                logger.warn(`Skipping ${fullPath}: Invalid JSON - ${error.message}`);
+              }
+            } else {
+              throw error;
             }
           }
         }
       }
-    } catch {
+    } catch (error) {
       // Directory doesn't exist or not readable - silently skip
+      if (error?.code === 'ENOENT' || error?.code === 'ENOTDIR') {
+        return;
+      }
+      throw error;
     }
   }
 

@@ -13,6 +13,46 @@ import { mergeInstances, getMergeStats } from './instance_merger.js';
 import { loadInstancesFromDir } from './instance_loader.js';
 import { TemplateRenderer } from './template_renderer.js';
 
+function validateRenderTasks(renderTasks, sourceLabel) {
+  if (renderTasks === undefined) {
+    return;
+  }
+  if (!Array.isArray(renderTasks)) {
+    throw new Error(
+      `${sourceLabel}: render must be an array of {template, output} objects.`
+    );
+  }
+
+  for (let i = 0; i < renderTasks.length; i++) {
+    const task = renderTasks[i];
+    if (!task || typeof task !== 'object' || Array.isArray(task)) {
+      throw new Error(
+        `${sourceLabel}: render[${i}] must be an object with "template" and "output".`
+      );
+    }
+
+    if (typeof task.template !== 'string' || task.template.trim() === '') {
+      throw new Error(
+        `${sourceLabel}: render[${i}].template must be a non-empty string.`
+      );
+    }
+
+    if (typeof task.output !== 'string' || task.output.trim() === '') {
+      throw new Error(
+        `${sourceLabel}: render[${i}].output must be a non-empty string.`
+      );
+    }
+
+    const extraKeys = Object.keys(task).filter(key => key !== 'template' && key !== 'output');
+    if (extraKeys.length > 0) {
+      throw new Error(
+        `${sourceLabel}: render[${i}] has unexpected keys: ${extraKeys.join(', ')}. ` +
+        'Only "template" and "output" are allowed.'
+      );
+    }
+  }
+}
+
 /**
  * Build a stack with organized output directory
  * @param {Object} options - Build options
@@ -39,6 +79,7 @@ export async function buildStack(options) {
   }
 
   const log = logger || createLogger({ quiet });
+  validateRenderTasks(renderTasks, 'Build config');
   
   // Generate deterministic build dir by default (disable with deterministic=false)
   let buildDir = requestedBuildDir;

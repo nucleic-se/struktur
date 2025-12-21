@@ -133,15 +133,14 @@ export class TemplateRenderer {
     if (!buildDir || typeof buildDir !== 'string') {
       throw new Error('buildDir must be a non-empty string');
     }
-    
-    // Normalize tasks to new format {template, output}
-    const normalizedTasks = this.normalizeTasks(renderTasks);
+
+    this.validateRenderTasks(renderTasks);
     
     // Create render context (holds canonical data + buffers)
     const renderContext = new RenderContext(canonical, buildDir, metadata);
     
     // Pre-flight validation (find ALL issues before rendering)
-    await this.validateAllTasks(normalizedTasks);
+    await this.validateAllTasks(renderTasks);
     
     // Register engine helpers with render context outputs
     const renderFileOutputs = [];
@@ -155,7 +154,7 @@ export class TemplateRenderer {
     const templateContext = this.buildContext(canonical, globalInstance, renderContext);
     
     // Separate tasks by type (for extends/yields support)
-    const { contentTasks, layoutTasks } = this.categorizeTasks(normalizedTasks);
+    const { contentTasks, layoutTasks } = this.categorizeTasks(renderTasks);
     
     // Phase 1: Render content templates (write to buffers)
     for (const task of contentTasks) {
@@ -200,22 +199,6 @@ export class TemplateRenderer {
       renderedCount: outputs.length,
       outputs
     };
-  }
-  
-  /**
-   * Normalize render tasks to standard format
-   * Only supports {template, output} format
-   */
-  normalizeTasks(tasks) {
-    return tasks.map(task => {
-      if (!task.template || !task.output) {
-        throw new Error(
-          'Render tasks must use format: {"template": "...", "output": "..."}\n' +
-          `Got: ${JSON.stringify(task)}`
-        );
-      }
-      return task;
-    });
   }
   
   /**
@@ -273,6 +256,28 @@ export class TemplateRenderer {
         this.log.log('');
       }
       throw new Error(`${issues.length} validation issue(s). Fix above errors and retry.`);
+    }
+  }
+
+  validateRenderTasks(renderTasks) {
+    for (let i = 0; i < renderTasks.length; i++) {
+      const task = renderTasks[i];
+      if (!task || typeof task !== 'object' || Array.isArray(task)) {
+        throw new Error(
+          'Render tasks must use format: {"template": "...", "output": "..."}'
+        );
+      }
+      if (!task.template || !task.output) {
+        throw new Error(
+          'Render tasks must use format: {"template": "...", "output": "..."}'
+        );
+      }
+      const extraKeys = Object.keys(task).filter(key => key !== 'template' && key !== 'output');
+      if (extraKeys.length > 0) {
+        throw new Error(
+          'Render tasks must use format: {"template": "...", "output": "..."}'
+        );
+      }
     }
   }
   
