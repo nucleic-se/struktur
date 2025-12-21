@@ -298,7 +298,7 @@ Universal includes a global instance with viewer.html template. Override it for 
 ## Step 9: Build Multi-Stack
 
 ```bash
-struktur build -c ../universal/classes classes/ -a ../universal/aspects aspects/ -i ../universal/instances instances/ -t ../universal/templates templates/ --exact
+struktur build -c ../universal/classes classes/ -a ../universal/aspects aspects/ -i ../universal/instances instances/ -t ../universal/templates templates/
 ```
 
 **Output:**
@@ -312,7 +312,7 @@ struktur build -c ../universal/classes classes/ -a ../universal/aspects aspects/
 🔍 Validating stack...
   ✓ All 5 class-bearing instances valid
 
-📁 Preparing build directory: ./build
+📁 Preparing build directory: ./build/build-<hash>/
 
 📝 Writing outputs...
   ✓ canonical.json (5 instances)
@@ -327,9 +327,9 @@ struktur build -c ../universal/classes classes/ -a ../universal/aspects aspects/
   📊 5 instances validated
   📦 4 class definitions
   🎨 2 templates rendered
-  📂 ./build/
+  📂 ./build/build-<hash>/
 
-✨ Open ./build/index.html to view your stack
+✨ Open ./build/build-<hash>/index.html to view your stack
 ```
 
 ---
@@ -337,7 +337,7 @@ struktur build -c ../universal/classes classes/ -a ../universal/aspects aspects/
 ## Step 10: View Results
 
 ```bash
-cat build/inventory.txt
+cat build/build-*/inventory.txt
 ```
 
 **Output:**
@@ -477,7 +477,7 @@ Universal includes an interactive hierarchical viewer:
 }
 ```
 
-Open \`build/index.html\` to see your domain hierarchy visualized.
+Open \`build/build-*/index.html\` to see your domain hierarchy visualized.
 
 ### Explore Examples
 

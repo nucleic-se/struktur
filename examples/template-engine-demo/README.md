@@ -38,7 +38,7 @@ This stack is **opinionated and minimal**:
 ### Build with Handlebars
 
 ```bash
-../../cli.js build --exact
+../../cli.js build
 ```
 
 Uses `struktur.build.json` config (Handlebars is default).
@@ -46,7 +46,7 @@ Uses `struktur.build.json` config (Handlebars is default).
 ### Build with Nunjucks
 
 ```bash
-../../cli.js build --config struktur.nunjucks.build.json --engine nunjucks --exact
+../../cli.js build --config struktur.nunjucks.build.json --engine nunjucks
 ```
 
 **Note**: Must include `--engine nunjucks` flag (config file setting not yet supported).
@@ -265,8 +265,8 @@ Generated documentation listing all services and deployment instructions.
 
 ```bash
 # Build both versions
-../../cli.js build --exact
-../../cli.js build --config struktur.nunjucks.build.json --engine nunjucks --exact
+../../cli.js build
+../../cli.js build --config struktur.nunjucks.build.json --engine nunjucks
 
 # Compare out/handlebars/ build/
 diff -r build-handlebars/ build-nunjucks/ --exclude="canonical.json" --exclude=".struktur-manifest.json"

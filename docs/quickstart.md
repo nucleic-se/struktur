@@ -97,7 +97,7 @@ Errors:   0
 ## Build
 
 ```bash
-struktur build . --exact
+struktur build .
 ```
 
 **Output:**
@@ -110,7 +110,7 @@ struktur build . --exact
 🔍 Validating stack...
   ✓ All 2 class-bearing instances valid
 
-📁 Preparing build directory: ./build
+📁 Preparing build directory: ./build/build-<hash>/
 
 📝 Writing outputs...
   ✓ canonical.json (2 instances)
@@ -125,24 +125,25 @@ struktur build . --exact
   📊 2 instances validated
   📦 4 class definitions
   🎨 1 templates rendered
-  📂 ./build/
+  📂 ./build/build-<hash>/
 
-✨ Open ./build/index.html to view your stack
+✨ Open ./build/build-<hash>/index.html to view your stack
 
 Build Output:
   build/
-  ├── .struktur-manifest.json
-  ├── canonical.json       # Validated data
-  ├── index.html           # Interactive tree view
-  └── meta/
-      ├── classes/         # Class definitions
-      └── validation.json
+  └── build-<hash>/
+      ├── .struktur-manifest.json
+      ├── canonical.json       # Validated data
+      ├── index.html           # Interactive tree view
+      └── meta/
+          ├── classes/         # Class definitions
+          └── validation.json
 ```
 
 ## View Result
 
 ```bash
-open build/index.html
+open build/build-*/index.html
 ```
 
 **You'll see:** Interactive hierarchical tree viewer with your domain instance.
@@ -164,7 +165,7 @@ cat > instances/web-team.json <<EOF
 }
 EOF
 
-struktur validate . && struktur build . --exact
+struktur validate . && struktur build .
 ```
 
 ### Explore Examples
@@ -279,8 +280,8 @@ EOF
 
 # Validate and build
 struktur validate .
-struktur build . --exact
-open build/posts.html
+struktur build .
+open build/build-*/posts.html
 ```
 
 **Success!** You've created a custom class, validated instances, and rendered templates.

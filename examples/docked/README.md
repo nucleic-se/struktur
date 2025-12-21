@@ -169,7 +169,7 @@ cd docked
 Docked includes a `struktur.build.json` config file that references Universal:
 
 ```bash
-struktur build --exact
+struktur build
 ```
 
 Or use explicit flags:
@@ -233,24 +233,24 @@ Or access via nginx reverse proxy:
 The build creates a complete application:
 
 **Frontend**:
-- `build/frontend/index.html` - Modern single-page app
+- `build/build-<hash>/frontend/index.html` - Modern single-page app
 
 **Backend**:
-- `build/api/server.js` - Node.js API (health, stats, track endpoints)
-- `build/api/package.json` - Dependencies (pg, redis)
+- `build/build-<hash>/api/server.js` - Node.js API (health, stats, track endpoints)
+- `build/build-<hash>/api/package.json` - Dependencies (pg, redis)
 
 **Infrastructure**:
-- `build/docker-compose.yml` - All services with health checks and dependencies
-- `build/nginx.conf` - Reverse proxy config (frontend + API routing)
+- `build/build-<hash>/docker-compose.yml` - All services with health checks and dependencies
+- `build/build-<hash>/nginx.conf` - Reverse proxy config (frontend + API routing)
 
 **Configuration**:
-- `build/.env.development` - Dev environment
-- `build/.env.staging` - Staging template
-- `build/.env.production` - Production with secrets placeholders
+- `build/build-<hash>/.env.development` - Dev environment
+- `build/build-<hash>/.env.staging` - Staging template
+- `build/build-<hash>/.env.production` - Production with secrets placeholders
 
 **Documentation**:
-- `build/index.html` - Visual stack viewer
-- `build/canonical.json` - Full data model
+- `build/build-<hash>/index.html` - Visual stack viewer
+- `build/build-<hash>/canonical.json` - Full data model
 
 ## Configuration
 
@@ -408,7 +408,7 @@ cd build && docker compose up -d myapp
 ```bash
 cp instances/containers/api.json instances/containers/myapp.json
 # Edit myapp.json, then:
-struktur build --exact
+struktur build
 cd build && docker compose up -d myapp
 ```
 

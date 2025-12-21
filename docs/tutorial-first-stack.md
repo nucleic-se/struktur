@@ -501,7 +501,7 @@ Update index template to generate individual pages using `render_file`.
 ## Step 14: Build!
 
 ```bash
-struktur build -c classes/ -i instances/ -t templates/ --exact
+struktur build -c classes/ -i instances/ -t templates/
 ```
 
 **Expected output:**
@@ -513,7 +513,7 @@ struktur build -c classes/ -i instances/ -t templates/ --exact
 🔍 Validating stack...
   ✓ All 4 class-bearing instances valid
 
-📁 Preparing build directory: ./build
+📁 Preparing build directory: ./build/build-<hash>/
 
 📝 Writing outputs...
   ✓ canonical.json (4 instances)
@@ -528,26 +528,27 @@ struktur build -c classes/ -i instances/ -t templates/ --exact
   📊 4 instances validated
   📦 4 class definitions
   🎨 4 templates rendered
-  📂 ./build/
+  📂 ./build/build-<hash>/
 
-✨ Open ./build/index.html to view your stack
+✨ Open ./build/build-<hash>/index.html to view your stack
 ```
 
 **Build output files:**
 ```
 build/
-├── .struktur-manifest.json
-├── canonical.json
-├── index.html
-├── about.html
-├── meta/
-│   ├── classes/
-│   │   ├── content.json
-│   │   ├── global.json
-│   │   ├── page.json
-│   │   └── post.json
-│   └── validation.json
-└── posts/
+└── build-<hash>/
+    ├── .struktur-manifest.json
+    ├── canonical.json
+    ├── index.html
+    ├── about.html
+    ├── meta/
+    │   ├── classes/
+    │   │   ├── content.json
+    │   │   ├── global.json
+    │   │   ├── page.json
+    │   │   └── post.json
+    │   └── validation.json
+    └── posts/
     ├── struktur-intro.html
     └── welcome.html
 ```
@@ -557,7 +558,7 @@ build/
 ## Step 15: View Your Blog
 
 ```bash
-open build/index.html
+open build/build-*/index.html
 ```
 
 **You should see:**

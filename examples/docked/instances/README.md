@@ -100,5 +100,5 @@ See existing files for examples of:
 
 1. Copy an existing container as template
 2. Modify `$id`, `image`, and other fields
-3. Run `struktur build --exact`
+3. Run `struktur build`
 4. Test with `cd build && docker compose up -d`

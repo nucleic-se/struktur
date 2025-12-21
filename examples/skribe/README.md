@@ -51,7 +51,7 @@ cd my-blog
 
 Build the site (uses `struktur.build.json` config):
 ```bash
-struktur build --exact
+struktur build
 ```
 
 The config includes RSS feed and dark theme by default.
@@ -63,7 +63,7 @@ struktur build -i instances -t templates
 
 CLI flags override the config file.
 
-Open `build/index.html` in your browser.
+Open `build/build-*/index.html` in your browser.
 
 ## Structure
 
@@ -586,11 +586,11 @@ aws s3 sync dist/ s3://my-bucket/ --delete
 
 **2. Rebuild**: `struktur build . --build-dir build`
 
-**3. Preview**: Open `build/index.html` (or use `python -m http.server` in build/)
+**3. Preview**: Open `build/build-*/index.html` (or use `python -m http.server` in `build/build-*/`)
 
-**4. Validate**: Check `build/meta/validation.json` for warnings
+**4. Validate**: Check `build/build-*/meta/validation.json` for warnings
 
-**5. Inspect**: Review `build/canonical.json` to see merged data
+**5. Inspect**: Review `build/build-*/canonical.json` to see merged data
 
 **6. Compare**: Diff builds to verify changes
 
@@ -598,7 +598,7 @@ aws s3 sync dist/ s3://my-bucket/ --delete
 
 ## Troubleshooting
 
-**Build fails with validation error**: Check `build/meta/validation.json` for details
+**Build fails with validation error**: Check `build/build-*/meta/validation.json` for details
 ```bash
 struktur build . --build-dir build  # Validation runs automatically
 ```
