@@ -15,7 +15,7 @@
       {{$aspects.aspect_blog_post.date}} • {{$aspects.aspect_blog_post.author}}
     </div>
     <div class="post-content">
-      <p>{{{replace (escape $aspects.blog_post.content) "\n\n" "</p><p>"}}}</p>
+      <p>{{{replace (escape $aspects.aspect_blog_post.content) "\n\n" "</p><p>"}}}</p>
     </div>
     {{#if $aspects.aspect_blog_post.tags}}
     {{> partials/tags.html tags=$aspects.aspect_blog_post.tags}}
