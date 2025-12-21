@@ -8,6 +8,7 @@ import path from 'path';
 import { resolveOutputPath } from './template_helpers/engine/index.js';
 import { RenderContext } from './render_context.js';
 import { registerBufferHelpers } from './template_helpers/buffers.js';
+import { OutputCollisionTracker } from './utils/output_collision_tracker.js';
 import {
   TemplateNotFoundError,
   TemplateError,
@@ -156,30 +157,29 @@ export class TemplateRenderer {
     // Separate tasks by type (for extends/yields support)
     const { contentTasks, layoutTasks } = this.categorizeTasks(renderTasks);
     
+    const collisionTracker = new OutputCollisionTracker();
+
     // Phase 1: Render content templates (write to buffers)
     for (const task of contentTasks) {
-      await this.renderContent(task, templateContext, buildDir, renderContext);
+      await this.renderContent(task, templateContext, buildDir, renderContext, collisionTracker);
     }
     
     // Phase 2: Render layout templates (consume buffers via yields)
     for (const task of layoutTasks) {
-      await this.renderLayout(task, templateContext, buildDir, renderContext);
+      await this.renderLayout(task, templateContext, buildDir, renderContext, collisionTracker);
     }
     
     // Phase 3: Write render_file outputs (additional files from helpers)
     for (const output of renderFileOutputs) {
-      try {
-        const relativePath = path.relative(buildDir, output.path);
-        const safeOutputPath = resolveOutputPath('render_file', relativePath, buildDir, console);
-        if (!safeOutputPath) {
-          this.log.log(`  ✗ Skipping render_file output: unsafe path ${relativePath}`);
-          continue;
-        }
-        await fs.mkdir(path.dirname(safeOutputPath), { recursive: true });
-        await fs.writeFile(safeOutputPath, output.content, 'utf-8');
-      } catch (error) {
-        this.log.log(`  ✗ Failed to write render_file output: ${error.message}`);
-      }
+      const relativePath = path.relative(buildDir, output.path);
+      const safeOutputPath = resolveOutputPath('render_file', relativePath, buildDir, console);
+      collisionTracker.register(safeOutputPath, {
+        template: output.template,
+        instance: output.instance,
+        source: 'render_file'
+      });
+      await fs.mkdir(path.dirname(safeOutputPath), { recursive: true });
+      await fs.writeFile(safeOutputPath, output.content, 'utf-8');
     }
     
     // Get all outputs (from files + buffers)
@@ -364,7 +364,7 @@ export class TemplateRenderer {
   /**
    * Render content template (writes to buffers for layout consumption)
    */
-  async renderContent(task, templateContext, buildDir, renderContext) {
+  async renderContent(task, templateContext, buildDir, renderContext, collisionTracker) {
     try {
       // Render template with canonical data + render context
       const output = await this.adapter.render(task.template, templateContext);
@@ -372,10 +372,10 @@ export class TemplateRenderer {
       // Write output to file
       if (task.output) {
         const resolvedPath = resolveOutputPath(task.template, task.output, buildDir, this.log);
-        if (!resolvedPath) {
-          this.log.log(`  ✗ Skipping ${task.template}: unsafe output path ${task.output}`);
-          return;
-        }
+        collisionTracker.register(resolvedPath, {
+          template: task.template,
+          source: 'render_task'
+        });
         await fs.mkdir(path.dirname(resolvedPath), { recursive: true });
         await fs.writeFile(resolvedPath, output, 'utf-8');
         renderContext.addOutput(task.output, output);
@@ -389,7 +389,7 @@ export class TemplateRenderer {
   /**
    * Render layout template (consumes buffers via yields)
    */
-  async renderLayout(task, templateContext, buildDir, renderContext) {
+  async renderLayout(task, templateContext, buildDir, renderContext, collisionTracker) {
     try {
       // Future: First render content template (creates buffers)
       // Future: Then render layout (consumes buffers via yields)
@@ -400,10 +400,10 @@ export class TemplateRenderer {
       // Write output
       if (task.output) {
         const resolvedPath = resolveOutputPath(task.template, task.output, buildDir, this.log);
-        if (!resolvedPath) {
-          this.log.log(`  ✗ Skipping ${task.template}: unsafe output path ${task.output}`);
-          return;
-        }
+        collisionTracker.register(resolvedPath, {
+          template: task.template,
+          source: 'render_task'
+        });
         await fs.mkdir(path.dirname(resolvedPath), { recursive: true });
         await fs.writeFile(resolvedPath, output, 'utf-8');
         renderContext.addOutput(task.output, output);

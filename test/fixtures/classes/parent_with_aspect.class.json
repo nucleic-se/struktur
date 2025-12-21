@@ -5,6 +5,9 @@
     "type": "object",
     "properties": {}
   },
+  "$uses_aspects": [
+    "aspect_network_interface"
+  ],
   "$aspects": {
     "aspect_network_interface": {
       "required": true

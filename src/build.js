@@ -13,6 +13,27 @@ import { mergeInstances, getMergeStats } from './instance_merger.js';
 import { loadInstancesFromDir } from './instance_loader.js';
 import { TemplateRenderer } from './template_renderer.js';
 
+function normalizeDirEntries(entries, defaultPath) {
+  if (entries === undefined) {
+    return defaultPath ? [{ path: defaultPath, explicit: false }] : [];
+  }
+
+  const list = Array.isArray(entries) ? entries : [entries];
+  return list.map(entry => {
+    if (entry && typeof entry === 'object' && entry.path) {
+      return {
+        path: entry.path,
+        explicit: entry.explicit === true
+      };
+    }
+    return { path: entry, explicit: true };
+  });
+}
+
+function extractDirPaths(entries) {
+  return (entries || []).map(entry => entry.path || entry);
+}
+
 function validateRenderTasks(renderTasks, sourceLabel) {
   if (renderTasks === undefined) {
     return;
@@ -61,9 +82,9 @@ function validateRenderTasks(renderTasks, sourceLabel) {
 export async function buildStack(options) {
   const {
     classDirs,
-    aspectDirs = [],
+    aspectDirs,
     instanceDirs,
-    templateDirs = [],
+    templateDirs,
     buildDir: requestedBuildDir = './build',
     engine = 'handlebars',
     quiet = false,
@@ -73,13 +94,18 @@ export async function buildStack(options) {
     renderTasks = []
   } = options;
 
-  // Validate required inputs
-  if (!classDirs || !Array.isArray(classDirs) || classDirs.length === 0) {
-    throw new Error('Either provide a stack directory or use -c/--classes flag');
+  if (!requestedBuildDir || typeof requestedBuildDir !== 'string') {
+    throw new Error('buildDir must be a non-empty string');
   }
 
   const log = logger || createLogger({ quiet });
   validateRenderTasks(renderTasks, 'Build config');
+
+  const normalizedClassDirs = normalizeDirEntries(classDirs, './classes');
+  const normalizedAspectDirs = normalizeDirEntries(aspectDirs, './aspects');
+  const normalizedInstanceDirs = normalizeDirEntries(instanceDirs, './instances');
+  const normalizedTemplateDirs = normalizeDirEntries(templateDirs, './templates');
+  const templatePaths = extractDirPaths(normalizedTemplateDirs);
   
   // Generate deterministic build dir by default (disable with deterministic=false)
   let buildDir = requestedBuildDir;
@@ -87,19 +113,19 @@ export async function buildStack(options) {
   
   if (useDeterministic) {
     buildDir = generateDeterministicBuildDir(requestedBuildDir, {
-      classDirs,
-      aspectDirs,
-      instanceDirs,
-      templateDirs
+      classDirs: normalizedClassDirs,
+      aspectDirs: normalizedAspectDirs,
+      instanceDirs: normalizedInstanceDirs,
+      templateDirs: normalizedTemplateDirs
     });
     log.log(`📍 Build directory: ${buildDir}`);
   } else {
     // Check for build collisions when using exact directory
     await checkCollision(buildDir, {
-      classDirs,
-      aspectDirs,
-      instanceDirs,
-      templateDirs
+      classDirs: normalizedClassDirs,
+      aspectDirs: normalizedAspectDirs,
+      instanceDirs: normalizedInstanceDirs,
+      templateDirs: normalizedTemplateDirs
     }, log);
   }
 
@@ -108,26 +134,26 @@ export async function buildStack(options) {
   const struktur = createStruktur();
 
   // Load classes from all directories
-  for (const dir of classDirs) {
+  for (const dir of normalizedClassDirs) {
     await struktur.classLoader.loadClassesFromDirectory(dir);
   }
   log.log(`  ✓ Loaded ${struktur.classLoader.classes.size} classes`);
 
   // Load aspects
-  for (const dir of aspectDirs) {
+  for (const dir of normalizedAspectDirs) {
     const aspects = await struktur.aspectLoader.loadAspectsFromDirectory(dir);
     for (const aspect of aspects) {
       struktur.validator.registerAspect(aspect);
     }
   }
-  if (aspectDirs.length > 0) {
+  if (normalizedAspectDirs.length > 0) {
     log.log(`  ✓ Loaded ${struktur.aspectLoader.aspects.size} aspects`);
   }
 
   // Load instances from all directories
   const allInstances = [];
   const allClasslessRejects = [];
-  for (const dir of instanceDirs || classDirs) {
+  for (const dir of normalizedInstanceDirs) {
     const result = await loadInstancesFromDir(dir, { logger: log });
     allInstances.push(...result.instances);
     allClasslessRejects.push(...result.classlessRejects);
@@ -237,12 +263,12 @@ export async function buildStack(options) {
 
   // Step 7: Render templates if provided (v1-compatible with global.build array)
   let renderedCount = 0;
-  if (templateDirs.length > 0) {
+  if (templatePaths.length > 0) {
     log.log('\n🎨 Rendering templates...');
     
     // Detect template collisions
     const { detectTemplateCollisions, formatCollisionReport } = await import('./utils/template_collision.js');
-    const collisionReport = await detectTemplateCollisions(templateDirs);
+    const collisionReport = await detectTemplateCollisions(templatePaths);
     
     if (collisionReport.collisionCount > 0) {
       const reportLines = formatCollisionReport(collisionReport, { verbose: false });
@@ -255,13 +281,13 @@ export async function buildStack(options) {
     
     const { createTemplateAdapter } = await import('./template_helpers.js');
     const adapter = createTemplateAdapter(engine);
-    adapter.setSearchPaths(templateDirs);
+    adapter.setSearchPaths(templatePaths);
 
     // Create renderer and register all helpers
     const renderer = new TemplateRenderer(adapter, { log, quiet });
-    renderer.setSearchPaths(templateDirs);  // For template resolution
+    renderer.setSearchPaths(templatePaths);  // For template resolution
     await renderer.registerHelpers(canonical);
-    await renderer.loadPartials(templateDirs);
+    await renderer.loadPartials(templatePaths);
 
     // Use merged render tasks
     if (allRenderTasks.length === 0) {
@@ -282,10 +308,10 @@ export async function buildStack(options) {
 
   // Write build manifest for collision detection
   await writeManifest(buildDir, {
-    classDirs,
-    aspectDirs,
-    instanceDirs,
-    templateDirs
+    classDirs: normalizedClassDirs,
+    aspectDirs: normalizedAspectDirs,
+    instanceDirs: normalizedInstanceDirs,
+    templateDirs: normalizedTemplateDirs
   });
 
   // Summary

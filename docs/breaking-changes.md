@@ -258,6 +258,49 @@ struktur build mystack --exact
 
 ---
 
+## v0.4.0-alpha (Planned - Reliability + Strictness)
+
+**Status**: Planned  
+**Scope**: Fail fast on security and integrity issues
+
+**Changes:**
+- Unsafe output paths now throw (path traversal is a hard error)
+- Unresolved classes now throw during canonical generation
+- Instance files without `$id` now throw (required field)
+- Invalid JSON in instance files now throws (no skip)
+- Explicitly configured directories must exist (missing dirs throw)
+- Template helpers now throw if `buildDir` is missing
+
+**Migration:**
+- Fix invalid JSON and add `$id` to all instances
+- Correct class names referenced by instances
+- Ensure CLI/config directories exist if explicitly set
+- Remove any template outputs that escape the build directory
+
+**Rationale**: These conditions indicate bugs or security issues. Failing fast prevents corrupt output and makes debugging obvious.
+
+---
+
+## v0.5.0-alpha (Planned - Default Strict Mode)
+
+**Status**: Planned  
+**Scope**: Enable strict checks by default (no opt-in flags)
+
+**Changes:**
+- Output-file collisions now throw (two outputs to same file)
+- Instances may only use aspects declared in `$uses_aspects`
+- Legacy `$aspects` array format removed (object format only)
+- AJV strict mode enabled (`strictRequired`, `strictTypes`)
+
+**Migration:**
+- Ensure all aspect usage is declared in class `$uses_aspects`
+- Convert `$aspects` arrays to object format
+- Update schemas to satisfy AJV strict rules
+
+**Rationale**: Strict defaults catch real issues early and keep the data model consistent.
+
+---
+
 ## v0.2.12-alpha (December 2025)
 
 **Tag**: v0.2.12-alpha  

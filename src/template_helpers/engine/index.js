@@ -24,10 +24,18 @@ import path from 'path';
  * @param {string} outputPath - Requested output path
  * @param {string} buildDir - Build directory root
  * @param {Object} [log] - Logger
- * @returns {string|null} - Resolved absolute path, or null if invalid
+ * @returns {string} - Resolved absolute path
  */
 export function resolveOutputPath(templateKey, outputPath, buildDir, log) {
-  if (!outputPath || !buildDir) return null;
+  if (!outputPath || !buildDir) {
+    throw new Error(
+      `Invalid output path resolution request\n` +
+      `  Template: ${templateKey}\n` +
+      `  Requested path: ${outputPath || '(missing)'}\n` +
+      `  Build directory: ${buildDir || '(missing)'}\n` +
+      `  Reason: outputPath and buildDir are required`
+    );
+  }
   
   const requested = path.join(buildDir, outputPath);
   const resolved = path.resolve(requested);
@@ -35,10 +43,15 @@ export function resolveOutputPath(templateKey, outputPath, buildDir, log) {
   // Security check: ensure resolved path is within build directory
   const buildRoot = path.resolve(buildDir);
   if (!resolved.startsWith(buildRoot)) {
-    if (log?.warn) {
-      log.warn(`Security: Output path '${outputPath}' in template '${templateKey}' tries to escape build directory`);
-    }
-    return null;
+    throw new Error(
+      `Security: Unsafe output path detected\n` +
+      `  Template: ${templateKey}\n` +
+      `  Requested path: ${outputPath}\n` +
+      `  Resolved to: ${resolved}\n` +
+      `  Build directory: ${buildRoot}\n` +
+      `  Reason: Path escapes build directory (possible path traversal)\n` +
+      `  Hint: Use relative paths within build directory only`
+    );
   }
   
   return resolved;

@@ -13,7 +13,7 @@
  * - Both single-object and array JSON formats supported
  * - Alphabetical loading order for determinism
  * - Classless instance rejection (requires '$class' field)
- * - Invalid JSON logged as warnings (helps users debug)
+ * - Invalid JSON throws (fail fast)
  * - Adds `$source_file` metadata to each instance
  * 
  * ## Comparison with Other Loaders
@@ -55,6 +55,19 @@
 
 import fs from 'fs/promises';
 import path from 'path';
+
+function normalizeDirEntry(dirEntry) {
+  if (dirEntry && typeof dirEntry === 'object' && dirEntry.path) {
+    return {
+      path: dirEntry.path,
+      explicit: dirEntry.explicit === true
+    };
+  }
+  return {
+    path: dirEntry,
+    explicit: true
+  };
+}
 
 function validateRenderFormat(renderValue, instanceId, filePath) {
   if (!Array.isArray(renderValue)) {
@@ -140,13 +153,13 @@ function validateRenderFormat(renderValue, instanceId, filePath) {
  * - `$class` field (references a class definition)
  * 
  * Instances missing either field are rejected:
- * - No `$id`: Silently skipped (not a valid instance)
+ * - No `$id`: Throws error (required field)
  * - No `$class`: Added to `classlessRejects` array for error reporting
  * 
  * ## Error Handling
  * 
- * - **Invalid JSON**: Logged as warning (if logger provided), file skipped
- * - **Missing directory**: Silently handled (returns empty arrays)
+ * - **Invalid JSON**: Throws error with file context
+ * - **Missing directory**: Throws if explicitly configured, otherwise skipped
  * - **Unreadable files**: Silently skipped
  * 
  * ## Loading Order
@@ -184,6 +197,7 @@ export async function loadInstancesFromDir(dirPath, options = {}) {
   const { logger } = options;
   const instances = [];
   const classlessRejects = [];
+  const dir = normalizeDirEntry(dirPath);
 
   async function loadFromDir(dir) {
     try {
@@ -204,7 +218,17 @@ export async function loadInstancesFromDir(dirPath, options = {}) {
         } else if (entry.name.endsWith('.json') && !entry.name.includes('.schema.') && !entry.name.includes('.class.')) {
           try {
             const content = await fs.readFile(fullPath, 'utf-8');
-            const data = JSON.parse(content);
+            let data;
+            try {
+              data = JSON.parse(content);
+            } catch (error) {
+              throw new Error(
+                `Failed to parse instance file\n` +
+                `  File: ${fullPath}\n` +
+                `  Error: ${error.message}\n` +
+                `  Hint: Check for syntax errors (trailing commas, missing quotes, etc.)`
+              );
+            }
 
             if (Array.isArray(data)) {
               // Reject array instance files
@@ -229,6 +253,14 @@ export async function loadInstancesFromDir(dirPath, options = {}) {
                 );
               }
 
+              if (!data.$id || typeof data.$id !== 'string' || data.$id.trim() === '') {
+                throw new Error(
+                  `Instance missing required $id field\n` +
+                  `  File: ${fullPath}\n` +
+                  `  Hint: Every instance must have a non-empty "$id" string`
+                );
+              }
+
               if (data.$id) {
                 // Single object with $id
                 if (!data.$class) {
@@ -243,26 +275,26 @@ export async function loadInstancesFromDir(dirPath, options = {}) {
               }
             }
           } catch (error) {
-            if (error instanceof SyntaxError) {
-              // Log warning for invalid JSON (helps users debug typos)
-              if (logger?.warn) {
-                logger.warn(`Skipping ${fullPath}: Invalid JSON - ${error.message}`);
-              }
-            } else {
-              throw error;
-            }
+            throw error;
           }
         }
       }
     } catch (error) {
       // Directory doesn't exist or not readable - silently skip
       if (error?.code === 'ENOENT' || error?.code === 'ENOTDIR') {
+        if (dir.explicit) {
+          throw new Error(
+            `Instance directory not found: ${dir.path}\n` +
+            `  This directory was explicitly configured via CLI or config file\n` +
+            `  Hint: Check path spelling or create the directory`
+          );
+        }
         return;
       }
       throw error;
     }
   }
 
-  await loadFromDir(dirPath);
+  await loadFromDir(dir.path);
   return { instances, classlessRejects };
 }

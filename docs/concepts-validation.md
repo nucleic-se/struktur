@@ -261,6 +261,39 @@ Error (instance: web-01)
 - Schema warnings → errors (`--warnings-as-errors=true`)
 - Extra fields → warnings (`--warn-extra-fields=true`)
 - Constraint conflicts → always errors (no opt-out)
+- **AJV strict mode enabled** (v0.5.0+): `strictRequired` and `strictTypes`
+
+**AJV Strict Mode (v0.5.0+):**
+
+Struktur enables AJV's strict validation flags to catch schema errors early:
+
+- **`strictRequired: true`** - Schemas with `required` array must define those properties
+  ```json
+  // Invalid (strictRequired catches this)
+  {
+    "type": "object",
+    "required": ["port"],
+    "properties": {}  // port not defined!
+  }
+  
+  // Valid
+  {
+    "type": "object",
+    "required": ["port"],
+    "properties": {
+      "port": { "type": "number" }
+    }
+  }
+  ```
+
+- **`strictTypes: true`** - No lenient type coercion or loose type rules
+  - Enforces proper type definitions in schemas
+  - Catches ambiguous or incorrect type specifications
+
+**Why strict mode?**
+- Catches schema authoring errors before they cause runtime issues
+- Ensures schemas are well-formed and maintainable
+- Prevents silent validation failures
 
 **Warnings vs Errors:**
 - Schema validation warnings → promoted to errors

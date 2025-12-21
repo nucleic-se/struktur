@@ -14,23 +14,35 @@
             "type": "object",
             "properties": {
               "environment": {
-                "type": [
-                  "string",
-                  "null"
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
                 ],
                 "description": "Environment where the infrastructure component is deployed (lab, home, production, remote)"
               },
               "location": {
-                "type": [
-                  "string",
-                  "null"
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
                 ],
                 "description": "Physical location of the infrastructure component"
               },
               "notes": {
-                "type": [
-                  "string",
-                  "null"
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
                 ],
                 "description": "Additional notes or documentation about this component"
               }

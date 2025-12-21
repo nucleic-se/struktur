@@ -26,10 +26,6 @@
   "template_engine": "handlebars",
   "render": [
     {
-      "template": "viewer.html",
-      "output": "/viewer.html"
-    },
-    {
       "template": "terraform/main.tf.j2",
       "output": "/terraform/main.tf"
     },

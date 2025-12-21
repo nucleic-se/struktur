@@ -153,12 +153,13 @@ export class ClassResolver {
       const classDef = this.classLoader.getClass(className);
       if (classDef.$aspects) {
         if (Array.isArray(classDef.$aspects)) {
-          // Handle array format: ["aspect1", "aspect2"] - assume optional
-          classDef.$aspects.forEach(aspect => {
-            if (!aspectMap[aspect]) {
-              aspectMap[aspect] = { required: false };
-            }
-          });
+          throw new Error(
+            `Class uses legacy $aspects array format (removed in v0.5.0)\n` +
+            `  Class: ${className}\n` +
+            `  Legacy format: "$aspects": ["aspect_network", "aspect_docker"]\n` +
+            `  Correct format: "$aspects": {"aspect_network": {"required": false}}\n` +
+            `  Hint: Convert $aspects to an object format`
+          );
         } else {
           // Handle object format: { aspect1: {required: true}, aspect2: {required: false} }
           for (const [aspectName, aspectConfig] of Object.entries(classDef.$aspects)) {

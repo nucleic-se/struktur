@@ -1,6 +1,9 @@
 {
   "$class": "docked_volume",
   "$parent": "entity_base",
+  "$uses_aspects": [
+    "aspect_docker_volume"
+  ],
   "$schema": {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",

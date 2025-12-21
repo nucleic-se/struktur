@@ -9,6 +9,8 @@ import { generateCanonical, generateCanonicalWithValidation } from '../src/canon
 import { ClassLoader } from '../src/class_loader.js';
 import { ClassResolver } from '../src/class_resolver.js';
 import { createStruktur } from '../src/index.js';
+import fs from 'node:fs/promises';
+import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -140,8 +142,21 @@ describe('Canonical Output', () => {
   });
 
   it('should handle instances with aspects', async () => {
+    const tempDir = await fs.mkdtemp(join(os.tmpdir(), 'struktur-canonical-aspects-'));
+    const classesDir = join(tempDir, 'classes');
+    await fs.mkdir(classesDir, { recursive: true });
+
+    await fs.writeFile(
+      join(classesDir, 'entity_base.class.json'),
+      JSON.stringify({
+        $class: 'entity_base',
+        $uses_aspects: ['aspect_test_aspect'],
+        $schema: { type: 'object', properties: { $id: { type: 'string' } } }
+      })
+    );
+
     const loader = new ClassLoader();
-    await loader.loadClassesFromDirectory(join(FIXTURES_DIR, 'universal', 'classes'));
+    await loader.loadClassesFromDirectory(classesDir);
     const resolver = new ClassResolver(loader);
 
     const instances = [
@@ -160,6 +175,8 @@ describe('Canonical Output', () => {
 
     assert.ok(canonical.$instances[0].$aspects, 'Should preserve aspects');
     assert.equal(canonical.$instances[0].$aspects.aspect_test_aspect.value, 'test', 'Should preserve aspect data');
+
+    await fs.rm(tempDir, { recursive: true, force: true });
   });
 
   it('should handle unknown classes gracefully', async () => {
@@ -171,11 +188,10 @@ describe('Canonical Output', () => {
       { $id: 'test1', $class: 'unknown_class', title: 'Test' }
     ];
 
-    const canonical = generateCanonical(instances, resolver);
-
-    assert.ok(canonical.$instances, 'Should still generate output');
-    assert.equal(canonical.$instances.length, 1, 'Should include instance');
-    assert.equal(canonical.$instances[0].$id, 'test1', 'Should preserve instance');
+    assert.throws(
+      () => generateCanonical(instances, resolver),
+      /unresolved class|Class not found/i
+    );
   });
 
   it('should generate canonical with validation metadata', async () => {

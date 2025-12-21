@@ -10,19 +10,5 @@
   "stylesheets": [
     "css/style.css",
     "css/custom.css"
-  ],
-  "$render": [
-    {
-      "template": "index.html",
-      "output": "/index.html"
-    },
-    {
-      "template": "css/style.css",
-      "output": "/css/style.css"
-    },
-    {
-      "template": "css/custom.css",
-      "output": "/css/custom.css"
-    }
   ]
 }

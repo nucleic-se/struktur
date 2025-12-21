@@ -9,7 +9,12 @@
       }
     }
   },
-  "$aspects": [
+  "$uses_aspects": [
     "aspect_network_interface"
-  ]
+  ],
+  "$aspects": {
+    "aspect_network_interface": {
+      "required": false
+    }
+  }
 }

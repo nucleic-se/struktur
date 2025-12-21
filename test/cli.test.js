@@ -103,7 +103,7 @@ describe('CLI: validate command', () => {
     const result = await runCLI([
       'validate',
       '-c', join(FIXTURES_DIR, 'universal', 'classes'),
-      '-a', join(FIXTURES_DIR, 'universal', 'aspects'),
+      '-a', join(FIXTURES_DIR, 'aspects'),
       '-i', join(FIXTURES_DIR, 'universal')
     ]);
 
@@ -198,7 +198,7 @@ describe('CLI: validate command', () => {
     const result = await runCLI([
       'validate',
       '-c', join(FIXTURES_DIR, 'universal', 'classes'),
-      '-a', join(FIXTURES_DIR, 'universal', 'aspects'), join(FIXTURES_DIR, 'docked', 'aspects'),
+      '-a', join(FIXTURES_DIR, 'aspects'), join(FIXTURES_DIR, 'aspect_recursive'),
       '-i', join(FIXTURES_DIR, 'universal')
     ]);
 
@@ -238,7 +238,7 @@ describe('CLI: info command', () => {
     const result = await runCLI([
       'info',
       '-c', join(FIXTURES_DIR, 'universal', 'classes'),
-      '-a', join(FIXTURES_DIR, 'universal', 'aspects')
+      '-a', join(FIXTURES_DIR, 'aspects')
     ]);
 
     assert.equal(result.exitCode, 0, 'Should exit with code 0');
@@ -282,9 +282,8 @@ describe('CLI: info command', () => {
       '-c', '/nonexistent/path'
     ]);
 
-    // Info command treats non-existent dir as empty (no error)
-    assert.equal(result.exitCode, 0, 'Should exit with code 0');
-    assert.match(result.stdout, /Total: 0 classes/, 'Should show 0 classes');
+    assert.equal(result.exitCode, 1, 'Should exit with code 1');
+    assert.match(result.stderr, /Class directory not found/i, 'Should report missing directory');
   });
 
   it('should support multiple classes directories', async () => {
@@ -304,7 +303,7 @@ describe('CLI: info command', () => {
     const result = await runCLI([
       'info',
       '-c', join(FIXTURES_DIR, 'universal', 'classes'),
-      '-a', join(FIXTURES_DIR, 'universal', 'aspects'), join(FIXTURES_DIR, 'docked', 'aspects')
+      '-a', join(FIXTURES_DIR, 'aspects'), join(FIXTURES_DIR, 'aspect_recursive')
     ]);
 
     assert.equal(result.exitCode, 0, 'Should exit with code 0');

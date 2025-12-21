@@ -1,11 +1,5 @@
 {
   "$id": "global",
   "$class": "global",
-  "description": "Universal stack base configuration",
-  "$render": [
-    {
-      "template": "viewer.html",
-      "output": "/index.html"
-    }
-  ]
+  "description": "Universal stack base configuration"
 }

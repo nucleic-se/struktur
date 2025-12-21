@@ -269,15 +269,16 @@ export default class NunjucksAdapter extends TemplateAdapter {
       const { buildDir, outputs, log, templateKey } = buildContext;
       
       if (!outputs || !buildDir) {
-        log?.warn?.('render_file helper called without buildDir/outputs');
-        return '';
+        throw new Error(
+          `Template helper 'render_file' requires buildDir and outputs to be configured\n` +
+          `  Template: ${templateKey || 'unknown'}\n` +
+          `  Reason: Cannot resolve file paths without build directory\n` +
+          `  Hint: This indicates a Struktur rendering bug`
+        );
       }
       
       // Resolve output path with security checks
       const resolved = resolveOutputPath(templateKey || 'unknown', outputPath, buildDir, log);
-      if (!resolved) {
-        return '';
-      }
       
       // Calculate relative path prefix based on output depth
       // E.g., 'posts/article.html' → '../', 'tags/tutorial.html' → '../'
@@ -316,14 +317,15 @@ export default class NunjucksAdapter extends TemplateAdapter {
       const { buildDir, outputs, log, templateKey } = buildContext;
       
       if (!outputs || !buildDir) {
-        log?.warn?.('file helper called without buildDir/outputs');
-        return '';
+        throw new Error(
+          `Template helper 'file' requires buildDir and outputs to be configured\n` +
+          `  Template: ${templateKey || 'unknown'}\n` +
+          `  Reason: Cannot resolve file paths without build directory\n` +
+          `  Hint: This indicates a Struktur rendering bug`
+        );
       }
       
       const resolved = resolveOutputPath(templateKey || 'unknown', filename, buildDir, log);
-      if (!resolved) {
-        return '';
-      }
       
       outputs.push({ path: resolved, content: String(content) });
       

@@ -2,43 +2,5 @@
   "$id": "global",
   "$class": "docked_stack",
   "stack_name": "Docked Full-Stack Application",
-  "description": "Complete full-stack web application with PostgreSQL database, Redis cache, Node.js backend API, and Nginx serving frontend and reverse proxy. Multi-environment support (dev/staging/prod) with health checks, resource limits, and proper dependency management.",
-  "$render": [
-    {
-      "template": "viewer.html",
-      "output": "/index.html"
-    },
-    {
-      "template": "frontend.html",
-      "output": "/frontend/index.html"
-    },
-    {
-      "template": "docker-compose.yml",
-      "output": "/docker-compose.yml"
-    },
-    {
-      "template": ".env.development",
-      "output": "/.env.development"
-    },
-    {
-      "template": ".env.staging",
-      "output": "/.env.staging"
-    },
-    {
-      "template": ".env.production",
-      "output": "/.env.production"
-    },
-    {
-      "template": "nginx.conf",
-      "output": "/nginx.conf"
-    },
-    {
-      "template": "api/server.js",
-      "output": "/api/server.js"
-    },
-    {
-      "template": "api/package.json",
-      "output": "/api/package.json"
-    }
-  ]
+  "description": "Complete full-stack web application with PostgreSQL database, Redis cache, Node.js backend API, and Nginx serving frontend and reverse proxy. Multi-environment support (dev/staging/prod) with health checks, resource limits, and proper dependency management."
 }

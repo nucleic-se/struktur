@@ -9,6 +9,7 @@
     "physical"
   ],
   "$uses_aspects": [
+    "aspect_terraform",
     "aspect_network_interface"
   ],
   "$schema": {

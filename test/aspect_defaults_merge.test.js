@@ -506,6 +506,7 @@ describe('Aspect Defaults Three-Layer Merge', () => {
         'classes/simple.class.json': {
           $class: 'simple',
           $parent: 'entity_base',
+          $uses_aspects: ['aspect_custom'],
           $schema: { type: 'object' }
         },
         'instances/test.json': {

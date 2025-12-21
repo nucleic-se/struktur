@@ -5,9 +5,13 @@
     "type": "object",
     "properties": {
       "vmid": {
-        "type": [
-          "integer",
-          "number"
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "number"
+          }
         ],
         "description": "Proxmox VMID"
       },

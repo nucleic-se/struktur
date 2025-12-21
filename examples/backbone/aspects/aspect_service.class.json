@@ -9,9 +9,13 @@
         "description": "Service type (dns, proxy, database, photo_management, etc.)"
       },
       "port": {
-        "type": [
-          "integer",
-          "number"
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "number"
+          }
         ],
         "description": "Primary service port"
       },

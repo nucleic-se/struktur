@@ -8,7 +8,9 @@
   "$domains": [
     "virtual"
   ],
-  "$uses_aspects": [],
+  "$uses_aspects": [
+    "aspect_terraform"
+  ],
   "$schema": {
     "type": "object",
     "description": "Proxmox KVM virtual machine",

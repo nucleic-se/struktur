@@ -75,8 +75,10 @@ describe('ClassLoader', () => {
     });
 
     it('should handle non-existent directory', async () => {
-      const classes = await loader.loadClassesFromDirectory('/nonexistent');
-      assert.strictEqual(classes.length, 0);
+      await assert.rejects(
+        async () => loader.loadClassesFromDirectory('/nonexistent'),
+        /Class directory not found/i
+      );
     });
 
     it('should load recursively by default', async () => {

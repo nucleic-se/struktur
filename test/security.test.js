@@ -18,6 +18,14 @@ const __dirname = path.dirname(__filename);
 describe('Security Tests', () => {
   const testDir = path.join(__dirname, 'fixtures', 'security');
   const buildDir = path.join(testDir, 'build');
+  const resetDirs = async () => {
+    await fs.rm(path.join(testDir, 'classes'), { recursive: true, force: true });
+    await fs.rm(path.join(testDir, 'instances'), { recursive: true, force: true });
+    await fs.rm(path.join(testDir, 'templates'), { recursive: true, force: true });
+    await fs.mkdir(path.join(testDir, 'classes'), { recursive: true });
+    await fs.mkdir(path.join(testDir, 'instances'), { recursive: true });
+    await fs.mkdir(path.join(testDir, 'templates'), { recursive: true });
+  };
 
   before(async () => {
     // Create test directories
@@ -34,7 +42,8 @@ describe('Security Tests', () => {
   });
 
   describe('Path Traversal Prevention', () => {
-    it('should reject path traversal in build array output paths', async () => {
+    it('should reject path traversal in render output paths', async () => {
+      await resetDirs();
       // Create test files
       await fs.writeFile(
         path.join(testDir, 'classes', 'test.class.json'),
@@ -47,14 +56,14 @@ describe('Security Tests', () => {
         })
       );
 
-      // Create malicious instance with path traversal in build array
+      // Create malicious instance with path traversal in $render output
       await fs.writeFile(
         path.join(testDir, 'instances', 'global.json'),
         JSON.stringify({
           $id: 'global',
           $class: 'test',
-          build: [
-            { 'test.html': '../../../etc/passwd' }
+          $render: [
+            { template: 'test.html', output: '../../../etc/passwd' }
           ]
         })
       );
@@ -64,38 +73,25 @@ describe('Security Tests', () => {
         'malicious content'
       );
 
-      // Attempt build - should prevent path traversal
-      const result = await buildStack({
-        classDirs: [path.join(testDir, 'classes')],
-        instanceDirs: [path.join(testDir, 'instances')],
-        templateDirs: [path.join(testDir, 'templates')],
-        buildDir,
-        quiet: true
-      });
+      // Attempt build - should reject path traversal
+      await assert.rejects(
+        async () => {
+          await buildStack({
+            classDirs: [path.join(testDir, 'classes')],
+            instanceDirs: [path.join(testDir, 'instances')],
+            templateDirs: [path.join(testDir, 'templates')],
+            buildDir,
+            quiet: true
+          });
+        },
+        /Unsafe output path|path traversal/i,
+        'Should reject unsafe output path'
+      );
 
-      // Verify malicious file was NOT written outside build dir
-      const etcPasswd = '/etc/passwd';
-      const etcExists = await fs.access(etcPasswd).then(() => true).catch(() => false);
-      
-      // If /etc/passwd exists, verify it wasn't modified
-      if (etcExists) {
-        const stat = await fs.stat(etcPasswd);
-        const now = Date.now();
-        const mtime = stat.mtimeMs;
-        const age = now - mtime;
-        
-        // File should be older than 1 second (not just written)
-        assert.ok(age > 1000, '/etc/passwd was recently modified - possible security breach');
-      }
-
-      // Verify file was either not written or written inside build dir
-      const buildFiles = await fs.readdir(result.buildDir, { recursive: true });
-      const hasPasswd = buildFiles.some(f => f.includes('passwd'));
-      assert.ok(!hasPasswd || buildFiles.some(f => f === 'passwd'), 
-        'passwd file should not exist outside build directory');
     });
 
     it('should reject path traversal in canonical.json path', async () => {
+      await resetDirs();
       // Create test files
       await fs.writeFile(
         path.join(testDir, 'classes', 'test.class.json'),
@@ -131,6 +127,7 @@ describe('Security Tests', () => {
     });
 
     it('should reject path traversal in meta/ directory writes', async () => {
+      await resetDirs();
       // Create test class with path traversal in class name (stored safely but name is malicious)
       await fs.writeFile(
         path.join(testDir, 'classes', 'malicious.class.json'),
@@ -145,13 +142,19 @@ describe('Security Tests', () => {
         JSON.stringify({ $id: 'test1', $class: '../../../tmp/malicious' })
       );
 
-      // Build should sanitize the path or skip it
-      await buildStack({
-        classDirs: [path.join(testDir, 'classes')],
-        instanceDirs: [path.join(testDir, 'instances')],
-        buildDir,
-        quiet: true
-      });
+      // Build should reject unsafe meta path
+      await assert.rejects(
+        async () => {
+          await buildStack({
+            classDirs: [path.join(testDir, 'classes')],
+            instanceDirs: [path.join(testDir, 'instances')],
+            buildDir,
+            quiet: true
+          });
+        },
+        /Unsafe output path|path traversal/i,
+        'Should reject unsafe class output path'
+      );
 
       // Verify nothing was written to /tmp
       const tmpMalicious = '/tmp/malicious.json';
@@ -315,7 +318,7 @@ describe('Security Tests', () => {
       );
     });
 
-    it('should skip instances without id field', async () => {
+    it('should reject instances without id field', async () => {
       // Clean directories first
       await fs.rm(path.join(testDir, 'classes'), { recursive: true, force: true });
       await fs.rm(path.join(testDir, 'instances'), { recursive: true, force: true });
@@ -343,21 +346,19 @@ describe('Security Tests', () => {
         JSON.stringify({ $id: 'valid1', $class: 'test' })
       );
 
-      // Build should succeed and skip instance without id
-      const result = await buildStack({
-        classDirs: [path.join(testDir, 'classes')],
-        instanceDirs: [path.join(testDir, 'instances')],
-        buildDir,
-        quiet: true
-      });
-
-      // Verify instance without id was not included
-      const noIdInstance = result.canonical.$instances.find(obj => obj.some_field === 'value');
-      assert.ok(!noIdInstance, 'Instance without id should not be loaded');
-      
-      // Verify valid instance was included
-      const validInstance = result.canonical.$instances.find(obj => obj.$id === 'valid1');
-      assert.ok(validInstance, 'Instance with id should be loaded');
+      // Build should fail on instance without $id
+      await assert.rejects(
+        async () => {
+          await buildStack({
+            classDirs: [path.join(testDir, 'classes')],
+            instanceDirs: [path.join(testDir, 'instances')],
+            buildDir,
+            quiet: true
+          });
+        },
+        /missing required \$id/i,
+        'Instance without $id should fail the build'
+      );
     });
   });
 });

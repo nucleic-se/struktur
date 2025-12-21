@@ -18,10 +18,10 @@ export function generateBuildHash(config) {
   
   // Create sorted, normalized config for consistent hashing
   const normalized = {
-    classDirs: (classDirs || []).map(d => path.resolve(d)).sort(),
-    aspectDirs: (aspectDirs || []).map(d => path.resolve(d)).sort(),
-    instanceDirs: (instanceDirs || []).map(d => path.resolve(d)).sort(),
-    templateDirs: (templateDirs || []).map(d => path.resolve(d)).sort()
+    classDirs: (classDirs || []).map(d => path.resolve(d.path || d)).sort(),
+    aspectDirs: (aspectDirs || []).map(d => path.resolve(d.path || d)).sort(),
+    instanceDirs: (instanceDirs || []).map(d => path.resolve(d.path || d)).sort(),
+    templateDirs: (templateDirs || []).map(d => path.resolve(d.path || d)).sort()
   };
   
   const configString = JSON.stringify(normalized);
@@ -50,10 +50,10 @@ export async function writeManifest(buildDir, config) {
     timestamp: new Date().toISOString(),
     hash: generateBuildHash(config),
     sources: {
-      classDirs: (config.classDirs || []).map(d => path.resolve(d)),
-      aspectDirs: (config.aspectDirs || []).map(d => path.resolve(d)),
-      instanceDirs: (config.instanceDirs || []).map(d => path.resolve(d)),
-      templateDirs: (config.templateDirs || []).map(d => path.resolve(d))
+      classDirs: (config.classDirs || []).map(d => path.resolve(d.path || d)),
+      aspectDirs: (config.aspectDirs || []).map(d => path.resolve(d.path || d)),
+      instanceDirs: (config.instanceDirs || []).map(d => path.resolve(d.path || d)),
+      templateDirs: (config.templateDirs || []).map(d => path.resolve(d.path || d))
     }
   };
   

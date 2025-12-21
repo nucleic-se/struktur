@@ -37,8 +37,8 @@ describe('Aspect DRY (Define Once, Use Many)', () => {
     const classB = classLoader.getClass('class_b');
 
     // Both classes reference the same aspect
-    assert.ok(classA.$aspects.includes('aspect_shared_aspect'));
-    assert.ok(classB.$aspects.includes('aspect_shared_aspect'));
+    assert.ok(classA.$aspects.aspect_shared_aspect);
+    assert.ok(classB.$aspects.aspect_shared_aspect);
 
     // Aspect is defined only once in aspect registry
     const sharedAspect = aspectLoader.getAspect('aspect_shared_aspect');
@@ -54,7 +54,7 @@ describe('Aspect DRY (Define Once, Use Many)', () => {
     const classC = classLoader.getClass('class_c');
 
     // class_c doesn't directly declare shared_aspect
-    const hasAspect = classC.$aspects?.includes('aspect_shared_aspect');
+    const hasAspect = classC.$aspects?.aspect_shared_aspect;
     assert.strictEqual(hasAspect, undefined, 'class_c should not directly declare aspect');
 
     // But it inherits from class_a which has shared_aspect

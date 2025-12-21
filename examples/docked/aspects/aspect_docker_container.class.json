@@ -299,11 +299,17 @@
     },
     "oneOf": [
       {
+        "properties": {
+          "image": {}
+        },
         "required": [
           "image"
         ]
       },
       {
+        "properties": {
+          "build": {}
+        },
         "required": [
           "build"
         ]

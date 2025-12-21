@@ -21,6 +21,9 @@
   "$fields": {
     "replicas": 1
   },
+  "$uses_aspects": [
+    "aspect_network_interface"
+  ],
   "$aspects": {
     "aspect_network_interface": {
       "required": true

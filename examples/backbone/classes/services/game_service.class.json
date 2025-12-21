@@ -2,7 +2,9 @@
   "$class": "game_service",
   "$parent": "service_entity",
   "$pretty_name": "Game Service",
-  "$uses_aspects": [],
+  "$uses_aspects": [
+    "aspect_service"
+  ],
   "$kinds": [
     "service"
   ],

@@ -51,8 +51,8 @@ describe('Required Aspect Enforcement', () => {
       assert.strictEqual(resolved.$aspects.aspect_network_interface.required, true);
     });
 
-    it('should treat array format as optional', () => {
-      // test_array_$aspects.aspect_class.json has array format: ["network_interface"]
+    it('should preserve required=false from object format', () => {
+      // test_array_aspects.class.json has object format with required=false
       const resolved = resolver.resolve('test_array_aspects');
       
       assert.strictEqual(typeof resolved.$aspects, 'object');

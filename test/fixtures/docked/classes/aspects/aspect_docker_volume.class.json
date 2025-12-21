@@ -99,10 +99,19 @@
               "type": "string"
             },
             "$parent": {
-              "type": [
-                "string",
-                "array",
-                "null"
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
               ]
             },
             "properties": {

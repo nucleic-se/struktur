@@ -8,6 +8,19 @@ import fs from 'fs/promises';
 import path from 'path';
 import Ajv from 'ajv';
 
+function normalizeDirEntry(dirEntry) {
+  if (dirEntry && typeof dirEntry === 'object' && dirEntry.path) {
+    return {
+      path: dirEntry.path,
+      explicit: dirEntry.explicit === true
+    };
+  }
+  return {
+    path: dirEntry,
+    explicit: true
+  };
+}
+
 export class AspectLoader {
   constructor() {
     /** @type {Map<string, AspectDefinition>} */
@@ -45,7 +58,7 @@ export class AspectLoader {
 
     // Meta-validate schema against JSON Schema draft-07 (security: fail fast)
     try {
-      const ajv = new Ajv({ strict: true, strictRequired: false, strictTypes: false, validateSchema: true, validateFormats: false });
+      const ajv = new Ajv({ strict: true, strictRequired: true, strictTypes: true, validateSchema: true, validateFormats: false });
       ajv.compile(aspect.$schema);
     } catch (error) {
       throw new Error(
@@ -78,6 +91,7 @@ export class AspectLoader {
   async loadAspectsFromDirectory(dirPath, options = {}) {
     const { recursive = true } = options;
     const aspects = [];
+    const dir = normalizeDirEntry(dirPath);
     const self = this;
 
     async function loadFromDir(dir) {
@@ -103,15 +117,25 @@ export class AspectLoader {
           }
         }
       } catch (error) {
-        if (error.code === 'ENOENT') {
-          // Directory doesn't exist, skip
-          return;
-        }
         throw error;
       }
     }
 
-    await loadFromDir(dirPath);
+    try {
+      await loadFromDir(dir.path);
+    } catch (error) {
+      if (error?.code === 'ENOENT' || error?.code === 'ENOTDIR') {
+        if (dir.explicit) {
+          throw new Error(
+            `Aspect directory not found: ${dir.path}\n` +
+            `  This directory was explicitly configured via CLI or config file\n` +
+            `  Hint: Check path spelling or create the directory`
+          );
+        }
+        return aspects;
+      }
+      throw error;
+    }
     return aspects;
   }
 

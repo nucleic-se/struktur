@@ -74,8 +74,10 @@ describe('AspectLoader', () => {
     });
 
     it('should handle non-existent directory', async () => {
-      const aspects = await loader.loadAspectsFromDirectory('/nonexistent');
-      assert.strictEqual(aspects.length, 0);
+      await assert.rejects(
+        async () => loader.loadAspectsFromDirectory('/nonexistent'),
+        /Aspect directory not found/i
+      );
     });
   });
 

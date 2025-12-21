@@ -294,8 +294,12 @@ export class HandlebarsAdapter extends TemplateAdapter {
       const handlebars = buildContext.adapter.handlebars;
       
       if (!outputs || !buildDir) {
-        log?.warn?.('render_file helper called without buildDir/outputs');
-        return '';
+        throw new Error(
+          `Template helper 'render_file' requires buildDir and outputs to be configured\n` +
+          `  Template: ${templateKey || 'unknown'}\n` +
+          `  Reason: Cannot resolve file paths without build directory\n` +
+          `  Hint: This indicates a Struktur rendering bug`
+        );
       }
       
       // Look up partial
@@ -319,9 +323,6 @@ export class HandlebarsAdapter extends TemplateAdapter {
       
       // Resolve output path with security checks
       const resolved = resolveOutputPath(templateKey || 'unknown', outputPath, buildDir, log);
-      if (!resolved) {
-        return '';
-      }
       
       // Calculate relative path prefix based on output depth
       // E.g., 'posts/article.html' → '../', 'tags/tutorial.html' → '../'
@@ -417,14 +418,15 @@ export class HandlebarsAdapter extends TemplateAdapter {
       const { buildDir, outputs, log, templateKey } = buildContext;
       
       if (!outputs || !buildDir) {
-        log?.warn?.('file helper called without buildDir/outputs');
-        return '';
+        throw new Error(
+          `Template helper 'file' requires buildDir and outputs to be configured\n` +
+          `  Template: ${templateKey || 'unknown'}\n` +
+          `  Reason: Cannot resolve file paths without build directory\n` +
+          `  Hint: This indicates a Struktur rendering bug`
+        );
       }
       
       const resolved = resolveOutputPath(templateKey || 'unknown', filename, buildDir, log);
-      if (!resolved) {
-        return '';
-      }
       
       // Get content from block or inline
       const content = options.fn ? options.fn(this) : '';

@@ -22,8 +22,8 @@ export class MultiPassValidator {
     this.ajv = new Ajv({
       allErrors: true,
       strict: true,
-      strictRequired: false, // Allow required in oneOf branches without defining all properties
-      strictTypes: false, // Allow union types like ["string", "null"]
+      strictRequired: true,
+      strictTypes: true,
       validateSchema: true,
       validateFormats: true,
       ...options.ajvOptions

@@ -18,6 +18,7 @@ describe('Deterministic Build Defaults', () => {
     const result = await buildStack({
       classDirs: [path.join(FIXTURES_DIR, 'classes')],
       instanceDirs: [path.join(FIXTURES_DIR, 'instances')],
+      templateDirs: [],
       buildDir: buildRoot,
       quiet: true
     });
@@ -35,6 +36,7 @@ describe('Deterministic Build Defaults', () => {
     const result = await buildStack({
       classDirs: [path.join(FIXTURES_DIR, 'classes')],
       instanceDirs: [path.join(FIXTURES_DIR, 'instances')],
+      templateDirs: [],
       buildDir: buildRoot,
       deterministic: false,
       quiet: true

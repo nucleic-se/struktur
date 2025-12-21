@@ -2,7 +2,9 @@
   "$class": "network_service",
   "$parent": "service_entity",
   "$pretty_name": "Network Service",
-  "$uses_aspects": [],
+  "$uses_aspects": [
+    "aspect_service"
+  ],
   "$kinds": [
     "service"
   ],

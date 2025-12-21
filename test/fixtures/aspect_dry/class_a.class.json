@@ -11,7 +11,12 @@
       "prop_a"
     ]
   },
-  "$aspects": [
+  "$uses_aspects": [
     "aspect_shared_aspect"
-  ]
+  ],
+  "$aspects": {
+    "aspect_shared_aspect": {
+      "required": false
+    }
+  }
 }

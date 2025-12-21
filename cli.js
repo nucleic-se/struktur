@@ -492,13 +492,27 @@ program
         configFromFile.build_dir = path.resolve(configDir, configFromFile.build_dir);
       }
 
+      const hasConfigKey = (key) => Object.prototype.hasOwnProperty.call(configFromFile, key);
+      const hasClassDirs = options.classes !== undefined || hasConfigKey('classes');
+      const hasAspectDirs = options.aspects !== undefined || hasConfigKey('aspects');
+      const hasInstanceDirs = options.instances !== undefined || hasConfigKey('instances');
+      const hasTemplateDirs = options.templates !== undefined || hasConfigKey('templates');
+
       // CLI flags override config file, config file overrides defaults
-      if (options.classes || configFromFile.classes || (stackDirs && stackDirs.length > 0)) {
+      if (hasClassDirs || hasAspectDirs || hasInstanceDirs || hasTemplateDirs || (stackDirs && stackDirs.length > 0)) {
         // Explicit mode or config mode
-        classDirs = normalizePathArray(options.classes || configFromFile.classes);
-        aspectDirs = normalizePathArray(options.aspects || configFromFile.aspects);
-        instanceDirs = normalizePathArray(options.instances || configFromFile.instances);
-        templateDirs = normalizePathArray(options.templates || configFromFile.templates);
+        if (hasClassDirs) {
+          classDirs = normalizePathArray(options.classes || configFromFile.classes);
+        }
+        if (hasAspectDirs) {
+          aspectDirs = normalizePathArray(options.aspects || configFromFile.aspects);
+        }
+        if (hasInstanceDirs) {
+          instanceDirs = normalizePathArray(options.instances || configFromFile.instances);
+        }
+        if (hasTemplateDirs) {
+          templateDirs = normalizePathArray(options.templates || configFromFile.templates);
+        }
 
         // Build dir: CLI > config > default
         if (options.buildDir !== './build') {
@@ -529,22 +543,17 @@ program
           options.quiet = configFromFile.quiet;
         }
 
-        // If no directories specified at all and no config, try stack-dirs mode
-        if (classDirs.length === 0 && stackDirs && stackDirs.length > 0) {
+        // If no class dirs specified and stack dirs provided, fall through to stack-dirs mode
+        if (!classDirs && stackDirs && stackDirs.length > 0) {
           // Fall through to stack-dirs mode below
-        } else if (classDirs.length === 0) {
-          throw new Error('Either provide a stack directory, use -c/--classes flag, or create struktur.build.json');
         } else {
-          // Default instances to classes if not specified
-          if (instanceDirs.length === 0) instanceDirs = [...classDirs];
-          
           // Skip the stack-dirs mode
           stackDirs = [];
         }
       }
 
       // Simplified mode: stack directories with conventional subdirectories
-      if (stackDirs && stackDirs.length > 0 && classDirs.length === 0) {
+      if (stackDirs && stackDirs.length > 0 && !classDirs) {
         const discovered = await discoverStackDirs(stackDirs, { includeTemplates: true });
         classDirs = discovered.classDirs;
         aspectDirs = discovered.aspectDirs;
@@ -574,16 +583,16 @@ program
         const config = {};
         
         // Add directories as relative paths
-        if (classDirs.length > 0) {
+        if (classDirs && classDirs.length > 0) {
           config.classes = classDirs.map(d => path.relative(saveConfigDir, d));
         }
-        if (aspectDirs.length > 0) {
+        if (aspectDirs && aspectDirs.length > 0) {
           config.aspects = aspectDirs.map(d => path.relative(saveConfigDir, d));
         }
-        if (instanceDirs.length > 0) {
+        if (instanceDirs && instanceDirs.length > 0) {
           config.instances = instanceDirs.map(d => path.relative(saveConfigDir, d));
         }
-        if (templateDirs.length > 0) {
+        if (templateDirs && templateDirs.length > 0) {
           config.templates = templateDirs.map(d => path.relative(saveConfigDir, d));
         }
         

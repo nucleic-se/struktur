@@ -8,6 +8,19 @@ import fs from 'fs/promises';
 import path from 'path';
 import Ajv from 'ajv';
 
+function normalizeDirEntry(dirEntry) {
+  if (dirEntry && typeof dirEntry === 'object' && dirEntry.path) {
+    return {
+      path: dirEntry.path,
+      explicit: dirEntry.explicit === true
+    };
+  }
+  return {
+    path: dirEntry,
+    explicit: true
+  };
+}
+
 export class ClassLoader {
   constructor() {
     /** @type {Map<string, ClassDefinition>} */
@@ -32,9 +45,17 @@ export class ClassLoader {
       throw new Error(`Class definition missing '$schema' field: ${filePath}`);
     }
 
+    if (Array.isArray(classDef.$aspects)) {
+      throw new Error(
+        `Class definition uses legacy $aspects array format (removed in v0.5.0): ${filePath}\n` +
+        `  Legacy format: "$aspects": ["aspect_network", "aspect_docker"]\n` +
+        `  Correct format: "$aspects": {"aspect_network": {"required": false}}`
+      );
+    }
+
     // Meta-validate schema against JSON Schema draft-07 (security: fail fast)
     try {
-      const ajv = new Ajv({ strict: true, strictRequired: false, strictTypes: false, validateSchema: true, validateFormats: false });
+      const ajv = new Ajv({ strict: true, strictRequired: true, strictTypes: true, validateSchema: true, validateFormats: false });
       ajv.compile(classDef.$schema);
     } catch (error) {
       throw new Error(
@@ -67,15 +88,16 @@ export class ClassLoader {
   async loadClassesFromDirectory(dirPath, options = {}) {
     const { recursive = true } = options;
     const classes = [];
+    const dir = normalizeDirEntry(dirPath);
 
     try {
-      const entries = await fs.readdir(dirPath, { withFileTypes: true });
+      const entries = await fs.readdir(dir.path, { withFileTypes: true });
       
       // Sort alphabetically for deterministic loading order
       entries.sort((a, b) => a.name.localeCompare(b.name));
 
       for (const entry of entries) {
-        const fullPath = path.join(dirPath, entry.name);
+        const fullPath = path.join(dir.path, entry.name);
 
         if (entry.isDirectory() && recursive) {
           // Recurse into subdirectories
@@ -91,8 +113,15 @@ export class ClassLoader {
         }
       }
     } catch (error) {
-      if (error.code === 'ENOENT') {
-        // Directory doesn't exist, return empty array
+      if (error.code === 'ENOENT' || error.code === 'ENOTDIR') {
+        if (dir.explicit) {
+          throw new Error(
+            `Class directory not found: ${dir.path}\n` +
+            `  This directory was explicitly configured via CLI or config file\n` +
+            `  Hint: Check path spelling or create the directory`
+          );
+        }
+        // Default directory missing, return empty array
         return classes;
       }
       throw error;

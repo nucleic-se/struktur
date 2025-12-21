@@ -20,6 +20,28 @@ const { version: PACKAGE_VERSION } = require('../package.json');
  */
 function mergeInstanceWithFields(instance, resolvedClass = {}, aspectLoader = null) {
   const fields = resolvedClass.$fields || {};
+  const declaredAspects = Array.isArray(resolvedClass.$uses_aspects)
+    ? resolvedClass.$uses_aspects
+    : [];
+
+  if (instance.$aspects && typeof instance.$aspects === 'object') {
+    const instanceAspects = Object.keys(instance.$aspects);
+    for (const aspectName of instanceAspects) {
+      if (!declaredAspects.includes(aspectName)) {
+        const lineageInfo = resolvedClass.$lineage
+          ? `\n  Class lineage: ${resolvedClass.$lineage.join(' → ')}`
+          : '';
+        throw new Error(
+          `Instance uses undeclared aspect\n` +
+          `  Instance: ${instance.$id || '(unknown)'}\n` +
+          `  Class: ${instance.$class || '(unknown)'}${lineageInfo}\n` +
+          `  Aspect: ${aspectName}\n` +
+          `  Declared in class: ${declaredAspects.join(', ') || 'none'}\n` +
+          `  Hint: Add '${aspectName}' to class $uses_aspects array (or parent class)`
+        );
+      }
+    }
+  }
   
   // Deep merge: start with empty object, merge defaults, then instance (instance wins)
   const merged = classMerge(classMerge({}, fields), instance);
@@ -94,14 +116,7 @@ function buildClassIndex(instances, resolver, logger) {
 
   // Resolve each class and add to index
   for (const className of uniqueClasses) {
-    try {
-      index[className] = resolver.resolve(className);
-    } catch (error) {
-      // Skip classes that can't be resolved
-      if (logger) {
-        logger.warn(`Warning: Could not resolve class ${className}: ${error.message}`);
-      }
-    }
+    index[className] = resolver.resolve(className);
   }
 
   return index;
@@ -135,11 +150,15 @@ export function generateCanonical(instances, resolver, options = {}) {
       const resolved = resolver.resolve(instance.$class);
       return mergeInstanceWithFields(instance, resolved, aspectLoader);
     } catch (error) {
-      // If class resolution fails, return instance as-is
-      if (logger) {
-        logger.warn(`Warning: Could not resolve class ${instance.$class}: ${error.message}`);
-      }
-      return instance;
+      const availableClasses = Array.from(resolver.classLoader.classes.keys()).sort().join(', ');
+      throw new Error(
+        `Cannot generate canonical output: unresolved class\n` +
+        `  Instance: ${instance.$id || '(unknown)'}\n` +
+        `  Class: ${instance.$class}\n` +
+        `  Available classes: ${availableClasses || '(none)'}\n` +
+        `  Error: ${error.message}\n` +
+        `  Hint: Check class name spelling or ensure class file exists`
+      );
     }
   });
 

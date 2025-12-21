@@ -58,7 +58,20 @@ export function createStruktur() {
 
       for (const instance of instances) {
         if (!resolved.has(instance.$class)) {
-          const resolvedClass = classResolver.resolve(instance.$class);
+          let resolvedClass;
+          try {
+            resolvedClass = classResolver.resolve(instance.$class);
+          } catch (error) {
+            const availableClasses = Array.from(classLoader.classes.keys()).sort().join(', ');
+            throw new Error(
+              `Cannot validate instance: unresolved class\n` +
+              `  Instance: ${instance.$id || '(unknown)'}\n` +
+              `  Class: ${instance.$class}\n` +
+              `  Available classes: ${availableClasses || '(none)'}\n` +
+              `  Error: ${error.message}\n` +
+              `  Hint: Check class name spelling or ensure class file exists`
+            );
+          }
           validator.registerClass(resolvedClass);
           resolved.set(instance.$class, resolvedClass);
         }

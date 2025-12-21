@@ -8,7 +8,9 @@
   "$domains": [
     "virtual"
   ],
-  "$uses_aspects": [],
+  "$uses_aspects": [
+    "aspect_terraform"
+  ],
   "$aspect_defaults": {
     "aspect_proxmox_guest": {
       "host_node": "polaris",

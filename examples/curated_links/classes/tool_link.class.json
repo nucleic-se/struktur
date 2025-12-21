@@ -7,9 +7,13 @@
     "description": "Link to a tool, library, or software",
     "properties": {
       "language": {
-        "type": [
-          "string",
-          "null"
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
         ],
         "description": "Primary programming language"
       },

@@ -72,6 +72,53 @@ Build Phase: Stack Loading & Validation
 ✓ Template directories: 2
 ```
 
+### Output Collision Detection (v0.5.0+)
+
+Struktur detects when multiple render tasks target the same output file:
+
+```bash
+# Multiple renders to same file
+❌ Error: Output file collision
+  File: /build/index.html
+  First: homepage (index.hbs, render)
+  Second: landing (landing.hbs, render)
+  Hint: Use unique output paths or remove one output
+```
+
+**Why detect collisions?**
+- Prevents silent overwrites (last render wins)
+- Catches template configuration mistakes
+- Makes output generation explicit and predictable
+
+**How it works:**
+- `OutputCollisionTracker` tracks all output paths during render phase
+- Paths are normalized with `path.resolve()` before comparison
+- Any duplicate throws immediately before rendering
+
+**Common causes:**
+- Copying render tasks without changing output path
+- Multiple instances rendering to same global file
+- Template logic producing same output path for different inputs
+
+**Fix:**
+```json
+// Bad - collision
+{
+  "$render": [
+    { "template": "page.hbs", "output": "index.html" },
+    { "template": "home.hbs", "output": "index.html" }
+  ]
+}
+
+// Good - unique outputs
+{
+  "$render": [
+    { "template": "page.hbs", "output": "page.html" },
+    { "template": "home.hbs", "output": "index.html" }
+  ]
+}
+```
+
 ### Errors in LOAD Phase
 
 **Missing directory:**
