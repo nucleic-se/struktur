@@ -80,9 +80,11 @@ Each entry requires:
 
 ### Validation Options
 
-- **`exact`** - Deterministic mode: exact reproducible builds, sorted output (default: `false`)
+- **`exact`** - Use exact build directory without hash suffix (default: `false`)
 - **`warn_extra_fields`** - Warn about instance fields not in schemas (default: `true`)
 - **`warnings_as_errors`** - Treat validation warnings as errors (default: `true`)
+
+**Default behavior:** When `exact` is `false`, builds output to hash-based directories (deterministic by default).
 
 ### Template Options
 
@@ -100,14 +102,13 @@ Each entry requires:
   "aspects": ["../universal/aspects", "aspects"],
   "instances": ["../universal/instances", "instances"],
   "templates": ["../universal/templates", "templates"],
-  "build_dir": "build",
+  "build_dir": "build",  // Outputs to build/build-<hash>/ by default
   "template_engine": "handlebars",
   "render": [
     { "template": "index.html.hbs", "output": "/index.html" },
     { "template": "api/docs.html.hbs", "output": "/api/docs.html" },
     { "template": "config/nginx.conf.hbs", "output": "/nginx.conf" }
   ],
-  "exact": true,
   "warn_extra_fields": true,
   "warnings_as_errors": true,
   "allow_template_collisions": false,
@@ -166,13 +167,15 @@ struktur build --template-engine nunjucks
 | `build_dir` | `--build-dir` | `"build"` |
 | `template_engine` | `--engine` | `"handlebars"` |
 | `render` | *(config only)* | `[]` |
-| `exact` | `--exact` | `false` |
+| `exact` | `--exact` | `false` (hash-based build dirs) |
 | `warn_extra_fields` | `--warn-extra-fields` | `true` |
 | `warnings_as_errors` | `--warnings-as-errors` | `true` |
 | `allow_template_collisions` | `--allow-template-collisions` | `false` |
 | `quiet` | `--quiet` | `false` |
 
 **Note:** The `render` field is config-only - there's no CLI equivalent. This makes configs the single source of truth for what gets rendered.
+
+**Build directory behavior:** Hash-based build directories are the default. Use `--exact` to force exact paths or `--no-deterministic` to allow overwrites.
 
 ## Generating Configs from CLI
 

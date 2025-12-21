@@ -1,0 +1,57 @@
+{
+  "$class": "optional_service",
+  "$lineage": [
+    "entity_base",
+    "optional_service"
+  ],
+  "$schemas": [
+    {
+      "type": "object",
+      "required": [
+        "$id",
+        "$class"
+      ],
+      "properties": {
+        "$id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "$class": {
+          "type": "string"
+        },
+        "domains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "$id"
+      ],
+      "properties": {
+        "$id": {
+          "type": "string"
+        }
+      }
+    }
+  ],
+  "$fields": {
+    "domains": []
+  },
+  "$aspects": {
+    "aspect_network_interface": {
+      "required": false
+    }
+  },
+  "$uses_aspects": [],
+  "$aspect_defaults": {},
+  "$pretty_name": "optional_service",
+  "$domains": [],
+  "$parent": [
+    "entity_base"
+  ]
+}

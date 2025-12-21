@@ -199,6 +199,46 @@ See [Concepts: Aspects - Aspect Defaults](concepts-aspects.md#aspect-defaults) f
 
 ---
 
+### Deterministic Builds Default to Enabled
+
+**Breaking**: Deterministic (hash-based) build directories are now the default.
+
+**Before:**
+```bash
+struktur build mystack
+# Output: ./build/
+```
+
+**After:**
+```bash
+struktur build mystack
+# Output: ./build/build-abc123def/
+```
+
+**Migration**:
+
+**Option 1: Use new default (recommended)**
+```bash
+struktur build mystack
+```
+
+**Option 2: Keep old behavior**
+```bash
+struktur build mystack --no-deterministic
+```
+
+**Option 3: Exact path without hash**
+```bash
+struktur build mystack --exact
+```
+
+**Rationale**:
+- Prevents accidental overwrites
+- Builds are reproducible and easy to compare
+- Safer default for production
+
+---
+
 ### Aspect Defaults Require Explicit `$defaults`
 
 **Breaking**: Aspect defaults must be placed under a `$defaults` object. No implicit top-level defaults.

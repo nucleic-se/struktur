@@ -68,7 +68,7 @@ export async function buildStack(options) {
     engine = 'handlebars',
     quiet = false,
     logger,
-    deterministic = false,
+    deterministic = true,
     failOnCollisions = true,
     renderTasks = []
   } = options;

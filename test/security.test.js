@@ -65,7 +65,7 @@ describe('Security Tests', () => {
       );
 
       // Attempt build - should prevent path traversal
-      await buildStack({
+      const result = await buildStack({
         classDirs: [path.join(testDir, 'classes')],
         instanceDirs: [path.join(testDir, 'instances')],
         templateDirs: [path.join(testDir, 'templates')],
@@ -89,7 +89,7 @@ describe('Security Tests', () => {
       }
 
       // Verify file was either not written or written inside build dir
-      const buildFiles = await fs.readdir(buildDir, { recursive: true });
+      const buildFiles = await fs.readdir(result.buildDir, { recursive: true });
       const hasPasswd = buildFiles.some(f => f.includes('passwd'));
       assert.ok(!hasPasswd || buildFiles.some(f => f === 'passwd'), 
         'passwd file should not exist outside build directory');
@@ -111,7 +111,7 @@ describe('Security Tests', () => {
       );
 
       // Build should complete without escaping buildDir
-      await buildStack({
+      const result = await buildStack({
         classDirs: [path.join(testDir, 'classes')],
         instanceDirs: [path.join(testDir, 'instances')],
         buildDir,
@@ -119,12 +119,12 @@ describe('Security Tests', () => {
       });
 
       // Verify canonical.json is inside build dir
-      const canonicalPath = path.join(buildDir, 'canonical.json');
+      const canonicalPath = path.join(result.buildDir, 'canonical.json');
       const canonicalExists = await fs.access(canonicalPath).then(() => true).catch(() => false);
       assert.ok(canonicalExists, 'canonical.json should exist in build directory');
 
       // Verify no canonical.json outside build dir
-      const parentDir = path.dirname(buildDir);
+      const parentDir = path.dirname(result.buildDir);
       const parentCanonical = path.join(parentDir, 'canonical.json');
       const parentExists = await fs.access(parentCanonical).then(() => true).catch(() => false);
       assert.ok(!parentExists, 'canonical.json should not exist outside build directory');

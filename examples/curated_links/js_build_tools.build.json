@@ -9,7 +9,6 @@
     "templates"
   ],
   "build_dir": "build/js_build_tools",
-  "exact": true,
   "template_engine": "nunjucks",
   "render": [
     {

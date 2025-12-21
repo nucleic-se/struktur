@@ -79,8 +79,8 @@ struktur build [options] [stack-dirs...]
 - `--engine <name>` - Template engine: `handlebars` or `nunjucks` (default: `handlebars`)
 - `-q, --quiet` - Suppress output except errors
 - `--json` - Output build results as JSON
-- `--exact` - Use exact build directory path without hash suffix (recommended)
-- `--no-deterministic` - Disable deterministic build directories (allows overwrites)
+- `--exact` - Use exact build directory path without hash suffix (overrides deterministic)
+- `--no-deterministic` - Use simple build directory (allows overwrites; not recommended for production)
 - `--allow-template-collisions` - Allow templates with same name in multiple directories (last wins)
 - `-h, --help` - Show command help
 
@@ -105,7 +105,10 @@ struktur build mystack --engine nunjucks
 # Allow template name conflicts (last directory wins)
 struktur build base overlay --allow-template-collisions
 
-# Use exact build directory (recommended for tutorials and production)
+# Default deterministic build (hash-based)
+struktur build mystack
+
+# Use exact build directory (no hash suffix)
 struktur build mystack --exact
 
 # Non-deterministic build (overwrites previous build)
@@ -120,7 +123,7 @@ struktur build mystack --no-deterministic
 
 **Build Output:**
 - By default: `./build/build-<hash>/` (deterministic, based on input hash)
-- With `--exact`: `./build/` (uses exact path, simpler for tutorials/production)
+- With `--exact`: `./build/` (uses exact path, no hash suffix)
 - With `--no-deterministic`: `./build/` (overwrites previous, with collision warnings)
 - Custom: Specify with `-b/--build-dir`
 
@@ -317,7 +320,6 @@ Optional configuration file for build settings. Automatically discovered when bu
   "render": [
     { "template": "index.html.hbs", "output": "/index.html" }
   ],
-  "exact": true,
   "allow_template_collisions": false,
   "warn_extra_fields": true,
   "warnings_as_errors": true,
@@ -354,8 +356,7 @@ Optional configuration file for build settings. Automatically discovered when bu
   "classes": ["../universal/classes", "./classes"],
   "instances": ["./instances"],
   "templates": ["./templates"],
-  "build_dir": "./build",
-  "exact": true
+  "build_dir": "./build"
 }
 
 # Build uses paths relative to mystack/
@@ -393,18 +394,17 @@ struktur build mystack --exact --save-config mystack/struktur.build.json
 
 ### Build Flags
 
-**`--exact`** (Recommended)
+**`--exact`**
 - Uses exact build directory path without hash suffix
 - Builds into `./build/` instead of `./build/build-<hash>/`
 - Overrides `--deterministic` setting
-- Recommended for tutorials, production builds, and predictable paths
 - Example: `struktur build mystack --exact` → `./build/`
 
 **`--no-deterministic`**
 - Disables hash-based build directories
 - Builds directly into `--build-dir` path (overwrites previous builds)
 - Default behavior: `build/build-<hash>/` for deterministic builds
-- Use when you want predictable output paths
+- Use when you want a fixed output path (not recommended for production)
 
 **`--allow-template-collisions`**
 - Permits templates with the same name in multiple directories

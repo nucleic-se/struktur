@@ -1,0 +1,50 @@
+{
+  "$class": "parent_with_aspect",
+  "$lineage": [
+    "entity_base",
+    "parent_with_aspect"
+  ],
+  "$schemas": [
+    {
+      "type": "object",
+      "required": [
+        "$id",
+        "$class"
+      ],
+      "properties": {
+        "$id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "$class": {
+          "type": "string"
+        },
+        "domains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "properties": {}
+    }
+  ],
+  "$fields": {
+    "domains": []
+  },
+  "$aspects": {
+    "aspect_network_interface": {
+      "required": true
+    }
+  },
+  "$uses_aspects": [],
+  "$aspect_defaults": {},
+  "$pretty_name": "parent_with_aspect",
+  "$domains": [],
+  "$parent": [
+    "entity_base"
+  ]
+}

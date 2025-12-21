@@ -424,7 +424,7 @@ program
   .option('--engine <name>', 'Template engine (handlebars, nunjucks)', 'handlebars')
   .option('-q, --quiet', 'Suppress output except errors')
   .option('--json', 'Output results as JSON')
-  .option('--no-deterministic', 'Disable deterministic build directories (allows overwrites)')
+  .option('--no-deterministic', 'Use simple build directory (allows overwrites, not recommended for production)')
   .option('--exact', 'Use exact build directory path without hash suffix (overrides deterministic)')
   .option('--allow-template-collisions', 'Allow templates with same name in multiple directories (last wins)')
   .action(async (stackDirs, options) => {

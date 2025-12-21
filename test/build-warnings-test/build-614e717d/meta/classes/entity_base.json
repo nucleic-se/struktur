@@ -1,0 +1,39 @@
+{
+  "$class": "entity_base",
+  "$lineage": [
+    "entity_base"
+  ],
+  "$schemas": [
+    {
+      "type": "object",
+      "required": [
+        "$id",
+        "$class"
+      ],
+      "properties": {
+        "$id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "$class": {
+          "type": "string"
+        },
+        "domains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  ],
+  "$fields": {
+    "domains": []
+  },
+  "$aspects": {},
+  "$uses_aspects": [],
+  "$aspect_defaults": {},
+  "$pretty_name": "entity_base",
+  "$domains": [],
+  "$parent": []
+}
