@@ -1,6 +1,9 @@
 {
   "$class": "tool_link",
   "$parent": "link_base",
+  "$uses_aspects": [
+    "aspect_quality"
+  ],
   "$schema": {
     "type": "object",
     "title": "Tool/Library Link",

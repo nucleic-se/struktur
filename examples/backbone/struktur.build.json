@@ -26,14 +26,6 @@
   "template_engine": "handlebars",
   "render": [
     {
-      "template": "terraform/main.tf.j2",
-      "output": "/terraform/main.tf"
-    },
-    {
-      "template": "terraform/variables.tf.j2",
-      "output": "/terraform/variables.tf"
-    },
-    {
       "template": "ansible/inventory.ini.j2",
       "output": "/ansible/inventory.ini"
     },
