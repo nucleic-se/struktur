@@ -1,8 +1,8 @@
 {# Reusable Nunjucks macros for curated links #}
 
 {# Count tool links in instances #}
-{% macro toolCount(instances) %}
-{{ instances | selectattr('class', 'equalto', 'tool_link') | list | length }}
+{% macro toolCount($instances) %}
+{{ $instances | selectattr('class', 'equalto', 'tool_link') | list | length }}
 {%- endmacro %}
 
 {# Macro to render a link with metadata #}

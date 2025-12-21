@@ -1,6 +1,6 @@
 <nav>
   <a href="{{#if pathPrefix}}{{pathPrefix}}{{/if}}index.html">Home</a>
-  {{#each @root.instances}}
+  {{#each @root.$instances}}
   {{#if (eq class "page")}}
   {{#if (or (eq menu "header") (eq menu "both"))}}
   <a href="{{#if ../pathPrefix}}{{../pathPrefix}}{{/if}}{{slug}}.html">{{title}}</a>

@@ -368,7 +368,7 @@ Before creating templates, we need a global configuration that specifies build t
     <h1>My Blog</h1>
     <nav>
       <a href="index.html">Home</a>
-      {{#each (where instances "class" "page")}}
+      {{#each (where $instances "class" "page")}}
         <a href="{{slug}}.html">{{title}}</a>
       {{/each}}
     </nav>
@@ -377,7 +377,7 @@ Before creating templates, we need a global configuration that specifies build t
   <main>
     <h2>Recent Posts</h2>
     
-    {{#each (where instances "class" "post")}}
+    {{#each (where $instances "class" "post")}}
       {{#if (eq status "published")}}
         <article>
           <h3>{{title}}</h3>
@@ -393,8 +393,8 @@ Before creating templates, we need a global configuration that specifies build t
   </main>
 
   <footer>
-    <p>Total posts: {{length (where instances "class" "post")}}</p>
-    <p>Built with Struktur at {{buildContext.timestamp}}</p>
+    <p>Total posts: {{length (where $instances "class" "post")}}</p>
+    <p>Built with Struktur at {{$metadata.timestamp}}</p>
   </footer>
 </body>
 </html>
@@ -476,12 +476,12 @@ Update index template to generate individual pages using `render_file`.
 **`templates/index.html`** (add before closing `</body>`):
 ```handlebars
   {{!-- Generate individual post pages --}}
-  {{#each (where instances "class" "post")}}
+  {{#each (where $instances "class" "post")}}
     {{render_file "post.html" (concat "posts/" id ".html") this}}
   {{/each}}
   
   {{!-- Generate individual page files --}}
-  {{#each (where instances "class" "page")}}
+  {{#each (where $instances "class" "page")}}
     {{render_file "page.html" (concat slug ".html") this}}
   {{/each}}
 
@@ -580,7 +580,7 @@ open build/index.html
 - `where`: Filter by field value
 - `eq`: Conditional rendering
 - `render_file`: Generate multiple output files
-- Context includes all instances, classes, buildContext
+- Context includes all instances, classes, $metadata
 
 ### Build Pipeline
 1. **Load** - Discover classes, schemas, instances
@@ -608,14 +608,14 @@ Won't appear (filtered by `{{#if (eq status "published")}}`)
 
 **2. Sort posts by date:**
 ```handlebars
-{{#each (reverse (sort_by (where instances "class" "post") "created_at"))}}
+{{#each (reverse (sort_by (where $instances "class" "post") "created_at"))}}
   <article>{{title}}</article>
 {{/each}}
 ```
 
 **3. Group by category:**
 ```handlebars
-{{#each (group_by (where instances "class" "post") "category")}}
+{{#each (group_by (where $instances "class" "post") "category")}}
   <h2>{{@key}}</h2>
   {{#each this}}
     <li>{{title}}</li>

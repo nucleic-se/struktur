@@ -150,26 +150,27 @@ export function generateCanonical(instances, resolver, options = {}) {
 
   // Build canonical structure
   const canonical = {
-    instances: mergedInstances
+    $instances: mergedInstances
   };
   
-  // Add instances_by_id for fast lookup
+  // Add $instances_by_id for fast lookup
   const instancesById = {};
   for (const obj of mergedInstances) {
     if (obj.id) {
       instancesById[obj.id] = obj;
     }
   }
-  canonical.instances_by_id = instancesById;
+  canonical.$instances_by_id = instancesById;
 
   // Add class index with resolved class objects (not instance IDs)
   if (includeClassIndex) {
-    canonical.classes_by_id = buildClassIndex(mergedInstances, resolver, logger);
+    canonical.$classes_by_id = buildClassIndex(mergedInstances, resolver, logger);
     // Also provide classes as array for consistency with instances
-    canonical.classes = Object.values(canonical.classes_by_id);
+    canonical.$classes = Object.values(canonical.$classes_by_id);
+    canonical.$class_names = Object.keys(canonical.$classes_by_id).sort();
   }
 
-  // Add aspects_by_id (first-class entities)
+  // Add $aspects_by_id (first-class entities)
   if (aspectLoader && aspectLoader.aspects) {
     const aspectsById = {};
     for (const [aspectName, aspectDef] of aspectLoader.aspects.entries()) {
@@ -184,19 +185,20 @@ export function generateCanonical(instances, resolver, options = {}) {
         defaults: Object.keys(defaults).length > 0 ? defaults : null
       };
     }
-    canonical.aspects_by_id = aspectsById;
+    canonical.$aspects_by_id = aspectsById;
     // Also provide aspects as array for consistency with instances
-    canonical.aspects = Object.values(aspectsById);
+    canonical.$aspects = Object.values(aspectsById);
+    canonical.$aspect_names = Object.keys(aspectsById).sort();
   }
 
   // Add metadata
   if (includeMetadata) {
-    canonical.metadata = {
+    canonical.$metadata = {
       timestamp,
       version: PACKAGE_VERSION,
       generator: 'struktur',
       count: mergedInstances.length,
-      classes: Object.keys(canonical.classes_by_id || {}).length,
+      classes: Object.keys(canonical.$classes_by_id || {}).length,
       aspects: aspectLoader ? aspectLoader.aspects.size : 0
     };
   }
@@ -204,7 +206,7 @@ export function generateCanonical(instances, resolver, options = {}) {
   // Add validation metadata if requested
   if (includeValidation && options.validationResults) {
     const results = options.validationResults;
-    canonical.validation = {
+    canonical.$validation = {
       total: results.length,
       valid: results.filter(r => r.valid).length,
       invalid: results.filter(r => !r.valid).length,

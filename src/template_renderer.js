@@ -45,7 +45,7 @@ export class TemplateRenderer {
     const strukturInheritance = await import('./template_helpers/struktur/inheritance.js');
     
     // Bind helpers with canonical context
-    const strukturContext = { classes_by_id: canonical.classes_by_id };
+    const strukturContext = { $classes_by_id: canonical.$classes_by_id };
     this.adapter.registerHelper('schemaRequired', (className, fieldName) => 
       strukturSchema.schemaRequired(strukturContext, className, fieldName));
     this.adapter.registerHelper('schemaHas', (className, fieldName) => 
@@ -102,20 +102,15 @@ export class TemplateRenderer {
    */
   buildContext(canonical, globalInstance, renderContext) {
     // Handle both full canonical structure and simple context objects
-    const instances = canonical.instances || [];
-    
-    // Build instances_by_id map for backward compatibility
-    const instancesById = {};
-    instances.forEach(obj => {
-      instancesById[obj.id] = obj;
-    });
+    const instances = canonical.$instances || [];
+    const instancesById = canonical.$instances_by_id || {};
 
     // Prepare context with canonical as single source of truth
     // Include __context for buffer helpers
     return {
       global: globalInstance,
-      instances,
-      instances_by_id: instancesById,  // v1 compatibility
+      $instances: instances,
+      $instances_by_id: instancesById,
       canonical,
       __context: renderContext,  // Buffer system access
       ...canonical
@@ -153,7 +148,7 @@ export class TemplateRenderer {
     await this.registerEngineHelpers(buildDir, renderFileOutputs);
     
     // Find global instance (handle both full canonical and simple context)
-    const instances = canonical.instances || [];
+    const instances = canonical.$instances || [];
     const globalInstance = instances.find?.(obj => obj.id === 'global') || null;
     
     // Build template context with render context for buffers
@@ -471,4 +466,3 @@ export class TemplateRenderer {
     return false;
   }
 }
-

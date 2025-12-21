@@ -82,6 +82,44 @@ See [Concepts: Aspects - Aspect Defaults](concepts-aspects.md#aspect-defaults) f
 
 ---
 
+## v0.3.0-alpha (Planned)
+
+### Canonical Top-Level Fields Use `$` Prefix
+
+**Breaking**: All top-level canonical.json fields now use `$` prefixes.
+
+**Before:**
+```json
+{
+  "instances": [...],
+  "instances_by_id": {...},
+  "classes": [...],
+  "classes_by_id": {...},
+  "aspects": [...],
+  "aspects_by_id": {...},
+  "metadata": {...},
+  "validation": {...}
+}
+```
+
+**After:**
+```json
+{
+  "$instances": [...],
+  "$instances_by_id": {...},
+  "$classes": [...],
+  "$classes_by_id": {...},
+  "$aspects": [...],
+  "$aspects_by_id": {...},
+  "$metadata": {...},
+  "$validation": {...}
+}
+```
+
+**Migration**: Update any canonical.json consumers and templates to use `$`-prefixed fields.
+
+---
+
 ## v0.2.0-alpha (December 2025)
 
 ### Schema `class` Field Required

@@ -116,7 +116,7 @@ export async function buildStack(options) {
     log.log(`  ✓ Merged ${mergeStats.reduction} duplicate IDs into ${instances.length} unique instances`);
   }
 
-  // Step 2: Generate canonical with validation (includes aspects_by_id)
+  // Step 2: Generate canonical with validation (includes $aspects_by_id)
   log.log('\n🔍 Validating stack...');
   const canonical = generateCanonicalWithValidation(instances, struktur, {
     includeMetadata: true,
@@ -126,14 +126,14 @@ export async function buildStack(options) {
     logger: log
   });
 
-  const summary = getValidationSummary(canonical.validation);
+  const summary = getValidationSummary(canonical.$validation);
   if (summary.invalid > 0) {
     log.log(`  ✗ Validation failed: ${summary.invalid} invalid instances`);
     
     // Display detailed error information
-    if (canonical.validation && canonical.validation.errors) {
+    if (canonical.$validation && canonical.$validation.errors) {
       log.log('');
-      displayValidationErrors(canonical.validation, log);
+      displayValidationErrors(canonical.$validation, log);
     }
     
     throw new Error('Validation failed');
@@ -151,7 +151,7 @@ export async function buildStack(options) {
     throw new Error('Security: canonical.json path resolution failed');
   }
   await fs.writeFile(canonicalPath, JSON.stringify(canonical, null, 2), 'utf-8');
-  log.log(`  ✓ canonical.json (${canonical.instances.length} instances)`);
+  log.log(`  ✓ canonical.json (${canonical.$instances.length} instances)`);
 
   // Step 5: Write class definitions
   const classDefsDir = path.join(buildDir, 'meta', 'classes');
@@ -179,11 +179,11 @@ export async function buildStack(options) {
   if (!validationPath) {
     throw new Error('Security: validation.json path resolution failed');
   }
-  await fs.writeFile(validationPath, JSON.stringify(canonical.validation, null, 2), 'utf-8');
+  await fs.writeFile(validationPath, JSON.stringify(canonical.$validation, null, 2), 'utf-8');
   log.log('  ✓ meta/validation.json');
 
   // Step 6.5: Extract render tasks from instances and merge with config render tasks
-  const instanceRenderTasks = canonical.instances
+  const instanceRenderTasks = canonical.$instances
     .filter(inst => inst.render && Array.isArray(inst.render) && inst.render.length > 0)
     .flatMap(inst => inst.render);
   

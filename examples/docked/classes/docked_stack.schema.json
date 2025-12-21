@@ -67,7 +67,7 @@
         "additionalProperties": true,
         "description": "Relationships to other instances (optional)"
       },
-      "instances": {
+      "$instances_by_id": {
         "type": "object",
         "description": "Resolved instance map injected at build time",
         "additionalProperties": {
@@ -75,7 +75,7 @@
           "additionalProperties": {}
         }
       },
-      "classes_by_id": {
+      "$classes_by_id": {
         "type": "object",
         "description": "Resolved classes metadata injected at build time",
         "additionalProperties": {

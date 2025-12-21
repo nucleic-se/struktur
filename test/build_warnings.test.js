@@ -12,7 +12,7 @@ describe('Build Warnings and Messaging', () => {
   const fixturesDir = path.join(__dirname, 'fixtures');
   const buildDir = path.join(__dirname, 'build-warnings-test');
 
-  it('should include instances_by_id in canonical output', async () => {
+  it('should include $instances_by_id in canonical output', async () => {
     const canonical = await buildStack({
       classDirs: [path.join(fixturesDir, 'classes')],
       instanceDirs: [path.join(fixturesDir, 'instances')],
@@ -20,15 +20,15 @@ describe('Build Warnings and Messaging', () => {
       quiet: true
     });
 
-    assert.ok(canonical.canonical.instances_by_id, 'canonical should have instances_by_id');
-    assert.strictEqual(typeof canonical.canonical.instances_by_id, 'object');
+    assert.ok(canonical.canonical.$instances_by_id, 'canonical should have $instances_by_id');
+    assert.strictEqual(typeof canonical.canonical.$instances_by_id, 'object');
     
     // Verify it's a lookup map
-    const instances = canonical.canonical.instances;
+    const instances = canonical.canonical.$instances;
     for (const inst of instances) {
       if (inst.id) {
-        assert.ok(canonical.canonical.instances_by_id[inst.id], `instances_by_id should contain ${inst.id}`);
-        assert.strictEqual(canonical.canonical.instances_by_id[inst.id], inst);
+        assert.ok(canonical.canonical.$instances_by_id[inst.id], `$instances_by_id should contain ${inst.id}`);
+        assert.strictEqual(canonical.canonical.$instances_by_id[inst.id], inst);
       }
     }
   });

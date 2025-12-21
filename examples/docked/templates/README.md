@@ -28,7 +28,7 @@ environment:
 
 **Template Logic**:
 ```handlebars
-{{#each instances}}
+{{#each $instances}}
   {{#if $aspects.docker_container}}
     {{id}}:
       image: {{{$aspects.docker_container.image}}}
@@ -229,7 +229,7 @@ Templates receive the full canonical data model:
 
 **Custom filtering**:
 ```handlebars
-{{#each instances}}
+{{#each $instances}}
   {{#if $aspects.docker_container}}
     # Only processes container instances
   {{/if}}
@@ -325,7 +325,7 @@ Templates can be layered (Docked extends Universal):
 **Health check scripts**:
 ```handlebars
 #!/bin/bash
-{{#each instances}}
+{{#each $instances}}
 {{#if $aspects.docker_container.healthcheck}}
 echo "Checking {{id}}..."
 docker exec {{id}} {{$aspects.docker_container.healthcheck.test}}
@@ -336,7 +336,7 @@ docker exec {{id}} {{$aspects.docker_container.healthcheck.test}}
 **Monitoring configs**:
 ```handlebars
 scrape_configs:
-  {{#each instances}}
+  {{#each $instances}}
   {{#if $aspects.docker_container.ports}}
   - job_name: '{{id}}'
     static_configs:

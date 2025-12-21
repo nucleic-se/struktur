@@ -263,7 +263,7 @@ cat > templates/posts.html <<EOF
 <head><title>Blog Posts</title></head>
 <body>
   <h1>Blog Posts</h1>
-  {{#each (where instances "class" "blog_post")}}
+  {{#each (where $instances "class" "blog_post")}}
     <article>
       <h2>{{title}}</h2>
       <p>By {{author}} - {{status}}</p>

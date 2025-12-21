@@ -72,7 +72,7 @@
           }
         }
       },
-      "instances": {
+      "$instances_by_id": {
         "type": "object",
         "description": "Stack instances catalog",
         "additionalProperties": {
@@ -80,7 +80,7 @@
           "additionalProperties": {}
         }
       },
-      "classes_by_id": {
+      "$classes_by_id": {
         "type": "object",
         "description": "Loaded class definitions",
         "additionalProperties": {

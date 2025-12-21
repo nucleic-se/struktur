@@ -422,7 +422,7 @@ Instances can reference other instances using tags:
 
 Tags are stored as strings in canonical output. Templates can:
 1. Use tags directly (as IDs)
-2. Look up referenced instances from `instances_by_id`
+2. Look up referenced instances from `$instances_by_id`
 3. Use future `resolve` helper (planned)
 
 **Example template usage:**
@@ -431,7 +431,7 @@ Tags are stored as strings in canonical output. Templates can:
 Database: {{database}}
 
 {{!-- Look up full database instance --}}
-{{#with (lookup ../instances_by_id database)}}
+{{#with (lookup ../$instances_by_id database)}}
   Database: {{name}} at {{host}}:{{port}}
 {{/with}}
 ```
@@ -730,7 +730,7 @@ Group related instances:
 
 **Filter in template:**
 ```handlebars
-{{#each (where instances "cluster" "web-cluster")}}
+{{#each (where $instances "cluster" "web-cluster")}}
   - {{id}}: {{hostname}}
 {{/each}}
 ```
@@ -823,7 +823,7 @@ struktur validate -c classes/ -i instances/ --json | jq .
 
 ```bash
 struktur generate -c classes/ -i instances/ -o debug.json
-cat debug.json | jq '.instances[] | {id, class}'
+cat debug.json | jq '."$instances"[] | {id, class}'
 ```
 
 ---

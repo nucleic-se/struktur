@@ -112,8 +112,8 @@
   <script>
     // Load canonical data (single source of truth)
     const canonical = {{{json canonical}}};
-    const allInstances = canonical.instances.filter(obj => obj.id !== 'global');
-    const allClasses = Object.values(canonical.classes_by_id);
+    const allInstances = canonical.$instances.filter(obj => obj.id !== 'global');
+    const allClasses = Object.values(canonical.$classes_by_id);
     
     // Build relation indexes (drift-safe unidirectional)
     const relationIndexes = buildRelationIndexes(allInstances);
@@ -145,9 +145,9 @@
       return { outbound, inbound };
     }
     
-    // Build aspect metadata map from canonical.aspects_by_id (single source of truth)
+    // Build aspect metadata map from canonical.$aspects_by_id (single source of truth)
     const aspectMetadata = new Map();
-    const aspectsByKind = canonical.aspects_by_id || {};
+    const aspectsByKind = canonical.$aspects_by_id || {};
     Object.entries(aspectsByKind).forEach(([kind, meta]) => {
       aspectMetadata.set(kind, {
         pretty_name: meta.pretty_name || kind.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),

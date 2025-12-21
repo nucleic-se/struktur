@@ -2,7 +2,7 @@
 {% import "_macros.njk" as m %}
 
 {# Extract data using filters (best practice: use selectattr instead of manual loops) #}
-{% set links = instances | selectattr('class', 'equalto', 'tool_link') | list %}
+{% set links = $instances | selectattr('class', 'equalto', 'tool_link') | list %}
 
 {# Extract unique categories #}
 {% set categories = [] %}
@@ -26,11 +26,11 @@
   {% set _ = unique_tags.push(tag) %}
 {% endfor %}
 
-# {{ instances_by_id['metadata'].title }}
+# {{ $instances_by_id['metadata'].title }}
 
-{{ instances_by_id['metadata'].description }}
+{{ $instances_by_id['metadata'].description }}
 
-**Total Links:** {{ m.toolCount(instances) }}
+**Total Links:** {{ m.toolCount($instances) }}
 
 ---
 

@@ -556,7 +556,7 @@ web_server
 
 ```bash
 struktur generate -c classes/ -i instances/ -o debug.json
-cat debug.json | jq '.instances[] | select(.id == "web-01")'
+cat debug.json | jq '."$instances"[] | select(.id == "web-01")'
 ```
 
 See what fields actually got merged.

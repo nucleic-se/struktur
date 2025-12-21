@@ -335,13 +335,15 @@ Every template receives:
 
 ```javascript
 {
-  instances: [...],
-  instances_by_id: {...},
-  classes: [...],
-  classes_by_id: {...},
-  aspects: [...],
-  aspects_by_id: {...},
-  buildContext: {
+  $instances: [...],
+  $instances_by_id: {...},
+  $classes: [...],
+  $classes_by_id: {...},
+  $class_names: [...],
+  $aspects: [...],
+  $aspects_by_id: {...},
+  $aspect_names: [...],
+  $metadata: {
     timestamp: "2025-12-16T10:30:00Z",
     version: "0.2.3-alpha",
     generator: "struktur"
@@ -717,7 +719,7 @@ grep -r '"parent"' classes/
 ```bash
 struktur validate . --json | jq .
 struktur generate . -o debug.json
-jq '.instances[] | select(.id == "problematic-id")' debug.json
+jq '."$instances"[] | select(.id == "problematic-id")' debug.json
 ```
 
 ### Build Fails in RENDER

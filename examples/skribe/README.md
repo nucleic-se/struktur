@@ -152,7 +152,7 @@ skribe/
 
 **Multi-file rendering**: Generate pages dynamically via render_file helper
 ```handlebars
-{{#each instances}}
+{{#each $instances}}
 {{#if (eq class "blog_post")}}
 {{render_file "blog-post" (concat "posts/" slug ".html")}}
 {{/if}}
@@ -399,7 +399,7 @@ Edit `templates/css/custom.css`:
 
 5. Update `templates/index.html` to render tutorials:
 ```handlebars
-{{#each instances}}
+{{#each $instances}}
 {{#if (eq class "tutorial")}}
 {{render_file "layouts/tutorial" (concat "tutorials/" slug ".html") pathPrefix="../"}}
 {{/if}}
@@ -457,14 +457,14 @@ Skribe uses Struktur's built-in Handlebars helpers:
 - **`json`** - Output JSON (for debugging)
 
 **Collection Helpers**:
-- **`sort_by`** - Sort array by field: `{{#each (sort_by instances "date")}}`
+- **`sort_by`** - Sort array by field: `{{#each (sort_by $instances "date")}}`
 - **`where_includes`** - Filter array where field includes value
 - **`filterList`** - Filter array by custom logic
 - **`length`** - Get array length
 
 Example - Generate post pages:
 ```handlebars
-{{#each instances}}
+{{#each $instances}}
 {{#if (eq class "blog_post")}}
 {{render_file "blog-post" (concat "posts/" slug ".html")}}
 {{/if}}
@@ -473,7 +473,7 @@ Example - Generate post pages:
 
 Example - Filter and sort posts:
 ```handlebars
-{{#each (sort_by (filterList instances class="blog_post") "$aspects.blog_post.date")}}
+{{#each (sort_by (filterList $instances class="blog_post") "$aspects.blog_post.date")}}
   <article>
     <h2>{{title}}</h2>
     <time>{{$aspects.blog_post.date}}</time>

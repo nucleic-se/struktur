@@ -215,15 +215,17 @@ Every template receives the same context object:
 ```javascript
 {
   // Top-level convenience
-  instances: [...],           // All instances (array)
-  instances_by_id: {...},     // Instances by ID (object)
-  classes: [...],             // All classes (array)
-  classes_by_id: {...},       // Classes by name (object)
-  aspects: [...],             // All aspects (array)
-  aspects_by_id: {...},       // Aspects by name (object)
+  $instances: [...],           // All instances (array)
+  $instances_by_id: {...},     // Instances by ID (object)
+  $classes: [...],             // All classes (array)
+  $classes_by_id: {...},       // Classes by name (object)
+  $class_names: [...],         // Class name list
+  $aspects: [...],             // All aspects (array)
+  $aspects_by_id: {...},       // Aspects by name (object)
+  $aspect_names: [...],        // Aspect name list
   
   // Build metadata
-  buildContext: {
+  $metadata: {
     timestamp: "2025-12-16T10:30:00Z",
     version: "0.2.3-alpha",
     generator: "struktur"
@@ -231,13 +233,15 @@ Every template receives the same context object:
   
   // Full canonical structure
   canonical: {
-    instances: [...],
-    instances_by_id: {...},
-    classes: [...],
-    classes_by_id: {...},
-    aspects: [...],
-    aspects_by_id: {...},
-    metadata: {...}
+    $instances: [...],
+    $instances_by_id: {...},
+    $classes: [...],
+    $classes_by_id: {...},
+    $class_names: [...],
+    $aspects: [...],
+    $aspects_by_id: {...},
+    $aspect_names: [...],
+    $metadata: {...}
   }
 }
 ```
@@ -246,33 +250,33 @@ Every template receives the same context object:
 
 **Handlebars:**
 ```handlebars
-{{!-- Loop through instances --}}
-{{#each instances}}
+{{!-- Loop through $instances --}}
+{{#each $instances}}
   <div>{{name}}</div>
 {{/each}}
 
 {{!-- Look up by ID --}}
-{{#with (lookup instances_by_id "web-01")}}
+{{#with (lookup $instances_by_id "web-01")}}
   <h1>{{name}}</h1>
 {{/with}}
 
 {{!-- Access build info --}}
-<p>Built: {{buildContext.timestamp}}</p>
+<p>Built: {{$metadata.timestamp}}</p>
 ```
 
 **Nunjucks:**
 ```nunjucks
 {# Loop through instances #}
-{% for instance in instances %}
+{% for instance in $instances %}
   <div>{{ instance.name }}</div>
 {% endfor %}
 
 {# Look up by ID #}
-{% set web = instances_by_id["web-01"] %}
+{% set web = $instances_by_id["web-01"] %}
 <h1>{{ web.name }}</h1>
 
 {# Access build info #}
-<p>Built: {{ buildContext.timestamp }}</p>
+<p>Built: {{ $metadata.timestamp }}</p>
 ```
 
 ---
@@ -290,7 +294,7 @@ Most templates generate a single output file:
 </head>
 <body>
   <h1>Posts</h1>
-  {{#each (where instances "class" "post")}}
+  {{#each (where $instances "class" "post")}}
     <article>
       <h2>{{title}}</h2>
       <p>{{excerpt}}</p>
@@ -328,7 +332,7 @@ The `render_file` helper generates multiple output files from a single template:
 <body>
   <h1>Posts</h1>
   <ul>
-    {{#each (where instances "class" "post")}}
+    {{#each (where $instances "class" "post")}}
       <li><a href="posts/{{id}}.html">{{title}}</a></li>
       
       {{!-- Generate individual post page --}}
@@ -369,7 +373,7 @@ The third parameter determines what data the rendered template sees:
 
 **Pass current instance:**
 ```handlebars
-{{#each instances}}
+{{#each $instances}}
   {{render_file "detail.hbs" (concat id ".html") this}}
   <!--                                          ^^^^ instance data only -->
 {{/each}}
@@ -377,7 +381,7 @@ The third parameter determines what data the rendered template sees:
 
 **Pass full context:**
 ```handlebars
-{{#each instances}}
+{{#each $instances}}
   {{render_file "detail.hbs" (concat id ".html") ..}}
   <!--                                           ^^ parent context (all data) -->
 {{/each}}
@@ -386,8 +390,8 @@ The third parameter determines what data the rendered template sees:
 **Pass custom context:**
 ```handlebars
 {{render_file "stats.html" "stats.html" (hash 
-  total=(length instances)
-  classes=(pluck classes "class")
+  total=(length $instances)
+  classes=(pluck $classes "class")
 )}}
 ```
 
@@ -438,14 +442,14 @@ Templates can use built-in helpers. See [Helper Reference](helpers-reference.md)
 
 **Filter by class:**
 ```handlebars
-{{#each (where instances "class" "post")}}
+{{#each (where $instances "class" "post")}}
   <h2>{{title}}</h2>
 {{/each}}
 ```
 
 **Filter by inheritance:**
 ```handlebars
-{{#each (filter_inherits instances "entity_base" classes_by_id)}}
+{{#each (filter_inherits $instances "entity_base" $classes_by_id)}}
   <div class="entity">{{name}}</div>
 {{/each}}
 ```
@@ -574,7 +578,7 @@ templates/
 <html>
 <body>
   <h1>All Items</h1>
-  {{#each instances}}
+  {{#each $instances}}
     <a href="{{id}}.html">{{name}}</a>
     {{render_file "detail.html.hbs" (concat id ".html") this}}
   {{/each}}
@@ -585,7 +589,7 @@ templates/
 ### Generate Per-Category Pages
 
 ```handlebars
-{{#each (group_by instances "category")}}
+{{#each (group_by $instances "category")}}
   {{render_file "category.html.hbs" (concat "categories/" @key ".html") (hash
     category=@key
     items=this
@@ -596,7 +600,7 @@ templates/
 ### Conditional File Generation
 
 ```handlebars
-{{#each instances}}
+{{#each $instances}}
   {{#if (eq status "published")}}
     {{render_file "published.html.hbs" (concat "posts/" id ".html") this}}
   {{/if}}
@@ -606,7 +610,7 @@ templates/
 ### Nested Directory Generation
 
 ```handlebars
-{{#each instances}}
+{{#each $instances}}
   {{render_file "detail.html.hbs" (concat class "/" id ".html") this}}
 {{/each}}
 ```
@@ -702,9 +706,9 @@ Shows complete context object.
 ```handlebars
 <h2>Available Context</h2>
 <ul>
-  <li>Instances: {{length instances}}</li>
-  <li>Classes: {{length classes}}</li>
-  <li>Aspects: {{length aspects}}</li>
+  <li>Instances: {{length $instances}}</li>
+  <li>Classes: {{length $classes}}</li>
+  <li>Aspects: {{length $aspects}}</li>
 </ul>
 ```
 
@@ -716,7 +720,7 @@ Result: {{slugify "Hello World"}}
 <!-- Should show: hello-world -->
 
 {{!-- Check filter result --}}
-{{#each (where instances "class" "post")}}
+{{#each (where $instances "class" "post")}}
   Found: {{id}}
 {{/each}}
 ```
@@ -863,8 +867,8 @@ volumes:
 {{!--
   Template: docker-compose.yml
   Inputs:
-    - instances: All instances with docker_container aspect
-    - buildContext: Build metadata
+    - $instances: All $instances with docker_container aspect
+    - $metadata: Build metadata
   Outputs:
     - docker-compose.yml: Service definitions
   

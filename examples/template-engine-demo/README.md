@@ -66,7 +66,7 @@ Outputs are identical except for generator comment.
 
 **Iteration:**
 ```handlebars
-{{#each (where instances "class" "web_service")}}
+{{#each (where $instances "class" "web_service")}}
   server {
     listen {{$aspects.web_service.port}};
     server_name {{$aspects.web_service.hostname}};
@@ -90,7 +90,7 @@ Outputs are identical except for generator comment.
 
 **Iteration:**
 ```nunjucks
-{% for instance in instances %}
+{% for instance in $instances %}
 {% if instance.class == "web_service" %}
   server {
     listen {{ instance.$aspects.web_service.port }};

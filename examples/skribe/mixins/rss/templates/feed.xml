@@ -9,7 +9,7 @@
     <copyright>{{global.rss.copyright}}</copyright>
     {{/if}}
     <atom:link href="{{global.rss.link}}/feed.xml" rel="self" type="application/rss+xml" />
-    {{#each (sort_by @root.instances "date" reverse=true)}}
+    {{#each (sort_by @root.$instances "date" reverse=true)}}
     {{#if (eq class "blog_post")}}
     <item>
       <title>{{title}}</title>

@@ -394,10 +394,11 @@ Templates are **read-only** by design. They receive validated data and generate 
 ```javascript
 {
   global,              // Global instance (id: "global")
-  instances,           // Array of all instances
-  instances_by_id,     // Map for lookups by ID
+  $instances,          // Array of all instances
+  $instances_by_id,    // Map for lookups by ID
   canonical,           // Full canonical structure
-  classes_by_id,       // Class definitions (for inheritance checks)
+  $classes_by_id,      // Class definitions (for inheritance checks)
+  $metadata,           // Build metadata (timestamp, version, counts)
   // ...plus all canonical fields spread at top level
 }
 ```
@@ -461,7 +462,7 @@ registry.register('myHelper', (value) => {
 
 // Struktur helper (needs context)
 registry.register('hasPort', (context, className) => {
-  return context.classes_by_id[className]?.fields?.port !== undefined;
+  return context.$classes_by_id[className]?.fields?.port !== undefined;
 }, { 
   category: 'struktur',
   requiresContext: true 
@@ -473,7 +474,7 @@ registry.registerToAdapter(handlebarsAdapter, strukturContext, buildContext);
 
 **Binding Rules**:
 - Generic helpers: Called directly with arguments
-- Struktur helpers: First argument is bound to `{ classes_by_id, canonical }`
+- Struktur helpers: First argument is bound to `{ $classes_by_id, canonical }`
 - Engine helpers: Receive `{ buildDir, outputs, log, adapter }`
 
 ### Validation Architecture

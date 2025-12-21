@@ -1,7 +1,7 @@
 /**
  * Tests for canonical.js correctness fixes
  * - Deep merge instance defaults (not shallow)
- * - classes_by_id returns resolved class objects (not ID arrays)
+ * - $classes_by_id returns resolved class objects (not ID arrays)
  * - Classless instances filtered from canonical
  */
 
@@ -56,7 +56,7 @@ describe('Canonical Deep Merge', () => {
     }];
     
     const canonical = generateCanonical(instances, resolver);
-    const merged = canonical.instances[0];
+    const merged = canonical.$instances[0];
     
     // Should have deep merged: level from instance, format from defaults
     assert.strictEqual(merged.config.logging.level, 'debug', 'Instance value should win');
@@ -99,7 +99,7 @@ describe('Canonical Deep Merge', () => {
     }];
     
     const canonical = generateCanonical(instances, resolver);
-    const merged = canonical.instances[0];
+    const merged = canonical.$instances[0];
     
     assert.strictEqual(merged.deployment.kubernetes.replicas, 3, 'Top-level default preserved');
     assert.strictEqual(merged.deployment.kubernetes.resources.limits.cpu, '1', 'Nested default CPU preserved');
@@ -108,7 +108,7 @@ describe('Canonical Deep Merge', () => {
   });
 });
 
-describe('Canonical classes_by_id Format', () => {
+describe('Canonical $classes_by_id Format', () => {
   it('should return resolved class objects, not ID arrays', async () => {
     const classLoader = new ClassLoader();
     
@@ -135,12 +135,12 @@ describe('Canonical classes_by_id Format', () => {
     const canonical = generateCanonical(instances, resolver, { includeClassIndex: true });
     
     // Should be an object with class metadata, not array of IDs
-    assert.ok(canonical.classes_by_id.container, 'Should have container class entry');
-    assert.strictEqual(typeof canonical.classes_by_id.container, 'object', 'Should be object, not array');
-    assert.strictEqual(canonical.classes_by_id.container.class, 'container', 'Should have class name');
-    assert.ok(Array.isArray(canonical.classes_by_id.container.lineage), 'Should have lineage array');
-    assert.strictEqual(canonical.classes_by_id.container.pretty_name, 'Container', 'Should have pretty_name');
-    assert.ok(Array.isArray(canonical.classes_by_id.container.$uses_aspects), 'Should have uses_aspects array');
+    assert.ok(canonical.$classes_by_id.container, 'Should have container class entry');
+    assert.strictEqual(typeof canonical.$classes_by_id.container, 'object', 'Should be object, not array');
+    assert.strictEqual(canonical.$classes_by_id.container.class, 'container', 'Should have class name');
+    assert.ok(Array.isArray(canonical.$classes_by_id.container.lineage), 'Should have lineage array');
+    assert.strictEqual(canonical.$classes_by_id.container.pretty_name, 'Container', 'Should have pretty_name');
+    assert.ok(Array.isArray(canonical.$classes_by_id.container.$uses_aspects), 'Should have uses_aspects array');
   });
 
   it('should include all resolved class metadata', async () => {
@@ -165,7 +165,7 @@ describe('Canonical classes_by_id Format', () => {
     const instances = [{ id: 'myapp', class: 'app' }];
     
     const canonical = generateCanonical(instances, resolver, { includeClassIndex: true });
-    const appClass = canonical.classes_by_id.app;
+    const appClass = canonical.$classes_by_id.app;
     
     assert.strictEqual(appClass.class, 'app');
     assert.ok(Array.isArray(appClass.lineage), 'Should have lineage array');
@@ -231,12 +231,12 @@ describe('Classless Instance Handling', () => {
     const canonical = generateCanonicalWithValidation(instances, struktur, { preserveGlobal: false });
     
     // Should only have instances with class field
-    assert.strictEqual(canonical.instances.length, 2, 'Should only include instances with class field');
-    assert.ok(canonical.instances.every(obj => obj.class), 'All objects should have class field');
-    assert.ok(canonical.instances.find(obj => obj.id === 'nginx'), 'Should include nginx');
-    assert.ok(canonical.instances.find(obj => obj.id === 'redis'), 'Should include redis');
-    assert.ok(!canonical.instances.find(obj => obj.id === 'global'), 'Should exclude global');
-    assert.ok(!canonical.instances.find(obj => obj.id === 'metadata'), 'Should exclude metadata');
+    assert.strictEqual(canonical.$instances.length, 2, 'Should only include instances with class field');
+    assert.ok(canonical.$instances.every(obj => obj.class), 'All objects should have class field');
+    assert.ok(canonical.$instances.find(obj => obj.id === 'nginx'), 'Should include nginx');
+    assert.ok(canonical.$instances.find(obj => obj.id === 'redis'), 'Should include redis');
+    assert.ok(!canonical.$instances.find(obj => obj.id === 'global'), 'Should exclude global');
+    assert.ok(!canonical.$instances.find(obj => obj.id === 'metadata'), 'Should exclude metadata');
   });
 
   it('should require all instances including global to have a class', async () => {
@@ -289,8 +289,8 @@ describe('Classless Instance Handling', () => {
     const canonical = generateCanonicalWithValidation(instances, struktur);
     
     // All instances including global must have class
-    assert.strictEqual(canonical.instances.length, 2, 'Should have 2 objects');
-    assert.ok(canonical.instances.find(obj => obj.id === 'global' && obj.class === 'global'), 'Global must have class');
-    assert.ok(canonical.instances.find(obj => obj.id === 'app'), 'Should include regular instances');
+    assert.strictEqual(canonical.$instances.length, 2, 'Should have 2 objects');
+    assert.ok(canonical.$instances.find(obj => obj.id === 'global' && obj.class === 'global'), 'Global must have class');
+    assert.ok(canonical.$instances.find(obj => obj.id === 'app'), 'Should include regular instances');
   });
 });

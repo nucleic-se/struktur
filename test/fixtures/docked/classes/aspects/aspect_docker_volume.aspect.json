@@ -72,15 +72,15 @@
           }
         }
       },
-      "objects": {
+      "$instances_by_id": {
         "type": "object",
-        "description": "Stack objects catalog",
+        "description": "Stack instances catalog",
         "additionalProperties": {
           "type": "object",
           "additionalProperties": {}
         }
       },
-      "classes_by_id": {
+      "$classes_by_id": {
         "type": "object",
         "description": "Loaded class definitions",
         "additionalProperties": {

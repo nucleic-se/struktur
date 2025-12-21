@@ -7,16 +7,16 @@
 
 /**
  * Check if a class inherits from target class(es)
- * @param {Object} context - Struktur context with classes_by_id
+ * @param {Object} context - Struktur context with $classes_by_id
  * @param {string} className - Class to check
  * @param {string|Array<string>} targetClasses - Target class(es) to check against
  * @returns {boolean}
  */
 export function inherits(context, className, targetClasses) {
-  const { classes_by_id } = context;
-  if (!classes_by_id || !className) return false;
+  const { $classes_by_id } = context;
+  if (!$classes_by_id || !className) return false;
   
-  const classDef = classes_by_id[className];
+  const classDef = $classes_by_id[className];
   if (!classDef) return false;
   
   const targets = Array.isArray(targetClasses) ? targetClasses : [targetClasses];
@@ -49,10 +49,10 @@ export function filterInherits(context, entries, targetClasses) {
  * @returns {Array<string>}
  */
 export function classLineage(context, className) {
-  const { classes_by_id } = context;
-  if (!classes_by_id || !className) return [];
+  const { $classes_by_id } = context;
+  if (!$classes_by_id || !className) return [];
   
-  const classDef = classes_by_id[className];
+  const classDef = $classes_by_id[className];
   if (!classDef) return [];
   
   return classDef.lineage || [className];

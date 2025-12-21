@@ -8,7 +8,7 @@ import * as strukturInheritance from '../src/template_helpers/struktur/inheritan
 
 describe('Struktur Helpers - Schema', () => {
   const mockContext = {
-    classes_by_id: {
+    $classes_by_id: {
       'base': {
         lineage: ['base'],
         schema: {
@@ -78,7 +78,7 @@ describe('Struktur Helpers - Schema', () => {
 
 describe('Struktur Helpers - Inheritance', () => {
   const mockContext = {
-    classes_by_id: {
+    $classes_by_id: {
       'base': {
         lineage: ['base']
       },

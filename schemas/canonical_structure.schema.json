@@ -5,11 +5,11 @@
   "description": "Schema for validating the structure of canonical.json output from struktur builds",
   "type": "object",
   "required": [
-    "instances",
-    "instances_by_id"
+    "$instances",
+    "$instances_by_id"
   ],
   "properties": {
-    "instances": {
+    "$instances": {
       "type": "array",
       "description": "Array of all merged instances in build order",
       "items": {
@@ -46,7 +46,7 @@
         "additionalProperties": true
       }
     },
-    "instances_by_id": {
+    "$instances_by_id": {
       "type": "object",
       "description": "Map of instance ID to instance object for fast lookup",
       "additionalProperties": {
@@ -58,7 +58,7 @@
         }
       }
     },
-    "classes": {
+    "$classes": {
       "type": "array",
       "description": "Array of all resolved class definitions (optional, only if includeClassIndex=true)",
       "items": {
@@ -108,7 +108,7 @@
         "additionalProperties": true
       }
     },
-    "classes_by_id": {
+    "$classes_by_id": {
       "type": "object",
       "description": "Map of class name to resolved class definition (optional, only if includeClassIndex=true)",
       "additionalProperties": {
@@ -158,7 +158,7 @@
         "additionalProperties": true
       }
     },
-    "aspects": {
+    "$aspects": {
       "type": "array",
       "description": "Array of all aspect definitions (optional, only if includeAspectsIndex=true)",
       "items": {
@@ -185,7 +185,7 @@
         "additionalProperties": true
       }
     },
-    "aspects_by_id": {
+    "$aspects_by_id": {
       "type": "object",
       "description": "Map of aspect name to aspect definition (optional, only if includeAspectsIndex=true)",
       "additionalProperties": {
@@ -212,7 +212,17 @@
         "additionalProperties": true
       }
     },
-    "metadata": {
+    "$class_names": {
+      "type": "array",
+      "description": "List of unique class names (optional, only if includeClassIndex=true)",
+      "items": { "type": "string" }
+    },
+    "$aspect_names": {
+      "type": "array",
+      "description": "List of unique aspect names (optional, only if includeAspectsIndex=true)",
+      "items": { "type": "string" }
+    },
+    "$metadata": {
       "type": "object",
       "description": "Build metadata (optional)",
       "properties": {
@@ -247,7 +257,7 @@
       },
       "additionalProperties": false
     },
-    "validation": {
+    "$validation": {
       "type": "object",
       "description": "Validation results (optional)",
       "required": ["total", "valid", "invalid", "errors"],

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{ instances_by_id['metadata'].title }}</title>
+  <title>{{ $instances_by_id['metadata'].title }}</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -176,10 +176,10 @@
 <body>
   <div class="container">
     <header>
-      <h1>{{ instances_by_id['metadata'].title }}</h1>
-      <p class="subtitle">{{ instances_by_id['metadata'].description }}</p>
+      <h1>{{ $instances_by_id['metadata'].title }}</h1>
+      <p class="subtitle">{{ $instances_by_id['metadata'].description }}</p>
       <div class="stats">
-        <span>📦 {% set count = 0 %}{% for i in instances %}{% if i.class == 'tool_link' %}{% set count = count + 1 %}{% endif %}{% endfor %}{{ count }} tools</span>
+        <span>📦 {% set count = 0 %}{% for i in $instances %}{% if i.class == 'tool_link' %}{% set count = count + 1 %}{% endif %}{% endfor %}{{ count }} tools</span>
       </div>
     </header>
 
@@ -189,7 +189,7 @@
         <select id="categoryFilter">
           <option value="">All Categories</option>
           {% set categories = [] %}
-          {% for instance in instances %}
+          {% for instance in $instances %}
             {% if instance.category and instance.category not in categories %}
               {% set categories = categories.concat([instance.category]) %}
             {% endif %}
@@ -217,7 +217,7 @@
 
   <script>
     const links = [
-      {% for link in instances %}{% if link.class == 'tool_link' %}{
+      {% for link in $instances %}{% if link.class == 'tool_link' %}{
         id: "{{ link.id }}",
         title: "{{ link.title }}",
         url: "{{ link.url }}",

@@ -727,8 +727,8 @@ fi
 struktur generate mystack -o debug.json
 
 # Inspect structure
-jq '.instances[] | {id, class}' debug.json
-jq '.classes_by_id | keys' debug.json
+jq '."$instances"[] | {id, class}' debug.json
+jq '."$classes_by_id" | keys' debug.json
 ```
 
 ---
@@ -742,8 +742,8 @@ Add to template:
 
 <!-- See specific sections -->
 <pre>
-Instances: {{length instances}}
-Classes: {{length classes}}
+Instances: {{length $instances}}
+Classes: {{length $classes}}
 </pre>
 
 <!-- Check if property exists -->

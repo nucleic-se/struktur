@@ -103,7 +103,7 @@ describe('Aspect Defaults Three-Layer Merge', () => {
         aspectLoader: struktur.aspectLoader
       });
 
-      const server = canonical.instances_by_id.test_server;
+      const server = canonical.$instances_by_id.test_server;
       assert.strictEqual(server.$aspects.network.ip, '192.168.1.100', 'Instance value present');
       assert.strictEqual(server.$aspects.network.bridge, 'vmbr0', 'Aspect default applied');
       assert.strictEqual(server.$aspects.network.gateway, '192.168.1.1', 'Aspect default applied');
@@ -155,7 +155,7 @@ describe('Aspect Defaults Three-Layer Merge', () => {
         aspectLoader: struktur.aspectLoader
       });
 
-      const disk = canonical.instances_by_id.test_disk;
+      const disk = canonical.$instances_by_id.test_disk;
       assert.strictEqual(disk.$aspects.storage.size, '100G', 'Instance value present');
       assert.strictEqual(Object.keys(disk.$aspects.storage).length, 1, 'No extra defaults added');
     });
@@ -217,7 +217,7 @@ describe('Aspect Defaults Three-Layer Merge', () => {
         aspectLoader: struktur.aspectLoader
       });
 
-      const lxc = canonical.instances_by_id.test_lxc;
+      const lxc = canonical.$instances_by_id.test_lxc;
       assert.strictEqual(lxc.$aspects.proxmox.vmid, 100, 'Instance value present');
       assert.strictEqual(lxc.$aspects.proxmox.host_node, 'pve-01', 'Class default applied');
       assert.strictEqual(lxc.$aspects.proxmox.start, true, 'Class default applied');
@@ -289,7 +289,7 @@ describe('Aspect Defaults Three-Layer Merge', () => {
         aspectLoader: struktur.aspectLoader
       });
 
-      const server = canonical.instances_by_id.prod_server;
+      const server = canonical.$instances_by_id.prod_server;
       assert.strictEqual(server.$aspects.compute.cores, 4, 'Child class default overrides parent');
       assert.strictEqual(server.$aspects.compute.memory, 4096, 'Instance value overrides all');
       assert.strictEqual(server.$aspects.compute.storage, '50G', 'Child class default added');
@@ -354,7 +354,7 @@ describe('Aspect Defaults Three-Layer Merge', () => {
         aspectLoader: struktur.aspectLoader
       });
 
-      const server = canonical.instances_by_id.custom_server;
+      const server = canonical.$instances_by_id.custom_server;
       assert.strictEqual(server.$aspects.network.bridge, 'vmbr2', 'Instance overrides all defaults');
       assert.strictEqual(server.$aspects.network.gateway, '10.0.0.1', 'Instance overrides aspect default');
       assert.strictEqual(server.$aspects.network.mtu, 1500, 'Class default applied when not in instance');
@@ -422,7 +422,7 @@ describe('Aspect Defaults Three-Layer Merge', () => {
         aspectLoader: struktur.aspectLoader
       });
 
-      const server = canonical.instances_by_id.my_server;
+      const server = canonical.$instances_by_id.my_server;
       
       // Layer 1: Aspect defaults
       assert.strictEqual(server.$aspects.network.bridge, 'vmbr0', 'From aspect definition');
@@ -479,7 +479,7 @@ describe('Aspect Defaults Three-Layer Merge', () => {
         aspectLoader: struktur.aspectLoader
       });
 
-      const vm = canonical.instances_by_id.test_vm;
+      const vm = canonical.$instances_by_id.test_vm;
       assert.ok(vm.$aspects.terraform, 'Aspect populated even without instance data');
       assert.strictEqual(vm.$aspects.terraform.enabled, false, 'Aspect default applied');
     });
@@ -516,7 +516,7 @@ describe('Aspect Defaults Three-Layer Merge', () => {
         aspectLoader: null
       });
 
-      const test = canonical.instances_by_id.test;
+      const test = canonical.$instances_by_id.test;
       assert.strictEqual(test.$aspects.custom.value, 'test', 'Instance value preserved');
     });
 
@@ -565,7 +565,7 @@ describe('Aspect Defaults Three-Layer Merge', () => {
         aspectLoader: struktur.aspectLoader
       });
 
-      const instance = canonical.instances_by_id.test_instance;
+      const instance = canonical.$instances_by_id.test_instance;
       assert.strictEqual(instance.$aspects.test.default_value, 'from_aspect', 'Aspect default applied despite prefix mismatch');
     });
   });

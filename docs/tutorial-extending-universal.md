@@ -268,13 +268,13 @@ Universal includes a global instance with viewer.html template. Override it for 
 # Infrastructure Inventory
 
 ## Domains
-{{#each (where instances "class" "domain_root")}}
+{{#each (where $instances "class" "domain_root")}}
 - {{name}}: {{description}}
   {{#if (gt (length domains) 0)}}Parent Domains: {{#each domains}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{/if}}
 {{/each}}
 
 ## Servers
-{{#each instances}}
+{{#each $instances}}
 {{#if $aspects.server}}
 ### {{name}}
 - Hostname: {{$aspects.server.hostname}}
@@ -500,7 +500,7 @@ Monitoring: {{$aspects.monitoring.metrics_port}}
 ### Filter by Aspect
 
 ```handlebars
-{{#each instances}}
+{{#each $instances}}
   {{#if $aspects.server}}
     {{!-- Has server aspect --}}
   {{/if}}

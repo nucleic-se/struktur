@@ -2,7 +2,7 @@
  * Struktur-Specific Helpers Module
  * 
  * Aggregates and exports all struktur-specific template helpers.
- * These helpers need access to Struktur context (classes_by_id, canonical, etc.).
+ * These helpers need access to Struktur context ($classes_by_id, canonical, etc.).
  */
 
 import * as inheritance from './inheritance.js';

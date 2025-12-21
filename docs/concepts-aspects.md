@@ -51,6 +51,7 @@ Aspects define:
 
 - `description` — What the aspect provides
 - `defaults` — Default values for aspect fields (see [Aspect Defaults](#aspect-defaults))
+- Required/optional is declared on classes via `$aspects` (not inside aspect definitions)
 
 ---
 
@@ -388,9 +389,9 @@ Supports all JSON Schema features:
 ### Filter by Aspect
 
 ```handlebars
-{{!-- Show all instances with monitoring --}}
+{{!-- Show all $instances with monitoring --}}
 <h2>Monitored Services</h2>
-{{#each instances}}
+{{#each $instances}}
   {{#if $aspects.monitoring}}
     <li>{{name}} - :{{$aspects.monitoring.metrics_port}}</li>
   {{/if}}
@@ -652,9 +653,9 @@ Group related aspects:
 ### Pattern 3: Aspect-Driven Configuration
 
 ```handlebars
-{{!-- Generate monitoring config for all monitored instances --}}
+{{!-- Generate monitoring config for all monitored $instances --}}
 scrape_configs:
-{{#each instances}}
+{{#each $instances}}
   {{#if $aspects.monitoring}}
   - job_name: {{id}}
     static_configs:

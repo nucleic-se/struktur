@@ -18,7 +18,7 @@ provider "proxmox" {
 # LXC Containers
 # Generated from backbone_lab stack
 #
-{{#each instances}}
+{{#each $instances}}
 {{#if (and (eq class "proxmox_lxc") $aspects.terraform.enabled)}}
 resource "proxmox_lxc" "{{id}}" {
     # From data model

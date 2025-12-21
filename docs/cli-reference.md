@@ -193,18 +193,21 @@ struktur generate -c classes/ -i instances/ -o canonical.json
 **Canonical Output Structure:**
 ```json
 {
-  "instances": [...],           // Array of all instances
-  "instances_by_id": {...},     // Map of id -> instance
-  "classes": [...],             // Array of class definitions
-  "classes_by_id": {...},       // Map of class name -> resolved class
-  "aspects": [...],             // Array of aspect definitions
-  "aspects_by_id": {...},       // Map of aspect name -> definition
-  "metadata": {
+  "$instances": [...],           // Array of all instances
+  "$instances_by_id": {...},     // Map of id -> instance
+  "$classes": [...],             // Array of class definitions
+  "$classes_by_id": {...},       // Map of class name -> resolved class
+  "$class_names": [...],         // List of class names
+  "$aspects": [...],             // Array of aspect definitions
+  "$aspects_by_id": {...},       // Map of aspect name -> definition
+  "$aspect_names": [...],        // List of aspect names
+  "$metadata": {
     "timestamp": "2025-12-16T...",
     "version": "0.2.3-alpha",
     "generator": "struktur",
     "count": 42
-  }
+  },
+  "$validation": {...}          // Validation results (if enabled)
 }
 ```
 

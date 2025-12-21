@@ -11,7 +11,7 @@
 # Health checks ensure each service is ready before dependents start.
 
 services:
-{{#each instances_by_id}}{{#if $aspects.docker_container}}{{#unless (eq id "global")}}
+{{#each $instances_by_id}}{{#if $aspects.docker_container}}{{#unless (eq id "global")}}
   # {{#if description}}{{description}}{{else}}{{id}} service{{/if}}
   {{id}}:
 {{#if $aspects.docker_container.image}}
@@ -130,7 +130,7 @@ services:
 {{/unless}}{{/if}}{{/each}}
 
 networks:
-{{#each instances_by_id}}{{#if $aspects.docker_network}}{{#unless (eq id "global")}}
+{{#each $instances_by_id}}{{#if $aspects.docker_network}}{{#unless (eq id "global")}}
   {{id}}:
 {{#if $aspects.docker_network.driver}}
     driver: {{$aspects.docker_network.driver}}
@@ -138,10 +138,9 @@ networks:
 {{/unless}}{{/if}}{{/each}}
 
 volumes:
-{{#each instances_by_id}}{{#if $aspects.docker_volume}}{{#unless (eq id "global")}}
+{{#each $instances_by_id}}{{#if $aspects.docker_volume}}{{#unless (eq id "global")}}
   {{id}}:
 {{#if $aspects.docker_volume.driver}}
     driver: {{$aspects.docker_volume.driver}}
 {{/if}}
 {{/unless}}{{/if}}{{/each}}
-

@@ -93,7 +93,7 @@ curated_links/
 
 ### Multi-format Output
 - Same canonical data → multiple output formats
-- Each template accesses: `instances`, `instances_by_id`, `classes_by_id`
+- Each template accesses: `$instances`, `$instances_by_id`, `$classes_by_id`
 - Templates can filter, sort, group data independently
 
 ### Data Modeling
@@ -107,7 +107,7 @@ curated_links/
 
 **Class-based filtering** (semantic, type-safe):
 ```nunjucks
-{% for instance in instances %}
+{% for instance in $instances %}
   {% if instance.class == 'tool_link' %}
     {# process link #}
   {% endif %}
@@ -117,7 +117,7 @@ curated_links/
 **Counting with manual loop**:
 ```nunjucks
 {% set count = 0 %}
-{% for i in instances %}
+{% for i in $instances %}
   {% if i.class == 'tool_link' %}
     {% set count = count + 1 %}
   {% endif %}
@@ -128,7 +128,7 @@ curated_links/
 **Array building**:
 ```nunjucks
 {% set links = [] %}
-{% for i in instances %}
+{% for i in $instances %}
   {% if i.class == 'tool_link' %}
     {% set links = links.concat([i]) %}
   {% endif %}
@@ -210,7 +210,7 @@ curated_links/
 ### Add New Format
 1. Create template: `templates/myformat.ext.njk`
 2. Add to `render` object in build config: `{"myformat.ext.njk": "/output.ext"}`
-3. Access same data: `instances`, `instances_by_id`, `classes_by_id`
+3. Access same data: `$instances`, `$instances_by_id`, `$classes_by_id`
 4. Filter links: `{% if instance.class == 'tool_link' %}`
 
 
