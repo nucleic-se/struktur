@@ -1,25 +1,45 @@
 /**
  * Instance Merger - Merge multiple instances with same ID
  * 
- * PURPOSE: Merges instances from multiple source files (e.g., base + overlay).
- * Uses strict type checking to catch configuration errors early.
+ * Merges instance data from multiple source files (e.g., base stack + overlay).
+ * This is intentionally different from utils/class_merge.js.
+ * 
+ * USE CASE: Merging multi-file instance definitions at build time
  * 
  * BEHAVIOR:
- * - Objects: Deep merge, last wins for scalars
- * - Arrays: Concatenate + auto-dedupe primitives
- * - Type mismatch: Throws error with path context
- * - Tracks source files for debugging
+ * - Objects: Deep merge recursively (nested objects preserved)
+ * - Arrays: Concatenated + deduped (primitives only)
+ * - Primitives: Last write wins (source overrides target)
+ * - Strict: Type checking with fail-fast on mismatch
  * 
- * NOTE: This is intentionally different from utils/class_merge.js
- * See utils/class_merge.js header for detailed comparison table.
+ * COMPARISON TO utils/class_merge.js:
  * 
- * USE CASE: Merging multi-file instance definitions
+ * | Aspect       | instance_merger.js | class_merge.js     |
+ * |--------------|--------------------|--------------------|
+ * | Purpose      | Instance data      | Class defaults     |
+ * | Arrays       | Concatenate        | Replace            |
+ * | Type safety  | Strict (fail-fast) | Lenient (no check) |
+ * | Errors       | Throw with path    | Silent replacement |
+ * | When         | Build-time         | Design-time        |
  * 
- * BEHAVIOR:
- * - Arrays: Concatenated and deduped (accumulate)
- * - Type checking: Strict (throws on mismatch)
- * - Path tracking: Full path in errors
- * - Build-time: Fails fast on conflicts
+ * EXAMPLES:
+ * 
+ * Instance merge (arrays concat):
+ *   File1: { tags: ['a'] }
+ *   File2: { tags: ['b'] }
+ *   Result: { tags: ['a', 'b'] }  // Both kept
+ * 
+ * Class inheritance (arrays replace):
+ *   Parent: { ports: [80] }
+ *   Child:  { ports: [443] }
+ *   Result: { ports: [443] }  // Child wins
+ * 
+ * Type conflict detection:
+ *   File1: { value: "string" }
+ *   File2: { value: 123 }
+ *   Result: Error "Type conflict at value: cannot merge string with number"
+ * 
+ * @module instance_merger
  */
 
 /**

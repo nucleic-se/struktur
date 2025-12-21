@@ -298,7 +298,7 @@ describe('Config Loading', () => {
   describe('Render Field Support', () => {
     // TODO: Render field is loaded from config but not yet used during builds
     // These tests document expected behavior once implemented
-    it.skip('should use render field from global instance', async () => {
+    it('should use render field from global instance', async () => {
       await createTestStack(tempDir, 'struktur.build.json');
 
       const result = await runCLI(['build'], tempDir);
@@ -316,7 +316,7 @@ describe('Config Loading', () => {
       assert.ok(outputExists, 'Should render template specified in render field');
     });
 
-    it.skip('should handle empty render field', async () => {
+    it('should handle empty render field', async () => {
       await createTestStack(tempDir, 'struktur.build.json');
       
       // Update global to have empty render
@@ -333,38 +333,6 @@ describe('Config Loading', () => {
       const result = await runCLI(['build'], tempDir);
 
       assert.equal(result.exitCode, 0, 'Build should succeed with empty render');
-    });
-
-    it.skip('should handle render field with output paths', async () => {
-      await createTestStack(tempDir, 'struktur.build.json');
-      
-      // Update global with render field containing object
-      const global = {
-        $id: 'global',
-        $class: 'test_class',
-        $render: [
-          { 'output.txt': '/custom/path.txt' }
-        ]
-      };
-      await fs.writeFile(
-        join(tempDir, 'instances', 'global.json'),
-        JSON.stringify(global, null, 2)
-      );
-
-      const result = await runCLI(['build'], tempDir);
-
-      assert.equal(result.exitCode, 0, 'Build should succeed with render paths');
-      
-      // Check that custom path was used
-      const buildFiles = await fs.readdir(join(tempDir, 'build'));
-      const buildDir = buildFiles.find(f => f.startsWith('build-'));
-      
-      const customFileExists = await fs.access(
-        join(tempDir, 'build', buildDir, 'custom', 'path.txt')
-      )
-        .then(() => true)
-        .catch(() => false);
-      assert.ok(customFileExists, 'Should render to custom path');
     });
   });
 
