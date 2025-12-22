@@ -20,10 +20,10 @@
         content: |
           <!DOCTYPE html>
           <html>
-          <head><title>{{ instance_name }}</title></head>
+          <head><title>\{{ instance_name }}</title></head>
           <body>
-            <h1>{{ instance_name }}</h1>
-            <p>Web server configured by Ansible on {{ inventory_hostname }}</p>
+            <h1>\{{ instance_name }}</h1>
+            <p>Web server configured by Ansible on \{{ inventory_hostname }}</p>
           </body>
           </html>
         dest: /var/www/html/index.html

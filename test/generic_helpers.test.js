@@ -370,5 +370,46 @@ describe('Generic Helpers', () => {
       assert.equal(genericHelpers.type_of(undefined), 'undefined');
       assert.equal(genericHelpers.type_of(true), 'boolean');
     });
+
+    it('exists - should check if value is not null/undefined', () => {
+      assert.equal(genericHelpers.exists(0), true);
+      assert.equal(genericHelpers.exists(''), true);
+      assert.equal(genericHelpers.exists(false), true);
+      assert.equal(genericHelpers.exists({}), true);
+      assert.equal(genericHelpers.exists([]), true);
+      assert.equal(genericHelpers.exists(null), false);
+      assert.equal(genericHelpers.exists(undefined), false);
+    });
+
+    it('has - should check if object has property', () => {
+      const obj = { foo: 'bar', baz: null, count: 0 };
+      assert.equal(genericHelpers.has(obj, 'foo'), true);
+      assert.equal(genericHelpers.has(obj, 'baz'), true); // Has property even if null
+      assert.equal(genericHelpers.has(obj, 'count'), true); // Has property even if 0
+      assert.equal(genericHelpers.has(obj, 'missing'), false);
+      assert.equal(genericHelpers.has(null, 'foo'), false);
+      assert.equal(genericHelpers.has(undefined, 'foo'), false);
+      assert.equal(genericHelpers.has('string', 'foo'), false);
+    });
+
+    it('get - should safely get nested properties', () => {
+      const obj = {
+        level1: {
+          level2: {
+            level3: 'value'
+          },
+          empty: null
+        },
+        array: [1, 2, 3]
+      };
+      
+      assert.equal(genericHelpers.get(obj, 'level1.level2.level3'), 'value');
+      assert.equal(genericHelpers.get(obj, 'level1.level2'), obj.level1.level2);
+      assert.equal(genericHelpers.get(obj, 'level1.empty'), null);
+      assert.equal(genericHelpers.get(obj, 'level1.missing.deep'), undefined);
+      assert.equal(genericHelpers.get(obj, 'missing'), undefined);
+      assert.equal(genericHelpers.get(null, 'foo'), undefined);
+      assert.equal(genericHelpers.get(obj, ''), undefined);
+    });
   });
 });

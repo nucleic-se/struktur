@@ -279,6 +279,7 @@ program
   .option('-o, --output <file>', 'Output file (default: stdout)')
   .option('-t, --templates <dirs...>', 'Template directories to render')
   .option('--engine <name>', 'Template engine (handlebars, nunjucks)', 'handlebars')
+  .option('--no-strict-templates', 'Disable strict mode (allows undefined variables in templates)')
   .option('--no-metadata', 'Exclude metadata from output')
   .option('--no-class-index', 'Exclude class index from output')
   .option('--include-validation', 'Include validation results in output')
@@ -422,6 +423,7 @@ program
   .option('--config <file>', 'Path to config file (defaults to first *.build.json found)')
   .option('--save-config <file>', 'Save successful build settings to config file')
   .option('--engine <name>', 'Template engine (handlebars, nunjucks)', 'handlebars')
+  .option('--no-strict-templates', 'Disable strict mode (allows undefined variables in templates)')
   .option('-q, --quiet', 'Suppress output except errors')
   .option('--json', 'Output results as JSON')
   .option('--no-deterministic', 'Use simple build directory (allows overwrites, not recommended for production)')
@@ -568,6 +570,7 @@ program
         templateDirs,
         buildDir: options.buildDir,
         engine: options.engine,
+        strictTemplates: options.strictTemplates,  // true by default, false with --no-strict-templates
         quiet: options.quiet || options.json,
         deterministic: options.exact ? false : options.deterministic,  // --exact overrides deterministic
         failOnCollisions: !options.allowTemplateCollisions,  // Invert: default strict, opt-out permissive
@@ -604,6 +607,11 @@ program
         // Add template_engine if not default
         if (options.engine !== 'handlebars') {
           config.template_engine = options.engine;
+        }
+        
+        // Add strict_templates if disabled (default is true)
+        if (options.strictTemplates === false) {
+          config.strict_templates = false;
         }
         
         // Add boolean flags if not default
@@ -652,12 +660,7 @@ program
 
       process.exit(0);
     } catch (error) {
-      if (!options.json) {
-        console.error(`\n❌ Build failed: ${error.message}`);
-        process.exit(1);
-      } else {
-        handleCommandError(error, options);
-      }
+      handleCommandError(error, options);
     }
   });
 

@@ -68,6 +68,9 @@ export const genericHelpers = {
   keys: utility.keys,
   lookup: utility.lookup,
   concat: utility.concat,
+  exists: utility.exists,
+  has: utility.has,
+  get: utility.get,
   
   // Math
   add: math.add,

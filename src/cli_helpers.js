@@ -121,7 +121,11 @@ export function handleCommandError(error, options = {}) {
       error: error.message
     }, null, 2));
   } else {
-    console.error(`Error: ${error.message}`);
+    // Use format() method if available (TemplateError classes)
+    const message = typeof error.format === 'function' 
+      ? error.format() 
+      : `Error: ${error.message}`;
+    console.error(`\n${message}`);
   }
   process.exit(1);
 }

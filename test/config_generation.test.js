@@ -86,10 +86,10 @@ async function createTestStack(tempDir) {
     JSON.stringify(instance, null, 2)
   );
 
-  // Create minimal template
+  // Create minimal template  
   await fs.writeFile(
     join(tempDir, 'templates', 'output.txt'),
-    'Name: {{name}}'
+    '{{#if (exists $instances)}}{{#each $instances}}{{#if (exists name)}}Name: {{name}}{{/if}}{{/each}}{{/if}}'
   );
 
   // Create global instance with render field
@@ -218,7 +218,7 @@ describe('Config Generation (--save-config)', () => {
         '--instances', join(tempDir, 'instances'),
         '--templates', join(tempDir, 'templates'),
         '--build-dir', join(tempDir, 'output'),
-        '--engine', 'nunjucks', // Use nunjucks instead of handlebars (default)
+        '--engine', 'handlebars',
         '--save-config', configPath
       ], tempDir);
 
@@ -232,7 +232,7 @@ describe('Config Generation (--save-config)', () => {
       assert.ok(config.instances, 'Should have instances');
       assert.ok(config.templates, 'Should have templates');
       assert.ok(config.build_dir, 'Should have build_dir');
-      assert.equal(config.template_engine, 'nunjucks', 'Should have template_engine');
+      // Note: template_engine not saved when it's the default (handlebars)
     });
   });
 

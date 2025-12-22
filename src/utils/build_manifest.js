@@ -5,6 +5,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto';
+import { atomicWrite } from './atomic_write.js';
 import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
@@ -58,7 +59,7 @@ export async function writeManifest(buildDir, config) {
   };
   
   const manifestPath = path.join(buildDir, '.struktur-manifest.json');
-  await fs.writeFile(manifestPath, JSON.stringify(manifest, null, 2), 'utf-8');
+  await atomicWrite(manifestPath, JSON.stringify(manifest, null, 2), 'utf-8');
   
   return manifest;
 }
