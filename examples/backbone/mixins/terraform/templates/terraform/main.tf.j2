@@ -19,45 +19,47 @@ provider "proxmox" {
 # Generated from backbone stack
 #
 {{#each $instances}}
-{{#if (and (eq $class "proxmox_lxc") $aspects.aspect_terraform.enabled)}}
+{{#if (exists $aspects)}}
+{{#if (and (eq $class "proxmox_lxc") (get $aspects "aspect_terraform.enabled"))}}
 resource "proxmox_lxc" "{{$id}}" {
     # From data model
-    vmid = {{$aspects.aspect_proxmox_guest.vmid}}
-    target_node = "{{$aspects.aspect_proxmox_guest.host_node}}"
-    hostname = "{{$aspects.aspect_network_interface.hostname}}"
+    vmid = {{get $aspects "aspect_proxmox_guest.vmid"}}
+    target_node = "{{get $aspects "aspect_proxmox_guest.host_node"}}"
+    hostname = "{{get $aspects "aspect_network_interface.hostname"}}"
     
     # From data model: ostemplate
-    ostemplate = "{{$aspects.aspect_proxmox_guest.ostemplate}}"
+    ostemplate = "{{get $aspects "aspect_proxmox_guest.ostemplate"}}"
     
     # From data model: cores and memory
-    cores = {{$aspects.aspect_compute_node.cores}}
-    memory = {{$aspects.aspect_compute_node.memory}}
+    cores = {{get $aspects "aspect_compute_node.cores"}}
+    memory = {{get $aspects "aspect_compute_node.memory"}}
     
     # From data model: boolean flags
-    start = {{$aspects.aspect_proxmox_guest.start}}
-    unprivileged = {{$aspects.aspect_proxmox_guest.unprivileged}}
-    cmode = "{{$aspects.aspect_proxmox_guest.cmode}}"
+    start = {{get $aspects "aspect_proxmox_guest.start"}}
+    unprivileged = {{get $aspects "aspect_proxmox_guest.unprivileged"}}
+    cmode = "{{get $aspects "aspect_proxmox_guest.cmode"}}"
     
     # From data model: rootfs (storage from compute_node, storage location from proxmox_guest)
     rootfs {
-        storage = "{{$aspects.aspect_proxmox_guest.rootfs_storage}}"
-        size = "{{$aspects.aspect_compute_node.storage}}"
+        storage = "{{get $aspects "aspect_proxmox_guest.rootfs_storage"}}"
+        size = "{{get $aspects "aspect_compute_node.storage"}}"
     }
     
     # From data model: network
     network {
         name = "eth0"
-        bridge = "{{$aspects.aspect_network_interface.bridge}}"
-        ip = "{{$aspects.aspect_network_interface.ip}}/24"
-        hwaddr = "{{$aspects.aspect_network_interface.mac}}"
-        gw = "{{$aspects.aspect_network_interface.gateway}}"
+        bridge = "{{get $aspects "aspect_network_interface.bridge"}}"
+        ip = "{{get $aspects "aspect_network_interface.ip"}}/24"
+        hwaddr = "{{get $aspects "aspect_network_interface.mac"}}"
+        gw = "{{get $aspects "aspect_network_interface.gateway"}}"
     }
     
     # From data model: nameserver
-    nameserver = "{{$aspects.aspect_network_interface.nameserver}}"
+    nameserver = "{{get $aspects "aspect_network_interface.nameserver"}}"
     
     # Still variable-based (sensitive data)
     ssh_public_keys = var.ssh_public_keys
 }
+{{/if}}
 {{/if}}
 {{/each}}

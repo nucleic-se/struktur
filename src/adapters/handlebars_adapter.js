@@ -21,11 +21,7 @@ export class HandlebarsAdapter extends TemplateAdapter {
     this.handlebars = Handlebars.create();
     this.searchPaths = config.searchPaths || [];
     this.partials = new Map();
-
-    // Configure Handlebars (strict mode if specified)
-    if (config.strict !== undefined && this.handlebars.options) {
-      this.handlebars.options.strict = config.strict;
-    }
+    this.strict = config.strict !== undefined ? config.strict : false;  // Store strict setting
   }
 
   /**
@@ -53,7 +49,7 @@ export class HandlebarsAdapter extends TemplateAdapter {
     try {
       // Load and compile template
       const templateSource = await fs.readFile(resolvedPath, 'utf-8');
-      const template = this.handlebars.compile(templateSource);
+      const template = this.handlebars.compile(templateSource, { strict: this.strict });  // Pass strict to compile
 
       // Render with context
       const output = template(context);
@@ -91,7 +87,7 @@ export class HandlebarsAdapter extends TemplateAdapter {
         // Compile if needed, then render the layout (which will yield from buffers)
         const compiledLayout = typeof layoutPartial === 'function'
           ? layoutPartial
-          : this.handlebars.compile(layoutPartial);
+          : this.handlebars.compile(layoutPartial, { strict: this.strict });  // Pass strict to layout compile
         return compiledLayout(context);
       }
       

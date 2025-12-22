@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{{yield "page_title" ""}}}{{{yield "title_separator" ""}}}{{@root.$instances_by_id.global.site.title}}</title>
   {{#each @root.$instances_by_id.global.stylesheets}}
-  <link rel="stylesheet" href="{{{../pathPrefix}}}{{this}}">
+  <link rel="stylesheet" href="{{{default_value ../pathPrefix ""}}}{{this}}">
   {{/each}}
   {{{yield "extra_head" ""}}}
 </head>

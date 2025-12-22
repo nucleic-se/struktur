@@ -11,7 +11,7 @@
 # Health checks ensure each service is ready before dependents start.
 
 services:
-{{#each $instances_by_id}}{{#if $aspects.aspect_docker_container}}{{#unless (eq $id "global")}}
+{{#each $instances_by_id}}{{#if (exists $aspects)}}{{#if (has $aspects "aspect_docker_container")}}{{#unless (eq $id "global")}}
   # {{#if description}}{{description}}{{else}}{{$id}} service{{/if}}
   {{$id}}:
 {{#if $aspects.aspect_docker_container.image}}
@@ -127,20 +127,20 @@ services:
 {{/if}}
 {{/if}}
 {{/if}}
-{{/unless}}{{/if}}{{/each}}
+{{/unless}}{{/if}}{{/if}}{{/each}}
 
 networks:
-{{#each $instances_by_id}}{{#if $aspects.aspect_docker_network}}{{#unless (eq $id "global")}}
+{{#each $instances_by_id}}{{#if (exists $aspects)}}{{#if (has $aspects "aspect_docker_network")}}{{#unless (eq $id "global")}}
   {{$id}}:
 {{#if $aspects.aspect_docker_network.driver}}
     driver: {{$aspects.aspect_docker_network.driver}}
 {{/if}}
-{{/unless}}{{/if}}{{/each}}
+{{/unless}}{{/if}}{{/if}}{{/each}}
 
 volumes:
-{{#each $instances_by_id}}{{#if $aspects.aspect_docker_volume}}{{#unless (eq $id "global")}}
+{{#each $instances_by_id}}{{#if (exists $aspects)}}{{#if (has $aspects "aspect_docker_volume")}}{{#unless (eq $id "global")}}
   {{$id}}:
 {{#if $aspects.aspect_docker_volume.driver}}
     driver: {{$aspects.aspect_docker_volume.driver}}
 {{/if}}
-{{/unless}}{{/if}}{{/each}}
+{{/unless}}{{/if}}{{/if}}{{/each}}

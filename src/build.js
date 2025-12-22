@@ -6,6 +6,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { createStruktur, generateCanonicalWithValidation } from './index.js';
+import { atomicWrite } from './utils/atomic_write.js';
 import { resolveOutputPath } from './template_helpers/engine/index.js';
 import { createLogger } from './utils/logger.js';
 import { checkCollision, writeManifest, generateDeterministicBuildDir } from './utils/build_manifest.js';
@@ -118,6 +119,7 @@ export async function buildStack(options) {
     templateDirs,
     buildDir: requestedBuildDir = './build',
     engine = 'handlebars',
+    strictTemplates = true,  // Strict mode by default (fail on undefined vars)
     quiet = false,
     logger,
     deterministic = true,
@@ -254,7 +256,7 @@ export async function buildStack(options) {
   if (!canonicalPath) {
     throw new Error('Security: canonical.json path resolution failed');
   }
-  await fs.writeFile(canonicalPath, JSON.stringify(canonical, null, 2), 'utf-8');
+  await atomicWrite(canonicalPath, JSON.stringify(canonical, null, 2), 'utf-8');
   log.log(`  ✓ canonical.json (${canonical.$instances.length} instances)`);
 
   // Step 5: Write class definitions
@@ -271,7 +273,7 @@ export async function buildStack(options) {
       continue;
     }
     await fs.mkdir(path.dirname(outputPath), { recursive: true });
-    await fs.writeFile(outputPath, JSON.stringify(resolved, null, 2), 'utf-8');
+    await atomicWrite(outputPath, JSON.stringify(resolved, null, 2), 'utf-8');
     classCount++;
   }
   log.log(`  ✓ meta/classes/ (${classCount} classes)`);
@@ -283,7 +285,7 @@ export async function buildStack(options) {
   if (!validationPath) {
     throw new Error('Security: validation.json path resolution failed');
   }
-  await fs.writeFile(validationPath, JSON.stringify(canonical.$validation, null, 2), 'utf-8');
+  await atomicWrite(validationPath, JSON.stringify(canonical.$validation, null, 2), 'utf-8');
   log.log('  ✓ meta/validation.json');
 
   // Step 6.5: Extract render tasks from instances and merge with config render tasks
@@ -317,7 +319,7 @@ export async function buildStack(options) {
     }
     
     const { createTemplateAdapter } = await import('./template_helpers.js');
-    const adapter = createTemplateAdapter(engine);
+    const adapter = createTemplateAdapter(engine, { strict: strictTemplates });
     adapter.setSearchPaths(templatePaths);
 
     // Create renderer and register all helpers

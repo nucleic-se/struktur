@@ -6,6 +6,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { resolveOutputPath } from './template_helpers/engine/index.js';
+import { atomicWrite } from './utils/atomic_write.js';
 import { RenderContext } from './render_context.js';
 import { registerBufferHelpers } from './template_helpers/buffers.js';
 import { OutputCollisionTracker } from './utils/output_collision_tracker.js';
@@ -179,7 +180,7 @@ export class TemplateRenderer {
         source: 'render_file'
       });
       await fs.mkdir(path.dirname(safeOutputPath), { recursive: true });
-      await fs.writeFile(safeOutputPath, output.content, 'utf-8');
+      await atomicWrite(safeOutputPath, output.content, 'utf-8');
     }
     
     // Get all outputs (from files + buffers)
@@ -377,7 +378,7 @@ export class TemplateRenderer {
           source: 'render_task'
         });
         await fs.mkdir(path.dirname(resolvedPath), { recursive: true });
-        await fs.writeFile(resolvedPath, output, 'utf-8');
+        await atomicWrite(resolvedPath, output, 'utf-8');
         renderContext.addOutput(task.output, output);
       }
       
@@ -405,7 +406,7 @@ export class TemplateRenderer {
           source: 'render_task'
         });
         await fs.mkdir(path.dirname(resolvedPath), { recursive: true });
-        await fs.writeFile(resolvedPath, output, 'utf-8');
+        await atomicWrite(resolvedPath, output, 'utf-8');
         renderContext.addOutput(task.output, output);
       }
       

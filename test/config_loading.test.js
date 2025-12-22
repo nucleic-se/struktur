@@ -89,7 +89,7 @@ async function createTestStack(tempDir, configFile = null) {
   // Create minimal template
   await fs.writeFile(
     join(tempDir, 'templates', 'output.txt'),
-    '{{name}}'
+    '{{#if (exists $instances)}}{{#each $instances}}{{#if (exists name)}}{{name}}{{/if}}{{/each}}{{/if}}'
   );
 
   // Create global instance with render field
@@ -113,7 +113,8 @@ async function createTestStack(tempDir, configFile = null) {
         classes: ['classes'],
         instances: ['instances'],
         templates: ['templates'],
-        build_dir: 'build'
+        build_dir: 'build',
+        strict_templates: false  // Config loading tests shouldn't fail on template strictness
       }, null, 2)
     );
   }

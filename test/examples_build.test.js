@@ -36,6 +36,7 @@ describe('Example Stack Builds', () => {
         templateDirs: (config.templates || config.templateDirs || []).map(resolvePath),
         buildDir: resolvePath(config.build_dir || config.buildDir || 'build'),
         engine: config.template_engine || config.engine || 'handlebars',
+        strictTemplates: config.strict_templates !== false, // Default to true
         renderTasks: config.render || [],
         logger: {
           log: () => {}, // Silent during tests

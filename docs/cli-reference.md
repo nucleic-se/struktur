@@ -77,6 +77,7 @@ struktur build [options] [stack-dirs...]
 - `--config <file>` - Path to build config file (auto-discovers `*.build.json`)
 - `--save-config <file>` - Save successful build settings to config file
 - `--engine <name>` - Template engine: `handlebars` or `nunjucks` (default: `handlebars`)
+- `--no-strict-templates` - Disable strict mode (allows undefined variables in templates)
 - `-q, --quiet` - Suppress output except errors
 - `--json` - Output build results as JSON
 - `--exact` - Use exact build directory path without hash suffix (overrides deterministic)
@@ -165,6 +166,7 @@ struktur generate [options] [stack-dirs...]
 - `-t, --templates <dirs...>` - Template directories to render
 - `-o, --output <file>` - Output file path (default: stdout)
 - `--engine <name>` - Template engine: `handlebars` or `nunjucks` (default: `handlebars`)
+- `--no-strict-templates` - Disable strict mode (allows undefined variables in templates)
 - `--no-metadata` - Exclude metadata from output
 - `--no-class-index` - Exclude class index from output
 - `--include-validation` - Include validation results in output

@@ -197,17 +197,17 @@ export async function loadInstancesFromDir(dirPath, options = {}) {
   const { logger } = options;
   const instances = [];
   const classlessRejects = [];
-  const dir = normalizeDirEntry(dirPath);
+  const dirEntry = normalizeDirEntry(dirPath);
 
-  async function loadFromDir(dir) {
+  async function loadFromDir(dirPath) {
     try {
-      const entries = await fs.readdir(dir, { withFileTypes: true });
+      const entries = await fs.readdir(dirPath, { withFileTypes: true });
       
       // Sort alphabetically for deterministic loading order
       entries.sort((a, b) => a.name.localeCompare(b.name));
 
       for (const entry of entries) {
-        const fullPath = path.join(dir, entry.name);
+        const fullPath = path.join(dirPath, entry.name);
 
         if (entry.isDirectory()) {
           // Exclude 'mixins' and 'stacks' directories - they must be explicitly included
@@ -280,11 +280,11 @@ export async function loadInstancesFromDir(dirPath, options = {}) {
         }
       }
     } catch (error) {
-      // Directory doesn't exist or not readable - silently skip
+      // Directory doesn't exist or not readable
       if (error?.code === 'ENOENT' || error?.code === 'ENOTDIR') {
-        if (dir.explicit) {
+        if (dirEntry.explicit) {
           throw new Error(
-            `Instance directory not found: ${dir.path}\n` +
+            `Instance directory not found: ${dirEntry.path}\n` +
             `  This directory was explicitly configured via CLI or config file\n` +
             `  Hint: Check path spelling or create the directory`
           );
@@ -295,6 +295,6 @@ export async function loadInstancesFromDir(dirPath, options = {}) {
     }
   }
 
-  await loadFromDir(dir.path);
+  await loadFromDir(dirEntry.path);
   return { instances, classlessRejects };
 }

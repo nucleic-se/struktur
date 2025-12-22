@@ -16,7 +16,7 @@
     <section>
       {{#each posts}}
       <article class="post-summary">
-        <h2><a href="{{../pathPrefix}}posts/{{slug}}.html">{{title}}</a></h2>
+        <h2><a href="{{default_value ../pathPrefix ""}}posts/{{slug}}.html">{{title}}</a></h2>
         <p class="post-meta">
           <time datetime="{{$aspects.aspect_blog_post.date}}">{{$aspects.aspect_blog_post.date}}</time>
           {{#if $aspects.aspect_blog_post.author}}by {{$aspects.aspect_blog_post.author}}{{/if}}\n        </p>

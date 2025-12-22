@@ -160,3 +160,51 @@ export function lookup(obj, key) {
   if (!obj || typeof obj !== 'object') return undefined;
   return obj[key];
 }
+
+/**
+ * Check if a value exists (not null/undefined)
+ * Safe for use in strict mode - won't throw on undefined access
+ * @param {*} value - Value to check
+ * @returns {boolean}
+ * @example {{#if (exists $aspects)}}...{{/if}}
+ */
+export function exists(value) {
+  return value !== null && value !== undefined;
+}
+
+/**
+ * Check if object has a property (even if value is null/undefined)
+ * Safe for use in strict mode
+ * @param {Object} obj - Object to check
+ * @param {string} prop - Property name
+ * @returns {boolean}
+ * @example {{#if (has $aspects "aspect_docker_container")}}...{{/if}}
+ */
+export function has(obj, prop) {
+  if (!obj || typeof obj !== 'object') return false;
+  return Object.prototype.hasOwnProperty.call(obj, prop);
+}
+
+/**
+ * Safely get nested property from object without throwing
+ * Returns undefined if any part of path doesn't exist
+ * @param {Object} obj - Object to get property from
+ * @param {string} path - Dot-separated property path (e.g., "aspect.container.image")
+ * @returns {*}
+ * @example {{get $aspects "aspect_docker_container.image"}}
+ */
+export function get(obj, path) {
+  if (!obj || typeof obj !== 'object' || !path) return undefined;
+  
+  const keys = path.split('.');
+  let result = obj;
+  
+  for (const key of keys) {
+    if (result === null || result === undefined || typeof result !== 'object') {
+      return undefined;
+    }
+    result = result[key];
+  }
+  
+  return result;
+}
