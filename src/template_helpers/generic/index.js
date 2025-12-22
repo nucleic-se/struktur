@@ -9,6 +9,7 @@ import * as comparison from './comparison.js';
 import * as strings from './strings.js';
 import * as collections from './collections.js';
 import * as utility from './utility.js';
+import * as math from './math.js';
 
 /**
  * All generic helpers
@@ -66,7 +67,12 @@ export const genericHelpers = {
   values: utility.values,
   keys: utility.keys,
   lookup: utility.lookup,
-  concat: utility.concat
+  concat: utility.concat,
+  
+  // Math
+  add: math.add,
+  sub: math.sub,
+  abs: math.abs
 };
 
 /**

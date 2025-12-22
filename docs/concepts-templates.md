@@ -395,6 +395,11 @@ The third parameter determines what data the rendered template sees:
 )}}
 ```
 
+**Path prefix behavior:**
+- `render_file` injects `pathPrefix` based on output depth when not provided.
+- If the context already includes `pathPrefix` (from class `$fields` or an explicit override), it is preserved.
+- You can override per render: `{{render_file "page.html.hbs" "pages/foo.html" pathPrefix="../"}}`
+
 ---
 
 ## Template Collision Detection

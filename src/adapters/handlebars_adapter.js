@@ -333,32 +333,21 @@ export class HandlebarsAdapter extends TemplateAdapter {
       // 'this' in a regular function is the Handlebars template context (the instance)
       // IMPORTANT: Create isolated __context for buffer system
       // We need a NEW RenderContext so buffers don't leak between renders
-      let context;
-      if (options.hash) {
-        context = { ...this, pathPrefix: autoPathPrefix, ...options.hash };
-        // Create NEW RenderContext for isolated buffers
-        const rootContext = options.data?.root;
-        if (rootContext && typeof rootContext === 'object' && rootContext.__context) {
-          // Import RenderContext at top of file
-          const RenderContext = rootContext.__context.constructor;
-          context.__context = new RenderContext(
-            rootContext.__context.canonical,
-            rootContext.__context.buildDir,
-            rootContext.__context.metadata
-          );
-        }
-      } else {
-        context = { ...this, pathPrefix: autoPathPrefix };
-        // Also create new context when no hash params
-        const rootContext = options.data?.root;
-        if (rootContext && typeof rootContext === 'object' && rootContext.__context) {
-          const RenderContext = rootContext.__context.constructor;
-          context.__context = new RenderContext(
-            rootContext.__context.canonical,
-            rootContext.__context.buildDir,
-            rootContext.__context.metadata
-          );
-        }
+      const hash = options.hash || {};
+      const context = { ...this, ...hash };
+      if (!Object.prototype.hasOwnProperty.call(context, 'pathPrefix')) {
+        context.pathPrefix = autoPathPrefix;
+      }
+      // Create NEW RenderContext for isolated buffers
+      const rootContext = options.data?.root;
+      if (rootContext && typeof rootContext === 'object' && rootContext.__context) {
+        // Import RenderContext at top of file
+        const RenderContext = rootContext.__context.constructor;
+        context.__context = new RenderContext(
+          rootContext.__context.canonical,
+          rootContext.__context.buildDir,
+          rootContext.__context.metadata
+        );
       }
       
       // Create data frame

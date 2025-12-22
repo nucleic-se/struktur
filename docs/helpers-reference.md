@@ -387,6 +387,56 @@ Group array by field value. Returns object with field values as keys.
 
 ---
 
+## Math Helpers
+
+### `add(a, b)`
+
+Add two numbers.
+
+**Handlebars:**
+```handlebars
+<p>Total: {{add subtotal tax}}</p>
+```
+
+**Nunjucks:**
+```nunjucks
+<p>Total: {{ add(subtotal, tax) }}</p>
+```
+
+---
+
+### `sub(a, b)`
+
+Subtract second number from first.
+
+**Handlebars:**
+```handlebars
+<p>Delta: {{sub max_price min_price}}</p>
+```
+
+**Nunjucks:**
+```nunjucks
+<p>Delta: {{ sub(max_price, min_price) }}</p>
+```
+
+---
+
+### `abs(value)`
+
+Absolute value.
+
+**Handlebars:**
+```handlebars
+<p>Distance: {{abs (sub a b)}}</p>
+```
+
+**Nunjucks:**
+```nunjucks
+<p>Distance: {{ abs(sub(a, b)) }}</p>
+```
+
+---
+
 ## String Helpers
 
 ### `slugify(str)`
@@ -1031,6 +1081,8 @@ Render template to separate output file.
 - Writes output to `outputPath` (relative to build directory)
 - Context can be subset of main context (e.g., single instance)
 - Template can be any registered template file
+- If `pathPrefix` is not provided in context, it is auto-derived from output depth
+- If `pathPrefix` is provided (class `$fields` or explicit override), it is preserved
 
 **Common Pattern - Generate Per-Instance Files:**
 ```handlebars
