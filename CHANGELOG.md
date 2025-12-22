@@ -4,7 +4,81 @@ All notable changes to Struktur will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.4.3-alpha] - 2025-12-22
+
+**Combined Release**: Template safety features + atomic file writes + strictness verifications.
+
+This release consolidates all v0.4.2 work (which was partially published) with additional atomic write implementations and comprehensive testing.
+
+### Added
+
+**Template Safety Features:**
+- `--no-strict-templates` CLI flag for permissive template mode (default: strict)
+- Safe template helpers: `exists()`, `has()`, `get()` for undefined-safe property access
+- Template strict mode throws on undefined variables (Handlebars only, Nunjucks always permissive)
+- Comprehensive template error messages with search paths and suggestions
+
+**Reliability Improvements:**
+- Atomic file writes for all output files (canonical.json, templates, manifests)
+- Write-to-temp + rename pattern prevents corruption on crashes
+- Easy library swap-out via comments (write-file-atomic compatible)
+- Custom atomic_write.js utility (15 lines, no dependencies)
+
+### Changed
+
+- All example templates updated to use safe helpers (`exists`, `has`, `get`)
+- Handlebars templates now fail-fast on undefined variables by default
+- Template error handling improved with structured context display
+
+### Fixed
+
+- Variable shadowing bug in instance_loader.js (dir → dirEntry)
+- Template errors now show helpful suggestions and full context
+
+### Technical
+
+- 527 tests passing (100% pass rate)
+- New test suite: `template_strict_mode.test.js`
+- Enhanced test suite: `strictness_upgrades.test.js`
+- All 7 fs.writeFile calls replaced with atomicWrite
+
+### Migration Guide
+
+**For strict template mode (recommended):**
+```handlebars
+<!-- Before: Can fail silently on undefined -->
+{{$aspects.docker_container.image}}
+
+<!-- After: Safe access -->
+{{get $aspects "docker_container.image"}}
+
+<!-- Check existence -->
+{{#if (exists $aspects)}}
+  {{#if (has $aspects "docker_container")}}
+    {{get $aspects "docker_container.image"}}
+  {{/if}}
+{{/if}}
+```
+
+**To disable strict mode:**
+```bash
+struktur build --no-strict-templates
+```
+
+**Config file:**
+```json
+{
+  "strict_templates": false
+}
+```
+
+---
+
 ## [0.4.2-alpha] - 2025-12-22
+
+**Note**: Partially published. Superseded by v0.4.3-alpha which includes all features plus atomic writes.
+
+### Added
 
 ### Added
 

@@ -6,6 +6,93 @@ This document tracks breaking changes in Struktur's alpha releases.
 
 ---
 
+## v0.4.3-alpha (December 2025)
+
+**Status**: Released  
+**Tag**: v0.4.3-alpha  
+**Package version**: `0.4.3-alpha`  
+**Focus**: Template Safety + Reliability
+
+### Breaking Changes
+
+**Template Strict Mode (Default Behavior):**
+- **Handlebars templates fail on undefined variables** by default (Nunjucks unchanged)
+- Previously: Undefined variables rendered as empty strings
+- Now: Throws error with helpful context
+- **Migration**: Use `exists()`, `has()`, `get()` helpers or opt-out with `--no-strict-templates`
+
+### Non-Breaking Additions
+
+**Safe Template Helpers:**
+- `exists(value)` - Check if value is not null/undefined
+- `has(obj, prop)` - Check if object has property
+- `get(obj, "path.to.prop")` - Safe nested property access
+
+**Atomic File Writes:**
+- All output files now use atomic writes (write-to-temp + rename)
+- Prevents corruption on process crashes
+- No API changes - transparent reliability improvement
+
+### Migration Guide
+
+**Update templates for strict mode:**
+
+```handlebars
+<!-- ❌ Old: Unsafe access (now throws if undefined) -->
+{{$aspects.docker_container.image}}
+{{instance.config.port}}
+
+<!-- ✅ New: Safe access with helpers -->
+{{get $aspects "docker_container.image"}}
+{{get instance "config.port"}}
+
+<!-- ✅ New: With existence checks -->
+{{#if (exists $aspects)}}
+  {{#if (has $aspects "docker_container")}}
+    Image: {{get $aspects "docker_container.image"}}
+  {{/if}}
+{{/if}}
+```
+
+**Opt-out of strict mode:**
+
+```bash
+# CLI
+struktur build --no-strict-templates
+
+# Config file (struktur.build.json)
+{
+  "strict_templates": false,
+  ...
+}
+```
+
+### Rationale
+
+**Strict mode catches bugs early:**
+- Typos in property names fail immediately vs. silent empty output
+- Missing data structures detected at build time
+- Better error messages show exactly where template fails
+
+**Safe helpers provide best of both:**
+- Explicit about optional data
+- Self-documenting code (clear when data might be missing)
+- No silent failures
+
+### Real Impact
+
+**Updated all example templates:**
+- backbone: 7 templates (Ansible, Terraform)
+- docked: 1 template (docker-compose.yml)
+- skribe: 6 templates (layouts, partials)
+
+**Zero production breakage:**
+- All examples build successfully
+- 527 tests passing
+- Opt-out available for gradual migration
+
+---
+
 ## v0.4.0-alpha (December 2025)
 
 **Status**: Released  
