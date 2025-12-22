@@ -26,6 +26,9 @@ export default class NunjucksAdapter extends TemplateAdapter {
     });
 
     this.searchPaths = [];
+    // Track registered helpers/globals so we can restore them when environment is recreated
+    this.registeredHelpers = new Map();
+    this.registeredGlobals = new Map();
   }
 
   /**
@@ -57,6 +60,15 @@ export default class NunjucksAdapter extends TemplateAdapter {
       throwOnUndefined: this.config.throwOnUndefined || false,
       noCache: true  // Always reload for testing
     });
+
+    // Re-register all previously registered helpers and globals
+    // This is necessary because creating a new Environment loses all custom filters/globals
+    for (const [name, fn] of this.registeredHelpers) {
+      this.env.addFilter(name, fn);
+    }
+    for (const [name, value] of this.registeredGlobals) {
+      this.env.addGlobal(name, value);
+    }
   }
 
   /**
@@ -65,6 +77,7 @@ export default class NunjucksAdapter extends TemplateAdapter {
    * @param {Function} fn - Filter function
    */
   registerHelper(name, fn) {
+    this.registeredHelpers.set(name, fn);
     this.env.addFilter(name, fn);
   }
 
@@ -74,6 +87,7 @@ export default class NunjucksAdapter extends TemplateAdapter {
    * @param {*} value - Global value or function
    */
   registerGlobal(name, value) {
+    this.registeredGlobals.set(name, value);
     this.env.addGlobal(name, value);
   }
 
